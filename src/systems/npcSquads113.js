@@ -4,7 +4,7 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=122';
+ faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=123';
 import {canOccupy,moveNpc,moveWithCollision} from '../map/navCollision109.js?v=109';
 import {PROPS} from '../map/camp.js?v=093';
 import {ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
@@ -98,7 +98,7 @@ function setStage(s){
   s.stage=stage;s.index=index;s.nextIndex=(index+1)%STAGES.length;
   s.phase='march';s.elapsed=0;s.blocked=0;s.runIndex=0;s.runTimer=0;
   s.done.clear();s.active.clear();s.trail=[];s.drillStarted=false;s.drillElapsed=0;
-  for(const n of s.members){n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;n.replanAt=0;n.squadMoveSpeed=0;
+  for(const n of s.members){n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;n.replanAt=0;n.squadMoveSpeed=0;n.squadEscape=null;n.squadEscapeTime=0;n.squadStall=0;
    n.activity=`第${s.id+1}小隊 · 前往${stage.name}`;n.anim.rifleAim=0;n.home.job='life';}
   const rally=squadWorldGoal(stage.rally);s.goal=rally||{...stage.rally};
   return true;
@@ -124,9 +124,13 @@ function recordTrail(s){const p=s.leader.pos,pts=s.trail;if(!pts.length){pts.pus
 function formationGoal(s,index){
  const f=FORM[index],sample=trailPoint(s,f.back),a=sample.angle;
  const x=sample.pos.x+Math.cos(a)*f.side,z=sample.pos.z-Math.sin(a)*f.side;
- if(canOccupy({x,z},.33))return W(x,z);
- // When a row is too narrow for two abreast, use a staggered single file.
- const stagger=f.back+(index%2?.35:0),single=trailPoint(s,stagger);
+ // A roadside building or lantern can be just wide enough for two separate
+ // bodies but not wide enough for two walking abreast. Fall into a proper
+ // SINGLE-FILE line rather than giving the two wingmen the same follow mark.
+ const wide=canOccupy({x,z},.62);
+ const occupied=s.members.some(o=>o!==s.members[index]&&dist(o.pos,{x,z})<.74);
+ if(wide&&!occupied)return W(x,z);
+ const single=trailPoint(s,index*1.30);
  return {...single.pos};
 }
 function follow(s,n,index,dt,all,playerPos,run=false){
@@ -153,15 +157,17 @@ function follow(s,n,index,dt,all,playerPos,run=false){
  if(sep>.10&&step>.0001){
   const moved=moveNpc(n,dx/sep*step,dz/sep*step,all,playerPos);
   const actual=dist(before,moved);
-  if(actual>.0001){n.pos=moved;faceSquadMember(n,moved.x-before.x,moved.z-before.z,dt);n.blocked=0;}
+  if(actual>.008){n.pos=moved;faceSquadMember(n,moved.x-before.x,moved.z-before.z,dt);n.blocked=0;}
   else if(sep>.60)n.blocked+=dt;
  }else if(sep<=.10){n.blocked=0;}
- if(n.blocked>3){
-  // Only replan when genuinely blocked, never for ordinary formation movement.
-  const recovery=trailPoint(s,Math.max(0,FORM[index].back-1.8)).pos;
-  if(!n.recoverTarget||dist(n.recoverTarget,recovery)>3.0)n.recoverTarget={...recovery};
-  moveSquadMember(n,n.recoverTarget,dt,false);
-  if(n.blocked>7)n.recoverTarget=null;
+ if(n.blocked>1.3&&sep>.65){
+  // Do not keep squeezing the same formation gap. Follow a distinct rear
+  // mark by road, using the persistent squad collision recovery if necessary.
+  const recovery=trailPoint(s,index*1.30+.35).pos;
+  moveSquadMember(n,recovery,dt,false,true);
+  n.activity=`第${s.id+1}小隊 · 避讓後追上隊伍`;
+  n.state='march';
+  return;
  }
  // Never switch to Idle just because the formation marker is briefly close.
  poseSquadMember(n,run?['Running','RunFast','Walking']:['Walking'],run?1.05:1.0);
@@ -337,35 +343,41 @@ function trainSquad(s,dt,now,all,playerPos){
   return;
  }
  if(stage.id==='weed'){
-  // Shared work session: no four idle finishers waiting for one late recruit.
-  // All members keep pulling their own grass; release the team as a unit.
+  // Every recruit starts the moment they reach THEIR OWN plant. No common
+  // animation trigger, common animation clock, or four idle finishers.
   let working=0,assigned=0;
   for(const n of s.members){
    const current=s.active.get(n.id);
-   if(!current){setIdle(n,`第${s.id+1}小隊 · 尋找獨立草點`);continue;}
-   assigned++;
+   if(!current){setIdle(n,`第${s.id+1}小隊 · 尋找草點`);continue;}
+   assigned++;current.travel+=dt;
    const goal=current.slot.pos,near=dist(n.pos,goal);
-   if(near>.18){
+   if(near>.29){
     if(near<.9)settleSquadTrainingSpot(n,goal,dt);
     else moveSquadMember(n,goal,dt,false);
     n.activity=`第${s.id+1}小隊 · 前往自己的草點`;
     n.state='training';
-    // If a narrow path is blocked, replan a different path. No teleporting.
-    if(current.travel>9&&n.blocked>2){n.route=null;n.routeGoal=null;n.routeIndex=0;n.replanAt=0;}
    }else{
-    working++;
+    if(!current.weedStarted){
+     current.weedStarted=true;current.elapsed=0;
+     n.anim.setClip('Pull_Radish',{restart:true});
+     n.anim.prevClip=null;n.anim.transition=0;
+     // Small per-person variation avoids five identical synchronized loops.
+     const duration=n.anim.clips.Pull_Radish?.duration||1.8;
+     n.anim.clock=((n.seed*0.137+n.id*.119)%1)*duration;
+     if(!s.drillStarted){s.drillStarted=true;s.drillElapsed=0;}
+    }
+    working++;current.elapsed+=dt;
     trainPose(n,stage,dt,now,current);
     n.angle=current.slot.angle;n.renderLift=current.slot.lift||0;
-    n.activity=`第${s.id+1}小隊 · 同時拔草`;
+    n.activity=`第${s.id+1}小隊 · 拔草`;
    }
-   current.travel+=dt;
   }
-  // The fifth usually joins before completion, while the other four keep working.
-  // A single impassable plant must not leave the rest queued indefinitely.
-  if(!s.drillStarted&&working>=4&&assigned===5){s.drillStarted=true;s.drillElapsed=0;}
   if(s.drillStarted)s.drillElapsed+=dt;
-  if(s.drillStarted&&s.drillElapsed>=stage.duration&&working===5 ||
-     s.drillStarted&&s.drillElapsed>=stage.duration+6 || s.elapsed>70){
+  // Each soldier works independently; the squad leaves together only after
+  // most have worked long enough. A blocked final plant cannot queue the other 4.
+  const enough=[...s.active.values()].filter(c=>c.weedStarted&&c.elapsed>=4).length;
+  if(s.drillStarted&&s.drillElapsed>=stage.duration&&working===5&&enough===5 ||
+     s.drillStarted&&s.drillElapsed>=stage.duration+7&&enough>=4 || s.elapsed>70){
    releaseStage(s);setStage(s);
   }
   return;
@@ -577,3 +589,4 @@ export function updateCampNPCs(npcs,dt,now,playerPos){
 export const SQUAD_CONFIG={total:30,free:10,squads:4,membersPerSquad:5,stations:STAGES.map(s=>s.name)};
 export function squadDebug(){return GROUPS.map(s=>({squad:s.id+1,stage:s.stage?.name||'候命',phase:s.phase,
  done:s.done.size,active:s.active.size,leader:{...s.leader.pos}}));}
+

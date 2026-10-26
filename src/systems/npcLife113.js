@@ -31,10 +31,14 @@ const NX=Math.floor((NAV.xMax-NAV.xMin)/NAV.step)+1,NZ=Math.floor((NAV.zMax-NAV.
 let pass=null,roadCost=null;
 let ALL_NPCS=[],PLAYER_POS=null;
 const spot=(x,z)=>({x,z});
+// Visual connector is part of the unified road mesh. Add the same strip to
+// A* pavement preference without mutating the camp layout or collision models.
+const NAV_ROADS=[...ROADS,{id:'visitor-west-link',width:1.9,
+ points:[[-11.0,-13.9],[-9.5,-12.65],[-8.0,-12.4]]}];
 function canStand(x,z){return canOccupy({x,z},NPC_RADIUS);}
 function roadDistance(x,z){
  let closest=Infinity;
- for(const road of ROADS){const points=road.points||[];
+ for(const road of NAV_ROADS){const points=road.points||[];
   for(let i=1;i<points.length;i++){
    const a=points[i-1],b=points[i],dx=b[0]-a[0],dz=b[1]-a[1];
    const k=clamp(((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz||1),0,1);
@@ -235,6 +239,23 @@ function pose(n,names=['Idle'],rate=1){
 }
 function face(n,dx,dz,dt){const wanted=Math.atan2(dx,dz),delta=Math.atan2(Math.sin(wanted-n.angle),Math.cos(wanted-n.angle));n.angle+=delta*clamp(1-Math.exp(-9*dt),0,1);}
 function to(n,goal,dt,run=false,forceRoads=false){
+ // Independent recruits also need to yield. Otherwise they repeatedly replan
+ // the same occupied doorstep while their "前往..." activity never changes.
+ if(n.squadId===undefined&&n.lifeEscape){
+  const mark=n.lifeEscape,dd=d(n.pos,mark),before=n.pos;
+  if(dd>.30){
+   const moved=moveNpc(n,(mark.x-before.x)/dd*Math.min(dd,1.25*dt),
+    (mark.z-before.z)/dd*Math.min(dd,1.25*dt),ALL_NPCS,PLAYER_POS);
+   if(d(before,moved)>.002){n.pos=moved;face(n,moved.x-before.x,moved.z-before.z,dt);}
+   pose(n,['Walking']);n.state='move';
+  }
+  n.lifeEscapeElapsed=(n.lifeEscapeElapsed||0)+dt;
+  if(d(n.pos,mark)<.32||n.lifeEscapeElapsed>3){
+   n.lifeEscape=null;n.lifeEscapeElapsed=0;n.lifeStall=0;
+   n.route=null;n.routeGoal=null;n.routeIndex=0;n.replanAt=0;
+  }
+  return false;
+ }
  if(!n.route||d(n.routeGoal||W(999,999),goal)>.8||n.routeRoads!==forceRoads){
   if(n.replanAt&&n.clock<n.replanAt)return false;
   const plan=pathTo(n.pos,goal,forceRoads);n.route=plan.points;n.routeGoal=plan.goal;n.routeIndex=0;n.blocked=0;n.routeRoads=forceRoads;
@@ -249,6 +270,16 @@ function to(n,goal,dt,run=false,forceRoads=false){
  const moved=moveNpc(n,dx/len*step,dz/len*step,ALL_NPCS,PLAYER_POS),actual=d(old,moved);
  if(actual<step*.10){n.blocked+=dt;if(n.blocked>1.20){n.route=null;n.routeGoal=null;n.blocked=0;n.retries++;n.replanAt=n.clock+.4;}}
  else{n.pos=moved;n.blocked=0;n.retries=0;face(n,moved.x-old.x,moved.z-old.z,dt);}
+ if(n.squadId===undefined){
+  if(actual<step*.14&&d(n.pos,goal)>1.0)n.lifeStall=(n.lifeStall||0)+dt;
+  else n.lifeStall=0;
+  if(n.lifeStall>1.3){
+   const escape=squadEscapeMark(n,goal);
+   if(escape){n.lifeEscape=escape;n.lifeEscapeElapsed=0;n.lifeStall=0;
+    n.route=null;n.routeGoal=null;n.routeIndex=0;n.replanAt=0;}
+   else n.lifeStall=.85;
+  }
+ }
  pose(n,run?['Running','RunFast','Walking']:['Walking'],run?1.15:1.05);
  n.state='move';
  return n.routeGoal?d(n.pos,n.routeGoal)<.75:false;
@@ -312,7 +343,7 @@ function begin(n,type,settings={}){
    angle:grenadePose?.angle??s.angle,actionLift:s.lift||0,grenadeMotion,grenadePose,
    phase:type==='walk'?'do':'go',remaining:dur,joined:settings.joined||null,group:settings.group||null,walkPause:0,walkStep:0};
  n.state='pause';n.renderLift=0;
- n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;n.activity=`前往${A[type].label}`;n.home.job='life';n.anim.rifleAim=0;n.decisionAfter=rand(1.5,3);
+ n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;n.lifeEscape=null;n.lifeStall=0;n.activity=`前往${A[type].label}`;n.home.job='life';n.anim.rifleAim=0;n.decisionAfter=rand(1.5,3);
  return true;
 }
 function want(n,type){
@@ -637,7 +668,65 @@ export function releaseForSquad(n){
  n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;
  n.cooldown=0;n.socialCooldown=99_999;
 }
-export function moveSquadMember(n,goal,dt,run=false,preferRoads=false){return to(n,goal,dt,run,preferRoads);}
+// In a tight corner a new A* plan repeatedly selects the same blocked corridor.
+// Keep a persistent squad-only recovery state so a recruit first steps into an
+// actual FREE patch of pavement, then replans its route. Never teleport or walk
+// through another soldier, the player, building, or the camp perimeter.
+function squadEscapeMark(n,goal){
+ const from=n.pos,len=Math.max(.001,d(from,goal));
+ const ux=(goal.x-from.x)/len,uz=(goal.z-from.z)/len;
+ let best=null,score=-Infinity;
+ for(const radius of [1.15,1.75,2.40])for(const radians of [1.2,-1.2,1.8,-1.8,2.4,-2.4,Math.PI]){
+  const ca=Math.cos(radians),si=Math.sin(radians);
+  const dx=ux*ca-uz*si,dz=ux*si+uz*ca;
+  const target=W(from.x+dx*radius,from.z+dz*radius);
+  if(!canOccupy(target,NPC_RADIUS+.09))continue;
+  const nearby=ALL_NPCS.filter(o=>o!==n).reduce((min,o)=>Math.min(min,d(o.pos,target)),Infinity);
+  if(nearby<NPC_RADIUS*2+.22||PLAYER_POS&&d(PLAYER_POS,target)<1.0)continue;
+  let clear=true;
+  for(const t of [.25,.5,.75]){
+   const p=W(from.x+dx*radius*t,from.z+dz*radius*t);
+   if(!canOccupy(p,NPC_RADIUS*.85)){clear=false;break;}
+  }
+  if(!clear)continue;
+  // Prefer room to maneuver and road proximity, not the blocked original line.
+  const value=Math.min(nearby,2.8)*1.3-roadDistance(target.x,target.z)*.22+
+   (dx*ux+dz*uz)*.22-radius*.13;
+  if(value>score){score=value;best=target;}
+ }
+ return best;
+}
+export function moveSquadMember(n,goal,dt,run=false,forceRoads=false){
+ if(!Number.isFinite(goal?.x)||!Number.isFinite(goal?.z))return false;
+ if(n.squadEscape){
+  const target=n.squadEscape;
+  const len=d(n.pos,target),before=n.pos;
+  if(len>.26){
+   const moved=moveNpc(n,(target.x-before.x)/len*Math.min(len,dt*1.34),
+     (target.z-before.z)/len*Math.min(len,dt*1.34),ALL_NPCS,PLAYER_POS);
+   if(d(before,moved)>.002){n.pos=moved;face(n,moved.x-before.x,moved.z-before.z,dt);}
+   pose(n,['Walking']);n.state='move';
+  }
+  n.squadEscapeTime=(n.squadEscapeTime||0)+dt;
+  if(d(n.pos,target)<.30||n.squadEscapeTime>3.1){
+   n.squadEscape=null;n.squadEscapeTime=0;n.squadStall=0;
+   n.route=null;n.routeGoal=null;n.routeIndex=0;n.replanAt=0;
+  }
+  return false;
+ }
+ const before={...n.pos},beforeDistance=d(before,goal);
+ const arrived=to(n,goal,dt,run,forceRoads);
+ const moved=d(before,n.pos);
+ if(beforeDistance>1.0&&moved<.008)n.squadStall=(n.squadStall||0)+dt;
+ else n.squadStall=0;
+ if(n.squadStall>1.35){
+  const escape=squadEscapeMark(n,goal);
+  if(escape){n.squadEscape=escape;n.squadEscapeTime=0;n.squadStall=0;
+   n.route=null;n.routeGoal=null;n.routeIndex=0;n.replanAt=0;}
+  else n.squadStall=.9; // Wait for crossing traffic to clear, then try again.
+ }
+ return arrived;
+}
 export function poseSquadMember(n,clips=['Idle'],speed=1){pose(n,clips,speed);}
 export function faceSquadMember(n,x,z,dt){face(n,x,z,dt);}
 export function squadWorldGoal(p){navInit();if(canStand(p.x,p.z))return {...p};const k=nearestNode(p);return k<0?null:idxPos(k);}
