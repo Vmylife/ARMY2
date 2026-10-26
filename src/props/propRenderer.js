@@ -13,6 +13,7 @@ export const PROP_MODELS=[
  {id:'bench',url:'./assets/props/bench.glb?v=112'},
  {id:'signboard',url:'./assets/props/signboard.glb?v=112'},
  {id:'hurdle',url:'./assets/props/hurdle.glb?v=112'},
+ {id:'weed',url:'./assets/props/weed.glb?v=115'},
  {id:'pullup',url:'./assets/props/pullup.glb?v=112'},
  {id:'flagpole',url:'./assets/props/flagpole.glb?v=112'},
  {id:'podium',url:'./assets/props/podium.glb?v=112'},

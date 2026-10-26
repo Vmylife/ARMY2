@@ -4,11 +4,14 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=122';
+ faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=120';
 import {canOccupy,moveNpc} from '../map/navCollision109.js?v=109';
+import {PROPS} from '../map/camp.js?v=093';
 import {ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
 import {chooseGrenadeMotion,calibratedGrenadePose} from '../training/grenadeCalibration112.js?v=112';
 const W=(x,z)=>({x,z});
+const OBSTACLE_MOTIONS=['Jump_Over_Obstacle_1','Jump_Over_Obstacle_2'];
+function chooseObstacleMotion(anim){const clips=OBSTACLE_MOTIONS.filter(x=>anim.hasClip(x));return clips.length?clips[Math.floor(Math.random()*clips.length)]:null;}
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const STAGES=[
@@ -19,7 +22,10 @@ const STAGES=[
  {id:'shoot',name:'靶場打靶',rally:W(10.7,14.3),duration:11,limited:true,clip:['Idle']},
  {id:'grenade',name:'手榴彈投擲',rally:W(-29.2,-23.1),duration:9,limited:true,clip:['Idle']},
  {id:'obstacle',name:'障礙訓練',rally:W(9,7.2),duration:12,
-  points:[W(5.5,7.9),W(8.5,7.9),W(11.5,7.9),W(14.5,7.9),W(17.5,7.9)],clip:['Idle']},
+  // Five exact hurdle fixtures from the latest editor layout. Approaching
+  // slightly from the southern side leaves room for the jump animation.
+  points:PROPS.filter(p=>p.type==='hurdle').sort((a,b)=>a.x-b.x)
+   .slice(0,5).map(p=>W(p.x,p.z-.70)),clip:['Idle']},
  {id:'weed',name:'草地拔草',rally:W(-31,8),duration:16,
   points:[W(-31,6.0),W(-29.4,6.8),W(-27.8,7.6),W(-26.2,8.4),W(-24.6,9.2)],clip:['Pull_Radish','Idle']},
  {id:'sweep',name:'營舍周邊掃地',rally:W(-34,-7.4),duration:16,
@@ -143,6 +149,16 @@ function trainPose(n,stage,dt,now,current){
    poseSquadMember(n,current?.motion?[current.motion]:['Idle'],current?.motionPose?.speed||1);
    n.renderLift=current?.motionPose?.lift||0;
    if(current?.motionPose)n.angle=current.motionPose.angle;
+  }else if(stage.id==='obstacle'){
+   // Every soldier independently chooses one of the two real hurdle jumps.
+   // Restart only after the current clip finishes, never halfway through it.
+   if(current?.motion&&n.anim.finished()){
+    current.motion=chooseObstacleMotion(n.anim)||current.motion;
+    n.anim.setClip(current.motion,{restart:true});
+    n.anim.transition=0;n.anim.prevClip=null;
+   }
+   poseSquadMember(n,current?.motion?[current.motion]:['Idle']);
+   n.angle=0; // All five jump towards the far side of their own hurdle.
   }else poseSquadMember(n,stage.clip||['Idle']);
   if(stage.id==='pullup')faceSquadMember(n,0,-1,dt);
  }
@@ -178,7 +194,8 @@ function trainSquad(s,dt,now,all,playerPos){
    const pos=assignedSpot(stage,i);if(!pos)continue;
    slot={key:null,pos};
   }
-  const motion=stage.id==='grenade'?chooseGrenadeMotion(n.anim):null;
+  const motion=stage.id==='grenade'?chooseGrenadeMotion(n.anim)
+    :stage.id==='obstacle'?chooseObstacleMotion(n.anim):null;
   const motionPose=stage.id==='grenade'?calibratedGrenadePose(slot,motion):null;
   // Keep the original slot reservation (shared with free NPCs), but navigate
   // to the exact marked position for the chosen animation.

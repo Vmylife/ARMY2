@@ -93,6 +93,9 @@ export function movePlayer(pos,dx,dz,npcs){
  for(const n of npcs){
   const a=next.x-n.pos.x,b=next.z-n.pos.z,dist=Math.hypot(a,b),min=PLAYER_RADIUS+NPC_RADIUS+.015;
   if(dist>=min)continue;
+  // A chair-bound soldier is fixed to a reserved bench: walking players must
+  // go around rather than shoving the soldier away from the seat.
+  if(n.state==='seated')return pos;
   // Players have priority; recruit yields, but never gets pushed through walls.
   const vx=dist>.001?-a/dist:dx/(Math.hypot(dx,dz)||1),vz=dist>.001?-b/dist:dz/(Math.hypot(dx,dz)||1);
   const shift=Math.min(.21,min-dist+.04);

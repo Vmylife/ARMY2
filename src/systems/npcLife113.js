@@ -119,18 +119,13 @@ function fixtureInit(){
  for(const [i,p] of PROPS.entries()){
   if(p.type!=='bench')continue;
   const yaw=p.yaw||0;
-  for(let side of [-1,1]){
-   // Animation-lab calibration imported from the latest user-tuned JSON.
-   // Bench yaw follows the prop coordinate system (local +X along the seat).
-   const seatLateral=side*.43+CALIBRATION.chair.x, seatForward=CALIBRATION.chair.z;
-   const seatBase=W(p.x+Math.cos(yaw)*seatLateral+Math.sin(yaw)*seatForward,
-                p.z-Math.sin(yaw)*seatLateral+Math.cos(yaw)*seatForward);
-   SEATS.push({key:`bench-${i}-${side}`,pos:seatBase,angle:yaw});
-   const dozeLateral=side*.43+CALIBRATION.doze.x, dozeForward=CALIBRATION.doze.z;
-   const dozeBase=W(p.x+Math.cos(yaw)*dozeLateral+Math.sin(yaw)*dozeForward,
-                p.z-Math.sin(yaw)*dozeLateral+Math.cos(yaw)*dozeForward);
-   DOZE_SEATS.push({key:`doze-bench-${i}-${side}`,pos:dozeBase,angle:yaw});
-  }
+  // One physical bench = ONE shared reservation. Sitting and dozing use the
+  // same key; a second recruit cannot sit or doze on an occupied bench.
+  const seat=(cal)=>W(p.x+Math.cos(yaw)*cal.x+Math.sin(yaw)*cal.z,
+                     p.z-Math.sin(yaw)*cal.x+Math.cos(yaw)*cal.z);
+  const key=`bench-${i}`;
+  SEATS.push({key,pos:seat(CALIBRATION.chair),angle:yaw,benchIndex:i});
+  DOZE_SEATS.push({key,pos:seat(CALIBRATION.doze),angle:yaw,benchIndex:i});
  }
  for(const [j,x] of [2.1,5.5,8.9,12.3,15.7,19.1].entries())SHOOT.push({key:`shoot-${j}`,pos:W(x,16.85),angle:0});
  for(const [j,p] of PROPS.filter(p=>p.type==='pullup').entries())PULLUPS.push({key:`pullup-${j}`,pos:W(p.x,p.z+1.5),angle:Math.PI});
@@ -270,6 +265,7 @@ function begin(n,type,settings={}){
  const dur=settings.duration||rand(type==='jog'?24:11,type==='jog'?43:26);
  n.task={type,goal,angle:grenadePose?.angle??s.angle,grenadeMotion,grenadePose,
    phase:type==='walk'?'do':'go',remaining:dur,joined:settings.joined||null,group:settings.group||null,walkPause:0,walkStep:0};
+ n.state='pause';n.renderLift=0;
  n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;n.activity=`前往${A[type].label}`;n.home.job='life';n.anim.rifleAim=0;n.decisionAfter=rand(1.5,3);
  return true;
 }
@@ -364,7 +360,13 @@ function perform(n,dt,now){
    updateRangeShooter(n,now);
    n.activity='靶場打靶';return;
  }
- n.state='action';n.activity=A[kind].label;
+ if(kind==='bench'||kind==='doze'){
+  // The model root position is the exact Animation Lab pose relative to this
+  // bench; keep it fixed during the entire seated animation.
+  n.pos={...task.goal};
+  if(Number.isFinite(task.angle))n.angle=task.angle;
+  n.state='seated';n.activity=A[kind].label;
+ }else {n.state='action';n.activity=A[kind].label;}
  pose(n,kind==='grenade'?(task.grenadeMotion?[task.grenadeMotion]:['Idle']):(NEED_ANIM[kind]||['Idle']),task.grenadePose?.speed||1);
  if(kind==='grenade')n.renderLift=task.grenadePose?.lift||0;
  if(kind==='chat'||kind==='greet'){
@@ -373,7 +375,7 @@ function perform(n,dt,now){
   // Lab-confirmed heading is clip-specific. Do not override it with a generic
   // 'face the field' calculation, or the crouch clip turns the wrong way.
   n.angle=task.grenadePose.angle;
- }else if(Number.isFinite(task.angle)){
+ }else if(Number.isFinite(task.angle)&&kind!=='bench'&&kind!=='doze'){
   const dx=Math.sin(task.angle),dz=Math.cos(task.angle);face(n,dx,dz,dt);
  }else if(kind==='sentry')face(n,0,-1,dt);
  else if(kind==='basketball')face(n,-1,0,dt);
@@ -381,7 +383,7 @@ function perform(n,dt,now){
 }
 function endTask(n){
  const last=n.task?.type||'';if(last){n.lastType=last;n.history[last]=(n.history[last]||0)+1;}
- release(n);n.task=null;n.home.job='life';n.anim.rifleAim=0;n.cooldown=rand(1.0,3.0);
+ release(n);n.task=null;n.state='pause';n.renderLift=0;n.home.job='life';n.anim.rifleAim=0;n.cooldown=rand(1.0,3.0);
  n.route=null;n.routeGoal=null;n.retries=0;
 }
 function closeGroup(n,all){
@@ -404,11 +406,14 @@ function socialInvite(all){
   const oldA=a.task,oldB=b.task;
   let ok=false;
   if(type==='bench'){
-    // Reserve two seats of the SAME bench so they visibly sit together.
+    // Pair-social invitations use TWO different benches, never the same bench.
     fixtureInit();
-    for(let k=0;k<SEATS.length;k+=2){const left=SEATS[k],right=SEATS[k+1];
-      if(!left||!right||SLOTS[left.key]!==undefined||SLOTS[right.key]!==undefined)continue;
-      if(begin(a,'bench',{spot:left,group,duration:rand(13,24)})&&begin(b,'bench',{spot:right,group,duration:a.task.remaining})){ok=true;break;}
+    for(const left of SEATS){
+      if(SLOTS[left.key]!==undefined)continue;
+      const right=SEATS.find(e=>e.key!==left.key&&SLOTS[e.key]===undefined&&d(e.pos,left.pos)<5.5);
+      if(!right)continue;
+      if(begin(a,'bench',{spot:left,group,duration:rand(13,24)})&&
+         begin(b,'bench',{spot:right,group,duration:a.task.remaining})){ok=true;break;}
     }
   }else{
     let anchor;
@@ -515,9 +520,20 @@ export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
       ?settleTrainingSpot(n,desired,dt):arrived;
     // The shared journey ends when the leader reaches the destination; the
     // follower first needs to be close, not at the exact same point.
-    const atDestination=task.type==='walk'&&task.joined&&n.id>task.joined.id
-      ? task.joined.task?.phase==='do'&&d(n.pos,task.joined.pos)<1.8 : arrived;
-    if(atDestination){task.phase='do';n.route=null;n.routeGoal=null;n.retries=0;
+    const seatedTask=task.type==='bench'||task.type==='doze';
+    // Allow a reserved seat to be approached with ordinary navigation. Finish
+    // only near the chair itself, not just close to A*'s adjusted goal.
+    const closeToSeat=d(n.pos,task.goal)<.72;
+    const atDestination=seatedTask ? closeToSeat
+      : task.type==='walk'&&task.joined&&n.id>task.joined.id
+        ? task.joined.task?.phase==='do'&&d(n.pos,task.joined.pos)<1.8 : arrived;
+    if(atDestination){
+      if(seatedTask){
+       // Final <0.72m pose correction after navigation. Cannot be displaced by
+       // local separation forces once the bench reservation is held.
+       n.pos={...task.goal};if(Number.isFinite(task.angle))n.angle=task.angle;
+      }
+      task.phase='do';n.route=null;n.routeGoal=null;n.retries=0;
       if(task.type==='jog')n.loopAngle=Math.atan2((n.pos.z+2.2)/8.2,(n.pos.x+21.5)/5.6);
     }else if(n.retries>=4||task.travel>45){closeGroup(n,npcs);endTask(n);n.cooldown=.5;}
   }else{

@@ -1,12 +1,12 @@
 // Army independent scene editor v0.10.3 (root-level deployment fix).
 // Uses the current camp geometry and GLB renderers; does not load the gameplay loop.
-import './src/map/activeCampLayout116.js?v=118';
+import './src/map/activeCampLayout116.js?v=120';
 import './src/lighting96.js?v=096';
 import {BUILDINGS as modelBuildings,PROPS as modelProps} from './src/map/camp.js?v=092';
 import {BUILDINGS as gameBuildings,PROPS as gameProps,FEATURES as gameFeatures} from './src/map/camp.js?v=093';
 import {ArmyRenderer} from './src/core/renderer.js?v=092';
 import {CampBuildings,BUILDING_MODELS} from './src/buildings/buildingRenderer.js?v=112';
-import {CampProps,PROP_MODELS} from './src/props/propRenderer.js?v=115';
+import {CampProps,PROP_MODELS} from './src/props/propRenderer.js?v=120';
 import {loadGlb} from './src/core/glb111.js?v=111';
 
 const $=id=>document.getElementById(id);
@@ -15,11 +15,10 @@ const round=(n,places=3)=>Number(n.toFixed(places));
 const rad=d=>d*Math.PI/180,deg=r=>r*180/Math.PI;
 const copy=value=>JSON.parse(JSON.stringify(value));
 // New baseline: don't auto-restore incompatible/old editor snapshots. They remain available for manual import.
-const storageKey='army-scene-editor-v0118-v118';
+const storageKey='army-scene-editor-v0113-v120';
 // Older localStorage drafts are deliberately left untouched; import saved JSON when needed.
 const names={weed:'雜草',streetlamp:'路燈',treeA:'樹木 A',treeB:'樹木 B',sandbag:'沙包',target:'靶子',crate:'木箱',barrel:'油桶',bench:'長椅',signboard:'標示牌',hurdle:'跨欄',pullup:'單槓',flagpole:'旗桿',podium:'司令台',fence:'圍欄',basketballHoop:'籃框',grenadeCrate:'手榴彈箱'};
-// The new decoration is editor-only until exported and approved for the main camp.
-PROP_MODELS.push({id:'weed',url:'./assets/props/weed.glb?v=115'});
+// Weed is now a normal, deployable main-game prop and is loaded by PROP_MODELS.
 const baseFeatures=gameFeatures.map(x=>copy(x));
 const records=[];
 const byKey=new Map();
@@ -54,7 +53,7 @@ const defaultsByKey=new Map(originalDescriptors.map(r=>[r.key,r]));
 const buildingPalette=originalDescriptors.filter(r=>r.kind==='building');
 const propPalette=[...new Set(originalDescriptors.filter(r=>r.kind==='prop').map(r=>r.type))].map(t=>originalDescriptors.find(r=>r.kind==='prop'&&r.type===t));
 // Palette-only template: do not spawn any weeds until the player places them.
-propPalette.push({kind:'prop',key:'template:weed',label:'雜草',index:null,type:'weed',templateId:'weed',isNew:true,
+if(!propPalette.some(p=>p.type==='weed'))propPalette.push({kind:'prop',key:'template:weed',label:'雜草',index:null,type:'weed',templateId:'weed',isNew:true,
  base:{type:'weed',x:-29,z:8,scale:.55,yaw:0,cull:45},yaw:0,state:{x:-29,z:8,yaw:0,scale:1}});
 const finiteState=s=>s&&[s.x,s.z,s.yaw,s.scale].every(Number.isFinite)&&s.scale>0;
 function descriptorOf(r){return{kind:r.kind,key:r.key,label:r.label,index:r.index??null,type:r.type??null,templateId:r.templateId,isNew:r.isNew,base:copy(r.base),yaw:r.yaw,state:{...r.state}};}
