@@ -8,7 +8,7 @@ import {installArmyProceduralActions,ARMY_PULLUP,ARMY_SWEEP} from '../characters
 import {BroomRenderer} from './broomRenderer117.js';
 import {loadGlb} from '../core/glb111.js';
 import {mul,translation,rotateY} from '../core/math.js?v=060';
-import {SAVED_ACTION_CALIBRATIONS,fixtureActorPose} from '../characters/fixturePose115.js?v=125';
+import {SAVED_ACTION_CALIBRATIONS,fixtureActorPose} from '../characters/fixturePose115.js?v=127';
 
 const $=id=>document.getElementById(id);
 const MODEL='assets/characters/cadet/cadet-animation-lab.glb?v=120';

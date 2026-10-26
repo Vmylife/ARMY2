@@ -5,6 +5,8 @@ export const SAVED_ACTION_CALIBRATIONS=Object.freeze({
   'Chair_Sit_Idle_M@@chair': Object.freeze({x:-0.14,z:0.56,y:0.20,yaw:0,speed:1}),
   'Sit_and_Doze_Off@@chair': Object.freeze({x:0,z:0.24,y:0.20,yaw:0,speed:1}),
   'Pull_Radish@@ground': Object.freeze({x:0,z:0,y:0.09,yaw:0,speed:1}),
+  'Pull_Radish@@weed': Object.freeze({x:-0.06,z:-0.42,y:0.16,yaw:0,speed:1}),
+  '__ARMY_SENTRY_IDLE__@@guard': Object.freeze({x:1.38,z:1.78,y:0,yaw:0,speed:1}),
   'baseball_pitching@@grenade': Object.freeze({x:-1.08,z:0.42,y:0,yaw:82,speed:1}),
   'Crouch_Pull_and_Throw@@grenade': Object.freeze({x:-1.18,z:0.48,y:0.23,yaw:168,speed:1})
 });

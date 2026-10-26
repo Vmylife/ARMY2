@@ -6,9 +6,9 @@ import {RigAnimator} from '../characters/rigAnimator.js?v=117';
 import {installArmyProceduralActions,ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
 import {updateRangeShooter} from '../training/rangeTraining.js?v=111';
 import {canOccupy,moveNpc,moveWithCollision,staticClearance,NPC_RADIUS,PLAYER_RADIUS} from '../map/navCollision109.js?v=109';
-import {PROPS,ROADS} from '../map/camp.js?v=093';
+import {PROPS,ROADS,BUILDINGS} from '../map/camp.js?v=093';
 import {chooseGrenadeMotion,calibratedGrenadePose,GRENADE_MOTIONS} from '../training/grenadeCalibration112.js?v=125';
-import {SAVED_ACTION_CALIBRATIONS,fixtureActorPose} from '../characters/fixturePose115.js?v=125';
+import {SAVED_ACTION_CALIBRATIONS,fixtureActorPose} from '../characters/fixturePose115.js?v=127';
 
 const TAU=Math.PI*2;
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
@@ -22,7 +22,7 @@ const ANIM_LOOPS=new Set(['Stand_and_Chat','Sit_Cross_Legged_on_Floor','Chair_Si
 const CALIBRATION={
  chair:SAVED_ACTION_CALIBRATIONS['Chair_Sit_Idle_M@@chair'],
  doze:SAVED_ACTION_CALIBRATIONS['Sit_and_Doze_Off@@chair'],
- weed:SAVED_ACTION_CALIBRATIONS['Pull_Radish@@ground']
+ weed:SAVED_ACTION_CALIBRATIONS['Pull_Radish@@weed']
 };
 const NAV={xMin:-46,xMax:45,zMin:-35,zMax:37,step:1.0};
 const NX=Math.floor((NAV.xMax-NAV.xMin)/NAV.step)+1,NZ=Math.floor((NAV.zMax-NAV.zMin)/NAV.step)+1,N=NX*NZ;
@@ -113,7 +113,7 @@ function pathTo(from,to){
 }
 
 // Model-defined fixtures: all from PROPS; seat and range slots are reserved.
-const SEATS=[];const DOZE_SEATS=[];const SHOOT=[];const PULLUPS=[];const GRENADE=[];const SLOTS=Object.create(null);
+const SEATS=[];const DOZE_SEATS=[];const SHOOT=[];const PULLUPS=[];const GRENADE=[];const WEEDS=[];const SENTRIES=[];const SLOTS=Object.create(null);
 const STATION_OWNER=Object.create(null);
 function fixtureInit(){
  if(SEATS.length)return;
@@ -138,6 +138,28 @@ function fixtureInit(){
   };
   SEATS.push({key,pos:seat.pos,angle:seat.angle,approach:approach(CALIBRATION.chair),benchIndex:i});
   DOZE_SEATS.push({key,pos:doze.pos,angle:doze.angle,approach:approach(CALIBRATION.doze),benchIndex:i});
+ }
+ // All 50 actual weeds are interactive fixtures, split into the two broad
+ // clearings. Standing poses are computed from the same GLB-relative transform
+ // used in the animation lab, never guessed static grass positions.
+ const patches=PROPS.filter(p=>p.type==='weed');
+ for(const [j,p] of patches.entries()){
+  const pose=fixtureActorPose(p,CALIBRATION.weed);
+  if(!pose||!canStand(pose.pos.x,pose.pos.z))continue;
+  WEEDS.push({key:`weed-${j}`,pos:pose.pos,angle:pose.angle,lift:pose.lift,
+    zone:p.x < -20 ? 0 : 1,fixture:p});
+ }
+ // Both are guardhouse-style buildings, but the ammo depot is physically wider.
+ // Keep the user's lateral position and facing; for the larger building only,
+ // slide the mark outward along its local front normal until safely walkable.
+ const guardCal=SAVED_ACTION_CALIBRATIONS['__ARMY_SENTRY_IDLE__@@guard'];
+ for(const b of BUILDINGS.filter(b=>b.id==='guard'||b.id==='ammo')){
+  for(let extra=0;extra<=2.4;extra+=.20){
+   const pose=fixtureActorPose(b,{...guardCal,z:guardCal.z+extra});
+   if(pose&&canStand(pose.pos.x,pose.pos.z)){
+    SENTRIES.push({key:`sentry-${b.id}`,pos:pose.pos,angle:pose.angle,lift:pose.lift,fixture:b});break;
+   }
+  }
  }
  for(const [j,x] of [2.1,5.5,8.9,12.3,15.7,19.1].entries())SHOOT.push({key:`shoot-${j}`,pos:W(x,16.85),angle:0});
  for(const [j,p] of PROPS.filter(p=>p.type==='pullup').entries())PULLUPS.push({key:`pullup-${j}`,pos:W(p.x,p.z+1.5),angle:Math.PI});
@@ -248,11 +270,12 @@ function hasTag(def,t){return def.tags.includes(t)}
 function release(n){if(n.reservation&&SLOTS[n.reservation]===n.id)delete SLOTS[n.reservation];n.reservation=null;}
 function selectSpot(n,type,requiredKey=null){
  fixtureInit();if(STATION_OWNER[type]!==undefined)return null;
- const data=type==='shoot'?SHOOT:type==='pullup'?PULLUPS:type==='grenade'?GRENADE:type==='bench'?SEATS:type==='doze'?DOZE_SEATS:null;
+ const data=type==='shoot'?SHOOT:type==='pullup'?PULLUPS:type==='grenade'?GRENADE:type==='bench'?SEATS:type==='doze'?DOZE_SEATS:type==='weed'?WEEDS:type==='sentry'?SENTRIES:null;
  if(data){const available=data.filter(s=>!SLOTS[s.key]||SLOTS[s.key]===n.id);
   if(!available.length)return null;
-  const s=requiredKey?available.find(x=>x.key===requiredKey):pick(available);
-  if(!s)return null;return {pos:{...s.pos},key:s.key,angle:s.angle,fixture:s.fixture,approach:s.approach};
+  const s=requiredKey?available.find(x=>x.key===requiredKey):
+     (type==='weed'?available.sort((a,b)=>d(a.pos,n.pos)-d(b.pos,n.pos)+rand(-1,1))[0]:pick(available));
+  if(!s)return null;return {pos:{...s.pos},key:s.key,angle:s.angle,lift:s.lift,fixture:s.fixture,approach:s.approach};
  }
  const locations=STATIC[type] || [W(n.pos.x,n.pos.z)];
  const shuffled=[...locations].sort(()=>Math.random()-.5);
@@ -277,7 +300,7 @@ function begin(n,type,settings={}){
  const goal=grenadePose?.pos||s.pos;
  const dur=settings.duration||rand(type==='jog'?24:11,type==='jog'?43:26);
  n.task={type,goal,approach:(type==='bench'||type==='doze')?s.approach:null,
-   angle:grenadePose?.angle??s.angle,grenadeMotion,grenadePose,
+   angle:grenadePose?.angle??s.angle,actionLift:s.lift||0,grenadeMotion,grenadePose,
    phase:type==='walk'?'do':'go',remaining:dur,joined:settings.joined||null,group:settings.group||null,walkPause:0,walkStep:0};
  n.state='pause';n.renderLift=0;
  n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;n.activity=`前往${A[type].label}`;n.home.job='life';n.anim.rifleAim=0;n.decisionAfter=rand(1.5,3);
@@ -383,15 +406,18 @@ function perform(n,dt,now){
  }else {n.state='action';n.activity=A[kind].label;}
  pose(n,kind==='grenade'?(task.grenadeMotion?[task.grenadeMotion]:['Idle']):(NEED_ANIM[kind]||['Idle']),task.grenadePose?.speed||1);
  if(kind==='grenade')n.renderLift=task.grenadePose?.lift||0;
+ if(kind==='weed'||kind==='sentry')n.renderLift=task.actionLift||0;
  if(kind==='chat'||kind==='greet'){
   const p=task.joined;if(p){face(n,p.pos.x-n.pos.x,p.pos.z-n.pos.z,dt);}
  }else if(kind==='grenade'&&task.grenadePose){
   // Lab-confirmed heading is clip-specific. Do not override it with a generic
   // 'face the field' calculation, or the crouch clip turns the wrong way.
   n.angle=task.grenadePose.angle;
+ }else if((kind==='weed'||kind==='sentry')&&Number.isFinite(task.angle)){
+  n.angle=task.angle; // Precisely face the calibrated plant / guardhouse.
  }else if(Number.isFinite(task.angle)&&kind!=='bench'&&kind!=='doze'){
   const dx=Math.sin(task.angle),dz=Math.cos(task.angle);face(n,dx,dz,dt);
- }else if(kind==='sentry')face(n,0,-1,dt);
+ }
  else if(kind==='basketball')face(n,-1,0,dt);
  else if(kind==='pullup')face(n,0,-1,dt);
 }
@@ -465,8 +491,8 @@ const INITIAL=[W(-23.4,-1.5),W(-21.8,-2.2),W(-19.8,-3.6),W(-21,1.4),
  W(-37.8,25.2),W(-29.0,26.1),W(8.0,-8.5),W(20.5,-8.5),
  W(24,-14.5),W(27.8,-9.5),W(27.8,8.8),W(31.2,-3.8)];
 const INITIAL_TASKS=['jog','jog','jog','basketball','assembly','sweep','patrol','chat','greet','pushup','situp','shoot','shoot','dining',
- 'walk','weed','sweep','chat','grenade','floor','patrol','basketball',
- 'basketballCoach','basketball','assembly','sentry','pullup','walk','wash','dining'];
+ 'walk','weed','sweep','chat','grenade','weed','patrol','basketball',
+ 'basketballCoach','basketball','assembly','floor','sentry','walk','wash','sentry'];
 export function createCampNPCs(glb){
  navInit();fixtureInit();
  // Parsing 18 GLB animation clips 14 times wastes CPU and memory on mobile.
@@ -542,7 +568,7 @@ export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
       // Don't walk in place forever against a bench or the next recruit.
       closeGroup(n,npcs);endTask(n);n.cooldown=4;continue;
     }
-    const aligned=task.type==='grenade'&&d(n.pos,desired)<.9
+    const aligned=(task.type==='grenade'||task.type==='weed'||task.type==='sentry')&&d(n.pos,desired)<.9
       ?settleTrainingSpot(n,desired,dt):arrived;
     // The shared journey ends when the leader reaches the destination; the
     // follower first needs to be close, not at the exact same point.
@@ -551,6 +577,7 @@ export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
     // only near the chair itself, not just close to A*'s adjusted goal.
     const closeToSeat=d(n.pos,task.approach||task.goal)<.80;
     const atDestination=seatedTask ? closeToSeat
+      : (task.type==='weed'||task.type==='sentry') ? d(n.pos,task.goal)<.18
       : task.type==='walk'&&task.joined&&n.id>task.joined.id
         ? task.joined.task?.phase==='do'&&d(n.pos,task.joined.pos)<1.8 : arrived;
     if(atDestination){
@@ -585,7 +612,7 @@ export function releaseSquadStation(type,squadId){
 }
 export function availableSquadSlots(type){
  fixtureInit();
- const source=type==='shoot'?SHOOT:type==='pullup'?PULLUPS:type==='grenade'?GRENADE:null;
+ const source=type==='shoot'?SHOOT:type==='pullup'?PULLUPS:type==='grenade'?GRENADE:type==='weed'?WEEDS:null;
  return source?source.filter(p=>SLOTS[p.key]===undefined):[];
 }
 export function claimSquadSlot(slot,member){

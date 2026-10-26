@@ -4,11 +4,12 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=126';
+ faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=127';
 import {canOccupy,moveNpc,moveWithCollision} from '../map/navCollision109.js?v=109';
 import {PROPS} from '../map/camp.js?v=093';
 import {ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
 import {chooseGrenadeMotion,calibratedGrenadePose} from '../training/grenadeCalibration112.js?v=125';
+import {grenadeQueueMarks} from '../training/grenadeQueue117.js?v=127';
 const W=(x,z)=>({x,z});
 const OBSTACLE_MOTIONS=['Jump_Over_Obstacle_1','Jump_Over_Obstacle_2'];
 function chooseObstacleMotion(anim){const clips=OBSTACLE_MOTIONS.filter(x=>anim.hasClip(x));return clips.length?clips[Math.floor(Math.random()*clips.length)]:null;}
@@ -26,8 +27,7 @@ const STAGES=[
   // slightly from the southern side leaves room for the jump animation.
   points:PROPS.filter(p=>p.type==='hurdle').sort((a,b)=>a.x-b.x)
    .slice(0,5).map(p=>W(p.x,p.z-.70)),clip:['Idle']},
- {id:'weed',name:'草地拔草',rally:W(-31,8),duration:16,
-  points:[W(-31,6.0),W(-29.4,6.8),W(-27.8,7.6),W(-26.2,8.4),W(-24.6,9.2)],clip:['Pull_Radish','Idle']},
+ {id:'weed',name:'草地拔草',rally:W(-37,14),duration:16,limited:true,clip:['Pull_Radish','Idle']},
  {id:'sweep',name:'營舍周邊掃地',rally:W(-34,-7.4),duration:16,
   points:[W(-34,-5.6),W(-33.5,-3.7),W(-33,-1.8),W(-32.5,.1),W(-32,2)],clip:[ARMY_SWEEP,'Idle']}
 ];
@@ -50,14 +50,29 @@ function releaseStage(s){
  s.stage=null;s.active.clear();s.done.clear();
  // Explicit egress: squads leave the south-west queue area via the open
  // north-west corridor before plotting the next training route.
- if(departingGrenade){s.exitPoint=W(-36.2,-24.0);s.exitStall=0;}
+ if(departingGrenade){const q=grenadeQueueMarks();s.exitPoint=q.length?W(q[0].x+1.0,q[0].z+4.5):null;s.exitStall=0;}
 }
 function setStage(s){
  // Start with the next item. If another squad is already in that station,
  // take another item rather than crowding the equipment or waiting forever.
  for(let skip=0;skip<STAGES.length;skip++){
-  const index=(s.nextIndex+skip)%STAGES.length,stage=STAGES[index];
-  if(stage.id==='grenade'&&CAMP_T<STATION_COOLDOWN.grenade)continue;
+  const index=(s.nextIndex+skip)%STAGES.length,base=STAGES[index];
+  if(base.id==='grenade'&&CAMP_T<STATION_COOLDOWN.grenade)continue;
+  const stage={...base};
+  if(stage.id==='grenade'){
+   const q=grenadeQueueMarks();if(q.length!==5)continue;
+   stage.queuePoints=q;stage.rally={x:(q[0].x+q[2].x)/2,z:(q[0].z+q[2].z)/2};
+  }
+  if(stage.id==='weed'){
+   // Pick one of the two real weed clusters for this visit, never an empty lawn.
+   const choices=[0,1].map(zone=>availableSquadSlots('weed').filter(w=>w.zone===zone));
+   const viable=choices.map((a,zone)=>({zone,a})).filter(x=>x.a.length>=5);
+   if(!viable.length)continue;
+   const choice=viable[Math.floor(Math.random()*viable.length)];
+   stage.weedZone=choice.zone;
+   const xs=choice.a.map(w=>w.pos.x).sort((a,b)=>a-b),zs=choice.a.map(w=>w.pos.z).sort((a,b)=>a-b);
+   stage.rally=W(xs[Math.floor(xs.length/2)],zs[Math.floor(zs.length/2)]);
+  }
   if(!claimSquadStation(stage.id,s.id))continue;
   s.stage=stage;s.index=index;s.nextIndex=(index+1)%STAGES.length;
   s.phase='march';s.elapsed=0;s.blocked=0;s.runIndex=0;s.runTimer=0;
@@ -158,15 +173,9 @@ function march(s,dt,all,playerPos){
  else if(s.elapsed>85||leader.retries>9){releaseStage(s);setStage(s);}
 }
 function queuePoint(stage,index){
- // Grenade stand-by area is east of the throwing lanes (blue marked region).
- if(stage.id==='grenade') {
-  // The red-circled area is south-west of the throwers, INSIDE the fence.
-  // These 5 distinct marks serve BOTH queueing and post-training assembly.
-  // Do not wait behind the sandbags, on the grenade crates, or downrange.
-  const marks=[W(-38.8,-29.4),W(-37.4,-29.4),W(-36.0,-29.4),
-               W(-38.2,-30.8),W(-36.8,-30.8)];
-  const q=marks[index%marks.length];
-  return squadWorldGoal(q)||q;
+ if(stage.id==='grenade'){
+  // Exact, dynamically rebuilt staging marks near the throwing area.
+  return stage.queuePoints[index%stage.queuePoints.length];
  }
  const offset=(index-2)*1.15;
  const candidate=W(stage.rally.x+offset,stage.rally.z-2.6);
@@ -228,7 +237,12 @@ function trainSquad(s,dt,now,all,playerPos){
   const n=s.members[i];if(s.done.has(n.id)||s.active.has(n.id))continue;
   let slot,token=`squad${s.id}-member${n.id}`;
   if(stage.limited){
-   const free=availableSquadSlots(stage.id);
+   let free=availableSquadSlots(stage.id);
+   if(stage.id==='weed'){
+    free=free.filter(w=>w.zone===stage.weedZone)
+      .sort((a,b)=>dist(a.pos,stage.rally)-dist(b.pos,stage.rally));
+    free=free.filter(w=>[...s.active.values()].every(c=>dist(c.slot.pos,w.pos)>1.05));
+   }
    if(!free.length)continue;
    slot=free[0];if(!claimSquadSlot(slot,token))continue;
   }else{
@@ -303,7 +317,7 @@ function trainSquad(s,dt,now,all,playerPos){
     }
    continue;
   }
-  if(stage.id==='grenade')settleSquadTrainingSpot(n,goal,dt);
+  if(stage.id==='grenade'||stage.id==='weed')settleSquadTrainingSpot(n,goal,dt);
   trainPose(n,stage,dt,now,current);
   current.elapsed+=dt;
   if(current.elapsed>=stage.duration){releaseMemberSlot(s,n);s.done.add(n.id);}
