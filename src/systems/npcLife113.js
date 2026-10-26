@@ -5,8 +5,9 @@
 import {RigAnimator} from '../characters/rigAnimator.js?v=117';
 import {installArmyProceduralActions,ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
 import {updateRangeShooter} from '../training/rangeTraining.js?v=111';
-import {canOccupy,moveNpc,NPC_RADIUS} from '../map/navCollision109.js?v=109';
+import {canOccupy,moveNpc,moveWithCollision,staticClearance,NPC_RADIUS,PLAYER_RADIUS} from '../map/navCollision109.js?v=109';
 import {PROPS,ROADS} from '../map/camp.js?v=093';
+import {chooseGrenadeMotion,calibratedGrenadePose,GRENADE_MOTIONS} from '../training/grenadeCalibration112.js?v=112';
 
 const TAU=Math.PI*2;
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
@@ -14,22 +15,9 @@ const W=(x,z)=>({x,z});
 const d=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const rand=(a,b)=>a+Math.random()*(b-a);
 const pick=a=>a[Math.floor(Math.random()*a.length)];
-const GRENADE_MOTIONS=['baseball_pitching','Crouch_Pull_and_Throw'];
-function nextGrenadeMotion(n,holder){
- const options=GRENADE_MOTIONS.filter(name=>n.anim.hasClip(name));
- if(!options.length){n.grenadeMotion=null;return ['Idle'];}
- if(!holder.grenadeMotion||n.clock>=(holder.grenadeMotionUntil||0)){
-  holder.grenadeMotion=pick(options);
-  const seconds=n.anim.clips[holder.grenadeMotion]?.duration||4.5;
-  holder.grenadeMotionUntil=n.clock+seconds+0.22;
-  n.anim.setClip(holder.grenadeMotion,{restart:true});
-  n.anim.transition=0;n.anim.prevClip=null;
- }
- return [holder.grenadeMotion];
-}
 const HEADS=['阿宏','阿明','阿杰','小林','阿偉','小陳','阿國','阿正','大雄','小張','阿哲','阿凱','阿軒','阿智',
  '阿豪','阿倫','小蔡','阿翔','阿廷','阿仁','小吳','阿勇','阿翔哥','小黃','阿彬','小陸','阿良','阿昇','小謝','阿達'];
-const ANIM_LOOPS=new Set(['Stand_and_Chat','Sit_Cross_Legged_on_Floor','Chair_Sit_Idle_M','Sit_and_Doze_Off','Pull_Radish',ARMY_PULLUP,ARMY_SWEEP]);
+const ANIM_LOOPS=new Set(['Stand_and_Chat','Sit_Cross_Legged_on_Floor','Chair_Sit_Idle_M','Sit_and_Doze_Off','Pull_Radish',ARMY_PULLUP,ARMY_SWEEP,...GRENADE_MOTIONS]);
 const CALIBRATION={
  chair:{x:-0.14,z:0.56,y:0.20,yaw:0,speed:1},
  doze:{x:0.0,z:0.24,y:0.20,yaw:0,speed:1},
@@ -151,7 +139,7 @@ function fixtureInit(){
   // Throwing direction points toward the big oval. Free NPCs and squads share slots.
   const stand=W(p.x-1.62,p.z+.10);
   const angle=Math.atan2(-20.8-stand.x,-2.0-stand.z);
-  GRENADE.push({key:`grenade-${j}`,pos:stand,angle});
+  GRENADE.push({key:`grenade-${j}`,pos:stand,anchor:W(p.x,p.z),angle});
  }
 }
 const A={
@@ -226,6 +214,28 @@ function to(n,goal,dt,run=false){
  n.state='move';
  return n.routeGoal?d(n.pos,n.routeGoal)<.75:false;
 }
+// Approach the last part of a fixed training mark gently. The general A* walker
+// considers 0.75m 'arrived', which is too coarse for an aligned throw animation.
+function settleTrainingSpot(n,goal,dt){
+ const distance=d(n.pos,goal);
+ // The user-aligned throwing marks overlap the decorative sandbag safety
+ // margin by ~0.1m. Only for this RESERVED training mark, allow the last
+ // approach with a reduced static-body radius. Do not bypass other NPC bodies
+ // or the player, and never enter a building or cross the camp perimeter.
+ if(distance<.12){
+  if(staticClearance(goal)>.075 && !ALL_NPCS.some(o=>o!==n&&d(o.pos,goal)<NPC_RADIUS*2-.015)
+      && (!PLAYER_POS||d(PLAYER_POS,goal)>NPC_RADIUS+PLAYER_RADIUS+.04))n.pos={...goal};
+  return d(n.pos,goal)<.13;
+ }
+ if(distance>1.0)return false;
+ const old=n.pos, step=Math.min(distance,1.28*dt);
+ const after=moveWithCollision(old,(goal.x-old.x)/distance*step,(goal.z-old.z)/distance*step,.075);
+ if(ALL_NPCS.some(o=>o!==n&&d(o.pos,after)<NPC_RADIUS*2-.015)
+     || PLAYER_POS&&d(PLAYER_POS,after)<NPC_RADIUS+PLAYER_RADIUS+.04)return false;
+ if(d(old,after)>.001){n.pos=after;face(n,after.x-old.x,after.z-old.z,dt);pose(n,['Walking']);}
+ return d(n.pos,goal)<.12;
+}
+export function settleSquadTrainingSpot(n,goal,dt){return settleTrainingSpot(n,goal,dt);}
 function hasTag(def,t){return def.tags.includes(t)}
 function release(n){if(n.reservation&&SLOTS[n.reservation]===n.id)delete SLOTS[n.reservation];n.reservation=null;}
 function selectSpot(n,type,requiredKey=null){
@@ -234,7 +244,7 @@ function selectSpot(n,type,requiredKey=null){
  if(data){const available=data.filter(s=>!SLOTS[s.key]||SLOTS[s.key]===n.id);
   if(!available.length)return null;
   const s=requiredKey?available.find(x=>x.key===requiredKey):pick(available);
-  if(!s)return null;return {pos:{...s.pos},key:s.key,angle:s.angle};
+  if(!s)return null;return {pos:{...s.pos},key:s.key,angle:s.angle,anchor:s.anchor};
  }
  const locations=STATIC[type] || [W(n.pos.x,n.pos.z)];
  const shuffled=[...locations].sort(()=>Math.random()-.5);
@@ -251,8 +261,15 @@ function begin(n,type,settings={}){
  if(s.key&&SLOTS[s.key]!==undefined&&SLOTS[s.key]!==n.id)return false;
  if(s.key)SLOTS[s.key]=n.id;
  n.reservation=s.key;
+ // Select the grenade animation BEFORE moving: each clip has its own user-tuned
+ // position, heading and height relative to the grenade crate. Never swap
+ // clips in place, which used to make the character jump between alignments.
+ const grenadeMotion=type==='grenade'?chooseGrenadeMotion(n.anim):null;
+ const grenadePose=type==='grenade'?calibratedGrenadePose(s,grenadeMotion):null;
+ const goal=grenadePose?.pos||s.pos;
  const dur=settings.duration||rand(type==='jog'?24:11,type==='jog'?43:26);
- n.task={type,goal:s.pos,angle:s.angle,phase:type==='walk'?'do':'go',remaining:dur,joined:settings.joined||null,group:settings.group||null,walkPause:0,walkStep:0};
+ n.task={type,goal,angle:grenadePose?.angle??s.angle,grenadeMotion,grenadePose,
+   phase:type==='walk'?'do':'go',remaining:dur,joined:settings.joined||null,group:settings.group||null,walkPause:0,walkStep:0};
  n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;n.activity=`前往${A[type].label}`;n.home.job='life';n.anim.rifleAim=0;n.decisionAfter=rand(1.5,3);
  return true;
 }
@@ -348,9 +365,14 @@ function perform(n,dt,now){
    n.activity='靶場打靶';return;
  }
  n.state='action';n.activity=A[kind].label;
- pose(n,kind==='grenade'?nextGrenadeMotion(n,task):(NEED_ANIM[kind]||['Idle']),1);
+ pose(n,kind==='grenade'?(task.grenadeMotion?[task.grenadeMotion]:['Idle']):(NEED_ANIM[kind]||['Idle']),task.grenadePose?.speed||1);
+ if(kind==='grenade')n.renderLift=task.grenadePose?.lift||0;
  if(kind==='chat'||kind==='greet'){
   const p=task.joined;if(p){face(n,p.pos.x-n.pos.x,p.pos.z-n.pos.z,dt);}
+ }else if(kind==='grenade'&&task.grenadePose){
+  // Lab-confirmed heading is clip-specific. Do not override it with a generic
+  // 'face the field' calculation, or the crouch clip turns the wrong way.
+  n.angle=task.grenadePose.angle;
  }else if(Number.isFinite(task.angle)){
   const dx=Math.sin(task.angle),dz=Math.cos(task.angle);face(n,dx,dz,dt);
  }else if(kind==='sentry')face(n,0,-1,dt);
@@ -489,6 +511,8 @@ export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
       if(canStand(alongside.x,alongside.z))desired=alongside;
     }
     const arrived=to(n,desired,dt,task.type==='jog');
+    const aligned=task.type==='grenade'&&d(n.pos,desired)<.9
+      ?settleTrainingSpot(n,desired,dt):arrived;
     // The shared journey ends when the leader reaches the destination; the
     // follower first needs to be close, not at the exact same point.
     const atDestination=task.type==='walk'&&task.joined&&n.id>task.joined.id

@@ -4,9 +4,10 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal} from './npcLife113.js?v=121';
+ faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=122';
 import {canOccupy,moveNpc} from '../map/navCollision109.js?v=109';
 import {ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
+import {chooseGrenadeMotion,calibratedGrenadePose} from '../training/grenadeCalibration112.js?v=112';
 const W=(x,z)=>({x,z});
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -28,21 +29,8 @@ const FORM=[{back:0,side:0},{back:1.48,side:-.65},{back:1.48,side:.65},{back:2.9
 const GROUPS=[];
 const FREE_IDS=new Set([0,3,7,8,11,12,19,23,26,29]);
 const WAIT_DISTANCE=7.0;
-const GRENADE_MOTIONS=['baseball_pitching','Crouch_Pull_and_Throw'];
-function squadGrenadePose(n){
- const clips=GRENADE_MOTIONS.filter(name=>n.anim.hasClip(name));
- if(!clips.length){poseSquadMember(n,['Idle']);return;}
- if(!n.grenadeMotion||n.clock>=(n.grenadeMotionUntil||0)){
-  const clip=clips[Math.floor(Math.random()*clips.length)];
-  n.grenadeMotion=clip;
-  n.grenadeMotionUntil=n.clock+(n.anim.clips[clip]?.duration||4.5)+.22;
-  n.anim.setClip(clip,{restart:true});
-  n.anim.transition=0;n.anim.prevClip=null;
- }
- poseSquadMember(n,[n.grenadeMotion]);
-}
 function setIdle(n,label){poseSquadMember(n,['Idle']);n.activity=label;n.state='squad';n.anim.rifleAim=0;n.home.job='life';}
-function releaseMemberSlot(s,n){const cur=s.active.get(n.id);if(cur?.slot?.key)releaseSquadSlot(cur.slot,cur.token);s.active.delete(n.id);n.anim.rifleAim=0;n.home.job='life';n.grenadeMotion=null;n.grenadeMotionUntil=0;}
+function releaseMemberSlot(s,n){const cur=s.active.get(n.id);if(cur?.slot?.key)releaseSquadSlot(cur.slot,cur.token);s.active.delete(n.id);n.anim.rifleAim=0;n.home.job='life';n.grenadeMotion=null;n.grenadeMotionUntil=0;n.renderLift=0;}
 function releaseStage(s){for(const n of s.members)releaseMemberSlot(s,n);if(s.stage)releaseSquadStation(s.stage.id,s.id);s.stage=null;s.active.clear();s.done.clear();}
 function setStage(s){
  // Start with the next item. If another squad is already in that station,
@@ -137,7 +125,7 @@ function queuePoint(stage,index){
  const candidate=W(stage.rally.x+offset,stage.rally.z-2.6);
  return squadWorldGoal(candidate)||squadWorldGoal(stage.rally)||stage.rally;
 }
-function trainPose(n,stage,dt,now){
+function trainPose(n,stage,dt,now,current){
  if(stage.id==='shoot'){
   // updateRangeShooter keeps the original sight alignment and shot audio.
   // Do not call it until the soldier has actually reached an assigned lane.
@@ -151,14 +139,12 @@ function trainPose(n,stage,dt,now){
   if(phase<.14&&n.lastSquadShot!==fire){n.lastSquadShot=fire;n.shotUntil=now+100;n.shotPending=true;}
  }else{
   n.anim.rifleAim=0;n.home.job='life';
-  if(stage.id==='grenade')squadGrenadePose(n);
-  else poseSquadMember(n,stage.clip||['Idle']);
-  if(stage.id==='pullup')faceSquadMember(n,0,-1,dt);
   if(stage.id==='grenade'){
-   // Facing towards the oval, never towards the people waiting beside it.
-   const wanted=Math.atan2(-20.8-n.pos.x,-2.0-n.pos.z),delta=Math.atan2(Math.sin(wanted-n.angle),Math.cos(wanted-n.angle));
-   n.angle+=delta*clamp(1-Math.exp(-12*dt),0,1);
-  }
+   poseSquadMember(n,current?.motion?[current.motion]:['Idle'],current?.motionPose?.speed||1);
+   n.renderLift=current?.motionPose?.lift||0;
+   if(current?.motionPose)n.angle=current.motionPose.angle;
+  }else poseSquadMember(n,stage.clip||['Idle']);
+  if(stage.id==='pullup')faceSquadMember(n,0,-1,dt);
  }
  n.activity=`第${n.squadId+1}小隊 · ${stage.name}`;n.state='training';
 }
@@ -192,7 +178,11 @@ function trainSquad(s,dt,now,all,playerPos){
    const pos=assignedSpot(stage,i);if(!pos)continue;
    slot={key:null,pos};
   }
-  s.active.set(n.id,{slot,token,elapsed:0,travel:0});
+  const motion=stage.id==='grenade'?chooseGrenadeMotion(n.anim):null;
+  const motionPose=stage.id==='grenade'?calibratedGrenadePose(slot,motion):null;
+  // Keep the original slot reservation (shared with free NPCs), but navigate
+  // to the exact marked position for the chosen animation.
+  s.active.set(n.id,{slot,token,motion,motionPose,elapsed:0,travel:0});
   n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;
  }
  // Push-up drills run as a synchronized five-person unit, not five individual timers.
@@ -243,14 +233,17 @@ function trainSquad(s,dt,now,all,playerPos){
    continue;
   }
   current.travel+=dt;
-  const goal=current.slot.pos;
-  if(dist(n.pos,goal)>.65){
-   moveSquadMember(n,goal,dt,false);
+  const goal=current.motionPose?.pos||current.slot.pos;
+  const near=dist(n.pos,goal);
+  if(near>(stage.id==='grenade'?.12:.65)){
+   if(stage.id==='grenade'&&near<.9)settleSquadTrainingSpot(n,goal,dt);
+   else moveSquadMember(n,goal,dt,false);
    n.activity=`第${s.id+1}小隊 · 就位${stage.name}`;
    if(current.travel>35){releaseMemberSlot(s,n);s.done.add(n.id);}
    continue;
   }
-  trainPose(n,stage,dt,now);
+  if(stage.id==='grenade')settleSquadTrainingSpot(n,goal,dt);
+  trainPose(n,stage,dt,now,current);
   current.elapsed+=dt;
   if(current.elapsed>=stage.duration){releaseMemberSlot(s,n);s.done.add(n.id);}
  }
