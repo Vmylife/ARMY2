@@ -8,13 +8,13 @@ import {TwoHandBroomRenderer} from './characters/twoHandBroomRenderer119.js?v=11
 import {RifleRenderer} from './training/rifleRenderer.js?v=117';
 import {createRangeAudio} from './training/rangeTraining.js?v=111';
 import {CAMP} from './map/camp.js?v=093';
-import {movePlayer} from './map/navCollision109.js?v=109';
+import {movePlayer} from './map/navCollision109.js?v=124';
 import {createNavDebugger} from './ui/navDebug109.js?v=109';
 import {drawMinimap} from './ui/minimap.js?v=093';
 import {initWorldMap} from './ui/worldMap.js?v=093';
 import {setupInput} from './ui/input.js?v=062';
 import {options} from './systems/settings.js?v=060';
-import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=123';
+import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=124';
 
 const $=id=>document.getElementById(id);
 const debug=new URLSearchParams(location.search).has('debug');

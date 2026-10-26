@@ -6,7 +6,7 @@ import {RigAnimator} from '../characters/rigAnimator.js?v=119';
 import {installArmyProceduralActions,ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
 import {installSimplePullupPreview,SIMPLE_PULLUP} from '../animation-lab/simplePullup120.js?v=121';
 import {updateRangeShooter} from '../training/rangeTraining.js?v=111';
-import {canOccupy,moveNpc,moveWithCollision,staticClearance,NPC_RADIUS,PLAYER_RADIUS} from '../map/navCollision109.js?v=109';
+import {canOccupy,moveNpc,moveWithCollision,staticClearance,NPC_RADIUS,PLAYER_RADIUS} from '../map/navCollision109.js?v=124';
 import {PROPS,ROADS,BUILDINGS} from '../map/camp.js?v=093';
 import {chooseGrenadeMotion,calibratedGrenadePose,GRENADE_MOTIONS} from '../training/grenadeCalibration112.js?v=125';
 import {SAVED_ACTION_CALIBRATIONS,fixtureActorPose} from '../characters/fixturePose115.js?v=121';
@@ -194,7 +194,6 @@ const A={
  situp:{label:'仰臥起坐',base:1.25,tags:['active']},
  sweep:{label:'掃地',base:1.1,tags:['chore']},
  weed:{label:'拔草',base:1.25,tags:['chore']},
- dining:{label:'排隊吃飯',base:1.2,tags:['rest'],placeholder:true},
  wash:{label:'洗碗',base:.8,tags:['chore'],placeholder:true},
  bench:{label:'坐椅子休息',base:1.55,tags:['rest']},
  doze:{label:'坐著打瞌睡',base:.85,tags:['rest']},
@@ -203,7 +202,6 @@ const A={
  greet:{label:'站著聊天',base:1.1,tags:['social']},
  sentry:{label:'站哨',base:1.15,tags:['chore'],placeholder:true},
  patrol:{label:'巡視營區',base:.95,tags:['active']},
- assembly:{label:'集合列隊',base:1.15,tags:['chore']},
  basketballCoach:{label:'球場旁看球',base:.65,tags:['social'],placeholder:true},
 };
 const STATIC={
@@ -217,14 +215,12 @@ const STATIC={
  situp:[W(23.2,-9.45),W(20.5,-8.15),W(23.25,-8.15)],
  sweep:[W(-33.5,-1),W(-13,9),W(2,-7),W(28,-5),W(32,-8)],
  weed:[W(-30,8),W(-25,6.5),W(4,14),W(-17,22),W(27,11)],
- dining:[W(32.2,-2.3),W(30.7,-2.3),W(29.1,-2.3)],
  wash:[W(40.3,3.0)],
  floor:[W(-32,7.2),W(-29,7.2),W(12,-6),W(19,-6),W(-24,-13)],
  chat:[W(-35,4.1),W(-33,4.1),W(14,-6),W(16,-6)],
  greet:[W(-35,4.1),W(-33,4.1),W(14,-6),W(16,-6)],
  sentry:[W(-1.6,-18.9),W(1.5,-18.2)],
  patrol:[W(-10,-6),W(25,-10),W(27,13),W(-28,11),W(-4,-11)],
- assembly:[W(12.7,-8.3),W(14.7,-8.3),W(16.7,-8.3),W(18.7,-8.3)],
  basketballCoach:[W(-33.1,25.7),W(-39,25.7)],
 };
 const NEED_ANIM={bench:['Chair_Sit_Idle_M'],doze:['Sit_and_Doze_Off','Chair_Sit_Idle_M'],floor:['Sit_Cross_Legged_on_Floor'],weed:['Pull_Radish'],pushup:['push_up'],situp:['situps'],chat:['Stand_and_Chat'],greet:['Stand_and_Chat'],pullup:[SIMPLE_PULLUP,'Idle'],sweep:['Sweeping_Both_Hands',ARMY_SWEEP,'Idle']};
@@ -342,7 +338,7 @@ function begin(n,type,settings={}){
  n.task={type,goal,approach:(type==='bench'||type==='doze')?s.approach:null,
    angle:grenadePose?.angle??s.angle,actionLift:s.lift||0,grenadeMotion,grenadePose,
    phase:type==='walk'?'do':'go',remaining:dur,joined:settings.joined||null,group:settings.group||null,walkPause:0,walkStep:0};
- n.state='pause';n.renderLift=0;
+ n.state='pause';n.renderLift=0;n.trafficYield=null;
  n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;n.lifeEscape=null;n.lifeStall=0;n.activity=`前往${A[type].label}`;n.home.job='life';n.anim.rifleAim=0;n.decisionAfter=rand(1.5,3);
  return true;
 }
@@ -463,7 +459,7 @@ function perform(n,dt,now){
 }
 function endTask(n){
  const last=n.task?.type||'';if(last){n.lastType=last;n.history[last]=(n.history[last]||0)+1;}
- release(n);n.task=null;n.state='pause';n.renderLift=0;n.home.job='life';n.anim.rifleAim=0;n.cooldown=rand(1.0,3.0);
+ release(n);n.task=null;n.state='pause';n.renderLift=0;n.trafficYield=null;n.home.job='life';n.anim.rifleAim=0;n.cooldown=rand(1.0,3.0);
  n.route=null;n.routeGoal=null;n.retries=0;
 }
 function closeGroup(n,all){
@@ -530,9 +526,9 @@ const INITIAL=[W(-23.4,-1.5),W(-21.8,-2.2),W(-19.8,-3.6),W(-21,1.4),
  W(-19.0,-6.5),W(-26.0,-9.5),W(-35.5,15.7),W(-28.4,22.0),
  W(-37.8,25.2),W(-29.0,26.1),W(8.0,-8.5),W(20.5,-8.5),
  W(24,-14.5),W(27.8,-9.5),W(27.8,8.8),W(31.2,-3.8)];
-const INITIAL_TASKS=['jog','jog','jog','basketball','assembly','sweep','patrol','chat','greet','pushup','situp','shoot','shoot','dining',
+const INITIAL_TASKS=['jog','jog','jog','basketball','patrol','sweep','patrol','chat','greet','pushup','situp','shoot','shoot','walk',
  'walk','weed','sweep','chat','grenade','weed','patrol','basketball',
- 'basketballCoach','basketball','assembly','floor','sentry','walk','wash','sentry'];
+ 'basketballCoach','basketball','patrol','floor','sentry','walk','wash','sentry'];
 export function createCampNPCs(glb){
  navInit();fixtureInit();
  // Parsing 18 GLB animation clips 14 times wastes CPU and memory on mobile.
@@ -574,6 +570,53 @@ export function createCampNPCs(glb){
   return npc;
  });
 }
+// Independent recruits yield a safe strip to a passing five-man squad.
+// The squad keeps walking in the designated corridor while the passer actually
+// steps aside instead of the six rigid colliders waiting on each other.
+function yieldToSquad(n,dt){
+ if(!n.task||!(n.task.phase==='go'||n.task.type==='walk'&&n.task.phase==='do'))return false;
+ const movers=ALL_NPCS.filter(o=>o.squadId!==undefined&&
+   (o.state==='march'||o.role==='leader'&&o.state==='move')&&d(o.pos,n.pos)<2.4);
+ const nearest=movers.sort((a,b)=>d(a.pos,n.pos)-d(b.pos,n.pos))[0];
+ const active=nearest&&movers.some(o=>{
+  const towardX=n.pos.x-o.pos.x,towardZ=n.pos.z-o.pos.z;
+  return Math.sin(o.angle)*towardX+Math.cos(o.angle)*towardZ>-.25;
+ });
+ if(n.trafficYield){
+  const mark=n.trafficYield,dd=d(n.pos,mark),before=n.pos;
+  if(dd>.23){
+   const step=Math.min(dd,1.5*dt);
+   const moved=moveNpc(n,(mark.x-before.x)/dd*step,(mark.z-before.z)/dd*step,ALL_NPCS,PLAYER_POS);
+   if(d(before,moved)>.002){n.pos=moved;face(n,moved.x-before.x,moved.z-before.z,dt);}
+   pose(n,['Walking']);n.state='move';n.activity='禮讓行進小隊';
+  }else{pose(n,['Idle']);n.state='pause';n.activity='讓小隊通過';}
+  if((!active&&dd<.38)||n.clock>=n.trafficYieldUntil){
+   n.trafficYield=null;n.route=null;n.routeGoal=null;n.routeIndex=0;n.replanAt=0;
+  }
+  return true;
+ }
+ if(!active||d(nearest.pos,n.pos)>1.8||n.clock<(n.yieldCooldown||0))return false;
+ const base=n.pos,angle=nearest.angle;
+ const right=W(Math.cos(angle),-Math.sin(angle));
+ let best=null,score=-Infinity;
+ for(const side of [1,-1])for(const radius of [1.25,1.75,2.2]){
+  const mark=W(base.x+right.x*side*radius,base.z+right.z*side*radius);
+  if(!canOccupy(mark,NPC_RADIUS+.17))continue;
+  const blockers=ALL_NPCS.filter(o=>o!==n).reduce((m,o)=>Math.min(m,d(o.pos,mark)),Infinity);
+  if(blockers<.91||PLAYER_POS&&d(PLAYER_POS,mark)<1.1)continue;
+  let accessible=true;
+  for(const t of [.25,.5,.75])if(!canOccupy(W(base.x+(mark.x-base.x)*t,base.z+(mark.z-base.z)*t),NPC_RADIUS*.86)){accessible=false;break;}
+  if(!accessible)continue;
+  const clearance=Math.min(...movers.map(o=>d(o.pos,mark)));
+  const metric=Math.min(2.8,clearance)*1.8+Math.min(2,blockers)*.6-radius*.32;
+  if(metric>score){score=metric;best=mark;}
+ }
+ n.yieldCooldown=n.clock+1.0;
+ if(!best)return false;
+ n.trafficYield=best;n.trafficYieldUntil=n.clock+4.0;
+ n.lifeEscape=null;n.route=null;n.routeGoal=null;n.routeIndex=0;n.replanAt=0;
+ return yieldToSquad(n,dt);
+}
 let SOCIAL_TIMER=1.0;
 export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
  if(!Number.isFinite(dt)||dt<0)return;
@@ -581,6 +624,7 @@ export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
  dt=clamp(dt,0,.05);if(!dt)return;
  for(const n of npcs){
   n.clock+=dt;n.cooldown=Math.max(0,n.cooldown-dt);n.socialCooldown=Math.max(0,n.socialCooldown-dt);
+  if(yieldToSquad(n,dt))continue;
   if(!n.task){pose(n,['Idle']);n.activity='短暫休息';if(n.cooldown<=0)decide(n);continue;}
   const task=n.task;
   if(task.phase==='go'){

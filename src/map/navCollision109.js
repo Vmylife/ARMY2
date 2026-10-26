@@ -6,12 +6,14 @@ export const NPC_RADIUS=.33;
 export const BODY_GAP=.02;
 const CFG={
  treeA:{kind:'circle',r:.43},treeB:{kind:'circle',r:.48},
- streetlamp:{kind:'circle',r:.28},flagpole:{kind:'circle',r:.24},
+ // Full visible bases from the GLB geometry, not just the centre pole.
+ streetlamp:{kind:'box',x:.254,z:.133},flagpole:{kind:'box',x:.386,z:.097},
  basketballHoop:{kind:'circle',r:.32},barrel:{kind:'circle',r:.29},
  crate:{kind:'box',x:.46,z:.38},grenadeCrate:{kind:'box',x:.42,z:.38},
  sandbag:{kind:'box',x:.56,z:.26},bench:{kind:'box',x:.44,z:.20},
- signboard:{kind:'circle',r:.20},target:{kind:'circle',r:.18},
- podium:{kind:'box',x:1.20,z:.85},pullup:{kind:'posts',spacing:.78,r:.16},
+ signboard:{kind:'box',x:.479,z:.071},target:{kind:'circle',r:.18},
+ // The podium GLB is 0.958 x 0.758 at scale 4.85 (~4.65 x 3.68).
+ podium:{kind:'box',x:.479,z:.379},pullup:{kind:'posts',spacing:.78,r:.16},
  hurdle:{kind:'posts',spacing:.64,r:.14},
 };
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
@@ -25,10 +27,10 @@ export function boxDistance(p,ob,hx,hz){
 function scaleOf(p){
  const scale=p.scale??Math.max(p.sx||1,p.sz||1);
  if(p.type==='treeA'||p.type==='treeB')return clamp(scale/3.6,.75,1.24);
- if(['streetlamp','flagpole','basketballHoop'].includes(p.type))return 1;
- if(p.type==='podium')return clamp(scale/4.85,.75,1.15);
+ if(p.type==='basketballHoop')return 1;
+ // The above four models are authored at unit mesh scale; use their real x/z scale.
+ if(['streetlamp','flagpole','signboard','podium'].includes(p.type))return scale;
  if(p.type==='pullup')return clamp(scale/2.3,.8,1.15);
- if(p.type==='signboard')return clamp(scale/1.9,.85,1.1);
  return clamp(scale/1.25,.7,1.16);
 }
 function propDistance(p,ob){
@@ -113,26 +115,46 @@ export function moveNpc(n,dx,dz,npcs,playerPos){
  // Predict and steer away from nearby recruits and the player, instead of
  // making 30 rigid colliders freeze against one another.
  let ax=0,az=0;
+ let oncoming=0;
  for(const o of npcs){if(o===n)continue;
   const vx=pos.x-o.pos.x,vz=pos.z-o.pos.z,dd=Math.hypot(vx,vz);
-  if(dd>.001&&dd<1.28){const weight=(1.28-dd)/1.28;ax+=vx/dd*weight;az+=vz/dd*weight;}
+  if(dd>.001&&dd<1.55){const weight=(1.55-dd)/1.55;ax+=vx/dd*weight;az+=vz/dd*weight;
+   // An opposite-going recruit should be passed on the right instead of
+   // two actors repeatedly aiming for the same gap in the centre.
+   const dir=o.trafficHeading;
+   if(dir&&['move','march','run'].includes(o.state)&&dd<1.5&&ux*dir.x+uz*dir.z<-.45)oncoming=Math.max(oncoming,(1.5-dd)/1.5);
+  }
  }
  if(playerPos){const vx=pos.x-playerPos.x,vz=pos.z-playerPos.z,dd=Math.hypot(vx,vz);
   if(dd>.001&&dd<1.5){ax+=vx/dd*(1.5-dd)*1.8;az+=vz/dd*(1.5-dd)*1.8;}}
- ux+=ax*1.2;uz+=az*1.2;const mag=Math.hypot(ux,uz)||1;ux/=mag;uz/=mag;
- const headings=[0,.48,-.48,.95,-.95,1.4,-1.4,Math.PI];
+ // Store intended heading (not the avoidance heading) for reciprocal passing.
+ n.trafficHeading={x:ux,z:uz};
+ ux+=ax*1.05;uz+=az*1.05;const mag=Math.hypot(ux,uz)||1;ux/=mag;uz/=mag;
+ const headings=oncoming>.12?[-.48,-.95,0,-1.4,.48,.95,1.4,Math.PI]
+                            :[0,-.48,.48,-.95,.95,-1.4,1.4,Math.PI];
  let best=pos,bestScore=-Infinity;
  for(const angle of headings){const co=Math.cos(angle),si=Math.sin(angle),xx=ux*co-uz*si,zz=ux*si+uz*co;
   const moved=moveWithCollision(pos,xx*speed,zz*speed,NPC_RADIUS);
   const actual=Math.hypot(moved.x-pos.x,moved.z-pos.z);
   if(actual<speed*.12)continue;
-  let overlap=false,clearance=3;
-  for(const o of npcs){if(o===n)continue;const dd=Math.hypot(moved.x-o.pos.x,moved.z-o.pos.z);
-   clearance=Math.min(clearance,dd);
-   if(dd<NPC_RADIUS*2-.015){overlap=true;break;}}
-  if(overlap||playerPos&&Math.hypot(moved.x-playerPos.x,moved.z-playerPos.z)<NPC_RADIUS+PLAYER_RADIUS+.04)continue;
+  // When two recruits are already overlapping, accept a step only if it
+  // strictly REDUCES combined penetration. This lets a packed squad untangle;
+  // actors that start separated still cannot pass through each other.
+  let clearance=3,oldOverlap=0,newOverlap=0;
+  for(const o of npcs){if(o===n)continue;
+   const before=Math.hypot(pos.x-o.pos.x,pos.z-o.pos.z);
+   const after=Math.hypot(moved.x-o.pos.x,moved.z-o.pos.z);
+   const min=NPC_RADIUS*2+(n.squadId!==undefined&&o.squadId===n.squadId ? .075 : -.015);
+   clearance=Math.min(clearance,after);
+   oldOverlap+=Math.max(0,min-before);
+   newOverlap+=Math.max(0,min-after);
+  }
+  if((newOverlap>.00001&&newOverlap>=oldOverlap-.0001)||
+     (playerPos&&Math.hypot(moved.x-playerPos.x,moved.z-playerPos.z)<NPC_RADIUS+PLAYER_RADIUS+.04))continue;
   const progress=((moved.x-pos.x)*dx+(moved.z-pos.z)*dz)/(speed*speed);
-  const score=progress*4+Math.min(1.0,clearance)*.25-Math.abs(angle)*.21;
+  const score=progress*(oncoming>.12?2.9:4)+Math.min(1.25,clearance)*.36
+   -Math.abs(angle)*.16+(oncoming>.12&&angle<-.01?.55:0)
+   +(oldOverlap-newOverlap)*13;
   if(score>bestScore){best=moved;bestScore=score;}
  }
  return best;
