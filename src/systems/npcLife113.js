@@ -2,7 +2,7 @@
 // Every actor owns needs/personality, chooses actions independently, and can
 // accept a two-way social invite. Facility positions use the approved layout103.
 // No generative API, remote services, or new meshes are required by the brains.
-import {RigAnimator} from '../characters/rigAnimator.js?v=117';
+import {RigAnimator} from '../characters/rigAnimator.js?v=119';
 import {installArmyProceduralActions,ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
 import {updateRangeShooter} from '../training/rangeTraining.js?v=111';
 import {canOccupy,moveNpc,moveWithCollision,staticClearance,NPC_RADIUS,PLAYER_RADIUS} from '../map/navCollision109.js?v=109';
@@ -18,7 +18,7 @@ const rand=(a,b)=>a+Math.random()*(b-a);
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const HEADS=['阿宏','阿明','阿杰','小林','阿偉','小陳','阿國','阿正','大雄','小張','阿哲','阿凱','阿軒','阿智',
  '阿豪','阿倫','小蔡','阿翔','阿廷','阿仁','小吳','阿勇','阿翔哥','小黃','阿彬','小陸','阿良','阿昇','小謝','阿達'];
-const ANIM_LOOPS=new Set(['Stand_and_Chat','Sit_Cross_Legged_on_Floor','Chair_Sit_Idle_M','Sit_and_Doze_Off','Pull_Radish',ARMY_PULLUP,ARMY_SWEEP,...GRENADE_MOTIONS]);
+const ANIM_LOOPS=new Set(['Stand_and_Chat','Sit_Cross_Legged_on_Floor','Chair_Sit_Idle_M','Sit_and_Doze_Off','Pull_Radish',ARMY_PULLUP,ARMY_SWEEP,'Sweeping_Both_Hands',...GRENADE_MOTIONS]);
 const CALIBRATION={
  chair:SAVED_ACTION_CALIBRATIONS['Chair_Sit_Idle_M@@chair'],
  doze:SAVED_ACTION_CALIBRATIONS['Sit_and_Doze_Off@@chair'],
@@ -181,7 +181,7 @@ const A={
  grenade:{label:'手榴彈投擲',base:1.0,tags:['training'],placeholder:true},
  pushup:{label:'伏地挺身',base:1.4,tags:['active']},
  situp:{label:'仰臥起坐',base:1.25,tags:['active']},
- sweep:{label:'掃地',base:1.1,tags:['chore'],placeholder:true},
+ sweep:{label:'掃地',base:1.1,tags:['chore']},
  weed:{label:'拔草',base:1.25,tags:['chore']},
  dining:{label:'排隊吃飯',base:1.2,tags:['rest'],placeholder:true},
  wash:{label:'洗碗',base:.8,tags:['chore'],placeholder:true},
@@ -214,7 +214,7 @@ const STATIC={
  assembly:[W(12.7,-8.3),W(14.7,-8.3),W(16.7,-8.3),W(18.7,-8.3)],
  basketballCoach:[W(-33.1,25.7),W(-39,25.7)],
 };
-const NEED_ANIM={bench:['Chair_Sit_Idle_M'],doze:['Sit_and_Doze_Off','Chair_Sit_Idle_M'],floor:['Sit_Cross_Legged_on_Floor'],weed:['Pull_Radish'],pushup:['push_up'],situp:['situps'],chat:['Stand_and_Chat'],greet:['Stand_and_Chat'],pullup:[ARMY_PULLUP,'Climb_Up_Rope','Idle'],sweep:[ARMY_SWEEP,'Idle']};
+const NEED_ANIM={bench:['Chair_Sit_Idle_M'],doze:['Sit_and_Doze_Off','Chair_Sit_Idle_M'],floor:['Sit_Cross_Legged_on_Floor'],weed:['Pull_Radish'],pushup:['push_up'],situp:['situps'],chat:['Stand_and_Chat'],greet:['Stand_and_Chat'],pullup:[ARMY_PULLUP,'Climb_Up_Rope','Idle'],sweep:['Sweeping_Both_Hands',ARMY_SWEEP,'Idle']};
 function pose(n,names=['Idle'],rate=1){
  let clip='Idle';for(const c of names){if(n.anim.hasClip(c)){clip=c;break;}}
  if(n.anim.clip!==clip)n.anim.setClip(clip);

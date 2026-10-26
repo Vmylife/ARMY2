@@ -3,7 +3,8 @@ import {CampBuildings,BUILDING_MODELS} from './buildings/buildingRenderer.js?v=1
 import {CampProps,PROP_MODELS} from './props/propRenderer.js?v=120';
 import {loadGlb} from './core/glb111.js?v=111';
 import {ArmyRenderer} from './core/renderer.js?v=116';
-import {RigAnimator} from './characters/rigAnimator.js?v=117';
+import {RigAnimator} from './characters/rigAnimator.js?v=119';
+import {TwoHandBroomRenderer} from './characters/twoHandBroomRenderer119.js?v=119';
 import {RifleRenderer} from './training/rifleRenderer.js?v=117';
 import {createRangeAudio} from './training/rangeTraining.js?v=111';
 import {CAMP} from './map/camp.js?v=093';
@@ -13,7 +14,7 @@ import {drawMinimap} from './ui/minimap.js?v=093';
 import {initWorldMap} from './ui/worldMap.js?v=093';
 import {setupInput} from './ui/input.js?v=062';
 import {options} from './systems/settings.js?v=060';
-import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=127';
+import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=119';
 
 const $=id=>document.getElementById(id);
 const debug=new URLSearchParams(location.search).has('debug');
@@ -32,7 +33,7 @@ function movement(mag){
  return {clip:'RunFast',speed:lerp(options.runSpeed,options.sprintSpeed,(mag-options.sprintThreshold)/(1-options.sprintThreshold)),rate:lerp(1.3,1.56,mag)};
 }
 const modelUrl='./assets/characters/cadet/cadet-green.glb?v=120';
-const lifeModelUrl='./assets/characters/cadet/cadet-life-lite.glb?v=120';
+const lifeModelUrl='./assets/characters/cadet/cadet-life-lite.glb?v=119';
 
 async function boot(){
  let step='初始化軍營';
@@ -67,6 +68,7 @@ async function boot(){
   step='建立 NPC 貼圖';await stage(renderer.addModel('lifeRecruit',npcGlb),'NPC 貼圖',45000);
   npcPart=1;progress('NPC 動畫就位');
   const rifleRenderer=new RifleRenderer(renderer.gl);
+  const sweepBroom=new TwoHandBroomRenderer(renderer.gl);
   const buildings=new CampBuildings(renderer.gl);
   const props=new CampProps(renderer.gl);
   const playRangeShot=createRangeAudio();
@@ -172,7 +174,7 @@ async function boot(){
       if(b.activity.textContent!==label)b.activity.textContent=label;
       b.root.classList.toggle('npc-paired',Boolean(npc.task?.group));
       b.root.classList.toggle('npc-placeholder',Boolean(npc.task&&[
-        'basketball','pullup','sweep','dining','wash',
+        'basketball','pullup','dining','wash',
         'sentry','basketballCoach','grenade'].includes(npc.task.type)));
       b.root.style.transform=`translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-100%)`;
     }
@@ -219,6 +221,7 @@ async function boot(){
       if(npc.shotPending){npc.shotPending=false;playRangeShot(distance)}
       if(renderer.isActorVisible(npc.pos)){
        npc.anim.evaluate(dt);floorCorrectCrossSit(npc.anim);renderer.drawActor('lifeRecruit',npc);
+       if(npc.anim.clip==='Sweeping_Both_Hands')sweepBroom.draw(renderer,npc);
        if(npc.home.job==='shoot')rifleRenderer.draw(renderer.vp,npc,now);
       }
     }

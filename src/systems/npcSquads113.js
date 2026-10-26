@@ -4,12 +4,12 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=127';
+ faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=119';
 import {canOccupy,moveNpc,moveWithCollision} from '../map/navCollision109.js?v=109';
 import {PROPS} from '../map/camp.js?v=093';
 import {ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
 import {chooseGrenadeMotion,calibratedGrenadePose} from '../training/grenadeCalibration112.js?v=125';
-import {grenadeQueueMarks} from '../training/grenadeQueue117.js?v=127';
+import {grenadeQueueMarks} from '../training/grenadeQueue117.js?v=119';
 const W=(x,z)=>({x,z});
 const OBSTACLE_MOTIONS=['Jump_Over_Obstacle_1','Jump_Over_Obstacle_2'];
 function chooseObstacleMotion(anim){const clips=OBSTACLE_MOTIONS.filter(x=>anim.hasClip(x));return clips.length?clips[Math.floor(Math.random()*clips.length)]:null;}
@@ -29,7 +29,7 @@ const STAGES=[
    .slice(0,5).map(p=>W(p.x,p.z-.70)),clip:['Idle']},
  {id:'weed',name:'草地拔草',rally:W(-37,14),duration:16,limited:true,clip:['Pull_Radish','Idle']},
  {id:'sweep',name:'營舍周邊掃地',rally:W(-34,-7.4),duration:16,
-  points:[W(-34,-5.6),W(-33.5,-3.7),W(-33,-1.8),W(-32.5,.1),W(-32,2)],clip:[ARMY_SWEEP,'Idle']}
+  points:[W(-34,-5.6),W(-33.5,-3.7),W(-33,-1.8),W(-32.5,.1),W(-32,2)],clip:['Sweeping_Both_Hands',ARMY_SWEEP,'Idle']}
 ];
 const FORM=[{back:0,side:0},{back:1.48,side:-.65},{back:1.48,side:.65},{back:2.98,side:-.65},{back:2.98,side:.65}];
 const GROUPS=[];

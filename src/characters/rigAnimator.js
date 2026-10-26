@@ -1,5 +1,5 @@
 import {I,mul,trs} from '../core/math.js';
-const LOOP=new Set(['Idle','Walking','Running','Casual_Walk','RunFast','Run_03','Idle_11','Talk_with_Left_Hand_on_Hip','push_up','situps','Army_Pullup','Army_Sweep']);
+const LOOP=new Set(['Idle','Walking','Running','Casual_Walk','RunFast','Run_03','push_up','situps','Army_Pullup','Army_Sweep','Sweeping_Both_Hands']);
 const ease=(a,b,t)=>a+(b-a)*t;
 function lerpQuat(a,b,t){let dot=a.reduce((sum,v,i)=>sum+v*b[i],0);const bv=dot<0?b.map(x=>-x):b;let q=a.map((v,i)=>ease(v,bv[i],t));const len=Math.hypot(...q)||1;return q.map(x=>x/len)}
 function readTrack(t,x,quat=false){const {times,values,width,interpolation}=t;const n=times.length;
@@ -30,7 +30,7 @@ export class RigAnimator{
  constructor(gltf){this.gltf=gltf;this.j=gltf.json;this.nodes=this.j.nodes;this.inverse=this.j.skins[0].inverseBindMatrices!==undefined?gltf.read(this.j.skins[0].inverseBindMatrices):null;this.joints=this.j.skins[0].joints;this.parents=new Map();this.nodes.forEach((n,i)=>{for(const c of n.children||[])this.parents.set(c,i)});this.meshIndex=this.nodes.findIndex(n=>n.mesh!==undefined);
  this.clips={};for(const anim of this.j.animations||[]){let max=0;const tracks=new Map();for(const c of anim.channels){const s=anim.samplers[c.sampler],times=gltf.read(s.input),values=gltf.read(s.output),path=c.target.path;max=Math.max(max,times[times.length-1]||0);tracks.set(`${c.target.node}/${path}`,{times,values,width:path==='rotation'?4:3,interpolation:s.interpolation||'LINEAR'})}this.clips[anim.name]={duration:max,tracks}}
  if(!this.clips.Idle){const walk=this.clips.Walking||this.clips.Casual_Walk;if(walk)this.clips.Idle=buildIdleClip(walk);}
- this.clip='Idle';this.clock=0;this.speed=1;this.bones=new Float32Array(this.joints.length*16);this.globals=new Map();this.prevClip=null;this.transition=0;this.prevTime=0;this.completed=false;this.rifleAim=0;this.recoil=0;this.handNode=this.nodes.findIndex(n=>n.name==='mixamorig:RightHand');this.rightHandWorld=null;
+ this.clip='Idle';this.clock=0;this.speed=1;this.bones=new Float32Array(this.joints.length*16);this.globals=new Map();this.prevClip=null;this.transition=0;this.prevTime=0;this.completed=false;this.rifleAim=0;this.recoil=0;this.handNode=this.nodes.findIndex(n=>n.name==='mixamorig:RightHand');this.rightHandWorld=null;this.leftHandNode=this.nodes.findIndex(n=>n.name==='mixamorig:LeftHand');this.leftHandWorld=null;
  }
  setClip(name,{restart=false}={}){if(!this.clips[name])return false;if(this.clip===name&&!restart)return true;
  this.prevClip=this.clip;this.prevTime=this.clock;this.transition=.18;this.clip=name;this.clock=0;this.completed=false;return true}
@@ -50,6 +50,7 @@ export class RigAnimator{
  for(let k=0;k<this.joints.length;k++){const i=this.joints[k],global=world(i),inv=this.inverse?this.inverse.subarray(k*16,k*16+16):I;this.bones.set(mul(global,inv),k*16)}
  // Keep a direct reference to the evaluated world-space wrist for held props.
  this.rightHandWorld=this.handNode>=0?world(this.handNode):null;
+ this.leftHandWorld=this.leftHandNode>=0?world(this.leftHandNode):null;
  return this.bones;
  }
 }
