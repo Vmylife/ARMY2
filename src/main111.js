@@ -13,7 +13,7 @@ import {drawMinimap} from './ui/minimap.js?v=093';
 import {initWorldMap} from './ui/worldMap.js?v=093';
 import {setupInput} from './ui/input.js?v=062';
 import {options} from './systems/settings.js?v=060';
-import {createCampNPCs,updateCampNPCs} from './systems/npcLife109.js?v=109';
+import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=113';
 
 const $=id=>document.getElementById(id);
 const debug=new URLSearchParams(location.search).has('debug');
@@ -103,7 +103,7 @@ async function boot(){
   step='建立主角骨架';const player={pos:{...CAMP.spawn},angle:0,anim:new RigAnimator(heroGlb)};
   player.anim.setClip('Idle');player.anim.evaluate(0);
   const npcs=createCampNPCs(npcGlb);
-  progress('30 名 NPC 已就位，建立鏡頭…');
+  progress('30 名 NPC：4 支小隊＋10 名自由活動士兵已就位…');
   const showNavDebug=debug?createNavDebugger():null;
   // The new cross-legged clip drops the hips below the original standing root.
   // Lift only the cross-legged skin pose to ground contact; the existing
@@ -229,7 +229,7 @@ async function boot(){
       if(!worldMap.isOpen())drawMinimap(player.pos,null,false,mapFacing,mapYaw);
       worldMap.update(player.pos,null,player.angle);lastMap=now;
     }
-    if(debug&&now-lastDebug>150){$('debug').hidden=false;$('debug').textContent=`fps: ${measuredFps}\nNPC: ${npcs.length}\nmode: ${m.clip}\npos: ${player.pos.x.toFixed(2)},${player.pos.z.toFixed(2)}\ninput: ${stick.magnitude.toFixed(2)}\nzoom: ${cameraZoom.toFixed(2)}\nrenderer: webgl2`;lastDebug=now}
+    if(debug&&now-lastDebug>150){$('debug').hidden=false;$('debug').textContent=`fps: ${measuredFps}\nNPC: ${npcs.length} (10自由＋4x5小隊)\n${squadDebug().map(s=>`隊${s.squad}: ${s.stage} ${s.phase} (${s.done}/5)`).join('\n')}\nmode: ${m.clip}\npos: ${player.pos.x.toFixed(2)},${player.pos.z.toFixed(2)}\ninput: ${stick.magnitude.toFixed(2)}\nzoom: ${cameraZoom.toFixed(2)}\nrenderer: webgl2`;lastDebug=now}
     // First frame (including ground + ALL models) must complete before reveal.
     if(!entered){entered=true;window.armyLoadComplete?.();last=now;}
     requestAnimationFrame(tick);
