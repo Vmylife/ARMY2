@@ -10,8 +10,21 @@ import {PROPS} from '../map/camp.js?v=093';
 import {ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
 import {chooseGrenadeMotion,calibratedGrenadePose} from '../training/grenadeCalibration112.js?v=125';
 import {grenadeQueueMarks} from '../training/grenadeQueue117.js?v=119';
+import {prepareLandingClip} from '../training/obstacleLanding120.js?v=120';
 const W=(x,z)=>({x,z});
 const OBSTACLE_MOTIONS=['Jump_Over_Obstacle_1','Jump_Over_Obstacle_2'];
+// The two GLB jumps carry 2.8m/3.9m of forward translation in the pelvis bone.
+// Read the ORIGINAL data; never try to restart that movement at a fixed world X/Z.
+function jumpLandingDisplacement(anim,clipName){
+ const clip=anim.clips[clipName];if(!clip)return {x:0,z:0};
+ const hips=anim.nodes.findIndex(n=>n.name==='mixamorig:Hips');
+ const jump=clip.tracks.get(`${hips}/translation`);
+ const walk=anim.clips.Walking?.tracks.get(`${hips}/translation`);
+ if(!jump?.values?.length)return {x:0,z:0};
+ const start=walk?.values||jump.values;
+ const last=jump.values.length-jump.width;
+ return {x:jump.values[last]-(start[0]||0),z:jump.values[last+2]-(start[2]||0)};
+}
 function chooseObstacleMotion(anim){const clips=OBSTACLE_MOTIONS.filter(x=>anim.hasClip(x));return clips.length?clips[Math.floor(Math.random()*clips.length)]:null;}
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -200,15 +213,9 @@ function trainPose(n,stage,dt,now,current){
    n.renderLift=current?.motionPose?.lift||0;
    if(current?.motionPose)n.angle=current.motionPose.angle;
   }else if(stage.id==='obstacle'){
-   // Every soldier independently chooses one of the two real hurdle jumps.
-   // Restart only after the current clip finishes, never halfway through it.
-   if(current?.motion&&n.anim.finished()){
-    current.motion=chooseObstacleMotion(n.anim)||current.motion;
-    n.anim.setClip(current.motion,{restart:true});
-    n.anim.transition=0;n.anim.prevClip=null;
-   }
-   poseSquadMember(n,current?.motion?[current.motion]:['Idle']);
-   n.angle=0; // All five jump towards the far side of their own hurdle.
+   // The obstacle's one-shot jump/landing/egress is controlled in trainSquad.
+   // Never restart a baked root-translation animation from the same world point.
+   poseSquadMember(n,['Idle']);
   }else poseSquadMember(n,stage.clip||['Idle']);
   if(stage.id==='pullup')faceSquadMember(n,0,-1,dt);
  }
@@ -246,15 +253,25 @@ function trainSquad(s,dt,now,all,playerPos){
    if(!free.length)continue;
    slot=free[0];if(!claimSquadSlot(slot,token))continue;
   }else{
-   const pos=assignedSpot(stage,i);if(!pos)continue;
-   slot={key:null,pos};
+   if(stage.id==='obstacle'){
+    // Use the REAL number of hurdles in the latest exported camp map (can be one).
+    // Each hurdle is single occupancy; other members must queue until it clears.
+    const used=new Set([...s.active.values()].map(c=>c.obstacleLane));
+    const index=stage.points.findIndex((point,j)=>!used.has(j));
+    if(index<0)continue;
+    slot={key:null,pos:stage.points[index]};
+    var obstacleLane=index;
+   }else{
+    const pos=assignedSpot(stage,i);if(!pos)continue;
+    slot={key:null,pos};
+   }
   }
   const motion=stage.id==='grenade'?chooseGrenadeMotion(n.anim)
     :stage.id==='obstacle'?chooseObstacleMotion(n.anim):null;
   const motionPose=stage.id==='grenade'?calibratedGrenadePose(slot,motion):null;
   // Keep the original slot reservation (shared with free NPCs), but navigate
   // to the exact marked position for the chosen animation.
-  s.active.set(n.id,{slot,token,motion,motionPose,elapsed:0,travel:0});
+  s.active.set(n.id,{slot,token,motion,motionPose,obstacleLane,obstaclePhase:'approach',obstacleTime:0,elapsed:0,travel:0});
   n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;
  }
  // Push-up drills run as a synchronized five-person unit, not five individual timers.
@@ -291,6 +308,8 @@ function trainSquad(s,dt,now,all,playerPos){
  for(let i=0;i<5;i++){
   const n=s.members[i],current=s.active.get(n.id);
   if(s.done.has(n.id)){
+   // After jumping, remain on the FAR side of the hurdle, not back at start.
+   if(stage.id==='obstacle'){setIdle(n,`第${s.id+1}小隊 · 已跨欄，等待隊友`);continue;}
    // Finished recruits move to a waiting line until the whole squad is ready.
    const spot=queuePoint(stage,i);
    if(dist(n.pos,spot)>.85)moveSquadMember(n,spot,dt,false);
@@ -305,6 +324,71 @@ function trainSquad(s,dt,now,all,playerPos){
    continue;
   }
   current.travel+=dt;
+  if(stage.id==='obstacle'){
+   // One jump, one landing, then walk FORWARD away from the hurdle.
+   // Original GLB pelvis translation is already rendered while jumping.
+   // On the final frame, hand off that distance to the actor's world position,
+   // then switch to Walking without blending the old 3.9m hip translation back.
+   if(current.obstaclePhase==='exit'){
+    const finish=current.exitPoint;
+    if(dist(n.pos,finish)>.66)moveSquadMember(n,finish,dt,false);
+    else poseSquadMember(n,['Idle']);
+    n.activity=`第${s.id+1}小隊 · 跨欄落地後離場`;
+    if(dist(n.pos,finish)<.75||current.travel>18){releaseMemberSlot(s,n);s.done.add(n.id);}
+    continue;
+   }
+   if(current.obstaclePhase==='landing'){
+    current.landingElapsed+=dt;
+    if(current.landingElapsed>=.36){
+     current.obstaclePhase='exit';n.anim.setClip('Walking',{restart:true});
+     n.anim.prevClip=null;n.anim.transition=0;
+     poseSquadMember(n,['Walking']);
+    }else{
+     n.anim.setClip(current.landingMotion);n.anim.clock=current.landingElapsed;
+     n.anim.prevClip=null;n.anim.transition=0;
+     n.activity=`第${s.id+1}小隊 · 跨欄落地收尾`;n.state='training';
+    }
+    continue;
+   }
+   if(current.obstaclePhase==='jump'){
+    const duration=n.anim.clips[current.motion]?.duration||1;
+    current.obstacleTime+=dt;
+    if(current.obstacleTime>=duration){
+     const offset=jumpLandingDisplacement(n.anim,current.motion);
+     const c=Math.cos(n.angle),si=Math.sin(n.angle);
+     n.pos={x:current.jumpStart.x+offset.x*c+offset.z*si,
+            z:current.jumpStart.z-offset.x*si+offset.z*c};
+     current.exitPoint={x:n.pos.x+(i-2)*.9+Math.sin(n.angle)*1.35,z:n.pos.z+Math.cos(n.angle)*1.35};
+     current.obstaclePhase='landing';current.landingElapsed=0;
+     current.landingMotion=prepareLandingClip(n.anim,current.motion);
+     n.route=null;n.routeGoal=null;n.routeIndex=0;
+     n.anim.setClip(current.landingMotion||'Walking',{restart:true});
+     n.anim.prevClip=null;n.anim.transition=0;
+     n.activity=`第${s.id+1}小隊 · 跨欄完成，落地收尾`;n.state='training';
+    }else{
+     // Clock synchronization also works for offscreen NPCs whose skeleton
+     // isn't evaluated/rendered every frame by the main loop.
+     n.anim.setClip(current.motion);n.anim.clock=current.obstacleTime;
+     n.anim.prevClip=null;n.anim.transition=0;
+     n.angle=0;
+     n.activity=`第${s.id+1}小隊 · 跨越障礙`;n.state='training';
+    }
+    continue;
+   }
+   const goal=current.slot.pos;
+   if(dist(n.pos,goal)>.60){
+    moveSquadMember(n,goal,dt,false);
+    n.activity=`第${s.id+1}小隊 · 跨欄起點就位`;
+    if(current.travel>35){releaseMemberSlot(s,n);s.done.add(n.id);}
+   }else{
+    current.obstaclePhase='jump';current.jumpStart={...n.pos};current.obstacleTime=0;
+    n.angle=0;n.anim.setClip(current.motion,{restart:true});
+    n.anim.transition=0;n.anim.prevClip=null;n.anim.clock=0;
+    poseSquadMember(n,[current.motion]);
+    n.activity=`第${s.id+1}小隊 · 起跑跨欄`;n.state='training';
+   }
+   continue;
+  }
   const goal=current.motionPose?.pos||current.slot.pos;
   const near=dist(n.pos,goal);
   if(near>(stage.id==='grenade'?.12:.65)){

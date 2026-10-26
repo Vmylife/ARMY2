@@ -2,9 +2,10 @@
 import {ArmyRenderer} from '../core/renderer.js?v=092';
 import {CampProps} from '../props/propRenderer.js?v=120';
 import {PROPS} from '../map/camp.js?v=092';
-import {RigAnimator} from './rigAnimatorTwoHands118.js?v=118';
+import {RigAnimator} from './rigAnimatorTwoHands118.js?v=120';
 import {RifleRenderer} from '../training/rifleRenderer.js?v=117';
 import {installArmyProceduralActions,ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js';
+import {installSimplePullupPreview,SIMPLE_PULLUP} from './simplePullup120.js?v=120';
 import {BroomRenderer} from './broomRenderer117.js';
 import {TwoHandBroomRenderer} from './twoHandBroomRenderer118.js?v=118';
 import {loadGlb} from '../core/glb111.js';
@@ -31,8 +32,8 @@ const PROP_CONFIG={
  weed:{type:'weed',label:'雜草',x:-7.25,z:-4.3,scale:.55,yaw:0,url:'assets/props/weed.glb?v=115'},
  ground:{label:'空地',x:0,z:-3.8,yaw:0}
 };
-const LABELS={[SWEEP_BOTH]:'掃地（新 GLB · 左右手握掃把）',[PROGRAM_SENTRY]:'站哨（遊戲現役立正）',baseball_pitching:'投球／手榴彈投擲',Crouch_Pull_and_Throw:'蹲下投擲手榴彈',[SALUTE]:'敬禮',[ORIGINAL_AIM]:'原始05舉槍／開槍',[ARMY_PULLUP]:'拉單槓（新製作）',[ARMY_SWEEP]:'掃地＋掃把（新製作）',Jump_Over_Obstacle_1:'跨欄跳躍 1',Jump_Over_Obstacle_2:'跨欄跳躍 2',Idle:'站立待機',Walking:'走路',Running:'跑步',RunFast:'全速奔跑',Chair_Sit_Idle_M:'坐椅子',Sit_Cross_Legged_on_Floor:'盤腿坐地',Stand_and_Chat:'站立聊天',Sit_and_Doze_Off:'坐著打瞌睡',Pull_Radish:'拔草／拉取',push_up:'伏地挺身',situps:'仰臥起坐',Climb_Up_Rope:'攀繩',Punch_Combo_1:'拳擊組合',Forward_Roll_and_Fire:'前滾翻',Victory_Cheer:'歡呼',Knock_Down:'倒下',Sleep_Normally:'躺下睡覺'};
-const ANCHORS={[SWEEP_BOTH]:'ground',[PROGRAM_SENTRY]:'guard',baseball_pitching:'grenade',Crouch_Pull_and_Throw:'grenade',Jump_Over_Obstacle_1:'hurdle',Jump_Over_Obstacle_2:'hurdle',[ARMY_PULLUP]:'pullup',[ARMY_SWEEP]:'ground',[PROGRAM_RIFLE]:'ground',[ORIGINAL_AIM]:'ground',Chair_Sit_Idle_M:'chair',Sit_and_Doze_Off:'chair',Sit_Cross_Legged_on_Floor:'ground',Climb_Up_Rope:'pullup',Pull_Radish:'weed',push_up:'ground',situps:'ground',Sleep_Normally:'ground'};
+const LABELS={[SIMPLE_PULLUP]:'拉單槓（新版：雙手握槓、身體上下）',[SWEEP_BOTH]:'掃地（新 GLB · 左右手握掃把）',[PROGRAM_SENTRY]:'站哨（遊戲現役立正）',baseball_pitching:'投球／手榴彈投擲',Crouch_Pull_and_Throw:'蹲下投擲手榴彈',[SALUTE]:'敬禮',[ORIGINAL_AIM]:'原始05舉槍／開槍',[ARMY_PULLUP]:'拉單槓（新製作）',[ARMY_SWEEP]:'掃地＋掃把（新製作）',Jump_Over_Obstacle_1:'跨欄跳躍 1',Jump_Over_Obstacle_2:'跨欄跳躍 2',Idle:'站立待機',Walking:'走路',Running:'跑步',RunFast:'全速奔跑',Chair_Sit_Idle_M:'坐椅子',Sit_Cross_Legged_on_Floor:'盤腿坐地',Stand_and_Chat:'站立聊天',Sit_and_Doze_Off:'坐著打瞌睡',Pull_Radish:'拔草／拉取',push_up:'伏地挺身',situps:'仰臥起坐',Climb_Up_Rope:'攀繩',Punch_Combo_1:'拳擊組合',Forward_Roll_and_Fire:'前滾翻',Victory_Cheer:'歡呼',Knock_Down:'倒下',Sleep_Normally:'躺下睡覺'};
+const ANCHORS={[SIMPLE_PULLUP]:'pullup',[SWEEP_BOTH]:'ground',[PROGRAM_SENTRY]:'guard',baseball_pitching:'grenade',Crouch_Pull_and_Throw:'grenade',Jump_Over_Obstacle_1:'hurdle',Jump_Over_Obstacle_2:'hurdle',[ARMY_PULLUP]:'pullup',[ARMY_SWEEP]:'ground',[PROGRAM_RIFLE]:'ground',[ORIGINAL_AIM]:'ground',Chair_Sit_Idle_M:'chair',Sit_and_Doze_Off:'chair',Sit_Cross_Legged_on_Floor:'ground',Climb_Up_Rope:'pullup',Pull_Radish:'weed',push_up:'ground',situps:'ground',Sleep_Normally:'ground'};
 const DEFAULTS={
  chair:{x:0,z:0,y:0,yaw:0,speed:1},
  pullup:{x:0,z:-.48,y:0,yaw:180,speed:1},
@@ -42,7 +43,7 @@ const DEFAULTS={
  weed:{x:0,z:0,y:0.09,yaw:0,speed:1},
  ground:{x:0,z:0,y:0,yaw:0,speed:1}
 };
-const BUILTIN_CALIBRATIONS=SAVED_ACTION_CALIBRATIONS;
+const BUILTIN_CALIBRATIONS={...SAVED_ACTION_CALIBRATIONS,[`${SIMPLE_PULLUP}@@pullup`]:{x:0,z:-.09,y:.37,yaw:180,speed:1}};
 function newStore(){return {version:1,model:MODEL,calibrations:{...BUILTIN_CALIBRATIONS}};}
 let store=newStore();try{const s=JSON.parse(localStorage.getItem(STORAGE)||'null');if(s&&s.calibrations&&typeof s.calibrations==='object')store={...newStore(),calibrations:{...BUILTIN_CALIBRATIONS,...s.calibrations}};}catch(_){/* storage may be unavailable */}
 const data={renderer:null,props:null,actor:null,anim:null,clip:'Idle',anchor:'chair',playing:false,loop:true,rifle:null,broom:null,broom2:null,lastShotAt:0,pose:{...DEFAULTS.chair},last:0,cameraYaw:.65,cameraPitch:.53,cameraZoom:9.6,loaded:false,ground:null};
@@ -55,7 +56,7 @@ function updateSliderText(key){const n=Number($(key).value);$(key+'Val').textCon
 function exportCalibration(){return {animation:data.clip,anchor:data.anchor,offset:{...data.pose},model:displayedModel};}
 function renderCurrentJSON(){$('currentJSON').textContent=JSON.stringify(exportCalibration(),null,2);}
 function setAnchor(anchor){if(!PROP_CONFIG[anchor])return;data.anchor=anchor;$('anchor').value=anchor;data.pose=currentPreset();fillSliders();data.renderer.cameraReady=false;data.cameraZoom=6.9;}
-function changeClip(name,automaticAnchor=true){if(!data.anim?.hasClip(name)&&name!==PROGRAM_RIFLE&&name!==PROGRAM_SENTRY)return;data.clip=name;$('clip').value=name;if(automaticAnchor)setAnchor(ANCHORS[name]||'ground');else {data.pose=currentPreset();fillSliders();}data.anim.setClip((name===PROGRAM_RIFLE||name===PROGRAM_SENTRY)?'Idle':name,{restart:true});data.anim.rifleAim=name===PROGRAM_RIFLE?1:0;data.anim.transition=0;data.anim.prevClip=null;data.anim.clock=0;data.anim.completed=false;data.anim.speed=data.pose.speed;data.playing=true;data.last=0;updateTimeline();$('clipHint').textContent=name===PROGRAM_RIFLE?'遊戲現役自製舉槍：骨架 RIFLE_POSE＋步槍、後座、槍口火光。':name===ORIGINAL_AIM?'原始 GLB 的 05 舉槍：保留原骨架姿勢，另外顯示實際步槍及開火效果，請比較槍口是否吻合。':name===ARMY_PULLUP?'新製作拉單槓動作：手臂抓槓、軀幹上下起伏。先用位置／高度／朝向把手掌校到橫桿。':name===PROGRAM_SENTRY?'與軍營一致的立正站哨姿勢，請在哨口建築前校正站位。':name===ARMY_SWEEP?'原本程式掃地動作（右手帶動掃把），保留供比較。':name===SWEEP_BOTH?'你最新 Meshy 掃地 GLB：掃把柄每幀穿過左右手握點，掃頭隨雙手上下左右移動。請從正面、側面檢查握把與刷頭。':`${LABELS[name]||'原始動畫'} · ${name}。可調整士兵與設施的相對站位，校正後按「儲存本動作校正」。`;}
+function changeClip(name,automaticAnchor=true){if(!data.anim?.hasClip(name)&&name!==PROGRAM_RIFLE&&name!==PROGRAM_SENTRY)return;data.clip=name;$('clip').value=name;if(automaticAnchor)setAnchor(ANCHORS[name]||'ground');else {data.pose=currentPreset();fillSliders();}data.anim.setClip((name===PROGRAM_RIFLE||name===PROGRAM_SENTRY)?'Idle':name,{restart:true});data.anim.rifleAim=name===PROGRAM_RIFLE?1:0;data.anim.transition=0;data.anim.prevClip=null;data.anim.clock=0;data.anim.completed=false;data.anim.speed=data.pose.speed;data.playing=true;data.last=0;updateTimeline();$('clipHint').textContent=name===PROGRAM_RIFLE?'遊戲現役自製舉槍：骨架 RIFLE_POSE＋步槍、後座、槍口火光。':name===ORIGINAL_AIM?'原始 GLB 的 05 舉槍：保留原骨架姿勢，另外顯示實際步槍及開火效果，請比較槍口是否吻合。':name===SIMPLE_PULLUP?'新版簡化引體向上預覽：雙手向上固定握槓，身體規律升降；不使用攀繩動畫，也不影響主遊戲。':name===ARMY_PULLUP?'新製作拉單槓動作：手臂抓槓、軀幹上下起伏。先用位置／高度／朝向把手掌校到橫桿。':name===PROGRAM_SENTRY?'與軍營一致的立正站哨姿勢，請在哨口建築前校正站位。':name===ARMY_SWEEP?'原本程式掃地動作（右手帶動掃把），保留供比較。':name===SWEEP_BOTH?'你最新 Meshy 掃地 GLB：掃把柄每幀穿過左右手握點，掃頭隨雙手上下左右移動。請從正面、側面檢查握把與刷頭。':`${LABELS[name]||'原始動畫'} · ${name}。可調整士兵與設施的相對站位，校正後按「儲存本動作校正」。`;}
 function updateTimeline(){if(!data.anim)return;if(data.clip===PROGRAM_RIFLE||data.clip===PROGRAM_SENTRY){$('timeline').value=0;$('timeline').disabled=true;$('timeLabel').textContent=data.clip===PROGRAM_SENTRY?'站哨待機 · 循環':'程式動作 · 循環射擊';return;}$('timeline').disabled=false;const c=data.anim.clips[data.clip],dur=c?.duration||0,t=dur?Math.min(dur,data.anim.clock):0;$('timeline').value=dur?Math.round(t/dur*1000):0;$('timeLabel').textContent=`${t.toFixed(2)} / ${dur.toFixed(2)} 秒`;}
 function makeFloor(gl){
  const verts=[],cols=[],norms=[];
@@ -134,7 +135,7 @@ function bindControls(){
  $('loop').addEventListener('change',()=>{data.loop=$('loop').checked;});
  $('timeline').addEventListener('input',()=>{if(!data.anim||data.clip===PROGRAM_RIFLE||data.clip===PROGRAM_SENTRY)return;data.playing=false;data.anim.clock=(Number($('timeline').value)/1000)*data.anim.clips[data.clip].duration;data.anim.completed=false;data.anim.transition=0;data.anim.evaluate(0);updateTimeline();});
  for(const key of VARS)$(key).addEventListener('input',()=>{data.pose[key]=Number($(key).value);updateSliderText(key);renderCurrentJSON();});
- $('resetPose').addEventListener('click',()=>{data.pose={...DEFAULTS[data.anchor]};fillSliders();$('saveStatus').textContent='已恢復預設數值；按「儲存」才會覆蓋已保存的設定。';});
+ $('resetPose').addEventListener('click',()=>{data.pose=data.clip===SIMPLE_PULLUP?{...BUILTIN_CALIBRATIONS[`${SIMPLE_PULLUP}@@pullup`]}:{...DEFAULTS[data.anchor]};fillSliders();$('saveStatus').textContent='已恢復預設數值；按「儲存」才會覆蓋已保存的設定。';});
  $('savePose').addEventListener('click',()=>{store.calibrations[currentKey()]={...data.pose};saveStorage();$('saveStatus').textContent=`已儲存：${LABELS[data.clip]||data.clip}＋${PROP_CONFIG[data.anchor].label}。`;});
  $('exportAll').addEventListener('click',()=>{const result={...store,exportedAt:new Date().toISOString(),current:exportCalibration()};const blob=new Blob([JSON.stringify(result,null,2)],{type:'application/json'});const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='army-animation-calibration.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),2000);});
  $('copyPose').addEventListener('click',async()=>{const txt=JSON.stringify(exportCalibration(),null,2);try{await navigator.clipboard.writeText(txt);$('saveStatus').textContent='目前動作數值已複製。';}catch(_){$('saveStatus').textContent='無法自動複製，請直接從下方 JSON 區塊選取。';}});
@@ -148,13 +149,13 @@ function bindControls(){
 async function installSoldier(g,modelName){
  // Full replacement of the preview soldier only; the active military camp is unchanged.
  if(!g?.json?.skins?.length||!g?.json?.meshes?.length||!g?.json?.animations?.length)throw Error('GLB 必須包含完整士兵網格、骨架與動畫');
- const next=installArmyProceduralActions(new RigAnimator(g));next.setClip('Idle');next.evaluate(0);
+ const next=installSimplePullupPreview(installArmyProceduralActions(new RigAnimator(g)));next.setClip('Idle');next.evaluate(0);
  await data.renderer.addModel('labSoldier',g);
  data.anim=next;data.actor={pos:{x:0,z:0},angle:0,height:0,anim:next};displayedModel=modelName;
- const names=Object.keys(next.clips),seen=names.filter(n=>n!=='Idle'&&n!==ARMY_PULLUP&&n!==ARMY_SWEEP);
- $('clip').innerHTML='';for(const [i,key] of ['Idle',ARMY_PULLUP,ARMY_SWEEP,PROGRAM_RIFLE,PROGRAM_SENTRY,...seen].entries()){const op=document.createElement('option');op.value=key;op.textContent=key===PROGRAM_RIFLE?'遊戲實際舉槍／射擊（程式動作）':(key==='baseball_pitching'||key==='Crouch_Pull_and_Throw')?LABELS[key]:`${LABELS[key]||(/^[0-9_a-f-]{25,}$/.test(key)?'未命名動作 '+(i+1):'其他動作')} · ${key}`;$('clip').append(op);}
+ const names=Object.keys(next.clips),seen=names.filter(n=>n!=='Idle'&&n!==ARMY_PULLUP&&n!==ARMY_SWEEP&&n!==SIMPLE_PULLUP);
+ $('clip').innerHTML='';for(const [i,key] of ['Idle',SIMPLE_PULLUP,ARMY_PULLUP,ARMY_SWEEP,PROGRAM_RIFLE,PROGRAM_SENTRY,...seen].entries()){const op=document.createElement('option');op.value=key;op.textContent=key===PROGRAM_RIFLE?'遊戲實際舉槍／射擊（程式動作）':(key==='baseball_pitching'||key==='Crouch_Pull_and_Throw')?LABELS[key]:`${LABELS[key]||(/^[0-9_a-f-]{25,}$/.test(key)?'未命名動作 '+(i+1):'其他動作')} · ${key}`;$('clip').append(op);}
  $('clip').disabled=false;for(const id of ['play','pause','restart','timeline'])$(id).disabled=false;
- changeClip(next.hasClip(SWEEP_BOTH)?SWEEP_BOTH:next.hasClip('Chair_Sit_Idle_M')?'Chair_Sit_Idle_M':names[0]);
+ changeClip(next.hasClip(SIMPLE_PULLUP)?SIMPLE_PULLUP:next.hasClip('Chair_Sit_Idle_M')?'Chair_Sit_Idle_M':names[0]);
 }
 async function load(){
  const canvas=$('labCanvas');const r=new ArmyRenderer(canvas);data.renderer=r;
