@@ -4,7 +4,7 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=121';
+ faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=122';
 import {canOccupy,moveNpc,moveWithCollision} from '../map/navCollision109.js?v=109';
 import {PROPS} from '../map/camp.js?v=093';
 import {ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
@@ -34,7 +34,7 @@ const STAGES=[
  {id:'jog',name:'操場跑步',rally:W(-29,-2.8),duration:36},
  {id:'pushup',name:'集合場伏地挺身',rally:W(10.4,-8.3),duration:16,
   points:[W(12.2,-6.9),W(15.3,-6.9),W(18.4,-6.9),W(13.75,-10.1),W(16.85,-10.1)],clip:['push_up','Idle']},
- {id:'pullup',name:'拉單槓',rally:W(19,-12.6),duration:10,limited:true,clip:[SIMPLE_PULLUP,'Idle']},
+ {id:'pullup',name:'拉單槓',rally:W(12.21,-11.44),duration:10,limited:true,clip:[SIMPLE_PULLUP,'Idle']},
  {id:'shoot',name:'靶場打靶',rally:W(10.7,14.3),duration:11,limited:true,clip:['Idle']},
  {id:'grenade',name:'手榴彈投擲',rally:W(-37.4,-29.3),duration:9,limited:true,clip:['Idle']},
  {id:'obstacle',name:'障礙訓練',rally:W(24.5,9.46),duration:12,
@@ -73,6 +73,13 @@ function setStage(s){
   const index=(s.nextIndex+skip)%STAGES.length,base=STAGES[index];
   if(base.id==='grenade'&&CAMP_T<STATION_COOLDOWN.grenade)continue;
   const stage={...base};
+  if(stage.id==='pushup'){
+   // Half of these five-person floor drills are synchronized sit-ups instead.
+   const situp=Math.random()<.5;
+   stage.drillClip=situp?'situps':'push_up';
+   stage.name=situp?'集合場仰臥起坐':'集合場伏地挺身';
+   stage.clip=[stage.drillClip,'Idle'];
+  }
   if(stage.id==='grenade'){
    const q=grenadeQueueMarks();if(q.length!==5)continue;
    stage.queuePoints=q;stage.rally={x:(q[0].x+q[2].x)/2,z:(q[0].z+q[2].z)/2};
@@ -130,6 +137,16 @@ function follow(s,n,index,dt,all,playerPos,run=false){
  const speedTarget=sep<.10?0:clamp(sep*2.0,0,run?2.85:2.0);
  const response=1-Math.exp(-7*dt);
  n.squadMoveSpeed=(n.squadMoveSpeed||0)+(speedTarget-(n.squadMoveSpeed||0))*response;
+ // When a member falls too far behind, use the same road-biased navigation
+ // as the leader. Direct body steering over a long distance cuts across lawns.
+ if(!run&&sep>3.15){
+  const before=n.pos;
+  moveSquadMember(n,goal,dt,true,true);
+  if(dist(before,n.pos)>.005)n.blocked=0;
+  n.activity=`第${s.id+1}小隊 · 沿道路追上隊伍`;
+  n.state='march';
+  return;
+ }
  const dx=goal.x-n.pos.x,dz=goal.z-n.pos.z;
  const before=n.pos;
  const step=Math.min(sep,Math.max(0,n.squadMoveSpeed)*dt);
@@ -158,7 +175,7 @@ function march(s,dt,all,playerPos){
  if(!halt||s.exitPoint&&s.elapsed>4){
   const point=s.exitPoint||s.goal;
   const before={...leader.pos};
-  moveSquadMember(leader,point,dt,false);
+  moveSquadMember(leader,point,dt,false,true);
   if(s.exitPoint){
    // The five-person group can otherwise deadlock each other beside the fence.
    // As a last-resort EGRESS ONLY, bypass actor-actor steering, but still obey
@@ -187,6 +204,12 @@ function march(s,dt,all,playerPos){
  else if(s.elapsed>85||leader.retries>9){releaseStage(s);setStage(s);}
 }
 function queuePoint(stage,index){
+ if(stage.id==='pullup'){
+  // 12.21,-11.44 is the approved rendezvous. Spread the five queue marks
+  // east along the walkway so nobody blocks the armory or the pull-up bars.
+  const mark=W(stage.rally.x+index*1.12,stage.rally.z);
+  return squadWorldGoal(mark)||mark;
+ }
  if(stage.id==='grenade'){
   // Exact, dynamically rebuilt staging marks near the throwing area.
   return stage.queuePoints[index%stage.queuePoints.length];
@@ -289,7 +312,7 @@ function trainSquad(s,dt,now,all,playerPos){
   });
   if(!s.drillStarted&&ready){
    s.drillStarted=true;s.drillElapsed=0;
-   for(const n of s.members){n.anim.setClip('push_up',{restart:true});n.anim.clock=0;n.anim.transition=0;n.anim.prevClip=null;}
+   for(const n of s.members){n.anim.setClip(stage.drillClip||'push_up',{restart:true});n.anim.clock=0;n.anim.transition=0;n.anim.prevClip=null;}
   }
   for(const n of s.members){
    const slot=s.active.get(n.id)?.slot;
@@ -297,15 +320,15 @@ function trainSquad(s,dt,now,all,playerPos){
    if(!s.drillStarted){
     if(dist(n.pos,slot.pos)>.38)moveSquadMember(n,slot.pos,dt,false);
     else poseSquadMember(n,['Idle']);
-    n.activity=`第${s.id+1}小隊 · 伏地挺身就位`;
+    n.activity=`第${s.id+1}小隊 · ${stage.name}就位`;
    }else{
     n.pos={...slot.pos};
     n.angle=0; // Same heading for all five; no random left/right push-ups.
-    poseSquadMember(n,['push_up']);
+    poseSquadMember(n,[stage.drillClip||'push_up']);
     // Shared phase: all recruits rise and lower at the same instant.
-    const len=n.anim.clips.push_up?.duration||2;
+    const len=n.anim.clips[stage.drillClip||'push_up']?.duration||2;
     n.anim.clock=s.drillElapsed%len;
-    n.activity=`第${s.id+1}小隊 · 同步伏地挺身`;
+    n.activity=`第${s.id+1}小隊 · 同步${stage.drillClip==='situps'?'仰臥起坐':'伏地挺身'}`;
    }
    n.state='training';
   }

@@ -72,13 +72,13 @@ function nearestNode(pos){
 function idxPos(k){return W(NAV.xMin+(k%NX)*NAV.step,NAV.zMin+Math.floor(k/NX)*NAV.step);}
 // Compact binary heap for A*: approximately 5k walkable cells, replanned only
 // when tasks change or an NPC fails to advance. Not every animation frame.
-function pathTo(from,to){
+function pathTo(from,to,forceRoads=false){
  navInit();const src=nearestNode(from),goal=nearestNode(to);
  if(src<0||goal<0)return {goal:null,points:[]};
  const realGoal=canStand(to.x,to.z)?to:idxPos(goal);
  if(src===goal)return {goal:realGoal,points:[realGoal]};
  const score=new Float32Array(N).fill(Infinity),parent=new Int32Array(N).fill(-1),closed=new Uint8Array(N),heap=[];
- const preferRoads=d(from,to)>8;
+ const preferRoads=forceRoads||d(from,to)>8;
  const heuristic=i=>{const dx=(i%NX)-(goal%NX),dz=Math.floor(i/NX)-Math.floor(goal/NX);return Math.hypot(dx,dz)*.86};
  const push=(i,f)=>{let at=heap.length;heap.push([i,f]);while(at>0){let p=(at-1)>>1;if(heap[p][1]<=f)break;heap[at]=heap[p];at=p;}heap[at]=[i,f]};
  const pop=()=>{const top=heap[0],last=heap.pop();if(heap.length){let at=0;while(true){let left=2*at+1,right=left+1;if(left>=heap.length)break;let best=right<heap.length&&heap[right][1]<heap[left][1]?right:left;if(last[1]<=heap[best][1])break;heap[at]=heap[best];at=best;}heap[at]=last;}return top[0]};
@@ -89,7 +89,9 @@ function pathTo(from,to){
   for(const [dx,dz,c] of dirs){const xx=x+dx,zz=z+dz;if(xx<0||xx>=NX||zz<0||zz>=NZ)continue;
    const n=node(xx,zz);if(!pass[n]||closed[n])continue;
    if(dx&&dz&&(!pass[node(x+dx,z)]||!pass[node(x,z+dz)]))continue;
-   const next=score[k]+c*(preferRoads?(roadCost[n]*.95):1);if(next>=score[n])continue;score[n]=next;parent[n]=k;push(n,next+heuristic(n));
+   // Marching squads strongly prefer paved roads; free recruits keep existing costs.
+   const cost=forceRoads?(roadCost[n]<=1.01?1:roadCost[n]*2.1):(preferRoads?roadCost[n]*.95:1);
+   const next=score[k]+c*cost;if(next>=score[n])continue;score[n]=next;parent[n]=k;push(n,next+heuristic(n));
   }
  }
  if(parent[goal]<0)return {goal:null,points:[]};
@@ -205,8 +207,10 @@ const STATIC={
  basketball:[W(-37.0,28.2),W(-30.5,28.3)],
  pullup:[W(15.9,-15.5),W(18.8,-15.5),W(21.7,-15.5),W(24.6,-15.5)],
  grenade:[W(-27.1,-24.9),W(-27.1,-27.8),W(-27.2,-30.3)],
- pushup:[W(16.8,-14.6),W(19.3,-14.6)],
- situp:[W(21.7,-14.5),W(24.0,-14.5)],
+ // Independent recruits do floor training in the company assembly square,
+ // not on the pull-up apparatus / fitness lawn. Keep clear of squad drill marks.
+ pushup:[W(21.4,-6.85),W(23.2,-6.85),W(21.4,-9.45)],
+ situp:[W(23.2,-9.45),W(20.5,-8.15),W(23.25,-8.15)],
  sweep:[W(-33.5,-1),W(-13,9),W(2,-7),W(28,-5),W(32,-8)],
  weed:[W(-30,8),W(-25,6.5),W(4,14),W(-17,22),W(27,11)],
  dining:[W(32.2,-2.3),W(30.7,-2.3),W(29.1,-2.3)],
@@ -230,10 +234,10 @@ function pose(n,names=['Idle'],rate=1){
  if(ANIM_LOOPS.has(clip)&&dur>0&&n.anim.clock>dur)n.anim.clock%=dur;
 }
 function face(n,dx,dz,dt){const wanted=Math.atan2(dx,dz),delta=Math.atan2(Math.sin(wanted-n.angle),Math.cos(wanted-n.angle));n.angle+=delta*clamp(1-Math.exp(-9*dt),0,1);}
-function to(n,goal,dt,run=false){
- if(!n.route||d(n.routeGoal||W(999,999),goal)>.8){
+function to(n,goal,dt,run=false,forceRoads=false){
+ if(!n.route||d(n.routeGoal||W(999,999),goal)>.8||n.routeRoads!==forceRoads){
   if(n.replanAt&&n.clock<n.replanAt)return false;
-  const plan=pathTo(n.pos,goal);n.route=plan.points;n.routeGoal=plan.goal;n.routeIndex=0;n.blocked=0;
+  const plan=pathTo(n.pos,goal,forceRoads);n.route=plan.points;n.routeGoal=plan.goal;n.routeIndex=0;n.blocked=0;n.routeRoads=forceRoads;
   if(!n.routeGoal){n.retries++;n.replanAt=n.clock+1.5;pose(n,['Idle']);n.activity='重新找路';return false;}
  }
  if(!n.routeGoal)return false;
@@ -633,7 +637,7 @@ export function releaseForSquad(n){
  n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;
  n.cooldown=0;n.socialCooldown=99_999;
 }
-export function moveSquadMember(n,goal,dt,run=false){return to(n,goal,dt,run);}
+export function moveSquadMember(n,goal,dt,run=false,preferRoads=false){return to(n,goal,dt,run,preferRoads);}
 export function poseSquadMember(n,clips=['Idle'],speed=1){pose(n,clips,speed);}
 export function faceSquadMember(n,x,z,dt){face(n,x,z,dt);}
 export function squadWorldGoal(p){navInit();if(canStand(p.x,p.z))return {...p};const k=nearestNode(p);return k<0?null:idxPos(k);}
