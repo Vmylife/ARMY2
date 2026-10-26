@@ -1,0 +1,60 @@
+:root{--ink:#274c3a;--leaf:#b7c9b2}
+*{box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--leaf);font-family:ui-rounded,"PingFang TC",-apple-system,system-ui,sans-serif;color:var(--ink);touch-action:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+button{font:inherit;cursor:pointer}
+#world{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#minimap{position:fixed;z-index:3;top:calc(env(safe-area-inset-top,0px) + 10px);left:max(12px,env(safe-area-inset-left,0px));width:126px;height:126px;border:3px solid #fffbdf;border-radius:50%;overflow:hidden;pointer-events:auto;cursor:pointer;padding:0;appearance:none;-webkit-appearance:none;touch-action:manipulation;filter:drop-shadow(0 4px 7px #233d303e);background:#a4b99b}
+#minimap canvas{width:100%;height:100%;display:block}
+#floatingStick{position:fixed;z-index:5;left:50%;top:70%;width:132px;height:132px;transform:translate(-50%,-50%) scale(.9);opacity:0;visibility:hidden;pointer-events:none;transition:opacity 80ms ease,transform 80ms ease,visibility 80ms}
+#floatingStick.active{visibility:visible;opacity:1;transform:translate(-50%,-50%) scale(1)}
+.stick-base{width:100%;height:100%;border:2px solid #f6ffecb0;border-radius:50%;display:grid;place-items:center;background:#31564557;box-shadow:0 3px 22px #213c2c4d,inset 0 0 14px #d5e7b638}
+.stick-thumb{width:54px;height:54px;border-radius:50%;border:3px solid #fffff5d8;background:#f1f8e7e8;box-shadow:0 4px 12px #14291e42;will-change:transform}
+#floatingStick.run .stick-thumb{background:#ddeaafe8}
+#floatingStick.sprint .stick-thumb{background:#ffd9a5ea}
+#notice,#fatal{position:fixed;z-index:20;left:50%;top:47%;transform:translate(-50%,-50%);max-width:min(88vw,400px);width:max-content;min-width:190px;padding:17px 23px;background:#fff9eded;border-radius:19px;text-align:center;font-weight:700;box-shadow:0 7px 22px #37573a2b}
+#fatal{width:min(88vw,420px);color:#8d4138}
+#fatal strong{display:block;font-size:18px;margin-bottom:8px}
+#fatal p{overflow-wrap:anywhere;white-space:pre-wrap;font-size:13px;font-weight:500;line-height:1.6}
+#fatal button{border:none;padding:10px 17px;border-radius:12px;background:#42654f;color:white;font-weight:700}
+#notice[hidden],#fatal[hidden],#debug[hidden]{display:none}
+#debug{position:fixed;z-index:8;left:8px;bottom:calc(env(safe-area-inset-bottom) + 12px);padding:8px 10px;border-radius:7px;background:#18352ccb;color:#fff;font:11px/1.5 monospace;pointer-events:none;white-space:pre-wrap}
+@media(orientation:landscape){#minimap{width:105px;height:105px;top:calc(env(safe-area-inset-top,0px) + 8px)}#floatingStick{width:115px;height:115px}.stick-thumb{width:47px;height:47px}}
+
+/* v0.6.2 large map overlay. The world canvas and model code are untouched. */
+#minimap:focus-visible{outline:3px solid #3a9fff;outline-offset:3px}
+#worldMap[hidden]{display:none!important}
+.world-map{position:fixed;inset:0;z-index:12;background:rgba(24,42,31,.48);display:flex;justify-content:center;align-items:center;padding:max(12px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));touch-action:none}
+.world-map-panel{background:#f6f4e7;width:min(680px,100%);height:min(94dvh,900px);max-height:100%;border-radius:24px;display:flex;flex-direction:column;min-height:0;box-shadow:0 16px 45px #17382672;overflow:hidden}
+.world-map-header{flex:none;display:flex;align-items:center;justify-content:space-between;padding:14px 17px 10px;gap:12px;background:#f6f4e7}
+.world-map-header div{display:flex;flex-direction:column;gap:4px}
+.world-map-header strong{font-size:19px;line-height:1.2;color:#294b3d}
+.world-map-header small{font-size:11px;color:#718271}
+#closeWorldMap{height:44px;width:44px;flex:none;display:grid;place-items:center;border-radius:50%;border:1px solid #cfddc8;background:#e8edde;color:#284a3b;font-size:22px;touch-action:manipulation}
+.world-map-body{flex:1;min-height:0;position:relative;margin:0 10px 8px;border-radius:14px;overflow:hidden;background:#e7edde;touch-action:none;display:flex;flex-direction:column;gap:8px}
+.map-canvas-holder{width:100%;aspect-ratio:96/55;max-height:49%;position:relative;flex:none;overflow:hidden;border-radius:12px;background:#afc49f}
+#worldMapCanvas{display:block;width:100%;height:100%;touch-action:none}
+.world-map-places{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;touch-action:pan-y;padding:3px 9px 10px}
+.world-map-places>strong{display:block;font-size:12px;color:#4e6d54;margin:4px 0 8px}
+.world-map-place-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.world-map-place{display:flex;gap:6px;align-items:center;min-height:36px;border-radius:8px;background:#f7f8eb;padding:6px 9px;font-size:12px;line-height:1.35;color:#304d3e;overflow-wrap:anywhere}
+.world-map-place i{width:9px;height:9px;border-radius:50%;flex:none;background:var(--dot-color,#82945c)}
+.world-map-footer{flex:none;display:flex;justify-content:center;gap:14px;flex-wrap:wrap;padding:7px 10px 15px;color:#486451;font-size:12px}
+.world-map-footer span{display:flex;align-items:center;gap:5px}
+.marker{display:inline-block;width:11px;height:11px;border-radius:50%;background:#a9b54c;border:1.5px solid white}
+.marker.player{background:#1679ea}.marker.enemy{background:#cf5550}
+@media(orientation:landscape){.world-map-panel{height:96dvh;width:min(960px,100%)}.world-map-body{flex-direction:row}.map-canvas-holder{height:100%;width:auto;max-height:none;max-width:68%;aspect-ratio:96/55}.world-map-places{padding:5px}.world-map-place-grid{grid-template-columns:1fr}.world-map-header{padding:7px 14px}.world-map-header strong{font-size:16px}.world-map-footer{padding:3px 10px 7px}}
+
+/* v0.7 - blueprint-wide map. Preserve full view rather than squeezing to square. */
+.map-canvas-holder{aspect-ratio:96 / 55;max-height:50%;flex-shrink:0}
+@media(orientation:landscape){.map-canvas-holder{aspect-ratio:96 / 55;max-height:none;max-width:68%}}
+
+/* v0.7.6: large map = map only, no location list or footer legend. */
+.world-map-panel{height:auto;max-height:calc(100dvh - 24px);width:min(96vw,680px,calc((100dvh - 105px)*1.745));}
+.world-map-body{flex:none;display:block;margin:0 10px 10px;overflow:hidden;}
+.map-canvas-holder{width:100%;height:auto;max-height:none;max-width:100%;aspect-ratio:96 / 55;}
+.world-map-places,.world-map-footer{display:none!important;}
+@media (orientation:landscape){
+ .world-map-panel{height:auto;width:min(94vw,900px,calc((100dvh - 105px)*1.745));}
+ .world-map-body{display:block;}
+ .map-canvas-holder{width:100%;height:auto;max-height:none;max-width:100%;aspect-ratio:96 / 55;}
+}

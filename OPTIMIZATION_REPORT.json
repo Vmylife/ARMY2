@@ -1,0 +1,786 @@
+{
+  "models": {
+    "assets/characters/cadet/cadet-green.glb": {
+      "before": 11403216,
+      "after": 7848208,
+      "images": [
+        {
+          "image": 0,
+          "original": 1362893,
+          "optimized": 119108,
+          "size": [
+            1536,
+            1536
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1593892,
+          "optimized": 213230,
+          "size": [
+            1536,
+            1536
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1005120,
+          "optimized": 75175,
+          "size": [
+            1536,
+            1536
+          ]
+        }
+      ]
+    },
+    "assets/characters/cadet/cadet-life-lite.glb": {
+      "before": 3864252,
+      "after": 2483268,
+      "images": [
+        {
+          "image": 0,
+          "original": 1593892,
+          "optimized": 213230,
+          "size": [
+            1536,
+            1536
+          ]
+        }
+      ]
+    },
+    "assets/weapons/rifle.glb": {
+      "before": 23264,
+      "after": 23264,
+      "images": []
+    },
+    "assets/buildings/building-4-guardhouse.glb": {
+      "before": 5214920,
+      "after": 529684,
+      "images": [
+        {
+          "image": 0,
+          "original": 2148842,
+          "optimized": 174933,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1255105,
+          "optimized": 85006,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1630859,
+          "optimized": 89640,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/buildings/building-2-community.glb": {
+      "before": 4782556,
+      "after": 866328,
+      "images": [
+        {
+          "image": 0,
+          "original": 1745993,
+          "optimized": 121675,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1116661,
+          "optimized": 62893,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1304132,
+          "optimized": 65998,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/buildings/building-6-office.glb": {
+      "before": 5408188,
+      "after": 1092964,
+      "images": [
+        {
+          "image": 0,
+          "original": 1986351,
+          "optimized": 121822,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1131005,
+          "optimized": 65172,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1439327,
+          "optimized": 54472,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/buildings/building-1-barracks.glb": {
+      "before": 4027832,
+      "after": 880500,
+      "images": [
+        {
+          "image": 0,
+          "original": 1385577,
+          "optimized": 106578,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 932743,
+          "optimized": 65662,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1055628,
+          "optimized": 54380,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/buildings/building-3-small-rear-fixed.glb": {
+      "before": 3770332,
+      "after": 562204,
+      "images": [
+        {
+          "image": 0,
+          "original": 1314065,
+          "optimized": 86736,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 968081,
+          "optimized": 47045,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1112840,
+          "optimized": 53086,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/buildings/building-5-wash.glb": {
+      "before": 5453800,
+      "after": 542684,
+      "images": [
+        {
+          "image": 0,
+          "original": 2131660,
+          "optimized": 154525,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1470538,
+          "optimized": 93989,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1621559,
+          "optimized": 64130,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/crate.glb": {
+      "before": 4254340,
+      "after": 254780,
+      "images": [
+        {
+          "image": 0,
+          "original": 1809487,
+          "optimized": 96060,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1049823,
+          "optimized": 59856,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1327221,
+          "optimized": 31072,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/fence.glb": {
+      "before": 2867196,
+      "after": 187688,
+      "images": [
+        {
+          "image": 0,
+          "original": 1082468,
+          "optimized": 60297,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 765770,
+          "optimized": 52498,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 969791,
+          "optimized": 25729,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/signboard.glb": {
+      "before": 3312212,
+      "after": 230480,
+      "images": [
+        {
+          "image": 0,
+          "original": 1290086,
+          "optimized": 75949,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 904207,
+          "optimized": 69274,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1069314,
+          "optimized": 36660,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/tree-b.glb": {
+      "before": 3511924,
+      "after": 197396,
+      "images": [
+        {
+          "image": 0,
+          "original": 1544440,
+          "optimized": 54274,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 851239,
+          "optimized": 42015,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1033558,
+          "optimized": 18427,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/hurdle.glb": {
+      "before": 4162832,
+      "after": 252724,
+      "images": [
+        {
+          "image": 0,
+          "original": 1698530,
+          "optimized": 97618,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1120285,
+          "optimized": 71121,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1295455,
+          "optimized": 35431,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/target.glb": {
+      "before": 5387552,
+      "after": 367056,
+      "images": [
+        {
+          "image": 0,
+          "original": 2334667,
+          "optimized": 144984,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1242264,
+          "optimized": 78606,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1727203,
+          "optimized": 60055,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/barrel.glb": {
+      "before": 3032544,
+      "after": 172984,
+      "images": [
+        {
+          "image": 0,
+          "original": 1082723,
+          "optimized": 51038,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 932200,
+          "optimized": 42859,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 959300,
+          "optimized": 20769,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/flagpole.glb": {
+      "before": 5757200,
+      "after": 413580,
+      "images": [
+        {
+          "image": 0,
+          "original": 2312436,
+          "optimized": 137710,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1616862,
+          "optimized": 122618,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1721639,
+          "optimized": 46995,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/grenade-crate.glb": {
+      "before": 4347108,
+      "after": 381492,
+      "images": [
+        {
+          "image": 0,
+          "original": 1789188,
+          "optimized": 136434,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1032959,
+          "optimized": 46798,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1379437,
+          "optimized": 52742,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/pullup.glb": {
+      "before": 4186260,
+      "after": 290420,
+      "images": [
+        {
+          "image": 0,
+          "original": 1703200,
+          "optimized": 105668,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1032135,
+          "optimized": 82780,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1397320,
+          "optimized": 48376,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/basketball-hoop.glb": {
+      "before": 5035704,
+      "after": 428312,
+      "images": [
+        {
+          "image": 0,
+          "original": 2133701,
+          "optimized": 155369,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1250090,
+          "optimized": 94653,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1539206,
+          "optimized": 65590,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/tree-a.glb": {
+      "before": 3218736,
+      "after": 217352,
+      "images": [
+        {
+          "image": 0,
+          "original": 1368717,
+          "optimized": 62820,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 726416,
+          "optimized": 29848,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1018459,
+          "optimized": 19550,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/bench.glb": {
+      "before": 3691620,
+      "after": 271012,
+      "images": [
+        {
+          "image": 0,
+          "original": 1441393,
+          "optimized": 97833,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1050284,
+          "optimized": 88236,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1154705,
+          "optimized": 39715,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/podium.glb": {
+      "before": 4672820,
+      "after": 361112,
+      "images": [
+        {
+          "image": 0,
+          "original": 1927345,
+          "optimized": 126297,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1132713,
+          "optimized": 70617,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1506332,
+          "optimized": 57776,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/sandbag.glb": {
+      "before": 3738924,
+      "after": 232204,
+      "images": [
+        {
+          "image": 0,
+          "original": 1478534,
+          "optimized": 64909,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 982128,
+          "optimized": 41059,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1172016,
+          "optimized": 19996,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    },
+    "assets/props/streetlamp.glb": {
+      "before": 5241288,
+      "after": 317680,
+      "images": [
+        {
+          "image": 0,
+          "original": 2171337,
+          "optimized": 115020,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 1,
+          "original": 1363540,
+          "optimized": 94870,
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        {
+          "image": 2,
+          "original": 1647405,
+          "optimized": 48793,
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      ]
+    }
+  },
+  "asset_count": 25,
+  "total_before": 110366620,
+  "total_after": 19405376
+}

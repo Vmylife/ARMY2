@@ -1,0 +1,33 @@
+:root{font-family:ui-rounded,'PingFang TC','Microsoft JhengHei',system-ui,sans-serif;color:#274639;background:#a8bfd0}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}button,input,select{font:inherit}
+button{background:#edf3e7;border:1px solid #c9d4c5;border-radius:9px;padding:9px 10px;color:#254438;cursor:pointer;font-size:12px;font-weight:650}button:hover{background:#dae8d6}button:disabled{opacity:.4;cursor:default}
+#scene,#overlay{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}#overlay{pointer-events:none}
+.topbar{position:fixed;left:0;right:0;top:0;z-index:20;min-height:60px;padding:9px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f7f6eeed;border-bottom:1px solid #d2d8cc;box-shadow:0 5px 20px #1a38321a}
+.topbar strong{font-size:18px}.topbar small{display:block;font-size:11px;color:#648071;margin-top:2px}.topActions{display:flex;align-items:center;gap:7px}.topActions a{background:#375d4a;color:#fff;text-decoration:none;border-radius:9px;padding:10px 11px;font-size:12px;white-space:nowrap}
+#editorPanel{position:fixed;z-index:15;top:72px;right:12px;bottom:12px;width:min(338px,calc(100vw - 24px));overflow:auto;padding:14px;background:#f7f6eef2;border:1px solid #d4ddcb;border-radius:18px;box-shadow:0 7px 30px #142b2340}
+#editorPanel.collapsed{display:none}
+.panelTop{display:flex;align-items:center;justify-content:space-between;gap:12px}.panelTop h2{font-size:15px;margin:0 0 9px}.panelTop #status{font-size:11px;color:#5f7567;text-align:right}
+#search{display:block;width:100%;padding:10px;border:1px solid #cbd5c9;background:#fff;border-radius:10px;outline:none;margin-bottom:7px;font-size:13px;color:#314438}
+#objectList{display:block;width:100%;background:#fff;border:1px solid #cbd5c9;border-radius:10px;padding:5px;min-height:127px;font-size:12px;color:#2e4e3e;outline:none}
+#objectList option{padding:7px 5px;border-radius:4px}
+.rowButtons{display:flex;gap:6px;margin-top:9px}.rowButtons button{flex:1;white-space:nowrap}.separator{border-top:1px solid #d4dccf;margin:14px 0}
+.details{font-size:12px;line-height:1.55;color:#566e5b}.details p{margin:0 0 7px}.details strong{font-size:13px;color:#305441}.details .note{background:#e7efe2;border-radius:8px;padding:8px;margin-top:7px}
+.fields label{font-size:11px;color:#537261;display:block;font-weight:650;margin:8px 0}.fields input{margin-top:4px;width:100%;background:#fff;padding:8px 9px;border:1px solid #c5d4c8;border-radius:8px;font-size:14px;color:#324638}
+.twoCols{display:grid;grid-template-columns:1fr 1fr;gap:8px}.nudge{margin-top:12px;font-size:11px;color:#55715e}.arrows{display:flex;justify-content:center;gap:6px;margin-top:6px}.arrows button{width:46px;font-size:18px;padding:4px 0}
+.block{width:100%}.primary{background:#37664f;border-color:#37664f;color:#fff}.primary:hover{background:#244a36}.warning{color:#a24c31}.ghost{background:transparent;border-color:#d7ddce}
+.hint{font-size:11px;line-height:1.55;color:#687d6b;margin-bottom:0}
+.instructions{position:fixed;z-index:10;left:12px;bottom:12px;padding:10px 12px;background:#f7f8eddc;border-radius:12px;box-shadow:0 3px 12px #34543d32;display:flex;flex-direction:column;gap:4px;max-width:calc(100% - 380px);font-size:11px;color:#405845;pointer-events:none}.instructions strong{font-size:12px;color:#2e5940}
+.zoomButtons{position:fixed;left:14px;top:73px;display:flex;flex-direction:column;gap:7px;z-index:10}.zoomButtons button{font-size:20px;width:40px;height:40px;padding:0}
+#loading{position:fixed;z-index:40;left:50%;top:45%;transform:translate(-50%,-50%);background:#fffbedf4;padding:18px 24px;border-radius:15px;font-weight:650;min-width:210px;max-width:86vw;text-align:center;box-shadow:0 8px 30px #0002}
+@media(max-width:730px){.topbar{padding:7px 9px}.topbar strong{font-size:14px}.topbar small{font-size:10px}.topActions button,.topActions a{font-size:10px;padding:8px}.topActions{gap:4px}#editorPanel{top:62px;bottom:9px;width:min(285px,80vw);right:7px}.instructions{left:6px;right:6px;max-width:none;bottom:5px;font-size:9px;gap:1px;padding:5px 7px}.instructions span:last-child{display:none}.zoomButtons{top:63px;left:5px}}
+
+/* v0.10.1 scene palette and destructive-action controls */
+.createTools{padding:11px;background:#e8f0e3;border:1px solid #cbd8c6;border-radius:12px;margin:0 0 13px}
+.createTools>strong{font-size:13px;display:block;margin-bottom:7px}
+.createTools label{font-size:11px;display:block;font-weight:650;color:#537261}
+.createTools select{margin-top:5px;width:100%;background:white;padding:9px 6px;border:1px solid #c4d2c4;border-radius:8px;color:#314438;font-size:12px}
+.createTools .twoCols{grid-template-columns:.85fr 1.15fr}
+.createTools .block{margin-top:10px}
+.miniTip{font-size:10.5px;line-height:1.45;margin:8px 0 0;color:#6b806e}
+button.danger{color:#a2372d;background:#fff2ed;border-color:#ecbdb7}
+button.danger:hover{background:#f6d8d1}

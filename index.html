@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#b7c9b2">
+<link rel="preload" as="fetch" href="./assets/characters/cadet/cadet-green.glb?v=111" crossorigin="anonymous">
+<title>國軍模擬器｜Army</title>
+<link rel="stylesheet" href="./src/ui/playtest.css?v=077">
+<link rel="stylesheet" href="./src/ui/home105.css?v=105">
+<link rel="stylesheet" href="./src/ui/npcLabels107.css?v=107">
+</head>
+<body>
+<canvas id="world" aria-label="國軍模擬器 3D 軍營"></canvas>
+<button id="minimap" type="button" aria-label="開啟新兵訓練營地圖" title="開啟新兵訓練營地圖"><canvas id="miniCanvas" width="224" height="224" aria-hidden="true"></canvas></button>
+<section id="worldMap" class="world-map" role="dialog" aria-label="新兵訓練營地圖" aria-modal="true" hidden>
+  <div class="world-map-panel">
+    <header class="world-map-header"><div><strong>🗺️ 新兵訓練營地圖</strong><small>固定營區方位 · 藍色箭頭為士兵面向</small></div><button id="closeWorldMap" type="button" aria-label="關閉大地圖">✕</button></header>
+    <div class="world-map-body"><div class="map-canvas-holder"><canvas id="worldMapCanvas" aria-label="完整軍營地圖，顯示所有地點和自身方向"></canvas></div></div>
+  </div>
+</section>
+<div id="floatingStick" aria-hidden="true"><div class="stick-base"><div id="stickThumb" class="stick-thumb"></div></div></div>
+<div id="notice" role="status" hidden></div>
+<section class="army-home" id="armyHome" aria-label="國軍模擬器首頁">
+  <div class="army-home__panel">
+    <div class="army-home__emblem" aria-hidden="true">🪖</div>
+    <h1>國軍模擬器</h1>
+    <p class="army-home__tagline">新兵訓練營 · 六分鐘軍旅生活</p>
+    <button id="armyStart" class="army-home__start" type="button">開始遊戲</button>
+    <div id="armyLoading" class="army-home__load" role="status" aria-live="polite" hidden>
+      <p class="army-home__message" id="armyMessage">準備載入…</p>
+      <div class="army-home__progress" role="progressbar" aria-label="軍營載入進度"><div id="armyBar" class="army-home__bar"></div></div>
+      <div id="armyCount" class="army-home__count">0%</div>
+    </div>
+    <div class="army-home__foot">地圖及模型載入完成後才會進入軍營</div>
+  </div>
+</section>
+<div id="fatal" role="alert" hidden><strong>遊戲無法啟動</strong><p id="errorText"></p><button type="button" id="retry">重新載入</button></div>
+<div id="debug" hidden></div>
+<!-- Army 3D Clean v0.11.1: refined collision, road-priority navigation, and NPC spacing. -->
+<script type="importmap">
+{"imports":{"./src/map/campGeometry.js?v=092":"./src/map/ground103.js?v=103","./src/map/mapDrawing.js?v=093":"./src/map/drawMap95.js?v=095","./src/map/roadMesh.js?v=071":"./src/map/roadMesh104.js?v=104"}}
+</script>
+<script type="module" src="./src/bootstrap111.js?v=111"></script>
+</body>
+</html>
