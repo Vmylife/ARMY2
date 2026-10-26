@@ -184,24 +184,24 @@ function pose(n,names=['Idle'],rate=1){
  if(ANIM_LOOPS.has(clip)&&dur>0&&n.anim.clock>dur)n.anim.clock%=dur;
 }
 function face(n,dx,dz,dt){const wanted=Math.atan2(dx,dz),delta=Math.atan2(Math.sin(wanted-n.angle),Math.cos(wanted-n.angle));n.angle+=delta*clamp(1-Math.exp(-9*dt),0,1);}
-function to(n,goal,dt,run=false){
+function to(n,goal,dt,run=false,arrivalRadius=.75){
  if(!n.route||d(n.routeGoal||W(999,999),goal)>.8){
   if(n.replanAt&&n.clock<n.replanAt)return false;
   const plan=pathTo(n.pos,goal);n.route=plan.points;n.routeGoal=plan.goal;n.routeIndex=0;n.blocked=0;
   if(!n.routeGoal){n.retries++;n.replanAt=n.clock+1.5;pose(n,['Idle']);n.activity='重新找路';return false;}
  }
  if(!n.routeGoal)return false;
- if(n.routeIndex>=n.route.length)return d(n.pos,n.routeGoal)<.8;
+ if(n.routeIndex>=n.route.length)return d(n.pos,n.routeGoal)<arrivalRadius;
  let target=n.route[n.routeIndex];if(d(n.pos,target)<.68&&n.routeIndex<n.route.length-1)target=n.route[++n.routeIndex];
  const dx=target.x-n.pos.x,dz=target.z-n.pos.z,len=Math.hypot(dx,dz);
- if(len<.28){n.routeIndex++;return n.routeIndex>=n.route.length;}
+ if(len<Math.min(.28,arrivalRadius*.5)){n.routeIndex++;return n.routeIndex>=n.route.length&&d(n.pos,n.routeGoal)<arrivalRadius;}
  const speed=run?2.18:1.36, step=Math.min(len,speed*dt),old=n.pos;
  const moved=moveNpc(n,dx/len*step,dz/len*step,ALL_NPCS,PLAYER_POS),actual=d(old,moved);
  if(actual<step*.10){n.blocked+=dt;if(n.blocked>1.20){n.route=null;n.routeGoal=null;n.blocked=0;n.retries++;n.replanAt=n.clock+.4;}}
  else{n.pos=moved;n.blocked=0;n.retries=0;face(n,moved.x-old.x,moved.z-old.z,dt);}
  pose(n,run?['Running','RunFast','Walking']:['Walking'],run?1.15:1.05);
  n.state='move';
- return n.routeGoal?d(n.pos,n.routeGoal)<.75:false;
+ return n.routeGoal?d(n.pos,n.routeGoal)<arrivalRadius:false;
 }
 function hasTag(def,t){return def.tags.includes(t)}
 function release(n){if(n.reservation&&SLOTS[n.reservation]===n.id)delete SLOTS[n.reservation];n.reservation=null;}
@@ -465,12 +465,24 @@ export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
       const alongside=W(leader.pos.x+lateral.x,leader.pos.z+lateral.z);
       if(canStand(alongside.x,alongside.z))desired=alongside;
     }
-    const arrived=to(n,desired,dt,task.type==='jog');
+    // Activity navigation can stop 0.75m from ordinary goals. A seated pose
+    // cannot: align the model root within 0.20m of the reserved bench slot.
+    // Chair/calibrated height is handled separately in pose() and renderer.
+    const seating=task.type==='bench'||task.type==='doze';
+    const arrived=to(n,desired,dt,task.type==='jog',seating?.20:.75);
     // The shared journey ends when the leader reaches the destination; the
     // follower first needs to be close, not at the exact same point.
     const atDestination=task.type==='walk'&&task.joined&&n.id>task.joined.id
       ? task.joined.task?.phase==='do'&&d(n.pos,task.joined.pos)<1.8 : arrived;
-    if(atDestination){task.phase='do';n.route=null;n.routeGoal=null;n.retries=0;
+    if(atDestination){
+      if(seating){
+        // Exact seat root and facing match Animation Lab's X/Z/yaw placement.
+        // The final snap is <=0.20m after the precision approach, rather than
+        // immediately posing up to 0.75m away from the seat.
+        n.pos={...task.goal};
+        if(Number.isFinite(task.angle))n.angle=task.angle;
+      }
+      task.phase='do';n.route=null;n.routeGoal=null;n.retries=0;
       if(task.type==='jog')n.loopAngle=Math.atan2((n.pos.z+2.2)/8.2,(n.pos.x+21.5)/5.6);
     }else if(n.retries>=4||task.travel>45){closeGroup(n,npcs);endTask(n);n.cooldown=.5;}
   }else{

@@ -13,7 +13,7 @@ import {drawMinimap} from './ui/minimap.js?v=093';
 import {initWorldMap} from './ui/worldMap.js?v=093';
 import {setupInput} from './ui/input.js?v=062';
 import {options} from './systems/settings.js?v=060';
-import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=118';
+import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=119';
 
 const $=id=>document.getElementById(id);
 const debug=new URLSearchParams(location.search).has('debug');
