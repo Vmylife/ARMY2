@@ -7,7 +7,8 @@ import {installArmyProceduralActions,ARMY_PULLUP,ARMY_SWEEP} from '../characters
 import {updateRangeShooter} from '../training/rangeTraining.js?v=111';
 import {canOccupy,moveNpc,moveWithCollision,staticClearance,NPC_RADIUS,PLAYER_RADIUS} from '../map/navCollision109.js?v=109';
 import {PROPS,ROADS} from '../map/camp.js?v=093';
-import {chooseGrenadeMotion,calibratedGrenadePose,GRENADE_MOTIONS} from '../training/grenadeCalibration112.js?v=124';
+import {chooseGrenadeMotion,calibratedGrenadePose,GRENADE_MOTIONS} from '../training/grenadeCalibration112.js?v=125';
+import {SAVED_ACTION_CALIBRATIONS,fixtureActorPose} from '../characters/fixturePose115.js?v=125';
 
 const TAU=Math.PI*2;
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
@@ -19,9 +20,9 @@ const HEADS=['阿宏','阿明','阿杰','小林','阿偉','小陳','阿國','阿
  '阿豪','阿倫','小蔡','阿翔','阿廷','阿仁','小吳','阿勇','阿翔哥','小黃','阿彬','小陸','阿良','阿昇','小謝','阿達'];
 const ANIM_LOOPS=new Set(['Stand_and_Chat','Sit_Cross_Legged_on_Floor','Chair_Sit_Idle_M','Sit_and_Doze_Off','Pull_Radish',ARMY_PULLUP,ARMY_SWEEP,...GRENADE_MOTIONS]);
 const CALIBRATION={
- chair:{x:-0.14,z:0.56,y:0.20,yaw:0,speed:1},
- doze:{x:0.0,z:0.24,y:0.20,yaw:0,speed:1},
- weed:{x:0.0,z:0.0,y:0.09,yaw:0,speed:1}
+ chair:SAVED_ACTION_CALIBRATIONS['Chair_Sit_Idle_M@@chair'],
+ doze:SAVED_ACTION_CALIBRATIONS['Sit_and_Doze_Off@@chair'],
+ weed:SAVED_ACTION_CALIBRATIONS['Pull_Radish@@ground']
 };
 const NAV={xMin:-46,xMax:45,zMin:-35,zMax:37,step:1.0};
 const NX=Math.floor((NAV.xMax-NAV.xMin)/NAV.step)+1,NZ=Math.floor((NAV.zMax-NAV.zMin)/NAV.step)+1,N=NX*NZ;
@@ -121,20 +122,21 @@ function fixtureInit(){
   const yaw=p.yaw||0;
   // One physical bench = ONE shared reservation. Sitting and dozing use the
   // same key; a second recruit cannot sit or doze on an occupied bench.
-  const seat=(cal)=>W(p.x+Math.cos(yaw)*cal.x+Math.sin(yaw)*cal.z,
-                     p.z-Math.sin(yaw)*cal.x+Math.cos(yaw)*cal.z);
+  // Same relative transform as the Animation Lab, including possible yaw calibration.
+  const seat=fixtureActorPose(p,CALIBRATION.chair),doze=fixtureActorPose(p,CALIBRATION.doze);
   const key=`bench-${i}`;
-  SEATS.push({key,pos:seat(CALIBRATION.chair),angle:yaw,benchIndex:i});
-  DOZE_SEATS.push({key,pos:seat(CALIBRATION.doze),angle:yaw,benchIndex:i});
+  SEATS.push({key,pos:seat.pos,angle:seat.angle,benchIndex:i});
+  DOZE_SEATS.push({key,pos:doze.pos,angle:doze.angle,benchIndex:i});
  }
  for(const [j,x] of [2.1,5.5,8.9,12.3,15.7,19.1].entries())SHOOT.push({key:`shoot-${j}`,pos:W(x,16.85),angle:0});
  for(const [j,p] of PROPS.filter(p=>p.type==='pullup').entries())PULLUPS.push({key:`pullup-${j}`,pos:W(p.x,p.z+1.5),angle:Math.PI});
  for(const [j,p] of PROPS.filter(p=>p.type==='grenadeCrate').sort((a,b)=>b.z-a.z).entries()) {
-  // 2026-10-26 red circles: WEST of the three boxes, north-to-south.
-  // Throwing direction points toward the big oval. Free NPCs and squads share slots.
-  const stand=W(p.x-1.62,p.z+.10);
-  const angle=Math.atan2(-20.8-stand.x,-2.0-stand.z);
-  GRENADE.push({key:`grenade-${j}`,pos:stand,anchor:W(p.x,p.z),angle});
+  // Facility center and rotation are authoritative. A neutral approach point
+  // gets the recruit near the box; the selected clip calculates its EXACT
+  // final position relative to the crate (never the former hand-drawn red marks).
+  const fixture={x:p.x,z:p.z,yaw:p.yaw||0};
+  const arrival=fixtureActorPose(fixture,SAVED_ACTION_CALIBRATIONS['baseball_pitching@@grenade']);
+  GRENADE.push({key:`grenade-${j}`,pos:arrival.pos,fixture,angle:arrival.angle});
  }
 }
 const A={
@@ -239,7 +241,7 @@ function selectSpot(n,type,requiredKey=null){
  if(data){const available=data.filter(s=>!SLOTS[s.key]||SLOTS[s.key]===n.id);
   if(!available.length)return null;
   const s=requiredKey?available.find(x=>x.key===requiredKey):pick(available);
-  if(!s)return null;return {pos:{...s.pos},key:s.key,angle:s.angle,anchor:s.anchor};
+  if(!s)return null;return {pos:{...s.pos},key:s.key,angle:s.angle,fixture:s.fixture};
  }
  const locations=STATIC[type] || [W(n.pos.x,n.pos.z)];
  const shuffled=[...locations].sort(()=>Math.random()-.5);

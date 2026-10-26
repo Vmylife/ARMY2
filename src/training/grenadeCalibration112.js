@@ -1,31 +1,15 @@
-// ARMY2 v0.11.14 — animation-lab grenade calibration applied at RED standing marks.
-// The lab controls use a crate at yaw=0. The field has 90-degree crates and
-// sandbags beside each one. Treating the LAB offsets as absolute CAMP offsets
-// from the crate CENTER had sent soldiers ON TOP of sandbags and crates.
-// The three red-mark slots (generated from each crate in npcLife113) are the
-// AUTHORITATIVE actor-foot positions. The two motions retain the exact
-// DIFFERENCE between the user’s tuned offsets and their individual yaw/lift.
-export const GRENADE_MOTIONS = Object.freeze(['baseball_pitching', 'Crouch_Pull_and_Throw']);
-export const GRENADE_CALIBRATIONS = Object.freeze({
-  baseball_pitching: Object.freeze({x:-1.08, z:0.42, y:0, yaw:82, speed:1}),
-  Crouch_Pull_and_Throw: Object.freeze({x:-1.18, z:0.48, y:0.23, yaw:168, speed:1})
-});
-// Center of the two saved calibration positions in the original lab’s axes.
-// Shifting each pose by this SAME base preserves all authored per-clip deltas.
-const LAB_REFERENCE = Object.freeze({x:-1.13, z:0.45});
+// All camp grenades use the EXACT Animation Lab relative pose around the crate.
+// v0.11.14's standing-mark averaging is intentionally removed.
+import {SAVED_ACTION_CALIBRATIONS,fixtureActorPose} from '../characters/fixturePose115.js?v=125';
+export const GRENADE_MOTIONS=Object.freeze(['baseball_pitching','Crouch_Pull_and_Throw']);
+export const GRENADE_CALIBRATIONS=Object.freeze(Object.fromEntries(GRENADE_MOTIONS.map(name=>[name,SAVED_ACTION_CALIBRATIONS[`${name}@@grenade`]])));
 export function chooseGrenadeMotion(anim,random=Math.random){
-  const available=GRENADE_MOTIONS.filter(name=>anim?.hasClip?.(name));
-  return available.length ? available[Math.floor(random()*available.length)] : null;
+ const available=GRENADE_MOTIONS.filter(name=>anim?.hasClip?.(name));
+ return available.length?available[Math.floor(random()*available.length)]:null;
 }
 export function calibratedGrenadePose(slot,motion){
-  const c=GRENADE_CALIBRATIONS[motion];
-  if(!c||!slot?.pos)return null;
-  // slot.pos is the actual red-circle foot mark, not a 3D prop mesh origin.
-  return {
-    pos:{x:slot.pos.x+(c.x-LAB_REFERENCE.x), z:slot.pos.z+(c.z-LAB_REFERENCE.z)},
-    angle:c.yaw*Math.PI/180,
-    lift:c.y,
-    speed:c.speed,
-    clip:motion
-  };
+ const calibration=GRENADE_CALIBRATIONS[motion];
+ if(!slot?.fixture||!calibration)return null;
+ const pose=fixtureActorPose(slot.fixture,calibration);
+ return {...pose,clip:motion};
 }

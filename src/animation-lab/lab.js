@@ -8,6 +8,7 @@ import {installArmyProceduralActions,ARMY_PULLUP,ARMY_SWEEP} from '../characters
 import {BroomRenderer} from './broomRenderer117.js';
 import {loadGlb} from '../core/glb111.js';
 import {mul,translation,rotateY} from '../core/math.js?v=060';
+import {SAVED_ACTION_CALIBRATIONS,fixtureActorPose} from '../characters/fixturePose115.js?v=125';
 
 const $=id=>document.getElementById(id);
 const MODEL='assets/characters/cadet/cadet-animation-lab.glb?v=120';
@@ -24,8 +25,8 @@ const PROP_CONFIG={
  hurdle:{type:'hurdle',label:'跨欄',x:6.75,z:.2,scale:1.15,yaw:0,url:'assets/props/hurdle.glb?v=112'},
  ground:{label:'空地',x:0,z:-3.8,yaw:0}
 };
-const LABELS={[SALUTE]:'敬禮',[ORIGINAL_AIM]:'原始05舉槍／開槍',[ARMY_PULLUP]:'拉單槓（新製作）',[ARMY_SWEEP]:'掃地＋掃把（新製作）',Jump_Over_Obstacle_1:'跨欄跳躍 1',Jump_Over_Obstacle_2:'跨欄跳躍 2',Idle:'站立待機',Walking:'走路',Running:'跑步',RunFast:'全速奔跑',Chair_Sit_Idle_M:'坐椅子',Sit_Cross_Legged_on_Floor:'盤腿坐地',Stand_and_Chat:'站立聊天',Sit_and_Doze_Off:'坐著打瞌睡',Pull_Radish:'拔草／拉取',push_up:'伏地挺身',situps:'仰臥起坐',Climb_Up_Rope:'攀繩',Punch_Combo_1:'拳擊組合',Forward_Roll_and_Fire:'前滾翻',Victory_Cheer:'歡呼',Knock_Down:'倒下',Sleep_Normally:'躺下睡覺'};
-const ANCHORS={Jump_Over_Obstacle_1:'hurdle',Jump_Over_Obstacle_2:'hurdle',[ARMY_PULLUP]:'pullup',[ARMY_SWEEP]:'ground',[PROGRAM_RIFLE]:'ground',[ORIGINAL_AIM]:'ground',Chair_Sit_Idle_M:'chair',Sit_and_Doze_Off:'chair',Sit_Cross_Legged_on_Floor:'ground',Climb_Up_Rope:'pullup',Pull_Radish:'ground',push_up:'ground',situps:'ground',Sleep_Normally:'ground'};
+const LABELS={baseball_pitching:'投球／手榴彈投擲',Crouch_Pull_and_Throw:'蹲下投擲手榴彈',[SALUTE]:'敬禮',[ORIGINAL_AIM]:'原始05舉槍／開槍',[ARMY_PULLUP]:'拉單槓（新製作）',[ARMY_SWEEP]:'掃地＋掃把（新製作）',Jump_Over_Obstacle_1:'跨欄跳躍 1',Jump_Over_Obstacle_2:'跨欄跳躍 2',Idle:'站立待機',Walking:'走路',Running:'跑步',RunFast:'全速奔跑',Chair_Sit_Idle_M:'坐椅子',Sit_Cross_Legged_on_Floor:'盤腿坐地',Stand_and_Chat:'站立聊天',Sit_and_Doze_Off:'坐著打瞌睡',Pull_Radish:'拔草／拉取',push_up:'伏地挺身',situps:'仰臥起坐',Climb_Up_Rope:'攀繩',Punch_Combo_1:'拳擊組合',Forward_Roll_and_Fire:'前滾翻',Victory_Cheer:'歡呼',Knock_Down:'倒下',Sleep_Normally:'躺下睡覺'};
+const ANCHORS={baseball_pitching:'grenade',Crouch_Pull_and_Throw:'grenade',Jump_Over_Obstacle_1:'hurdle',Jump_Over_Obstacle_2:'hurdle',[ARMY_PULLUP]:'pullup',[ARMY_SWEEP]:'ground',[PROGRAM_RIFLE]:'ground',[ORIGINAL_AIM]:'ground',Chair_Sit_Idle_M:'chair',Sit_and_Doze_Off:'chair',Sit_Cross_Legged_on_Floor:'ground',Climb_Up_Rope:'pullup',Pull_Radish:'ground',push_up:'ground',situps:'ground',Sleep_Normally:'ground'};
 const DEFAULTS={
  chair:{x:0,z:0,y:0,yaw:0,speed:1},
  pullup:{x:0,z:-.48,y:0,yaw:180,speed:1},
@@ -33,15 +34,9 @@ const DEFAULTS={
  hurdle:{x:0,z:-0.70,y:0,yaw:0,speed:1},
  ground:{x:0,z:0,y:0,yaw:0,speed:1}
 };
-const BUILTIN_CALIBRATIONS={
- 'Chair_Sit_Idle_M@@chair':{x:-.14,z:.56,y:.20,yaw:0,speed:1},
- 'Sit_and_Doze_Off@@chair':{x:0,z:.24,y:.20,yaw:0,speed:1},
- 'Pull_Radish@@ground':{x:0,z:0,y:.09,yaw:0,speed:1},
- 'baseball_pitching@@grenade':{x:-1.08,z:.42,y:0,yaw:82,speed:1},
- 'Crouch_Pull_and_Throw@@grenade':{x:-1.18,z:.48,y:.23,yaw:168,speed:1}
-};
+const BUILTIN_CALIBRATIONS=SAVED_ACTION_CALIBRATIONS;
 function newStore(){return {version:1,model:MODEL,calibrations:{...BUILTIN_CALIBRATIONS}};}
-let store=newStore();try{const s=JSON.parse(localStorage.getItem(STORAGE)||'null');if(s&&s.calibrations&&typeof s.calibrations==='object')store={...newStore(),calibrations:s.calibrations};}catch(_){/* storage may be unavailable */}
+let store=newStore();try{const s=JSON.parse(localStorage.getItem(STORAGE)||'null');if(s&&s.calibrations&&typeof s.calibrations==='object')store={...newStore(),calibrations:{...BUILTIN_CALIBRATIONS,...s.calibrations}};}catch(_){/* storage may be unavailable */}
 const data={renderer:null,props:null,actor:null,anim:null,clip:'Idle',anchor:'chair',playing:false,loop:true,rifle:null,broom:null,lastShotAt:0,pose:{...DEFAULTS.chair},last:0,cameraYaw:.65,cameraPitch:.53,cameraZoom:9.6,loaded:false,ground:null};
 function saveStorage(){try{localStorage.setItem(STORAGE,JSON.stringify(store));}catch(_){/* private browsing */}}
 function currentKey(){return `${data.clip}@@${data.anchor}`}
@@ -87,9 +82,9 @@ function drawActor(){
  gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,a.tex);gl.uniform1i(r.uniforms.tex,0);gl.bindVertexArray(a.vao);gl.drawElements(gl.TRIANGLES,a.count,a.indexType,0);gl.bindVertexArray(null);
 }
 function setSoldierPose(){
- const p=PROP_CONFIG[data.anchor],v=data.pose;const a=p.yaw||0,co=Math.cos(a),si=Math.sin(a);
- data.actor.pos.x=p.x+v.x*co+v.z*si;data.actor.pos.z=p.z-v.x*si+v.z*co;data.actor.height=v.y;data.actor.angle=a+v.yaw*Math.PI/180;
- data.actor.anim.speed=v.speed;
+ const position=fixtureActorPose(PROP_CONFIG[data.anchor],data.pose);
+ data.actor.pos={...position.pos};data.actor.height=position.lift;data.actor.angle=position.angle;
+ data.actor.anim.speed=position.speed;
 }
 function animationFrame(now){requestAnimationFrame(animationFrame);if(!data.loaded)return;const dt=data.last?Math.min(.07,(now-data.last)/1000):0;data.last=now;
  const anim=data.anim;
@@ -148,7 +143,7 @@ async function installSoldier(g,modelName){
  await data.renderer.addModel('labSoldier',g);
  data.anim=next;data.actor={pos:{x:0,z:0},angle:0,height:0,anim:next};displayedModel=modelName;
  const names=Object.keys(next.clips),seen=names.filter(n=>n!=='Idle'&&n!==ARMY_PULLUP&&n!==ARMY_SWEEP);
- $('clip').innerHTML='';for(const [i,key] of ['Idle',ARMY_PULLUP,ARMY_SWEEP,PROGRAM_RIFLE,...seen].entries()){const op=document.createElement('option');op.value=key;op.textContent=key===PROGRAM_RIFLE?'遊戲實際舉槍／射擊（程式動作）':`${LABELS[key]||(/^[0-9_a-f-]{25,}$/.test(key)?'未命名動作 '+(i+1):'其他動作')} · ${key}`;$('clip').append(op);}
+ $('clip').innerHTML='';for(const [i,key] of ['Idle',ARMY_PULLUP,ARMY_SWEEP,PROGRAM_RIFLE,...seen].entries()){const op=document.createElement('option');op.value=key;op.textContent=key===PROGRAM_RIFLE?'遊戲實際舉槍／射擊（程式動作）':(key==='baseball_pitching'||key==='Crouch_Pull_and_Throw')?LABELS[key]:`${LABELS[key]||(/^[0-9_a-f-]{25,}$/.test(key)?'未命名動作 '+(i+1):'其他動作')} · ${key}`;$('clip').append(op);}
  $('clip').disabled=false;for(const id of ['play','pause','restart','timeline'])$(id).disabled=false;
  changeClip(next.hasClip('Chair_Sit_Idle_M')?'Chair_Sit_Idle_M':names[0]);
 }
