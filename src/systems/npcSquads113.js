@@ -4,7 +4,7 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal} from './npcLife113.js?v=115';
+ faceSquadMember,squadWorldGoal} from './npcLife113.js?v=116';
 import {canOccupy,moveNpc} from '../map/navCollision109.js?v=109';
 const W=(x,z)=>({x,z});
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);

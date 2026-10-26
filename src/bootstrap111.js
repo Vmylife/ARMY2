@@ -30,11 +30,8 @@ button.addEventListener('click',async()=>{
   window.armySetLoading(0,1,'建立軍營場景…');
   try {
     // Separate map versioned modules are intentional: both must share the editor changes.
-    await import('./map/layout105.js?v=105');
+    await import('./map/activeCampLayout116.js?v=116');
     await import('./lighting96.js?v=096');
-    await import('./map/lifeBounds107.js?v=107');
-    await import('./map/layout109.js?v=109');
-    await import('./map/layout115.js?v=115');
-    await import('./main111.js?v=115');
+    await import('./main111.js?v=116');
   }catch(error){console.error('軍營載入錯誤',error);window.armyLoadFailure(error);}
 },{once:true});

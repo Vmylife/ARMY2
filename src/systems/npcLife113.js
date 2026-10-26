@@ -113,8 +113,11 @@ function fixtureInit(){
   if(p.type!=='bench')continue;
   const yaw=p.yaw||0;
   for(let side of [-1,1]){
-   const lateral=side*.43;
-   const base=W(p.x+Math.cos(yaw)*lateral-Math.sin(yaw)*.79,p.z-Math.sin(yaw)*lateral-Math.cos(yaw)*.79);
+   // Chair_Sit_Idle_M calibrated in Animation Lab: x +0.04, z +0.52, y +0.17.
+   // Bench yaw follows the prop coordinate system (local +X along the seat).
+   const lateral=side*.43+.04, forward=.52;
+   const base=W(p.x+Math.cos(yaw)*lateral+Math.sin(yaw)*forward,
+                p.z-Math.sin(yaw)*lateral+Math.cos(yaw)*forward);
    SEATS.push({key:`bench-${i}-${side}`,pos:base,angle:yaw});
   }
  }
@@ -174,6 +177,8 @@ function pose(n,names=['Idle'],rate=1){
  let clip='Idle';for(const c of names){if(n.anim.hasClip(c)){clip=c;break;}}
  if(n.anim.clip!==clip)n.anim.setClip(clip);
  n.anim.speed=rate;
+ // The animated hips need +0.17m to meet the bench seat. Only apply when seated.
+ n.renderLift=(clip==='Chair_Sit_Idle_M'||clip==='Sit_and_Doze_Off')?.17:0;
  const dur=n.anim.clips[clip]?.duration;
  if(ANIM_LOOPS.has(clip)&&dur>0&&n.anim.clock>dur)n.anim.clock%=dur;
 }

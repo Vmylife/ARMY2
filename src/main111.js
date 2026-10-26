@@ -2,7 +2,7 @@
 import {CampBuildings,BUILDING_MODELS} from './buildings/buildingRenderer.js?v=112';
 import {CampProps,PROP_MODELS} from './props/propRenderer.js?v=112';
 import {loadGlb} from './core/glb111.js?v=111';
-import {ArmyRenderer} from './core/renderer.js?v=092';
+import {ArmyRenderer} from './core/renderer.js?v=116';
 import {RigAnimator} from './characters/rigAnimator.js?v=084';
 import {RifleRenderer} from './training/rifleRenderer.js?v=111';
 import {createRangeAudio} from './training/rangeTraining.js?v=111';
@@ -13,7 +13,7 @@ import {drawMinimap} from './ui/minimap.js?v=093';
 import {initWorldMap} from './ui/worldMap.js?v=093';
 import {setupInput} from './ui/input.js?v=062';
 import {options} from './systems/settings.js?v=060';
-import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=115';
+import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=116';
 
 const $=id=>document.getElementById(id);
 const debug=new URLSearchParams(location.search).has('debug');

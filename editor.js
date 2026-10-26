@@ -1,21 +1,22 @@
 // Army independent scene editor v0.10.3 (root-level deployment fix).
 // Uses the current camp geometry and GLB renderers; does not load the gameplay loop.
-import './src/map/layout115.js?v=115';
+import './src/map/activeCampLayout116.js?v=116';
 import './src/lighting96.js?v=096';
 import {BUILDINGS as modelBuildings,PROPS as modelProps} from './src/map/camp.js?v=092';
 import {BUILDINGS as gameBuildings,PROPS as gameProps,FEATURES as gameFeatures} from './src/map/camp.js?v=093';
 import {ArmyRenderer} from './src/core/renderer.js?v=092';
 import {CampBuildings,BUILDING_MODELS} from './src/buildings/buildingRenderer.js?v=112';
 import {CampProps,PROP_MODELS} from './src/props/propRenderer.js?v=115';
-import {loadGlb} from './src/core/glb.js?v=060';
+import {loadGlb} from './src/core/glb111.js?v=111';
 
 const $=id=>document.getElementById(id);
 const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
 const round=(n,places=3)=>Number(n.toFixed(places));
 const rad=d=>d*Math.PI/180,deg=r=>r*180/Math.PI;
 const copy=value=>JSON.parse(JSON.stringify(value));
-const storageKey='army-scene-editor-v0115-v115';
-const previousStorageKey='army-scene-editor-v0103-v103-no-legacy';
+// New baseline: don't auto-restore incompatible/old editor snapshots. They remain available for manual import.
+const storageKey='army-scene-editor-v0116-v116';
+// Older localStorage drafts are deliberately left untouched; import saved JSON when needed.
 const names={weed:'雜草',streetlamp:'路燈',treeA:'樹木 A',treeB:'樹木 B',sandbag:'沙包',target:'靶子',crate:'木箱',barrel:'油桶',bench:'長椅',signboard:'標示牌',hurdle:'跨欄',pullup:'單槓',flagpole:'旗桿',podium:'司令台',fence:'圍欄',basketballHoop:'籃框',grenadeCrate:'手榴彈箱'};
 // The new decoration is editor-only until exported and approved for the main camp.
 PROP_MODELS.push({id:'weed',url:'./assets/props/weed.glb?v=115'});
@@ -225,7 +226,7 @@ function select(item,{focus=false}={}){
  if(focus&&item){pivot={x:item.state.x,z:item.state.z};zoom=clamp(item.kind==='building'?25:15,8,95);}
 }
 function exportLayout(){
- const result={format:'army-camp-layout',schemaVersion:2,baseVersion:'v0.10.3',editorVersion:'v0.10.3',exportedAt:new Date().toISOString(),
+ const result={format:'army-camp-layout',schemaVersion:2,baseVersion:'v0.11.6',editorVersion:'v0.11.6',exportedAt:new Date().toISOString(),
   note:'This is an editable preview snapshot; apply building collision, features, static shadows and other derived positions during integration.',
   changedCount:changedCount(),deletedOriginals:originalDescriptors.filter(d=>!byKey.has(d.key)).map(d=>({key:d.key,kind:d.kind,id:d.kind==='building'?d.base.id:null,type:d.type??null,label:d.label,index:d.index})),
   items:sceneSnapshot().objects,scene:sceneSnapshot(),
@@ -445,9 +446,7 @@ async function boot(){
   try{
    const raw=localStorage.getItem(storageKey);
    if(raw){const saved=JSON.parse(raw);if(saved?.schemaVersion===2)rebuildScene(saved)}
-   else{const old=JSON.parse(localStorage.getItem(previousStorageKey)||'null');
-    if(old){const baseline=snapshot();for(const [key,v] of Object.entries(old)){const d=baseline.objects.find(r=>r.key===key);if(d&&finiteState(v))d.state={...v}}rebuildScene(baseline)}
-   }
+   // No implicit old-draft migration. The editor opens the actual current game map.
   }catch(err){console.warn('編輯進度讀取失敗',err)}
   startRenderLoop();
   // Load models independently: a bad GLB should not block all other objects.
@@ -464,7 +463,7 @@ async function boot(){
   await Promise.all(tasks);refreshMeshes();loaded=true;
   $('loading').hidden=true;
   if(failed){$('status').textContent=`${failed} 個模型未載入，請確認檔案路徑`}
-  else $('toolLabel').textContent='拖動物件即可修改｜匯出 JSON 後傳給我';
+  else $('toolLabel').textContent='已載入與主遊戲一致的 v0.11.6 正式場景｜修改後可匯出 JSON';
  }catch(err){console.error(err);$('loading').textContent='啟動編輯器失敗：'+(err.message||err)}
 }
 boot();

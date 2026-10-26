@@ -3,11 +3,15 @@ import {ArmyRenderer} from '../core/renderer.js?v=092';
 import {CampProps} from '../props/propRenderer.js?v=092';
 import {PROPS} from '../map/camp.js?v=092';
 import {RigAnimator} from '../characters/rigAnimator.js';
+import {RifleRenderer} from '../training/rifleRenderer.js?v=111';
 import {loadGlb} from '../core/glb111.js';
 import {mul,translation,rotateY} from '../core/math.js?v=060';
 
 const $=id=>document.getElementById(id);
 const MODEL='assets/characters/cadet/cadet-animation-lab.glb';
+const PROGRAM_RIFLE='__ARMY_GAME_RIFLE_AIM__';
+const SALUTE='_01a16f90_0a0e_7065_a16d_e78ab0acb493';
+const UNUSED_AIM='_01a16f94_b5ea_72d7_b8cd_df0ad0e689b6';
 let displayedModel=MODEL;
 const STORAGE='army-animation-lab.v1';
 const VARS=['x','z','y','yaw','speed'];
@@ -17,8 +21,8 @@ const PROP_CONFIG={
  grenade:{type:'grenadeCrate',label:'手榴彈投擲箱',x:3.45,z:.2,scale:1.05,yaw:0,url:'assets/props/grenade-crate.glb?v=112'},
  ground:{label:'空地',x:0,z:-3.8,yaw:0}
 };
-const LABELS={Idle:'站立待機',Walking:'走路',Running:'跑步',RunFast:'全速奔跑',Chair_Sit_Idle_M:'坐椅子',Sit_Cross_Legged_on_Floor:'盤腿坐地',Stand_and_Chat:'站立聊天',Sit_and_Doze_Off:'坐著打瞌睡',Pull_Radish:'拔草／拉取',push_up:'伏地挺身',situps:'仰臥起坐',Climb_Up_Rope:'攀繩',Punch_Combo_1:'拳擊組合',Forward_Roll_and_Fire:'前滾翻',Victory_Cheer:'歡呼',Knock_Down:'倒下',Sleep_Normally:'躺下睡覺'};
-const ANCHORS={Chair_Sit_Idle_M:'chair',Sit_and_Doze_Off:'chair',Sit_Cross_Legged_on_Floor:'ground',Climb_Up_Rope:'pullup',Pull_Radish:'ground',push_up:'ground',situps:'ground',Sleep_Normally:'ground'};
+const LABELS={[SALUTE]:'敬禮',Idle:'站立待機',Walking:'走路',Running:'跑步',RunFast:'全速奔跑',Chair_Sit_Idle_M:'坐椅子',Sit_Cross_Legged_on_Floor:'盤腿坐地',Stand_and_Chat:'站立聊天',Sit_and_Doze_Off:'坐著打瞌睡',Pull_Radish:'拔草／拉取',push_up:'伏地挺身',situps:'仰臥起坐',Climb_Up_Rope:'攀繩',Punch_Combo_1:'拳擊組合',Forward_Roll_and_Fire:'前滾翻',Victory_Cheer:'歡呼',Knock_Down:'倒下',Sleep_Normally:'躺下睡覺'};
+const ANCHORS={[PROGRAM_RIFLE]:'ground',Chair_Sit_Idle_M:'chair',Sit_and_Doze_Off:'chair',Sit_Cross_Legged_on_Floor:'ground',Climb_Up_Rope:'pullup',Pull_Radish:'ground',push_up:'ground',situps:'ground',Sleep_Normally:'ground'};
 const DEFAULTS={
  chair:{x:0,z:0,y:0,yaw:0,speed:1},
  pullup:{x:0,z:-.48,y:0,yaw:180,speed:1},
@@ -27,7 +31,7 @@ const DEFAULTS={
 };
 function newStore(){return {version:1,model:MODEL,calibrations:{}};}
 let store=newStore();try{const s=JSON.parse(localStorage.getItem(STORAGE)||'null');if(s&&s.calibrations&&typeof s.calibrations==='object')store={...newStore(),calibrations:s.calibrations};}catch(_){/* storage may be unavailable */}
-const data={renderer:null,props:null,actor:null,anim:null,clip:'Idle',anchor:'chair',playing:false,loop:true,pose:{...DEFAULTS.chair},last:0,cameraYaw:.65,cameraPitch:.53,cameraZoom:9.6,loaded:false,ground:null};
+const data={renderer:null,props:null,actor:null,anim:null,clip:'Idle',anchor:'chair',playing:false,loop:true,rifle:null,lastShotAt:0,pose:{...DEFAULTS.chair},last:0,cameraYaw:.65,cameraPitch:.53,cameraZoom:9.6,loaded:false,ground:null};
 function saveStorage(){try{localStorage.setItem(STORAGE,JSON.stringify(store));}catch(_){/* private browsing */}}
 function currentKey(){return `${data.clip}@@${data.anchor}`}
 function currentPreset(){const saved=store.calibrations[currentKey()];return saved?{...DEFAULTS[data.anchor],...saved}:{...DEFAULTS[data.anchor]};}
@@ -37,8 +41,8 @@ function updateSliderText(key){const n=Number($(key).value);$(key+'Val').textCon
 function exportCalibration(){return {animation:data.clip,anchor:data.anchor,offset:{...data.pose},model:displayedModel};}
 function renderCurrentJSON(){$('currentJSON').textContent=JSON.stringify(exportCalibration(),null,2);}
 function setAnchor(anchor){if(!PROP_CONFIG[anchor])return;data.anchor=anchor;$('anchor').value=anchor;data.pose=currentPreset();fillSliders();data.renderer.cameraReady=false;data.cameraZoom=6.9;}
-function changeClip(name,automaticAnchor=true){if(!data.anim?.hasClip(name))return;data.clip=name;$('clip').value=name;if(automaticAnchor)setAnchor(ANCHORS[name]||'ground');else {data.pose=currentPreset();fillSliders();}data.anim.setClip(name,{restart:true});data.anim.transition=0;data.anim.prevClip=null;data.anim.clock=0;data.anim.completed=false;data.anim.speed=data.pose.speed;data.playing=true;data.last=0;updateTimeline();$('clipHint').textContent=`${LABELS[name]||'原始動畫'} · ${name}。可調整士兵與設施的相對站位，校正後按「儲存本動作校正」。`;}
-function updateTimeline(){if(!data.anim)return;const c=data.anim.clips[data.clip],dur=c?.duration||0,t=dur?Math.min(dur,data.anim.clock):0;$('timeline').value=dur?Math.round(t/dur*1000):0;$('timeLabel').textContent=`${t.toFixed(2)} / ${dur.toFixed(2)} 秒`;}
+function changeClip(name,automaticAnchor=true){if(!data.anim?.hasClip(name)&&name!==PROGRAM_RIFLE)return;data.clip=name;$('clip').value=name;if(automaticAnchor)setAnchor(ANCHORS[name]||'ground');else {data.pose=currentPreset();fillSliders();}data.anim.setClip(name===PROGRAM_RIFLE?'Idle':name,{restart:true});data.anim.rifleAim=name===PROGRAM_RIFLE?1:0;data.anim.transition=0;data.anim.prevClip=null;data.anim.clock=0;data.anim.completed=false;data.anim.speed=data.pose.speed;data.playing=true;data.last=0;updateTimeline();$('clipHint').textContent=name===PROGRAM_RIFLE?'遊戲現役自製舉槍姿勢（骨架 RIFLE_POSE）＋實際步槍、後座與槍口火光。這是程式動作，不在 GLB 內。':`${LABELS[name]||'原始動畫'} · ${name}。可調整士兵與設施的相對站位，校正後按「儲存本動作校正」。`;}
+function updateTimeline(){if(!data.anim)return;if(data.clip===PROGRAM_RIFLE){$('timeline').value=0;$('timeline').disabled=true;$('timeLabel').textContent='程式動作 · 循環射擊';return;}$('timeline').disabled=false;const c=data.anim.clips[data.clip],dur=c?.duration||0,t=dur?Math.min(dur,data.anim.clock):0;$('timeline').value=dur?Math.round(t/dur*1000):0;$('timeLabel').textContent=`${t.toFixed(2)} / ${dur.toFixed(2)} 秒`;}
 function makeFloor(gl){
  const verts=[],cols=[],norms=[];
  function tri(a,b,c,color){for(const p of [a,b,c]){verts.push(...p);cols.push(...color);norms.push(0,1,0)}}
@@ -84,6 +88,10 @@ function animationFrame(now){requestAnimationFrame(animationFrame);if(!data.load
  setSoldierPose();const r=data.renderer,a=PROP_CONFIG[data.anchor];
  r.setCamera({yaw:data.cameraYaw,pitch:data.cameraPitch,zoom:data.cameraZoom});r.startFrame({x:a.x,z:a.z});
  drawFloor();data.props.draw(r.vp,null);drawActor();
+ if(data.clip===PROGRAM_RIFLE){
+  if(data.playing&&now-data.lastShotAt>900){data.actor.shotUntil=now+105;data.lastShotAt=now;}
+  data.rifle?.draw(r.vp,data.actor,now);
+ }
 }
 function setupCamera(){
  const canvas=$('labCanvas');let pointers=new Map(),prev=null,lastPinch=null;
@@ -108,7 +116,7 @@ function bindControls(){
  $('pause').addEventListener('click',()=>{data.playing=false;updateTimeline();});
  $('restart').addEventListener('click',()=>changeClip(data.clip,false));
  $('loop').addEventListener('change',()=>{data.loop=$('loop').checked;});
- $('timeline').addEventListener('input',()=>{if(!data.anim)return;data.playing=false;data.anim.clock=(Number($('timeline').value)/1000)*data.anim.clips[data.clip].duration;data.anim.completed=false;data.anim.transition=0;data.anim.evaluate(0);updateTimeline();});
+ $('timeline').addEventListener('input',()=>{if(!data.anim||data.clip===PROGRAM_RIFLE)return;data.playing=false;data.anim.clock=(Number($('timeline').value)/1000)*data.anim.clips[data.clip].duration;data.anim.completed=false;data.anim.transition=0;data.anim.evaluate(0);updateTimeline();});
  for(const key of VARS)$(key).addEventListener('input',()=>{data.pose[key]=Number($(key).value);updateSliderText(key);renderCurrentJSON();});
  $('resetPose').addEventListener('click',()=>{data.pose={...DEFAULTS[data.anchor]};fillSliders();$('saveStatus').textContent='已恢復預設數值；按「儲存」才會覆蓋已保存的設定。';});
  $('savePose').addEventListener('click',()=>{store.calibrations[currentKey()]={...data.pose};saveStorage();$('saveStatus').textContent=`已儲存：${LABELS[data.clip]||data.clip}＋${PROP_CONFIG[data.anchor].label}。`;});
@@ -127,8 +135,8 @@ async function installSoldier(g,modelName){
  const next=new RigAnimator(g);next.setClip('Idle');next.evaluate(0);
  await data.renderer.addModel('labSoldier',g);
  data.anim=next;data.actor={pos:{x:0,z:0},angle:0,height:0,anim:next};displayedModel=modelName;
- const names=Object.keys(next.clips),seen=names.filter(n=>n!=='Idle');
- $('clip').innerHTML='';for(const [i,key] of ['Idle',...seen].entries()){const op=document.createElement('option');op.value=key;op.textContent=`${LABELS[key]||(/^[0-9_a-f-]{25,}$/.test(key)?'未命名動作 '+(i+1):'其他動作')} · ${key}`;$('clip').append(op);}
+ const names=Object.keys(next.clips),seen=names.filter(n=>n!=='Idle'&&n!==UNUSED_AIM);
+ $('clip').innerHTML='';for(const [i,key] of ['Idle',PROGRAM_RIFLE,...seen].entries()){const op=document.createElement('option');op.value=key;op.textContent=key===PROGRAM_RIFLE?'遊戲實際舉槍／射擊（程式動作）':`${LABELS[key]||(/^[0-9_a-f-]{25,}$/.test(key)?'未命名動作 '+(i+1):'其他動作')} · ${key}`;$('clip').append(op);}
  $('clip').disabled=false;for(const id of ['play','pause','restart','timeline'])$(id).disabled=false;
  changeClip(next.hasClip('Chair_Sit_Idle_M')?'Chair_Sit_Idle_M':names[0]);
 }
@@ -150,7 +158,8 @@ async function load(){
   if(key==='ground')continue;
   try{const g=await loadGlb(`./${p.url}`,{onProgress:(n,t)=>setStatus(`載入${p.label}：${(n/1048576).toFixed(1)} / ${t?(t/1048576).toFixed(1):'?'} MB`),timeoutMs:45000});await data.props.add(p.type,g);}catch(e){console.error(e);setStatus(`${p.label}載入失敗：${e.message}（動畫仍可測試）`,true);}
  }
- if(data.props.models.size===3)setStatus(`已就緒：${Object.keys(data.anim.clips).length} 組可選動畫、3 件道具`);
+ try{const weapon=await loadGlb('./assets/weapons/rifle.glb?v=111',{timeoutMs:45000});data.rifle=new RifleRenderer(r.gl);await data.rifle.addModel(weapon);}catch(e){console.warn('步槍預覽載入失敗',e);setStatus('可測試其他動畫；程式舉槍的步槍模型載入失敗',true);}
+ if(data.props.models.size===3&&data.rifle)setStatus('已就緒：程式舉槍射擊＋內建動畫、3 件道具');
  $('frameInfo').textContent='士兵使用完整動畫 GLB；道具使用軍營正式模型';
 }
 bindControls();fillSliders();

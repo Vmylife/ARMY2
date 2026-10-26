@@ -92,7 +92,7 @@ export class ArmyRenderer{
   return Math.abs(sx)<w*1.20+.5 && Math.abs(sy)<w*1.22+.6 && sz>=-w-.6 && sz<=w+.6;
  }
  drawActor(asset,actor){const gl=this.gl,a=this.assets.get(asset);if(!a)return;
- gl.useProgram(this.p);gl.uniformMatrix4fv(this.uniforms.vp,false,this.vp);gl.uniformMatrix4fv(this.uniforms.model,false,mul(translation(actor.pos.x,groundLift(a,actor),actor.pos.z),rotateY(actor.angle)));
+ gl.useProgram(this.p);gl.uniformMatrix4fv(this.uniforms.vp,false,this.vp);gl.uniformMatrix4fv(this.uniforms.model,false,mul(translation(actor.pos.x,groundLift(a,actor)+(actor.renderLift||0),actor.pos.z),rotateY(actor.angle)));
  gl.uniformMatrix4fv(this.uniforms.bones,false,actor.anim.bones);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,a.tex);gl.uniform1i(this.uniforms.tex,0);gl.bindVertexArray(a.vao);gl.drawElements(gl.TRIANGLES,a.count,a.indexType,0);
  }
 }
