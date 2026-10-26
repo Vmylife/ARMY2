@@ -4,7 +4,7 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal} from './npcLife113.js?v=117';
+ faceSquadMember,squadWorldGoal} from './npcLife113.js?v=118';
 import {canOccupy,moveNpc} from '../map/navCollision109.js?v=109';
 const W=(x,z)=>({x,z});
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
@@ -15,7 +15,7 @@ const STAGES=[
   points:[W(12.2,-6.9),W(15.3,-6.9),W(18.4,-6.9),W(13.75,-10.1),W(16.85,-10.1)],clip:['push_up','Idle']},
  {id:'pullup',name:'拉單槓',rally:W(19,-12.6),duration:10,limited:true,clip:['Idle']},
  {id:'shoot',name:'靶場打靶',rally:W(10.7,14.3),duration:11,limited:true,clip:['Idle']},
- {id:'grenade',name:'手榴彈投擲',rally:W(-14.3,-10.7),duration:9,limited:true,clip:['Idle']},
+ {id:'grenade',name:'手榴彈投擲',rally:W(-29.2,-23.1),duration:9,limited:true,clip:['Idle']},
  {id:'obstacle',name:'障礙訓練',rally:W(9,7.2),duration:12,
   points:[W(5.5,7.9),W(8.5,7.9),W(11.5,7.9),W(14.5,7.9),W(17.5,7.9)],clip:['Idle']},
  {id:'weed',name:'草地拔草',rally:W(-31,8),duration:16,
@@ -116,7 +116,7 @@ function march(s,dt,all,playerPos){
 function queuePoint(stage,index){
  // Grenade stand-by area is east of the throwing lanes (blue marked region).
  if(stage.id==='grenade') {
-  const q=W(-14.5+(index%2)*.90,-10.2-Math.floor(index/2)*.90);
+  const q=W(-31.0+(index%2)*1.10,-25.1-Math.floor(index/2)*1.45);
   return squadWorldGoal(q)||q;
  }
  const offset=(index-2)*1.15;
@@ -141,7 +141,7 @@ function trainPose(n,stage,dt,now){
   if(stage.id==='pullup')faceSquadMember(n,0,-1,dt);
   if(stage.id==='grenade'){
    // Facing towards the oval, never towards the people waiting beside it.
-   const wanted=0,delta=Math.atan2(Math.sin(wanted-n.angle),Math.cos(wanted-n.angle));
+   const wanted=Math.atan2(-20.8-n.pos.x,-2.0-n.pos.z),delta=Math.atan2(Math.sin(wanted-n.angle),Math.cos(wanted-n.angle));
    n.angle+=delta*clamp(1-Math.exp(-12*dt),0,1);
   }
  }

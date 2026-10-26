@@ -1,6 +1,6 @@
 // Army independent scene editor v0.10.3 (root-level deployment fix).
 // Uses the current camp geometry and GLB renderers; does not load the gameplay loop.
-import './src/map/activeCampLayout116.js?v=116';
+import './src/map/activeCampLayout116.js?v=118';
 import './src/lighting96.js?v=096';
 import {BUILDINGS as modelBuildings,PROPS as modelProps} from './src/map/camp.js?v=092';
 import {BUILDINGS as gameBuildings,PROPS as gameProps,FEATURES as gameFeatures} from './src/map/camp.js?v=093';
@@ -15,7 +15,7 @@ const round=(n,places=3)=>Number(n.toFixed(places));
 const rad=d=>d*Math.PI/180,deg=r=>r*180/Math.PI;
 const copy=value=>JSON.parse(JSON.stringify(value));
 // New baseline: don't auto-restore incompatible/old editor snapshots. They remain available for manual import.
-const storageKey='army-scene-editor-v0116-v116';
+const storageKey='army-scene-editor-v0118-v118';
 // Older localStorage drafts are deliberately left untouched; import saved JSON when needed.
 const names={weed:'雜草',streetlamp:'路燈',treeA:'樹木 A',treeB:'樹木 B',sandbag:'沙包',target:'靶子',crate:'木箱',barrel:'油桶',bench:'長椅',signboard:'標示牌',hurdle:'跨欄',pullup:'單槓',flagpole:'旗桿',podium:'司令台',fence:'圍欄',basketballHoop:'籃框',grenadeCrate:'手榴彈箱'};
 // The new decoration is editor-only until exported and approved for the main camp.
@@ -383,7 +383,8 @@ function installControls(){
 function installUI(){
  $('newCategory').onchange=refreshTemplateList;
  $('addObject').onclick=()=>{
-  const d=defaultsByKey.get($('newTemplate').value);
+  const key=$('newTemplate').value;
+  const d=defaultsByKey.get(key)||selectedSource($('newCategory').value).find(p=>p.key===key);
   if(d)createFromDescriptor(d);else $('toolLabel').textContent='素材清單是空的，請重新選擇分類';
  };
  $('duplicateObject').onclick=()=>createFromDescriptor(selected,{duplicate:true});
@@ -463,7 +464,7 @@ async function boot(){
   await Promise.all(tasks);refreshMeshes();loaded=true;
   $('loading').hidden=true;
   if(failed){$('status').textContent=`${failed} 個模型未載入，請確認檔案路徑`}
-  else $('toolLabel').textContent='已載入與主遊戲一致的 v0.11.6 正式場景｜修改後可匯出 JSON';
+  else $('toolLabel').textContent='已載入與主遊戲一致的 v0.11.8 正式場景｜修改後可匯出 JSON';
  }catch(err){console.error(err);$('loading').textContent='啟動編輯器失敗：'+(err.message||err)}
 }
 boot();
