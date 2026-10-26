@@ -2,7 +2,7 @@
 // Every actor owns needs/personality, chooses actions independently, and can
 // accept a two-way social invite. Facility positions use the approved layout103.
 // No generative API, remote services, or new meshes are required by the brains.
-import {RigAnimator} from '../characters/rigAnimator.js?v=084';
+import {RigAnimator} from '../characters/rigAnimator.js?v=117';
 import {updateRangeShooter} from '../training/rangeTraining.js?v=111';
 import {canOccupy,moveNpc,NPC_RADIUS} from '../map/navCollision109.js?v=109';
 import {PROPS,ROADS} from '../map/camp.js?v=093';
@@ -150,7 +150,6 @@ const A={
  patrol:{label:'巡視營區',base:.95,tags:['active']},
  assembly:{label:'集合列隊',base:1.15,tags:['chore']},
  basketballCoach:{label:'球場旁看球',base:.65,tags:['social'],placeholder:true},
- cheer:{label:'幫同梯加油',base:.7,tags:['social']},
 };
 const STATIC={
  walk:[W(-34,-8),W(-31,12),W(-12,15),W(-10,-4),W(0,-10),W(10,-12),W(27,-12),W(29,-3),W(27,15),W(0,15)],
@@ -170,9 +169,8 @@ const STATIC={
  patrol:[W(-10,-6),W(25,-10),W(27,13),W(-28,11),W(-4,-11)],
  assembly:[W(12.7,-8.3),W(14.7,-8.3),W(16.7,-8.3),W(18.7,-8.3)],
  basketballCoach:[W(-33.1,25.7),W(-39,25.7)],
- cheer:[W(-18,-3),W(19,-12)],
 };
-const NEED_ANIM={bench:['Chair_Sit_Idle_M'],doze:['Sit_and_Doze_Off','Chair_Sit_Idle_M'],floor:['Sit_Cross_Legged_on_Floor'],weed:['Pull_Radish'],pushup:['push_up'],situp:['situps'],chat:['Stand_and_Chat'],greet:['Stand_and_Chat'],cheer:['Victory_Cheer']};
+const NEED_ANIM={bench:['Chair_Sit_Idle_M'],doze:['Sit_and_Doze_Off','Chair_Sit_Idle_M'],floor:['Sit_Cross_Legged_on_Floor'],weed:['Pull_Radish'],pushup:['push_up'],situp:['situps'],chat:['Stand_and_Chat'],greet:['Stand_and_Chat']};
 function pose(n,names=['Idle'],rate=1){
  let clip='Idle';for(const c of names){if(n.anim.hasClip(c)){clip=c;break;}}
  if(n.anim.clip!==clip)n.anim.setClip(clip);

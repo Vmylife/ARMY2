@@ -4,7 +4,7 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal} from './npcLife113.js?v=116';
+ faceSquadMember,squadWorldGoal} from './npcLife113.js?v=117';
 import {canOccupy,moveNpc} from '../map/navCollision109.js?v=109';
 const W=(x,z)=>({x,z});
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
@@ -12,7 +12,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const STAGES=[
  {id:'jog',name:'操場跑步',rally:W(-29,-2.8),duration:36},
  {id:'pushup',name:'集合場伏地挺身',rally:W(10.4,-8.3),duration:16,
-  points:[W(11.7,-7.6),W(13.7,-7.6),W(15.7,-7.6),W(17.7,-7.6),W(19.7,-7.6)],clip:['push_up','Idle']},
+  points:[W(12.2,-6.9),W(15.3,-6.9),W(18.4,-6.9),W(13.75,-10.1),W(16.85,-10.1)],clip:['push_up','Idle']},
  {id:'pullup',name:'拉單槓',rally:W(19,-12.6),duration:10,limited:true,clip:['Idle']},
  {id:'shoot',name:'靶場打靶',rally:W(10.7,14.3),duration:11,limited:true,clip:['Idle']},
  {id:'grenade',name:'手榴彈投擲',rally:W(-14.3,-10.7),duration:9,limited:true,clip:['Idle']},
@@ -38,7 +38,7 @@ function setStage(s){
   if(!claimSquadStation(stage.id,s.id))continue;
   s.stage=stage;s.index=index;s.nextIndex=(index+1)%STAGES.length;
   s.phase='march';s.elapsed=0;s.blocked=0;s.runIndex=0;s.runTimer=0;
-  s.done.clear();s.active.clear();s.trail=[];
+  s.done.clear();s.active.clear();s.trail=[];s.drillStarted=false;s.drillElapsed=0;
   for(const n of s.members){n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;n.replanAt=0;n.squadMoveSpeed=0;
    n.activity=`第${s.id+1}小隊 · 前往${stage.name}`;n.anim.rifleAim=0;n.home.job='life';}
   const rally=squadWorldGoal(stage.rally);s.goal=rally||{...stage.rally};
@@ -179,6 +179,37 @@ function trainSquad(s,dt,now,all,playerPos){
   }
   s.active.set(n.id,{slot,token,elapsed:0,travel:0});
   n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;
+ }
+ // Push-up drills run as a synchronized five-person unit, not five individual timers.
+ if(stage.id==='pushup'){
+  const ready=s.members.every(n=>{
+   const c=s.active.get(n.id);return c&&dist(n.pos,c.slot.pos)<.38;
+  });
+  if(!s.drillStarted&&ready){
+   s.drillStarted=true;s.drillElapsed=0;
+   for(const n of s.members){n.anim.setClip('push_up',{restart:true});n.anim.clock=0;n.anim.transition=0;n.anim.prevClip=null;}
+  }
+  for(const n of s.members){
+   const slot=s.active.get(n.id)?.slot;
+   if(!slot)continue;
+   if(!s.drillStarted){
+    if(dist(n.pos,slot.pos)>.38)moveSquadMember(n,slot.pos,dt,false);
+    else poseSquadMember(n,['Idle']);
+    n.activity=`第${s.id+1}小隊 · 伏地挺身就位`;
+   }else{
+    n.pos={...slot.pos};
+    n.angle=0; // Same heading for all five; no random left/right push-ups.
+    poseSquadMember(n,['push_up']);
+    // Shared phase: all recruits rise and lower at the same instant.
+    const len=n.anim.clips.push_up?.duration||2;
+    n.anim.clock=s.drillElapsed%len;
+    n.activity=`第${s.id+1}小隊 · 同步伏地挺身`;
+   }
+   n.state='training';
+  }
+  if(s.drillStarted){s.drillElapsed+=dt;if(s.drillElapsed>=stage.duration){releaseStage(s);setStage(s);}}
+  else if(s.elapsed>65){releaseStage(s);setStage(s);}
+  return;
  }
  for(let i=0;i<5;i++){
   const n=s.members[i],current=s.active.get(n.id);

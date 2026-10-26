@@ -47,8 +47,8 @@ export class RifleRenderer{
   if(!indices.length)throw Error('步槍沒有可讀取的三角形');
   this.weapon=bindMesh(this.gl,new Float32Array(verts),new Uint32Array(indices));
  }
- draw(vp,actor,now){
-  if(!this.weapon||!(actor.anim.rifleAim>.01))return;
+ draw(vp,actor,now,{force=false}={}){
+   if(!this.weapon||!(actor.anim.rifleAim>.01||force))return;
   const gl=this.gl,recoil=Math.max(0,(actor.shotUntil-now)/90);
   // The rifle muzzle is local +X. With this right-handed rotateY, -90° maps +X to actor +Z.
   const local=mul(translation(-.085,1.002,.300),mul(rotateY(-Math.PI/2),mul(translation(-.045*recoil,0,0),scale(.38))));
