@@ -1,0 +1,9 @@
+/* Overhead NPC activity badges. UI only; never intercept movement or camera input. */
+#npcLifeLabels{position:fixed;inset:0;z-index:12;pointer-events:none;overflow:hidden;contain:layout style;}
+.npc-life-label{position:absolute;left:0;top:0;white-space:nowrap;transform:translate(-50%,-100%);text-align:center;pointer-events:none;filter:drop-shadow(0 2px 3px #2233275c);transition:opacity .12s;will-change:transform;}
+.npc-life-label .npc-name{display:block;font-size:10px;font-weight:800;line-height:1.25;color:#fff5d5;text-shadow:0 1px 3px #263d32,0 2px 7px #263d32;}
+.npc-life-label .npc-act{display:inline-flex;align-items:center;max-width:160px;overflow:hidden;text-overflow:ellipsis;justify-content:center;font-size:12px;font-weight:800;line-height:1.2;color:#263d2d;background:#faf4d9f0;border:1px solid #b0c09b;border-radius:12px;padding:4px 9px;box-shadow:0 2px 6px #12231326;}
+.npc-life-label.npc-paired .npc-act{background:#d8ecdcf1;border-color:#83b291;}
+.npc-life-label.npc-placeholder .npc-act{background:#fff3dff0;border-color:#d6ba89;}
+.npc-life-label[hidden],#npcLifeLabels[hidden]{display:none!important}
+@media(max-width:480px){.npc-life-label .npc-name{font-size:9px}.npc-life-label .npc-act{font-size:10px;padding:3px 6px;max-width:110px}}
