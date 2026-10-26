@@ -4,8 +4,9 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal} from './npcLife113.js?v=119';
+ faceSquadMember,squadWorldGoal} from './npcLife113.js?v=118';
 import {canOccupy,moveNpc} from '../map/navCollision109.js?v=109';
+import {ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
 const W=(x,z)=>({x,z});
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -13,7 +14,7 @@ const STAGES=[
  {id:'jog',name:'操場跑步',rally:W(-29,-2.8),duration:36},
  {id:'pushup',name:'集合場伏地挺身',rally:W(10.4,-8.3),duration:16,
   points:[W(12.2,-6.9),W(15.3,-6.9),W(18.4,-6.9),W(13.75,-10.1),W(16.85,-10.1)],clip:['push_up','Idle']},
- {id:'pullup',name:'拉單槓',rally:W(19,-12.6),duration:10,limited:true,clip:['Idle']},
+ {id:'pullup',name:'拉單槓',rally:W(19,-12.6),duration:10,limited:true,clip:[ARMY_PULLUP,'Climb_Up_Rope','Idle']},
  {id:'shoot',name:'靶場打靶',rally:W(10.7,14.3),duration:11,limited:true,clip:['Idle']},
  {id:'grenade',name:'手榴彈投擲',rally:W(-29.2,-23.1),duration:9,limited:true,clip:['Idle']},
  {id:'obstacle',name:'障礙訓練',rally:W(9,7.2),duration:12,
@@ -21,7 +22,7 @@ const STAGES=[
  {id:'weed',name:'草地拔草',rally:W(-31,8),duration:16,
   points:[W(-31,6.0),W(-29.4,6.8),W(-27.8,7.6),W(-26.2,8.4),W(-24.6,9.2)],clip:['Pull_Radish','Idle']},
  {id:'sweep',name:'營舍周邊掃地',rally:W(-34,-7.4),duration:16,
-  points:[W(-34,-5.6),W(-33.5,-3.7),W(-33,-1.8),W(-32.5,.1),W(-32,2)],clip:['Idle']}
+  points:[W(-34,-5.6),W(-33.5,-3.7),W(-33,-1.8),W(-32.5,.1),W(-32,2)],clip:[ARMY_SWEEP,'Idle']}
 ];
 const FORM=[{back:0,side:0},{back:1.48,side:-.65},{back:1.48,side:.65},{back:2.98,side:-.65},{back:2.98,side:.65}];
 const GROUPS=[];

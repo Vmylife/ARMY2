@@ -1,6 +1,6 @@
-// Shared, non-destructive procedural animation clips for the animation lab.
-// Original GLB and existing clips remain intact. These two clips have independently
-// calibrated roots and short seamless loops; they can later be enabled in camp.
+// Shared, non-destructive procedural animation clips for the animation lab and camp.
+// Original GLB and existing clips remain intact. The custom clips below are built
+// from sampled key poses and then procedurally corrected for camp use.
 export const ARMY_PULLUP='Army_Pullup';
 export const ARMY_SWEEP='Army_Sweep';
 const AIM_05='_01a16f94_b5ea_72d7_b8cd_df0ad0e689b6';
@@ -32,11 +32,27 @@ function actionFrom(anim,sourceName,frames,{duration,kind}){
    const frame=frames[i];let v=sample(srcTrack,frame.source,rot);
    const nodeName=anim.nodes[node]?.name||'';
    if(kind==='pullup'){
+    // Simple, readable pull-up: hands stay high and spread apart, while the
+    // body rhythmically rises and falls. This intentionally avoids the noisy
+    // 'climb rope' look that Meshy keeps producing.
     if(nodeName==='mixamorig:Hips'&&path==='translation'){
-     // Stay under the bar: keep horizontal motion fixed and lift the body rhythmically.
-     v=[0.0036,.66+frame.lift,-.083];
+     v=[0.0036,.64+frame.lift,-.083];
     }
-    if(rot&&nodeName==='mixamorig:Spine1')v=quatMultiply(v,axial('x',-frame.lift*.13));
+    if(rot&&nodeName==='mixamorig:Spine')v=quatMultiply(v,axial('x',-0.05-frame.pull*.08));
+    if(rot&&nodeName==='mixamorig:Spine1')v=quatMultiply(v,axial('x',-0.06-frame.pull*.12));
+    if(rot&&nodeName==='mixamorig:Spine2')v=quatMultiply(v,axial('x',-0.04-frame.pull*.10));
+    if(rot&&nodeName==='mixamorig:LeftShoulder')v=quatMultiply(quatMultiply(v,axial('z',-.42)),axial('x',-.38+frame.pull*.04));
+    if(rot&&nodeName==='mixamorig:RightShoulder')v=quatMultiply(quatMultiply(v,axial('z', .42)),axial('x',-.38+frame.pull*.04));
+    if(rot&&nodeName==='mixamorig:LeftArm')v=quatMultiply(quatMultiply(v,axial('z',-.52)),axial('x',-.78+frame.pull*.08));
+    if(rot&&nodeName==='mixamorig:RightArm')v=quatMultiply(quatMultiply(v,axial('z', .52)),axial('x',-.78+frame.pull*.08));
+    if(rot&&nodeName==='mixamorig:LeftForeArm')v=quatMultiply(v,axial('x',-.16+frame.pull*.55));
+    if(rot&&nodeName==='mixamorig:RightForeArm')v=quatMultiply(v,axial('x',-.16+frame.pull*.55));
+    if(rot&&nodeName==='mixamorig:LeftHand')v=quatMultiply(v,axial('x',.10-frame.pull*.12));
+    if(rot&&nodeName==='mixamorig:RightHand')v=quatMultiply(v,axial('x',.10-frame.pull*.12));
+    if(rot&&nodeName==='mixamorig:LeftUpLeg')v=quatMultiply(v,axial('x',.08-frame.pull*.18));
+    if(rot&&nodeName==='mixamorig:RightUpLeg')v=quatMultiply(v,axial('x',.08-frame.pull*.18));
+    if(rot&&nodeName==='mixamorig:LeftLeg')v=quatMultiply(v,axial('x',-.05+frame.pull*.12));
+    if(rot&&nodeName==='mixamorig:RightLeg')v=quatMultiply(v,axial('x',-.05+frame.pull*.12));
    }
    if(kind==='sweep'){
     const swing=frame.swing;
@@ -58,9 +74,13 @@ export function installArmyProceduralActions(anim){
   // Reuse calibrated climbing arm poses as keyframe sources; this is a new
   // looping pull-up, NOT the original rope-climbing clip relabelled.
   const frames=[
-   {at:0,source:1.93,lift:.04},{at:.35,source:2.15,lift:.12},
-   {at:.77,source:2.56,lift:.31},{at:1.05,source:2.48,lift:.28},
-   {at:1.45,source:2.15,lift:.12},{at:1.85,source:1.93,lift:.04}
+   {at:0.00,source:2.08,lift:.02,pull:0.00},
+   {at:0.32,source:2.08,lift:.11,pull:0.22},
+   {at:0.64,source:2.08,lift:.22,pull:0.68},
+   {at:0.92,source:2.08,lift:.28,pull:1.00},
+   {at:1.22,source:2.08,lift:.22,pull:0.68},
+   {at:1.52,source:2.08,lift:.11,pull:0.22},
+   {at:1.85,source:2.08,lift:.02,pull:0.00}
   ];
   anim.clips[ARMY_PULLUP]=actionFrom(anim,'Climb_Up_Rope',frames,{duration:1.85,kind:'pullup'});
  }

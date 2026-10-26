@@ -3,6 +3,7 @@
 // accept a two-way social invite. Facility positions use the approved layout103.
 // No generative API, remote services, or new meshes are required by the brains.
 import {RigAnimator} from '../characters/rigAnimator.js?v=117';
+import {installArmyProceduralActions,ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
 import {updateRangeShooter} from '../training/rangeTraining.js?v=111';
 import {canOccupy,moveNpc,NPC_RADIUS} from '../map/navCollision109.js?v=109';
 import {PROPS,ROADS} from '../map/camp.js?v=093';
@@ -15,7 +16,12 @@ const rand=(a,b)=>a+Math.random()*(b-a);
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const HEADS=['阿宏','阿明','阿杰','小林','阿偉','小陳','阿國','阿正','大雄','小張','阿哲','阿凱','阿軒','阿智',
  '阿豪','阿倫','小蔡','阿翔','阿廷','阿仁','小吳','阿勇','阿翔哥','小黃','阿彬','小陸','阿良','阿昇','小謝','阿達'];
-const ANIM_LOOPS=new Set(['Stand_and_Chat','Sit_Cross_Legged_on_Floor','Chair_Sit_Idle_M','Sit_and_Doze_Off','Pull_Radish']);
+const ANIM_LOOPS=new Set(['Stand_and_Chat','Sit_Cross_Legged_on_Floor','Chair_Sit_Idle_M','Sit_and_Doze_Off','Pull_Radish',ARMY_PULLUP,ARMY_SWEEP]);
+const CALIBRATION={
+ chair:{x:-0.14,z:0.56,y:0.20,yaw:0,speed:1},
+ doze:{x:0.0,z:0.24,y:0.20,yaw:0,speed:1},
+ weed:{x:0.0,z:0.0,y:0.09,yaw:0,speed:1}
+};
 const NAV={xMin:-46,xMax:45,zMin:-35,zMax:37,step:1.0};
 const NX=Math.floor((NAV.xMax-NAV.xMin)/NAV.step)+1,NZ=Math.floor((NAV.zMax-NAV.zMin)/NAV.step)+1,N=NX*NZ;
 let pass=null,roadCost=null;
@@ -105,7 +111,7 @@ function pathTo(from,to){
 }
 
 // Model-defined fixtures: all from PROPS; seat and range slots are reserved.
-const SEATS=[];const SHOOT=[];const PULLUPS=[];const GRENADE=[];const SLOTS=Object.create(null);
+const SEATS=[];const DOZE_SEATS=[];const SHOOT=[];const PULLUPS=[];const GRENADE=[];const SLOTS=Object.create(null);
 const STATION_OWNER=Object.create(null);
 function fixtureInit(){
  if(SEATS.length)return;
@@ -113,12 +119,16 @@ function fixtureInit(){
   if(p.type!=='bench')continue;
   const yaw=p.yaw||0;
   for(let side of [-1,1]){
-   // Chair_Sit_Idle_M calibrated in Animation Lab: x +0.04, z +0.52, y +0.17.
+   // Animation-lab calibration imported from the latest user-tuned JSON.
    // Bench yaw follows the prop coordinate system (local +X along the seat).
-   const lateral=side*.43+.04, forward=.52;
-   const base=W(p.x+Math.cos(yaw)*lateral+Math.sin(yaw)*forward,
-                p.z-Math.sin(yaw)*lateral+Math.cos(yaw)*forward);
-   SEATS.push({key:`bench-${i}-${side}`,pos:base,angle:yaw});
+   const seatLateral=side*.43+CALIBRATION.chair.x, seatForward=CALIBRATION.chair.z;
+   const seatBase=W(p.x+Math.cos(yaw)*seatLateral+Math.sin(yaw)*seatForward,
+                p.z-Math.sin(yaw)*seatLateral+Math.cos(yaw)*seatForward);
+   SEATS.push({key:`bench-${i}-${side}`,pos:seatBase,angle:yaw});
+   const dozeLateral=side*.43+CALIBRATION.doze.x, dozeForward=CALIBRATION.doze.z;
+   const dozeBase=W(p.x+Math.cos(yaw)*dozeLateral+Math.sin(yaw)*dozeForward,
+                p.z-Math.sin(yaw)*dozeLateral+Math.cos(yaw)*dozeForward);
+   DOZE_SEATS.push({key:`doze-bench-${i}-${side}`,pos:dozeBase,angle:yaw});
   }
  }
  for(const [j,x] of [2.1,5.5,8.9,12.3,15.7,19.1].entries())SHOOT.push({key:`shoot-${j}`,pos:W(x,16.85),angle:0});
@@ -173,41 +183,41 @@ const STATIC={
  assembly:[W(12.7,-8.3),W(14.7,-8.3),W(16.7,-8.3),W(18.7,-8.3)],
  basketballCoach:[W(-33.1,25.7),W(-39,25.7)],
 };
-const NEED_ANIM={bench:['Chair_Sit_Idle_M'],doze:['Sit_and_Doze_Off','Chair_Sit_Idle_M'],floor:['Sit_Cross_Legged_on_Floor'],weed:['Pull_Radish'],pushup:['push_up'],situp:['situps'],chat:['Stand_and_Chat'],greet:['Stand_and_Chat']};
+const NEED_ANIM={bench:['Chair_Sit_Idle_M'],doze:['Sit_and_Doze_Off','Chair_Sit_Idle_M'],floor:['Sit_Cross_Legged_on_Floor'],weed:['Pull_Radish'],pushup:['push_up'],situp:['situps'],chat:['Stand_and_Chat'],greet:['Stand_and_Chat'],pullup:[ARMY_PULLUP,'Climb_Up_Rope','Idle'],sweep:[ARMY_SWEEP,'Idle']};
 function pose(n,names=['Idle'],rate=1){
  let clip='Idle';for(const c of names){if(n.anim.hasClip(c)){clip=c;break;}}
  if(n.anim.clip!==clip)n.anim.setClip(clip);
  n.anim.speed=rate;
- // The animated hips need +0.17m to meet the bench seat. Only apply when seated.
- n.renderLift=(clip==='Chair_Sit_Idle_M'||clip==='Sit_and_Doze_Off')?.17:0;
+ // Per-animation height offsets from the latest animation-lab calibration.
+ n.renderLift=clip==='Chair_Sit_Idle_M'?CALIBRATION.chair.y:clip==='Sit_and_Doze_Off'?CALIBRATION.doze.y:clip==='Pull_Radish'?CALIBRATION.weed.y:0;
  const dur=n.anim.clips[clip]?.duration;
  if(ANIM_LOOPS.has(clip)&&dur>0&&n.anim.clock>dur)n.anim.clock%=dur;
 }
 function face(n,dx,dz,dt){const wanted=Math.atan2(dx,dz),delta=Math.atan2(Math.sin(wanted-n.angle),Math.cos(wanted-n.angle));n.angle+=delta*clamp(1-Math.exp(-9*dt),0,1);}
-function to(n,goal,dt,run=false,arrivalRadius=.75){
+function to(n,goal,dt,run=false){
  if(!n.route||d(n.routeGoal||W(999,999),goal)>.8){
   if(n.replanAt&&n.clock<n.replanAt)return false;
   const plan=pathTo(n.pos,goal);n.route=plan.points;n.routeGoal=plan.goal;n.routeIndex=0;n.blocked=0;
   if(!n.routeGoal){n.retries++;n.replanAt=n.clock+1.5;pose(n,['Idle']);n.activity='重新找路';return false;}
  }
  if(!n.routeGoal)return false;
- if(n.routeIndex>=n.route.length)return d(n.pos,n.routeGoal)<arrivalRadius;
+ if(n.routeIndex>=n.route.length)return d(n.pos,n.routeGoal)<.8;
  let target=n.route[n.routeIndex];if(d(n.pos,target)<.68&&n.routeIndex<n.route.length-1)target=n.route[++n.routeIndex];
  const dx=target.x-n.pos.x,dz=target.z-n.pos.z,len=Math.hypot(dx,dz);
- if(len<Math.min(.28,arrivalRadius*.5)){n.routeIndex++;return n.routeIndex>=n.route.length&&d(n.pos,n.routeGoal)<arrivalRadius;}
+ if(len<.28){n.routeIndex++;return n.routeIndex>=n.route.length;}
  const speed=run?2.18:1.36, step=Math.min(len,speed*dt),old=n.pos;
  const moved=moveNpc(n,dx/len*step,dz/len*step,ALL_NPCS,PLAYER_POS),actual=d(old,moved);
  if(actual<step*.10){n.blocked+=dt;if(n.blocked>1.20){n.route=null;n.routeGoal=null;n.blocked=0;n.retries++;n.replanAt=n.clock+.4;}}
  else{n.pos=moved;n.blocked=0;n.retries=0;face(n,moved.x-old.x,moved.z-old.z,dt);}
  pose(n,run?['Running','RunFast','Walking']:['Walking'],run?1.15:1.05);
  n.state='move';
- return n.routeGoal?d(n.pos,n.routeGoal)<arrivalRadius:false;
+ return n.routeGoal?d(n.pos,n.routeGoal)<.75:false;
 }
 function hasTag(def,t){return def.tags.includes(t)}
 function release(n){if(n.reservation&&SLOTS[n.reservation]===n.id)delete SLOTS[n.reservation];n.reservation=null;}
 function selectSpot(n,type,requiredKey=null){
  fixtureInit();if(STATION_OWNER[type]!==undefined)return null;
- const data=type==='shoot'?SHOOT:type==='pullup'?PULLUPS:type==='grenade'?GRENADE:type==='bench'||type==='doze'?SEATS:null;
+ const data=type==='shoot'?SHOOT:type==='pullup'?PULLUPS:type==='grenade'?GRENADE:type==='bench'?SEATS:type==='doze'?DOZE_SEATS:null;
  if(data){const available=data.filter(s=>!SLOTS[s.key]||SLOTS[s.key]===n.id);
   if(!available.length)return null;
   const s=requiredKey?available.find(x=>x.key===requiredKey):pick(available);
@@ -407,7 +417,7 @@ export function createCampNPCs(glb){
  navInit();fixtureInit();
  // Parsing 18 GLB animation clips 14 times wastes CPU and memory on mobile.
  // Share immutable clip data while giving each recruit its own bones and clock.
- const prototype=new RigAnimator(glb);
+ const prototype=installArmyProceduralActions(new RigAnimator(glb));
  const makeAnimator=()=>{
    const anim=Object.assign(Object.create(Object.getPrototypeOf(prototype)),prototype);
    anim.bones=new Float32Array(prototype.bones.length);
@@ -465,24 +475,12 @@ export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
       const alongside=W(leader.pos.x+lateral.x,leader.pos.z+lateral.z);
       if(canStand(alongside.x,alongside.z))desired=alongside;
     }
-    // Activity navigation can stop 0.75m from ordinary goals. A seated pose
-    // cannot: align the model root within 0.20m of the reserved bench slot.
-    // Chair/calibrated height is handled separately in pose() and renderer.
-    const seating=task.type==='bench'||task.type==='doze';
-    const arrived=to(n,desired,dt,task.type==='jog',seating?.20:.75);
+    const arrived=to(n,desired,dt,task.type==='jog');
     // The shared journey ends when the leader reaches the destination; the
     // follower first needs to be close, not at the exact same point.
     const atDestination=task.type==='walk'&&task.joined&&n.id>task.joined.id
       ? task.joined.task?.phase==='do'&&d(n.pos,task.joined.pos)<1.8 : arrived;
-    if(atDestination){
-      if(seating){
-        // Exact seat root and facing match Animation Lab's X/Z/yaw placement.
-        // The final snap is <=0.20m after the precision approach, rather than
-        // immediately posing up to 0.75m away from the seat.
-        n.pos={...task.goal};
-        if(Number.isFinite(task.angle))n.angle=task.angle;
-      }
-      task.phase='do';n.route=null;n.routeGoal=null;n.retries=0;
+    if(atDestination){task.phase='do';n.route=null;n.routeGoal=null;n.retries=0;
       if(task.type==='jog')n.loopAngle=Math.atan2((n.pos.z+2.2)/8.2,(n.pos.x+21.5)/5.6);
     }else if(n.retries>=4||task.travel>45){closeGroup(n,npcs);endTask(n);n.cooldown=.5;}
   }else{

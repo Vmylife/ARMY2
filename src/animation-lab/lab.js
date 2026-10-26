@@ -31,7 +31,12 @@ const DEFAULTS={
  grenade:{x:0,z:-1.05,y:0,yaw:0,speed:1},
  ground:{x:0,z:0,y:0,yaw:0,speed:1}
 };
-function newStore(){return {version:1,model:MODEL,calibrations:{}};}
+const BUILTIN_CALIBRATIONS={
+ 'Chair_Sit_Idle_M@@chair':{x:-0.14,z:0.56,y:0.20,yaw:0,speed:1},
+ 'Sit_and_Doze_Off@@chair':{x:0.0,z:0.24,y:0.20,yaw:0,speed:1},
+ 'Pull_Radish@@ground':{x:0.0,z:0.0,y:0.09,yaw:0,speed:1}
+};
+function newStore(){return {version:1,model:MODEL,calibrations:{...BUILTIN_CALIBRATIONS}};}
 let store=newStore();try{const s=JSON.parse(localStorage.getItem(STORAGE)||'null');if(s&&s.calibrations&&typeof s.calibrations==='object')store={...newStore(),calibrations:s.calibrations};}catch(_){/* storage may be unavailable */}
 const data={renderer:null,props:null,actor:null,anim:null,clip:'Idle',anchor:'chair',playing:false,loop:true,rifle:null,broom:null,lastShotAt:0,pose:{...DEFAULTS.chair},last:0,cameraYaw:.65,cameraPitch:.53,cameraZoom:9.6,loaded:false,ground:null};
 function saveStorage(){try{localStorage.setItem(STORAGE,JSON.stringify(store));}catch(_){/* private browsing */}}
@@ -43,7 +48,7 @@ function updateSliderText(key){const n=Number($(key).value);$(key+'Val').textCon
 function exportCalibration(){return {animation:data.clip,anchor:data.anchor,offset:{...data.pose},model:displayedModel};}
 function renderCurrentJSON(){$('currentJSON').textContent=JSON.stringify(exportCalibration(),null,2);}
 function setAnchor(anchor){if(!PROP_CONFIG[anchor])return;data.anchor=anchor;$('anchor').value=anchor;data.pose=currentPreset();fillSliders();data.renderer.cameraReady=false;data.cameraZoom=6.9;}
-function changeClip(name,automaticAnchor=true){if(!data.anim?.hasClip(name)&&name!==PROGRAM_RIFLE)return;data.clip=name;$('clip').value=name;if(automaticAnchor)setAnchor(ANCHORS[name]||'ground');else {data.pose=currentPreset();fillSliders();}data.anim.setClip(name===PROGRAM_RIFLE?'Idle':name,{restart:true});data.anim.rifleAim=name===PROGRAM_RIFLE?1:0;data.anim.transition=0;data.anim.prevClip=null;data.anim.clock=0;data.anim.completed=false;data.anim.speed=data.pose.speed;data.playing=true;data.last=0;updateTimeline();$('clipHint').textContent=name===PROGRAM_RIFLE?'遊戲現役自製舉槍：骨架 RIFLE_POSE＋步槍、後座、槍口火光。':name===ORIGINAL_AIM?'原始 GLB 的 05 舉槍：保留原骨架姿勢，另外顯示實際步槍及開火效果，請比較槍口是否吻合。':name===ARMY_PULLUP?'新製作拉單槓動作：手臂抓槓、軀幹上下起伏。先用位置／高度／朝向把手掌校到橫桿。':name===ARMY_SWEEP?'新製作掃地動作：身體左右帶動掃把；掃把直接跟隨右手骨架而移動。請調整站位並從側面觀察掃把刷頭與地面。':`${LABELS[name]||'原始動畫'} · ${name}。可調整士兵與設施的相對站位，校正後按「儲存本動作校正」。`;}
+function changeClip(name,automaticAnchor=true){if(!data.anim?.hasClip(name)&&name!==PROGRAM_RIFLE)return;data.clip=name;$('clip').value=name;if(automaticAnchor)setAnchor(ANCHORS[name]||'ground');else {data.pose=currentPreset();fillSliders();}data.anim.setClip(name===PROGRAM_RIFLE?'Idle':name,{restart:true});data.anim.rifleAim=name===PROGRAM_RIFLE?1:0;data.anim.transition=0;data.anim.prevClip=null;data.anim.clock=0;data.anim.completed=false;data.anim.speed=data.pose.speed;data.playing=true;data.last=0;updateTimeline();$('clipHint').textContent=name===PROGRAM_RIFLE?'遊戲現役自製舉槍：骨架 RIFLE_POSE＋步槍、後座、槍口火光。':name===ORIGINAL_AIM?'原始 GLB 的 05 舉槍：保留原骨架姿勢，另外顯示實際步槍及開火效果，請比較槍口是否吻合。':name===ARMY_PULLUP?'新製作拉單槓動作：雙手上舉並固定在槓位附近，身體做上下起伏。先用位置／高度／朝向把手掌校到橫桿。':name===ARMY_SWEEP?'新製作掃地動作：身體左右帶動掃把；掃把直接跟隨右手骨架而移動。請調整站位並從側面觀察掃把刷頭與地面。':`${LABELS[name]||'原始動畫'} · ${name}。可調整士兵與設施的相對站位，校正後按「儲存本動作校正」。`;}
 function updateTimeline(){if(!data.anim)return;if(data.clip===PROGRAM_RIFLE){$('timeline').value=0;$('timeline').disabled=true;$('timeLabel').textContent='程式動作 · 循環射擊';return;}$('timeline').disabled=false;const c=data.anim.clips[data.clip],dur=c?.duration||0,t=dur?Math.min(dur,data.anim.clock):0;$('timeline').value=dur?Math.round(t/dur*1000):0;$('timeLabel').textContent=`${t.toFixed(2)} / ${dur.toFixed(2)} 秒`;}
 function makeFloor(gl){
  const verts=[],cols=[],norms=[];
