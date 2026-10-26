@@ -4,7 +4,7 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal} from './npcLife113.js?v=118';
+ faceSquadMember,squadWorldGoal} from './npcLife113.js?v=121';
 import {canOccupy,moveNpc} from '../map/navCollision109.js?v=109';
 import {ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
 const W=(x,z)=>({x,z});
@@ -28,8 +28,21 @@ const FORM=[{back:0,side:0},{back:1.48,side:-.65},{back:1.48,side:.65},{back:2.9
 const GROUPS=[];
 const FREE_IDS=new Set([0,3,7,8,11,12,19,23,26,29]);
 const WAIT_DISTANCE=7.0;
+const GRENADE_MOTIONS=['baseball_pitching','Crouch_Pull_and_Throw'];
+function squadGrenadePose(n){
+ const clips=GRENADE_MOTIONS.filter(name=>n.anim.hasClip(name));
+ if(!clips.length){poseSquadMember(n,['Idle']);return;}
+ if(!n.grenadeMotion||n.clock>=(n.grenadeMotionUntil||0)){
+  const clip=clips[Math.floor(Math.random()*clips.length)];
+  n.grenadeMotion=clip;
+  n.grenadeMotionUntil=n.clock+(n.anim.clips[clip]?.duration||4.5)+.22;
+  n.anim.setClip(clip,{restart:true});
+  n.anim.transition=0;n.anim.prevClip=null;
+ }
+ poseSquadMember(n,[n.grenadeMotion]);
+}
 function setIdle(n,label){poseSquadMember(n,['Idle']);n.activity=label;n.state='squad';n.anim.rifleAim=0;n.home.job='life';}
-function releaseMemberSlot(s,n){const cur=s.active.get(n.id);if(cur?.slot?.key)releaseSquadSlot(cur.slot,cur.token);s.active.delete(n.id);n.anim.rifleAim=0;n.home.job='life';}
+function releaseMemberSlot(s,n){const cur=s.active.get(n.id);if(cur?.slot?.key)releaseSquadSlot(cur.slot,cur.token);s.active.delete(n.id);n.anim.rifleAim=0;n.home.job='life';n.grenadeMotion=null;n.grenadeMotionUntil=0;}
 function releaseStage(s){for(const n of s.members)releaseMemberSlot(s,n);if(s.stage)releaseSquadStation(s.stage.id,s.id);s.stage=null;s.active.clear();s.done.clear();}
 function setStage(s){
  // Start with the next item. If another squad is already in that station,
@@ -138,7 +151,8 @@ function trainPose(n,stage,dt,now){
   if(phase<.14&&n.lastSquadShot!==fire){n.lastSquadShot=fire;n.shotUntil=now+100;n.shotPending=true;}
  }else{
   n.anim.rifleAim=0;n.home.job='life';
-  poseSquadMember(n,stage.clip||['Idle']);
+  if(stage.id==='grenade')squadGrenadePose(n);
+  else poseSquadMember(n,stage.clip||['Idle']);
   if(stage.id==='pullup')faceSquadMember(n,0,-1,dt);
   if(stage.id==='grenade'){
    // Facing towards the oval, never towards the people waiting beside it.

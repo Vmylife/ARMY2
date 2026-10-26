@@ -10,7 +10,7 @@ import {loadGlb} from '../core/glb111.js';
 import {mul,translation,rotateY} from '../core/math.js?v=060';
 
 const $=id=>document.getElementById(id);
-const MODEL='assets/characters/cadet/cadet-animation-lab.glb';
+const MODEL='assets/characters/cadet/cadet-animation-lab.glb?v=121';
 const PROGRAM_RIFLE='__ARMY_GAME_RIFLE_AIM__';
 const SALUTE='_01a16f90_0a0e_7065_a16d_e78ab0acb493';
 const ORIGINAL_AIM='_01a16f94_b5ea_72d7_b8cd_df0ad0e689b6';
@@ -23,8 +23,8 @@ const PROP_CONFIG={
  grenade:{type:'grenadeCrate',label:'手榴彈投擲箱',x:3.45,z:.2,scale:1.05,yaw:0,url:'assets/props/grenade-crate.glb?v=112'},
  ground:{label:'空地',x:0,z:-3.8,yaw:0}
 };
-const LABELS={[SALUTE]:'敬禮',[ORIGINAL_AIM]:'原始05舉槍／開槍',[ARMY_PULLUP]:'拉單槓（新製作）',[ARMY_SWEEP]:'掃地＋掃把（新製作）',Idle:'站立待機',Walking:'走路',Running:'跑步',RunFast:'全速奔跑',Chair_Sit_Idle_M:'坐椅子',Sit_Cross_Legged_on_Floor:'盤腿坐地',Stand_and_Chat:'站立聊天',Sit_and_Doze_Off:'坐著打瞌睡',Pull_Radish:'拔草／拉取',push_up:'伏地挺身',situps:'仰臥起坐',Climb_Up_Rope:'攀繩',Punch_Combo_1:'拳擊組合',Forward_Roll_and_Fire:'前滾翻',Victory_Cheer:'歡呼',Knock_Down:'倒下',Sleep_Normally:'躺下睡覺'};
-const ANCHORS={[ARMY_PULLUP]:'pullup',[ARMY_SWEEP]:'ground',[PROGRAM_RIFLE]:'ground',[ORIGINAL_AIM]:'ground',Chair_Sit_Idle_M:'chair',Sit_and_Doze_Off:'chair',Sit_Cross_Legged_on_Floor:'ground',Climb_Up_Rope:'pullup',Pull_Radish:'ground',push_up:'ground',situps:'ground',Sleep_Normally:'ground'};
+const LABELS={baseball_pitching:'投球／投擲手榴彈',Crouch_Pull_and_Throw:'蹲下投擲手榴彈',Idle_11:'新增待機 11',Right_Jab_from_Guard:'右刺拳',Talk_with_Left_Hand_on_Hip:'左手叉腰說話',_01a17968_c874_777a_b255_32aeca30e7e2:'新增未命名動作',[SALUTE]:'敬禮',[ORIGINAL_AIM]:'原始05舉槍／開槍',[ARMY_PULLUP]:'拉單槓（新製作）',[ARMY_SWEEP]:'掃地＋掃把（新製作）',Idle:'站立待機',Walking:'走路',Running:'跑步',RunFast:'全速奔跑',Chair_Sit_Idle_M:'坐椅子',Sit_Cross_Legged_on_Floor:'盤腿坐地',Stand_and_Chat:'站立聊天',Sit_and_Doze_Off:'坐著打瞌睡',Pull_Radish:'拔草／拉取',push_up:'伏地挺身',situps:'仰臥起坐',Climb_Up_Rope:'攀繩',Punch_Combo_1:'拳擊組合',Forward_Roll_and_Fire:'前滾翻',Victory_Cheer:'歡呼',Knock_Down:'倒下',Sleep_Normally:'躺下睡覺'};
+const ANCHORS={baseball_pitching:'grenade',Crouch_Pull_and_Throw:'grenade',[ARMY_PULLUP]:'pullup',[ARMY_SWEEP]:'ground',[PROGRAM_RIFLE]:'ground',[ORIGINAL_AIM]:'ground',Chair_Sit_Idle_M:'chair',Sit_and_Doze_Off:'chair',Sit_Cross_Legged_on_Floor:'ground',Climb_Up_Rope:'pullup',Pull_Radish:'ground',push_up:'ground',situps:'ground',Sleep_Normally:'ground'};
 const DEFAULTS={
  chair:{x:0,z:0,y:0,yaw:0,speed:1},
  pullup:{x:0,z:-.48,y:0,yaw:180,speed:1},

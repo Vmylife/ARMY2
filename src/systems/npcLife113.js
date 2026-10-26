@@ -14,6 +14,19 @@ const W=(x,z)=>({x,z});
 const d=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const rand=(a,b)=>a+Math.random()*(b-a);
 const pick=a=>a[Math.floor(Math.random()*a.length)];
+const GRENADE_MOTIONS=['baseball_pitching','Crouch_Pull_and_Throw'];
+function nextGrenadeMotion(n,holder){
+ const options=GRENADE_MOTIONS.filter(name=>n.anim.hasClip(name));
+ if(!options.length){n.grenadeMotion=null;return ['Idle'];}
+ if(!holder.grenadeMotion||n.clock>=(holder.grenadeMotionUntil||0)){
+  holder.grenadeMotion=pick(options);
+  const seconds=n.anim.clips[holder.grenadeMotion]?.duration||4.5;
+  holder.grenadeMotionUntil=n.clock+seconds+0.22;
+  n.anim.setClip(holder.grenadeMotion,{restart:true});
+  n.anim.transition=0;n.anim.prevClip=null;
+ }
+ return [holder.grenadeMotion];
+}
 const HEADS=['阿宏','阿明','阿杰','小林','阿偉','小陳','阿國','阿正','大雄','小張','阿哲','阿凱','阿軒','阿智',
  '阿豪','阿倫','小蔡','阿翔','阿廷','阿仁','小吳','阿勇','阿翔哥','小黃','阿彬','小陸','阿良','阿昇','小謝','阿達'];
 const ANIM_LOOPS=new Set(['Stand_and_Chat','Sit_Cross_Legged_on_Floor','Chair_Sit_Idle_M','Sit_and_Doze_Off','Pull_Radish',ARMY_PULLUP,ARMY_SWEEP]);
@@ -335,7 +348,7 @@ function perform(n,dt,now){
    n.activity='靶場打靶';return;
  }
  n.state='action';n.activity=A[kind].label;
- pose(n,NEED_ANIM[kind]||['Idle'],1);
+ pose(n,kind==='grenade'?nextGrenadeMotion(n,task):(NEED_ANIM[kind]||['Idle']),1);
  if(kind==='chat'||kind==='greet'){
   const p=task.joined;if(p){face(n,p.pos.x-n.pos.x,p.pos.z-n.pos.z,dt);}
  }else if(Number.isFinite(task.angle)){

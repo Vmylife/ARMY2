@@ -1,5 +1,5 @@
 import {I,mul,trs} from '../core/math.js';
-const LOOP=new Set(['Idle','Walking','Running','Casual_Walk','RunFast','Run_03','push_up','situps','Army_Pullup','Army_Sweep']);
+const LOOP=new Set(['Idle','Walking','Running','Casual_Walk','RunFast','Run_03','Idle_11','Talk_with_Left_Hand_on_Hip','push_up','situps','Army_Pullup','Army_Sweep']);
 const ease=(a,b,t)=>a+(b-a)*t;
 function lerpQuat(a,b,t){let dot=a.reduce((sum,v,i)=>sum+v*b[i],0);const bv=dot<0?b.map(x=>-x):b;let q=a.map((v,i)=>ease(v,bv[i],t));const len=Math.hypot(...q)||1;return q.map(x=>x/len)}
 function readTrack(t,x,quat=false){const {times,values,width,interpolation}=t;const n=times.length;

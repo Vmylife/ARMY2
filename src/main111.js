@@ -13,7 +13,7 @@ import {drawMinimap} from './ui/minimap.js?v=093';
 import {initWorldMap} from './ui/worldMap.js?v=093';
 import {setupInput} from './ui/input.js?v=062';
 import {options} from './systems/settings.js?v=060';
-import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=119';
+import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=121';
 
 const $=id=>document.getElementById(id);
 const debug=new URLSearchParams(location.search).has('debug');
@@ -31,8 +31,8 @@ function movement(mag){
  if(mag<options.sprintThreshold)return {clip:'Running',speed:lerp(options.moveSpeed,options.runSpeed,(mag-options.runThreshold)/(options.sprintThreshold-options.runThreshold)),rate:lerp(1.1,1.42,mag)};
  return {clip:'RunFast',speed:lerp(options.runSpeed,options.sprintSpeed,(mag-options.sprintThreshold)/(1-options.sprintThreshold)),rate:lerp(1.3,1.56,mag)};
 }
-const modelUrl='./assets/characters/cadet/cadet-green.glb?v=111';
-const lifeModelUrl='./assets/characters/cadet/cadet-life-lite.glb?v=111';
+const modelUrl='./assets/characters/cadet/cadet-green.glb?v=121';
+const lifeModelUrl='./assets/characters/cadet/cadet-life-lite.glb?v=121';
 
 async function boot(){
  let step='初始化軍營';
