@@ -140,8 +140,9 @@ async function load(){
  PROPS.splice(0,PROPS.length,...Object.entries(PROP_CONFIG).filter(([k])=>k!=='ground').map(([k,p])=>({type:p.type,x:p.x,z:p.z,scale:p.scale,yaw:p.yaw,cull:999})));
  data.props=new CampProps(r.gl);
  setStatus('載入完整士兵動畫模型…');
- const soldier=await loadGlb(`./${MODEL}`,{onProgress:(n,t)=>setStatus(`下載士兵動畫：${(n/1048576).toFixed(1)} / ${t?(t/1048576).toFixed(1):'?'} MB`),timeoutMs:55000});
- await r.addModel('labSoldier',soldier);
+ const soldier=await loadGlb(`./${MODEL}`,{onProgress:(n,t)=>setStatus(`下載士兵動畫：${(n/1048576).toFixed(1)} / ${t?(t/1048576).toFixed(1):'?'} MB`),timeoutMs:120000});
+ // installSoldier already uploads the mesh and texture; avoid double allocation on iPhone.
+ setStatus('建立士兵動畫與材質…');
  await installSoldier(soldier,MODEL);
  data.loaded=true;requestAnimationFrame(animationFrame);
  setStatus(`士兵已載入；正在載入 3 件道具…`);

@@ -11,10 +11,10 @@
 
 【安裝】
 1. 此 ZIP 為『追加檔案』，不是全遊戲 ZIP。請先有 v0.11.2 或 v0.11.3 乾淨軍營版本。
-2. 解壓 ZIP，保持資料夾路徑，把新增檔案上傳 GitHub 的 Vmylife/Army 儲存庫。
+2. 解壓 ZIP，保持資料夾路徑，把新增檔案上傳 GitHub 的 Vmylife/ARMY2 儲存庫。
 3. 不要將 ZIP 原檔直接當作網頁上傳；要上傳解壓縮後的內容。
 4. 等 GitHub Pages 部署完畢，打開：
-   https://vmylife.github.io/Army/animation-lab.html
+   https://vmylife.github.io/ARMY2/animation-lab.html
 
 【本次新增的檔案】
  animation-lab.html
@@ -44,3 +44,9 @@
 【測試狀態】
 JavaScript 語法、GLB 格式與必要模型資料檢查已完成。
 無法在此環境成功打開本機 Chromium 頁面（環境限制），因此尚未宣稱完成 iPhone 實機、WebGL 畫面驗證；若部署後有報錯，請傳截圖修正。
+
+【v0.1.1 修正】
+- 修正士兵模型被重複建立兩次 WebGL 幾何與貼圖，減少 iPhone 初始化記憶體與等待。
+- 下載 120 秒沒有資料才判定中斷，介面顯示貼圖/模型建立中。
+- 更正 ARMY2 新倉庫連結及快取版本號。
+- 若新網址顯示 404，請確認 ARMY2 的 Settings → Pages 已設定 main / (root) 並完成部署。
