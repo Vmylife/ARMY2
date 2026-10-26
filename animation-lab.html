@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e3eae0">
+<title>國軍模擬器｜3D 動畫校正實驗室</title>
+<link rel="stylesheet" href="./src/animation-lab/lab.css?v=114">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div><div class="eyebrow">ARMY · ANIMATION LAB</div><h1>3D 動畫測試器 <span>v0.1</span></h1></div>
+    <div class="head-actions"><a href="./index.html">返回軍營</a><button id="resetAll" class="light" type="button" title="只重設本測試器的校正資料">重設設定</button></div>
+  </header>
+  <main>
+    <section class="viewer" aria-label="三維動畫測試畫面">
+      <canvas id="labCanvas" aria-label="可拖動旋轉鏡頭的3D預覽"></canvas>
+      <div class="viewer-top"><span id="loadStatus" class="status">正在初始化 3D 場景…</span><span id="frameInfo" class="small"></span></div>
+      <div class="viewer-bottom"><div>拖曳：旋轉鏡頭　滾輪／雙指：縮放</div><div class="camera-controls"><button type="button" data-camera="front">正面</button><button type="button" data-camera="side">側面</button><button type="button" data-camera="top">俯視</button><button type="button" data-camera="reset">重設視角</button></div></div>
+    </section>
+    <aside class="panel">
+      <div class="panel-head"><h2>動畫與道具控制</h2><p>選擇動畫 → 選道具 → 播放 → 微調站位 → 匯出校正數值</p></div>
+      <div class="section"><label for="clip">要測試的動畫</label><select id="clip" disabled><option>模型載入中…</option></select><p class="hint" id="clipHint">目前會使用你提供的完整 18 組動畫模型，沒有動畫的動作暫不會偽裝成已完成。</p></div>
+      <div class="section"><label for="anchor">靠近哪個設施測試</label><select id="anchor"><option value="chair">椅子</option><option value="pullup">單槓</option><option value="grenade">手榴彈投擲箱</option><option value="ground">空地</option></select><p class="hint">三樣實際道具都保留在場景中；切換這個選項只會讓鏡頭和士兵靠近目標。</p></div>
+      <div class="section transport"><button id="play" class="primary" disabled>▶ 播放</button><button id="pause" disabled>暫停</button><button id="restart" disabled>重播</button><label class="check"><input id="loop" type="checkbox" checked> 循環播放</label><div class="track"><input id="timeline" type="range" min="0" max="1000" value="0" step="1" disabled><span id="timeLabel">0.00 / 0.00 秒</span></div></div>
+      <div class="section"><h3>站位校正（相對於設施）</h3><div class="slider" data-key="x"><label>左右偏移 X <output id="xVal"></output></label><input id="x" type="range" min="-2.5" max="2.5" step="0.02" value="0"></div><div class="slider" data-key="z"><label>前後偏移 Z <output id="zVal"></output></label><input id="z" type="range" min="-2.5" max="2.5" step="0.02" value="0"></div><div class="slider" data-key="y"><label>高度偏移 Y <output id="yVal"></output></label><input id="y" type="range" min="-1" max="1.5" step="0.01" value="0"></div><div class="slider" data-key="yaw"><label>角色朝向 <output id="yawVal"></output></label><input id="yaw" type="range" min="-180" max="180" step="1" value="0"></div><div class="slider" data-key="speed"><label>播放速度 <output id="speedVal"></output></label><input id="speed" type="range" min="0.2" max="2" step="0.05" value="1"></div><div class="buttons"><button id="resetPose">重設這個動作</button><button id="savePose" class="primary">儲存本動作校正</button></div><p class="hint" id="saveStatus">可分別儲存每個動畫／設施組合的偏移設定。</p></div>
+      <div class="section"><h3>直接測試新 GLB 動畫</h3><p class="hint">之後有新的士兵動畫模型，可以直接在這裡選擇完整 GLB 檔預覽，不需要先修改主遊戲或上傳 GitHub。須為含網格、骨架及動畫的 GLB。</p><div class="buttons"><button id="loadModelBtn">選擇新士兵 GLB</button><button id="restoreModelBtn">還原內建動畫</button></div><input type="file" id="modelFile" accept=".glb,model/gltf-binary" hidden></div>
+      <div class="section"><h3>匯出／匯入校正</h3><p class="hint">輸出 JSON 留作日後實裝。這裡的修改不會影響軍營主遊戲。</p><div class="buttons"><button id="exportAll">匯出全部設定 JSON</button><button id="copyPose">複製目前數值</button><button id="importBtn">匯入 JSON</button></div><input id="importFile" type="file" accept="application/json,.json" hidden><pre id="currentJSON"></pre></div>
+      <p class="footer-note">獨立實驗頁面；不修改原本的 NPC、地圖或模型設定。貼圖使用既有軍營資源，只有開啟本頁才載入動畫模型。</p>
+    </aside>
+  </main>
+</div>
+<script type="module" src="./src/animation-lab/lab.js?v=114"></script>
+</body>
+</html>

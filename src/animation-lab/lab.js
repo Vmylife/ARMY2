@@ -1,0 +1,156 @@
+// Army 3D animation lab, standalone. No game NPC/state imports, and no changes to main.js.
+import {ArmyRenderer} from '../core/renderer.js?v=092';
+import {CampProps} from '../props/propRenderer.js?v=092';
+import {PROPS} from '../map/camp.js?v=092';
+import {RigAnimator} from '../characters/rigAnimator.js';
+import {loadGlb} from '../core/glb111.js';
+import {mul,translation,rotateY} from '../core/math.js?v=060';
+
+const $=id=>document.getElementById(id);
+const MODEL='assets/characters/cadet/cadet-animation-lab.glb';
+let displayedModel=MODEL;
+const STORAGE='army-animation-lab.v1';
+const VARS=['x','z','y','yaw','speed'];
+const PROP_CONFIG={
+ chair:{type:'bench',label:'椅子',x:-3.05,z:.2,scale:1.10,yaw:0,url:'assets/props/bench.glb?v=112'},
+ pullup:{type:'pullup',label:'單槓',x:.3,z:.2,scale:2.3,yaw:0,url:'assets/props/pullup.glb?v=112'},
+ grenade:{type:'grenadeCrate',label:'手榴彈投擲箱',x:3.45,z:.2,scale:1.05,yaw:0,url:'assets/props/grenade-crate.glb?v=112'},
+ ground:{label:'空地',x:0,z:-3.8,yaw:0}
+};
+const LABELS={Idle:'站立待機',Walking:'走路',Running:'跑步',RunFast:'全速奔跑',Chair_Sit_Idle_M:'坐椅子',Sit_Cross_Legged_on_Floor:'盤腿坐地',Stand_and_Chat:'站立聊天',Sit_and_Doze_Off:'坐著打瞌睡',Pull_Radish:'拔草／拉取',push_up:'伏地挺身',situps:'仰臥起坐',Climb_Up_Rope:'攀繩',Punch_Combo_1:'拳擊組合',Forward_Roll_and_Fire:'前滾翻',Victory_Cheer:'歡呼',Knock_Down:'倒下',Sleep_Normally:'躺下睡覺'};
+const ANCHORS={Chair_Sit_Idle_M:'chair',Sit_and_Doze_Off:'chair',Sit_Cross_Legged_on_Floor:'ground',Climb_Up_Rope:'pullup',Pull_Radish:'ground',push_up:'ground',situps:'ground',Sleep_Normally:'ground'};
+const DEFAULTS={
+ chair:{x:0,z:0,y:0,yaw:0,speed:1},
+ pullup:{x:0,z:-.48,y:0,yaw:180,speed:1},
+ grenade:{x:0,z:-1.05,y:0,yaw:0,speed:1},
+ ground:{x:0,z:0,y:0,yaw:0,speed:1}
+};
+function newStore(){return {version:1,model:MODEL,calibrations:{}};}
+let store=newStore();try{const s=JSON.parse(localStorage.getItem(STORAGE)||'null');if(s&&s.calibrations&&typeof s.calibrations==='object')store={...newStore(),calibrations:s.calibrations};}catch(_){/* storage may be unavailable */}
+const data={renderer:null,props:null,actor:null,anim:null,clip:'Idle',anchor:'chair',playing:false,loop:true,pose:{...DEFAULTS.chair},last:0,cameraYaw:.65,cameraPitch:.53,cameraZoom:9.6,loaded:false,ground:null};
+function saveStorage(){try{localStorage.setItem(STORAGE,JSON.stringify(store));}catch(_){/* private browsing */}}
+function currentKey(){return `${data.clip}@@${data.anchor}`}
+function currentPreset(){const saved=store.calibrations[currentKey()];return saved?{...DEFAULTS[data.anchor],...saved}:{...DEFAULTS[data.anchor]};}
+function setStatus(message,error=false){$('loadStatus').textContent=message;$('loadStatus').style.color=error?'#a63931':'#345748';}
+function fillSliders(){for(const key of VARS){$(key).value=Number(data.pose[key]??DEFAULTS[data.anchor][key]);updateSliderText(key);}renderCurrentJSON();}
+function updateSliderText(key){const n=Number($(key).value);$(key+'Val').textContent=key==='yaw'?`${n.toFixed(0)}°`:key==='speed'?`${n.toFixed(2)} 倍`:`${n.toFixed(2)} m`;}
+function exportCalibration(){return {animation:data.clip,anchor:data.anchor,offset:{...data.pose},model:displayedModel};}
+function renderCurrentJSON(){$('currentJSON').textContent=JSON.stringify(exportCalibration(),null,2);}
+function setAnchor(anchor){if(!PROP_CONFIG[anchor])return;data.anchor=anchor;$('anchor').value=anchor;data.pose=currentPreset();fillSliders();data.renderer.cameraReady=false;data.cameraZoom=6.9;}
+function changeClip(name,automaticAnchor=true){if(!data.anim?.hasClip(name))return;data.clip=name;$('clip').value=name;if(automaticAnchor)setAnchor(ANCHORS[name]||'ground');else {data.pose=currentPreset();fillSliders();}data.anim.setClip(name,{restart:true});data.anim.transition=0;data.anim.prevClip=null;data.anim.clock=0;data.anim.completed=false;data.anim.speed=data.pose.speed;data.playing=true;data.last=0;updateTimeline();$('clipHint').textContent=`${LABELS[name]||'原始動畫'} · ${name}。可調整士兵與設施的相對站位，校正後按「儲存本動作校正」。`;}
+function updateTimeline(){if(!data.anim)return;const c=data.anim.clips[data.clip],dur=c?.duration||0,t=dur?Math.min(dur,data.anim.clock):0;$('timeline').value=dur?Math.round(t/dur*1000):0;$('timeLabel').textContent=`${t.toFixed(2)} / ${dur.toFixed(2)} 秒`;}
+function makeFloor(gl){
+ const verts=[],cols=[],norms=[];
+ function tri(a,b,c,color){for(const p of [a,b,c]){verts.push(...p);cols.push(...color);norms.push(0,1,0)}}
+ function rect(x1,z1,x2,z2,c){const y=-.045;tri([x1,y,z1],[x1,y,z2],[x2,y,z1],c);tri([x2,y,z1],[x1,y,z2],[x2,y,z2],c)}
+ for(let x=-11;x<11;x++)for(let z=-9;z<9;z++){
+  rect(x,z,x+1,z+1,(x+z)&1?[.73,.82,.69]:[.76,.84,.73]);
+ }
+ for(let x=-11;x<=11;x++)rect(x-.009,-9,x+.009,9,[.59,.71,.61]);
+ for(let z=-9;z<=9;z++)rect(-11,z-.009,11,z+.009,[.59,.71,.61]);
+ // Warm pad around each test prop, helps show its intended footprint.
+ for(const anchor of ['chair','pullup','grenade']){const a=PROP_CONFIG[anchor];rect(a.x-.95,a.z-.85,a.x+.95,a.z+.85,[.73,.74,.68]);}
+ const vao=gl.createVertexArray();gl.bindVertexArray(vao);
+ function buffer(loc,items){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(items),gl.STATIC_DRAW);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0)}
+ buffer(0,verts);buffer(1,cols);buffer(2,norms);gl.bindVertexArray(null);
+ return {vao,count:verts.length/3};
+}
+function drawFloor(){const r=data.renderer,gl=r.gl;gl.useProgram(r.pFlat);gl.uniformMatrix4fv(r.flatVP,false,r.vp);gl.bindVertexArray(data.ground.vao);gl.drawArrays(gl.TRIANGLES,0,data.ground.count);gl.bindVertexArray(null);}
+function footLift(asset,actor){
+ const clip=actor.anim.clip;
+ if(!new Set(['Knock_Down','Sleep_Normally','push_up','situps','Sit_Cross_Legged_on_Floor']).has(clip))return 0;
+ const bones=actor.anim.bones;let low=Infinity;
+ for(const sample of asset.sample){const [x,y,z]=sample.p;let yy=0;for(let i=0;i<4;i++){const wt=sample.w[i];if(wt<=0)continue;const offset=sample.j[i]*16;yy+=wt*(bones[offset+1]*x+bones[offset+5]*y+bones[offset+9]*z+bones[offset+13]);}if(yy<low)low=yy;}
+ return Number.isFinite(low)?Math.max(0,.015-low):0;
+}
+function drawActor(){
+ const r=data.renderer,gl=r.gl,a=r.assets.get('labSoldier'),actor=data.actor;
+ if(!a)return;
+ gl.useProgram(r.p);gl.uniformMatrix4fv(r.uniforms.vp,false,r.vp);
+ gl.uniformMatrix4fv(r.uniforms.model,false,mul(translation(actor.pos.x,actor.height+footLift(a,actor),actor.pos.z),rotateY(actor.angle)));
+ gl.uniformMatrix4fv(r.uniforms.bones,false,actor.anim.bones);
+ gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,a.tex);gl.uniform1i(r.uniforms.tex,0);gl.bindVertexArray(a.vao);gl.drawElements(gl.TRIANGLES,a.count,a.indexType,0);gl.bindVertexArray(null);
+}
+function setSoldierPose(){
+ const p=PROP_CONFIG[data.anchor],v=data.pose;const a=p.yaw||0,co=Math.cos(a),si=Math.sin(a);
+ data.actor.pos.x=p.x+v.x*co+v.z*si;data.actor.pos.z=p.z-v.x*si+v.z*co;data.actor.height=v.y;data.actor.angle=a+v.yaw*Math.PI/180;
+ data.actor.anim.speed=v.speed;
+}
+function animationFrame(now){requestAnimationFrame(animationFrame);if(!data.loaded)return;const dt=data.last?Math.min(.07,(now-data.last)/1000):0;data.last=now;
+ const anim=data.anim;
+ if(data.playing){anim.evaluate(dt);if(data.loop&&anim.finished()&&anim.clips[data.clip].duration>0){anim.clock=0;anim.completed=false;anim.transition=0;anim.prevClip=null;}}
+ else anim.evaluate(0);
+ if(data.playing&&Math.floor(now/90)!==Math.floor((now-16)/90))updateTimeline();
+ setSoldierPose();const r=data.renderer,a=PROP_CONFIG[data.anchor];
+ r.setCamera({yaw:data.cameraYaw,pitch:data.cameraPitch,zoom:data.cameraZoom});r.startFrame({x:a.x,z:a.z});
+ drawFloor();data.props.draw(r.vp,null);drawActor();
+}
+function setupCamera(){
+ const canvas=$('labCanvas');let pointers=new Map(),prev=null,lastPinch=null;
+ canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});prev={x:e.clientX,y:e.clientY};});
+ canvas.addEventListener('pointermove',e=>{
+  if(!pointers.has(e.pointerId))return;
+  const before=pointers.get(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pointers.size===1){data.cameraYaw-=(e.clientX-before.x)*.008;data.cameraPitch=Math.min(1.3,Math.max(.16,data.cameraPitch+(e.clientY-before.y)*.007));}
+  if(pointers.size===2){const [a,b]=[...pointers.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(lastPinch){data.cameraZoom=Math.max(2.8,Math.min(16,data.cameraZoom*lastPinch/d));}lastPinch=d;}
+ });
+ function up(e){pointers.delete(e.pointerId);lastPinch=null;prev=null;}
+ canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+ canvas.addEventListener('wheel',e=>{e.preventDefault();data.cameraZoom=Math.max(2.8,Math.min(16,data.cameraZoom+Math.sign(e.deltaY)*.55));},{passive:false});
+ document.querySelectorAll('[data-camera]').forEach(el=>el.addEventListener('click',()=>{
+  const which=el.dataset.camera;if(which==='front'){data.cameraYaw=0;data.cameraPitch=.46;}else if(which==='side'){data.cameraYaw=Math.PI/2;data.cameraPitch=.48;}else if(which==='top'){data.cameraYaw=.15;data.cameraPitch=1.28;}else {data.cameraYaw=.65;data.cameraPitch=.53;}data.cameraZoom=6.9;
+ }));
+}
+function bindControls(){
+ $('clip').addEventListener('change',()=>changeClip($('clip').value,true));
+ $('anchor').addEventListener('change',()=>setAnchor($('anchor').value));
+ $('play').addEventListener('click',()=>{data.playing=true;data.last=0;});
+ $('pause').addEventListener('click',()=>{data.playing=false;updateTimeline();});
+ $('restart').addEventListener('click',()=>changeClip(data.clip,false));
+ $('loop').addEventListener('change',()=>{data.loop=$('loop').checked;});
+ $('timeline').addEventListener('input',()=>{if(!data.anim)return;data.playing=false;data.anim.clock=(Number($('timeline').value)/1000)*data.anim.clips[data.clip].duration;data.anim.completed=false;data.anim.transition=0;data.anim.evaluate(0);updateTimeline();});
+ for(const key of VARS)$(key).addEventListener('input',()=>{data.pose[key]=Number($(key).value);updateSliderText(key);renderCurrentJSON();});
+ $('resetPose').addEventListener('click',()=>{data.pose={...DEFAULTS[data.anchor]};fillSliders();$('saveStatus').textContent='已恢復預設數值；按「儲存」才會覆蓋已保存的設定。';});
+ $('savePose').addEventListener('click',()=>{store.calibrations[currentKey()]={...data.pose};saveStorage();$('saveStatus').textContent=`已儲存：${LABELS[data.clip]||data.clip}＋${PROP_CONFIG[data.anchor].label}。`;});
+ $('exportAll').addEventListener('click',()=>{const result={...store,exportedAt:new Date().toISOString(),current:exportCalibration()};const blob=new Blob([JSON.stringify(result,null,2)],{type:'application/json'});const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='army-animation-calibration.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),2000);});
+ $('copyPose').addEventListener('click',async()=>{const txt=JSON.stringify(exportCalibration(),null,2);try{await navigator.clipboard.writeText(txt);$('saveStatus').textContent='目前動作數值已複製。';}catch(_){$('saveStatus').textContent='無法自動複製，請直接從下方 JSON 區塊選取。';}});
+ $('importBtn').addEventListener('click',()=>$('importFile').click());$('importFile').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{const obj=JSON.parse(await file.text());if(!obj.calibrations||typeof obj.calibrations!=='object')throw Error('校正資料格式錯誤');store={...newStore(),calibrations:obj.calibrations};saveStorage();data.pose=currentPreset();fillSliders();$('saveStatus').textContent=`成功匯入 ${Object.keys(store.calibrations).length} 組設定。`;}catch(err){$('saveStatus').textContent='匯入失敗：'+err.message;}e.target.value='';});
+ $('resetAll').addEventListener('click',()=>{if(!confirm('確定要清除動畫測試器全部已儲存校正數值？不影響主遊戲。'))return;store=newStore();saveStorage();data.pose=currentPreset();fillSliders();});
+ $('loadModelBtn').addEventListener('click',()=>$('modelFile').click());
+ $('modelFile').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;const u=URL.createObjectURL(f);try{setStatus('解析自訂動畫模型…');const g=await loadGlb(u,{timeoutMs:55000});await installSoldier(g,f.name);setStatus(`已載入自訂動畫：${f.name}`);}catch(err){console.error(err);setStatus(`無法載入自訂 GLB：${err.message}`,true);}finally{URL.revokeObjectURL(u);e.target.value='';}});
+ $('restoreModelBtn').addEventListener('click',async()=>{try{setStatus('還原內建動畫模型…');const g=await loadGlb(`./${MODEL}`,{timeoutMs:55000});await installSoldier(g,MODEL);setStatus('已還原內建動畫模型');}catch(err){setStatus(`還原失敗：${err.message}`,true);}});
+ setupCamera();
+}
+async function installSoldier(g,modelName){
+ // Full replacement of the preview soldier only; the active military camp is unchanged.
+ if(!g?.json?.skins?.length||!g?.json?.meshes?.length||!g?.json?.animations?.length)throw Error('GLB 必須包含完整士兵網格、骨架與動畫');
+ const next=new RigAnimator(g);next.setClip('Idle');next.evaluate(0);
+ await data.renderer.addModel('labSoldier',g);
+ data.anim=next;data.actor={pos:{x:0,z:0},angle:0,height:0,anim:next};displayedModel=modelName;
+ const names=Object.keys(next.clips),seen=names.filter(n=>n!=='Idle');
+ $('clip').innerHTML='';for(const [i,key] of ['Idle',...seen].entries()){const op=document.createElement('option');op.value=key;op.textContent=`${LABELS[key]||(/^[0-9_a-f-]{25,}$/.test(key)?'未命名動作 '+(i+1):'其他動作')} · ${key}`;$('clip').append(op);}
+ $('clip').disabled=false;for(const id of ['play','pause','restart','timeline'])$(id).disabled=false;
+ changeClip(next.hasClip('Chair_Sit_Idle_M')?'Chair_Sit_Idle_M':names[0]);
+}
+async function load(){
+ const canvas=$('labCanvas');const r=new ArmyRenderer(canvas);data.renderer=r;
+ // Use the game's WebGL renderer and rig, but suppress all camp geometry in this standalone test scene.
+ r.environment.count=0;data.ground=makeFloor(r.gl);
+ // CampProps intentionally reads PROPS from camp.js?v=092. This page is independent of the real camp page.
+ PROPS.splice(0,PROPS.length,...Object.entries(PROP_CONFIG).filter(([k])=>k!=='ground').map(([k,p])=>({type:p.type,x:p.x,z:p.z,scale:p.scale,yaw:p.yaw,cull:999})));
+ data.props=new CampProps(r.gl);
+ setStatus('載入完整士兵動畫模型…');
+ const soldier=await loadGlb(`./${MODEL}`,{onProgress:(n,t)=>setStatus(`下載士兵動畫：${(n/1048576).toFixed(1)} / ${t?(t/1048576).toFixed(1):'?'} MB`),timeoutMs:55000});
+ await r.addModel('labSoldier',soldier);
+ await installSoldier(soldier,MODEL);
+ data.loaded=true;requestAnimationFrame(animationFrame);
+ setStatus(`士兵已載入；正在載入 3 件道具…`);
+ for(const [key,p] of Object.entries(PROP_CONFIG)){
+  if(key==='ground')continue;
+  try{const g=await loadGlb(`./${p.url}`,{onProgress:(n,t)=>setStatus(`載入${p.label}：${(n/1048576).toFixed(1)} / ${t?(t/1048576).toFixed(1):'?'} MB`),timeoutMs:45000});await data.props.add(p.type,g);}catch(e){console.error(e);setStatus(`${p.label}載入失敗：${e.message}（動畫仍可測試）`,true);}
+ }
+ if(data.props.models.size===3)setStatus(`已就緒：${Object.keys(data.anim.clips).length} 組可選動畫、3 件道具`);
+ $('frameInfo').textContent='士兵使用完整動畫 GLB；道具使用軍營正式模型';
+}
+bindControls();fillSliders();
+if(!window.WebGL2RenderingContext){setStatus('這個瀏覽器不支援 WebGL2',true);}else load().catch(err=>{console.error(err);setStatus(`初始化失敗：${err.message}`,true);});
