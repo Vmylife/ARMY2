@@ -79,10 +79,10 @@ export function makeEnvironment(){
    stroke(x+Math.cos(a)*rx,z+Math.sin(a)*rz,x+Math.cos(b)*rx,z+Math.sin(b)*rz,width,y,col);
   }
  }
- // New grenade-annex entrance: real rendered road corresponding to road navigation.
- const spur=[[-29,-18],[-29,-22],[-29,-25],[-28.8,-27.0]];
- for(let i=1;i<spur.length;i++)
-   segment(spur[i-1][0],spur[i-1][1],spur[i][0],spur[i][1],2.75,.101,[.863,.833,.74],.091);
+ // The old grenade-annex road was an extra long rectangular dirt-colored
+ // slab over the grass and gray circular throwing ground. The user removed
+ // that visual strip. Keep the underlying walkable route and the actual 3D
+ // props: there is no longer any painted/raised spur here.
  // basketball court slab and markings only — hoop models are rendered as props.
  const border=[.73,.74,.68],court=[.51,.56,.55],key=[.64,.51,.46],chalk=[.94,.945,.88];
  const {x,z,w,d}=BASKETBALL_COURT; const x0=x-w/2,x1=x+w/2,z0=z-d/2,z1=z+d/2;
