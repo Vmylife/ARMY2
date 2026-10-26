@@ -34,6 +34,7 @@ button.addEventListener('click',async()=>{
     await import('./lighting96.js?v=096');
     await import('./map/lifeBounds107.js?v=107');
     await import('./map/layout109.js?v=109');
-    await import('./main111.js?v=113');
+    await import('./map/layout115.js?v=115');
+    await import('./main111.js?v=115');
   }catch(error){console.error('軍營載入錯誤',error);window.armyLoadFailure(error);}
 },{once:true});

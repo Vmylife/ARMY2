@@ -120,7 +120,10 @@ function fixtureInit(){
  }
  for(const [j,x] of [2.1,5.5,8.9,12.3,15.7,19.1].entries())SHOOT.push({key:`shoot-${j}`,pos:W(x,16.85),angle:0});
  for(const [j,p] of PROPS.filter(p=>p.type==='pullup').entries())PULLUPS.push({key:`pullup-${j}`,pos:W(p.x,p.z+1.5),angle:Math.PI});
- for(const [j,p] of [W(-22,-10.0),W(-19.6,-10.0)].entries())GRENADE.push({key:`grenade-${j}`,pos:p,angle:0});
+ for(const [j,p] of PROPS.filter(p=>p.type==='grenadeCrate').sort((a,b)=>a.x-b.x).entries()) {
+  // Soldier stands south of each crate and faces the main oval (+Z).
+  GRENADE.push({key:`grenade-${j}`,pos:W(p.x,p.z-1.52),angle:0});
+ }
 }
 const A={
  jog:{label:'操場跑步',base:1.5,tags:['active'],speed:2.02},
@@ -150,7 +153,7 @@ const STATIC={
  walk:[W(-34,-8),W(-31,12),W(-12,15),W(-10,-4),W(0,-10),W(10,-12),W(27,-12),W(29,-3),W(27,15),W(0,15)],
  basketball:[W(-37.0,28.2),W(-30.5,28.3)],
  pullup:[W(15.9,-15.5),W(18.8,-15.5),W(21.7,-15.5),W(24.6,-15.5)],
- grenade:[W(-22,-10.0),W(-19.6,-10.0)],
+ grenade:[W(-24.59,-10.48),W(-21.48,-10.48),W(-18.26,-10.48)],
  pushup:[W(16.8,-14.6),W(19.3,-14.6)],
  situp:[W(21.7,-14.5),W(24.0,-14.5)],
  sweep:[W(-33.5,-1),W(-13,9),W(2,-7),W(28,-5),W(32,-8)],
@@ -503,5 +506,5 @@ export function moveSquadMember(n,goal,dt,run=false){return to(n,goal,dt,run);}
 export function poseSquadMember(n,clips=['Idle'],speed=1){pose(n,clips,speed);}
 export function faceSquadMember(n,x,z,dt){face(n,x,z,dt);}
 export function squadWorldGoal(p){navInit();if(canStand(p.x,p.z))return {...p};const k=nearestNode(p);return k<0?null:idxPos(k);}
-export const NPC_LIFE_VERSION='0.11.3';
+export const NPC_LIFE_VERSION='0.11.5';
 export const NPC_ACTIVITIES=Object.keys(A).map(k=>({id:k,label:A[k].label,animation:A[k].placeholder?'待補':'已支援'}));

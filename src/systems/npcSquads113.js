@@ -4,7 +4,7 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal} from './npcLife113.js?v=113';
+ faceSquadMember,squadWorldGoal} from './npcLife113.js?v=115';
 import {canOccupy,moveNpc} from '../map/navCollision109.js?v=109';
 const W=(x,z)=>({x,z});
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
@@ -15,7 +15,7 @@ const STAGES=[
   points:[W(11.7,-7.6),W(13.7,-7.6),W(15.7,-7.6),W(17.7,-7.6),W(19.7,-7.6)],clip:['push_up','Idle']},
  {id:'pullup',name:'拉單槓',rally:W(19,-12.6),duration:10,limited:true,clip:['Idle']},
  {id:'shoot',name:'靶場打靶',rally:W(10.7,14.3),duration:11,limited:true,clip:['Idle']},
- {id:'grenade',name:'手榴彈投擲',rally:W(-21,-8.3),duration:9,limited:true,clip:['Idle']},
+ {id:'grenade',name:'手榴彈投擲',rally:W(-14.3,-10.7),duration:9,limited:true,clip:['Idle']},
  {id:'obstacle',name:'障礙訓練',rally:W(9,7.2),duration:12,
   points:[W(5.5,7.9),W(8.5,7.9),W(11.5,7.9),W(14.5,7.9),W(17.5,7.9)],clip:['Idle']},
  {id:'weed',name:'草地拔草',rally:W(-31,8),duration:16,
@@ -39,7 +39,7 @@ function setStage(s){
   s.stage=stage;s.index=index;s.nextIndex=(index+1)%STAGES.length;
   s.phase='march';s.elapsed=0;s.blocked=0;s.runIndex=0;s.runTimer=0;
   s.done.clear();s.active.clear();s.trail=[];
-  for(const n of s.members){n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;n.replanAt=0;
+  for(const n of s.members){n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;n.replanAt=0;n.squadMoveSpeed=0;
    n.activity=`第${s.id+1}小隊 · 前往${stage.name}`;n.anim.rifleAim=0;n.home.job='life';}
   const rally=squadWorldGoal(stage.rally);s.goal=rally||{...stage.rally};
   return true;
@@ -72,23 +72,30 @@ function formationGoal(s,index){
 }
 function follow(s,n,index,dt,all,playerPos,run=false){
  const goal=formationGoal(s,index),sep=dist(n.pos,goal);
- if(sep<.30){setIdle(n,`第${s.id+1}小隊 · 列隊行進`);return;}
- // Each recruit follows the leader's trail rather than doing 20 A* searches.
- // Larger gaps are corrected by increasing speed, never by teleporting.
- const dx=goal.x-n.pos.x,dz=goal.z-n.pos.z,speed=clamp((run?2.25:1.55)+(sep>2.5?.55:0),1.25,2.95);
- const before=n.pos,step=Math.min(sep,speed*dt);
- const moved=moveNpc(n,dx/sep*step,dz/sep*step,all,playerPos);
- if(dist(before,moved)>.015){n.pos=moved;faceSquadMember(n,moved.x-before.x,moved.z-before.z,dt);n.blocked=0;}
- else n.blocked+=dt;
- if(n.blocked>2.5){
-  // The common road route remains authoritative; blocked followers can
-  // independently ask A* how to reach a STABLE point a few metres ahead.
+ // Smooth chase: followers USED TO toggle Idle/Walking on every 0.30m threshold,
+ // making all four figures twitch. Keep the locomotion clip stable during a march.
+ // Adjust speed (not animation state) continuously, with a small dead band.
+ const speedTarget=sep<.10?0:clamp(sep*2.0,0,run?2.85:2.0);
+ const response=1-Math.exp(-7*dt);
+ n.squadMoveSpeed=(n.squadMoveSpeed||0)+(speedTarget-(n.squadMoveSpeed||0))*response;
+ const dx=goal.x-n.pos.x,dz=goal.z-n.pos.z;
+ const before=n.pos;
+ const step=Math.min(sep,Math.max(0,n.squadMoveSpeed)*dt);
+ if(sep>.10&&step>.0001){
+  const moved=moveNpc(n,dx/sep*step,dz/sep*step,all,playerPos);
+  const actual=dist(before,moved);
+  if(actual>.0001){n.pos=moved;faceSquadMember(n,moved.x-before.x,moved.z-before.z,dt);n.blocked=0;}
+  else if(sep>.60)n.blocked+=dt;
+ }else if(sep<=.10){n.blocked=0;}
+ if(n.blocked>3){
+  // Only replan when genuinely blocked, never for ordinary formation movement.
   const recovery=trailPoint(s,Math.max(0,FORM[index].back-1.8)).pos;
   if(!n.recoverTarget||dist(n.recoverTarget,recovery)>3.0)n.recoverTarget={...recovery};
   moveSquadMember(n,n.recoverTarget,dt,false);
   if(n.blocked>7)n.recoverTarget=null;
  }
- poseSquadMember(n,run?['Running','RunFast','Walking']:['Walking'],run?1.1:1.05);
+ // Never switch to Idle just because the formation marker is briefly close.
+ poseSquadMember(n,run?['Running','RunFast','Walking']:['Walking'],run?1.05:1.0);
  n.activity=`第${s.id+1}小隊 · ${run?'集體跑步':'列隊前進'}`;
  n.state='march';
 }
@@ -107,6 +114,11 @@ function march(s,dt,all,playerPos){
  else if(s.elapsed>85||leader.retries>9){releaseStage(s);setStage(s);}
 }
 function queuePoint(stage,index){
+ // Grenade stand-by area is east of the throwing lanes (blue marked region).
+ if(stage.id==='grenade') {
+  const q=W(-14.5+(index%2)*.90,-10.2-Math.floor(index/2)*.90);
+  return squadWorldGoal(q)||q;
+ }
  const offset=(index-2)*1.15;
  const candidate=W(stage.rally.x+offset,stage.rally.z-2.6);
  return squadWorldGoal(candidate)||squadWorldGoal(stage.rally)||stage.rally;
@@ -127,7 +139,11 @@ function trainPose(n,stage,dt,now){
   n.anim.rifleAim=0;n.home.job='life';
   poseSquadMember(n,stage.clip||['Idle']);
   if(stage.id==='pullup')faceSquadMember(n,0,-1,dt);
-  if(stage.id==='grenade')faceSquadMember(n,0,1,dt);
+  if(stage.id==='grenade'){
+   // Facing towards the oval, never towards the people waiting beside it.
+   const wanted=0,delta=Math.atan2(Math.sin(wanted-n.angle),Math.cos(wanted-n.angle));
+   n.angle+=delta*clamp(1-Math.exp(-12*dt),0,1);
+  }
  }
  n.activity=`第${n.squadId+1}小隊 · ${stage.name}`;n.state='training';
 }
@@ -182,7 +198,7 @@ function trainSquad(s,dt,now,all,playerPos){
   }
   current.travel+=dt;
   const goal=current.slot.pos;
-  if(dist(n.pos,goal)>.85){
+  if(dist(n.pos,goal)>.65){
    moveSquadMember(n,goal,dt,false);
    n.activity=`第${s.id+1}小隊 · 就位${stage.name}`;
    if(current.travel>35){releaseMemberSlot(s,n);s.done.add(n.id);}
