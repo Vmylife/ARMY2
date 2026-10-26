@@ -8,7 +8,9 @@ export const SAVED_ACTION_CALIBRATIONS=Object.freeze({
   'Pull_Radish@@weed': Object.freeze({x:-0.06,z:-0.42,y:0.16,yaw:0,speed:1}),
   '__ARMY_SENTRY_IDLE__@@guard': Object.freeze({x:1.38,z:1.78,y:0,yaw:0,speed:1}),
   'baseball_pitching@@grenade': Object.freeze({x:-1.08,z:0.42,y:0,yaw:82,speed:1}),
-  'Crouch_Pull_and_Throw@@grenade': Object.freeze({x:-1.18,z:0.48,y:0.23,yaw:168,speed:1})
+  'Crouch_Pull_and_Throw@@grenade': Object.freeze({x:-1.18,z:0.48,y:0.23,yaw:168,speed:1}),
+  'Army_Pullup_Simple@@pullup': Object.freeze({"x":0,"z":-0.02,"y":0,"yaw":180,"speed":1}),
+  'Jump_Over_Obstacle_1@@hurdle': Object.freeze({"x":-0.24,"z":-1.78,"y":0.12,"yaw":0,"speed":0.7})
 });
 export function fixtureActorPose(fixture,calibration){
   if(!fixture||!calibration)return null;

@@ -1,7 +1,7 @@
-// v0.11.20: deliberately simple two-hand pull-up PREVIEW ONLY.
+// v0.11.21: shared calibrated two-hand pull-up for the lab and live camp.
 // Pose solved against this cadet rig: wrists remain near the same fixed
 // horizontal handholds as hips rise 0.18 m and elbows flex.
-// No Climb_Up_Rope clip is used, and no live-camp file imports this module.
+// No Climb_Up_Rope clip is used; game NPCs install exactly this same action.
 export const SIMPLE_PULLUP='Army_Pullup_Simple';
 const TIMES=new Float32Array([0, 0.25, 0.9, 1.15, 1.4, 2.05, 2.3]);
 const LIFTS=[0, 0, 0.18, 0.18, 0.18, 0, 0];

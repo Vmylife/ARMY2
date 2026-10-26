@@ -32,6 +32,6 @@ button.addEventListener('click',async()=>{
     // Separate map versioned modules are intentional: both must share the editor changes.
     await import('./map/activeCampLayout116.js?v=126');
     await import('./lighting96.js?v=096');
-    await import('./main111.js?v=120');
+    await import('./main111.js?v=121');
   }catch(error){console.error('軍營載入錯誤',error);window.armyLoadFailure(error);}
 },{once:true});

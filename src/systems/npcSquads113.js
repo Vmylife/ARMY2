@@ -4,16 +4,18 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=119';
+ faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=121';
 import {canOccupy,moveNpc,moveWithCollision} from '../map/navCollision109.js?v=109';
 import {PROPS} from '../map/camp.js?v=093';
-import {ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
+import {ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
+import {SIMPLE_PULLUP} from '../animation-lab/simplePullup120.js?v=121';
+import {SAVED_ACTION_CALIBRATIONS,fixtureActorPose} from '../characters/fixturePose115.js?v=121';
 import {chooseGrenadeMotion,calibratedGrenadePose} from '../training/grenadeCalibration112.js?v=125';
 import {grenadeQueueMarks} from '../training/grenadeQueue117.js?v=119';
 import {prepareLandingClip} from '../training/obstacleLanding120.js?v=120';
 const W=(x,z)=>({x,z});
-const OBSTACLE_MOTIONS=['Jump_Over_Obstacle_1','Jump_Over_Obstacle_2'];
-// The two GLB jumps carry 2.8m/3.9m of forward translation in the pelvis bone.
+const OBSTACLE_MOTIONS=['Jump_Over_Obstacle_1'];
+// Jump 1 contains 3.9m of pelvis travel: use it once per repetition.
 // Read the ORIGINAL data; never try to restart that movement at a fixed world X/Z.
 function jumpLandingDisplacement(anim,clipName){
  const clip=anim.clips[clipName];if(!clip)return {x:0,z:0};
@@ -25,21 +27,20 @@ function jumpLandingDisplacement(anim,clipName){
  const last=jump.values.length-jump.width;
  return {x:jump.values[last]-(start[0]||0),z:jump.values[last+2]-(start[2]||0)};
 }
-function chooseObstacleMotion(anim){const clips=OBSTACLE_MOTIONS.filter(x=>anim.hasClip(x));return clips.length?clips[Math.floor(Math.random()*clips.length)]:null;}
+function chooseObstacleMotion(anim){return anim.hasClip(OBSTACLE_MOTIONS[0])?OBSTACLE_MOTIONS[0]:null;}
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const STAGES=[
  {id:'jog',name:'操場跑步',rally:W(-29,-2.8),duration:36},
  {id:'pushup',name:'集合場伏地挺身',rally:W(10.4,-8.3),duration:16,
   points:[W(12.2,-6.9),W(15.3,-6.9),W(18.4,-6.9),W(13.75,-10.1),W(16.85,-10.1)],clip:['push_up','Idle']},
- {id:'pullup',name:'拉單槓',rally:W(19,-12.6),duration:10,limited:true,clip:[ARMY_PULLUP,'Climb_Up_Rope','Idle']},
+ {id:'pullup',name:'拉單槓',rally:W(19,-12.6),duration:10,limited:true,clip:[SIMPLE_PULLUP,'Idle']},
  {id:'shoot',name:'靶場打靶',rally:W(10.7,14.3),duration:11,limited:true,clip:['Idle']},
  {id:'grenade',name:'手榴彈投擲',rally:W(-37.4,-29.3),duration:9,limited:true,clip:['Idle']},
- {id:'obstacle',name:'障礙訓練',rally:W(9,7.2),duration:12,
-  // Five exact hurdle fixtures from the latest editor layout. Approaching
-  // slightly from the southern side leaves room for the jump animation.
+ {id:'obstacle',name:'障礙訓練',rally:W(24.5,9.46),duration:12,
+  // One exact start/facing/height/speed per physical hurdle. Never approximate the trigger.
   points:PROPS.filter(p=>p.type==='hurdle').sort((a,b)=>a.x-b.x)
-   .slice(0,5).map(p=>W(p.x,p.z-.70)),clip:['Idle']},
+   .slice(0,5).map(p=>({...fixtureActorPose(p,SAVED_ACTION_CALIBRATIONS['Jump_Over_Obstacle_1@@hurdle']),fixture:p})),clip:['Idle']},
  {id:'weed',name:'草地拔草',rally:W(-37,14),duration:16,limited:true,clip:['Pull_Radish','Idle']},
  {id:'sweep',name:'營舍周邊掃地',rally:W(-34,-7.4),duration:16,
   points:[W(-34,-5.6),W(-33.5,-3.7),W(-33,-1.8),W(-32.5,.1),W(-32,2)],clip:['Sweeping_Both_Hands',ARMY_SWEEP,'Idle']}
@@ -217,7 +218,7 @@ function trainPose(n,stage,dt,now,current){
    // Never restart a baked root-translation animation from the same world point.
    poseSquadMember(n,['Idle']);
   }else poseSquadMember(n,stage.clip||['Idle']);
-  if(stage.id==='pullup')faceSquadMember(n,0,-1,dt);
+  if(stage.id==='pullup'&&current?.slot){n.angle=current.slot.angle;n.renderLift=current.slot.lift||0;}
  }
  n.activity=`第${n.squadId+1}小隊 · ${stage.name}`;n.state='training';
 }
@@ -248,7 +249,11 @@ function trainSquad(s,dt,now,all,playerPos){
    if(stage.id==='weed'){
     free=free.filter(w=>w.zone===stage.weedZone)
       .sort((a,b)=>dist(a.pos,stage.rally)-dist(b.pos,stage.rally));
-    free=free.filter(w=>[...s.active.values()].every(c=>dist(c.slot.pos,w.pos)>1.05));
+    // Spread the team over the whole grass patch. Each recruit owns a distinct weed.
+    const reserved=[...s.active.values()].map(c=>c.slot.pos);
+    const spaced=free.filter(w=>reserved.every(p=>dist(p,w.pos)>1.40));
+    free=(spaced.length?spaced:free.filter(w=>reserved.every(p=>dist(p,w.pos)>.84)))
+      .sort((a,b)=>dist(a.pos,n.pos)+dist(a.pos,stage.rally)*.22-dist(b.pos,n.pos)-dist(b.pos,stage.rally)*.22);
    }
    if(!free.length)continue;
    slot=free[0];if(!claimSquadSlot(slot,token))continue;
@@ -257,9 +262,11 @@ function trainSquad(s,dt,now,all,playerPos){
     // Use the REAL number of hurdles in the latest exported camp map (can be one).
     // Each hurdle is single occupancy; other members must queue until it clears.
     const used=new Set([...s.active.values()].map(c=>c.obstacleLane));
-    const index=stage.points.findIndex((point,j)=>!used.has(j));
+    const preferred=i<stage.points.length&&!used.has(i)?i:-1;
+    const index=preferred>=0?preferred:stage.points.findIndex((point,j)=>!used.has(j));
     if(index<0)continue;
-    slot={key:null,pos:stage.points[index]};
+    const mark=stage.points[index];
+    slot={key:null,pos:{...mark.pos},angle:mark.angle,lift:mark.lift,speed:mark.speed,fixture:mark.fixture};
     var obstacleLane=index;
    }else{
     const pos=assignedSpot(stage,i);if(!pos)continue;
@@ -269,9 +276,10 @@ function trainSquad(s,dt,now,all,playerPos){
   const motion=stage.id==='grenade'?chooseGrenadeMotion(n.anim)
     :stage.id==='obstacle'?chooseObstacleMotion(n.anim):null;
   const motionPose=stage.id==='grenade'?calibratedGrenadePose(slot,motion):null;
+  if(stage.id==='obstacle'&&!motion){s.done.add(n.id);continue;}
   // Keep the original slot reservation (shared with free NPCs), but navigate
   // to the exact marked position for the chosen animation.
-  s.active.set(n.id,{slot,token,motion,motionPose,obstacleLane,obstaclePhase:'approach',obstacleTime:0,elapsed:0,travel:0});
+  s.active.set(n.id,{slot,token,motion,motionPose,obstacleLane,obstaclePhase:'approach',obstacleTime:0,obstacleReps:0,elapsed:0,travel:0});
   n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;
  }
  // Push-up drills run as a synchronized five-person unit, not five individual timers.
@@ -305,6 +313,40 @@ function trainSquad(s,dt,now,all,playerPos){
   else if(s.elapsed>65){releaseStage(s);setStage(s);}
   return;
  }
+ if(stage.id==='weed'){
+  // Shared work session: no four idle finishers waiting for one late recruit.
+  // All members keep pulling their own grass; release the team as a unit.
+  let working=0,assigned=0;
+  for(const n of s.members){
+   const current=s.active.get(n.id);
+   if(!current){setIdle(n,`第${s.id+1}小隊 · 尋找獨立草點`);continue;}
+   assigned++;
+   const goal=current.slot.pos,near=dist(n.pos,goal);
+   if(near>.18){
+    if(near<.9)settleSquadTrainingSpot(n,goal,dt);
+    else moveSquadMember(n,goal,dt,false);
+    n.activity=`第${s.id+1}小隊 · 前往自己的草點`;
+    n.state='training';
+    // If a narrow path is blocked, replan a different path. No teleporting.
+    if(current.travel>9&&n.blocked>2){n.route=null;n.routeGoal=null;n.routeIndex=0;n.replanAt=0;}
+   }else{
+    working++;
+    trainPose(n,stage,dt,now,current);
+    n.angle=current.slot.angle;n.renderLift=current.slot.lift||0;
+    n.activity=`第${s.id+1}小隊 · 同時拔草`;
+   }
+   current.travel+=dt;
+  }
+  // The fifth usually joins before completion, while the other four keep working.
+  // A single impassable plant must not leave the rest queued indefinitely.
+  if(!s.drillStarted&&working>=4&&assigned===5){s.drillStarted=true;s.drillElapsed=0;}
+  if(s.drillStarted)s.drillElapsed+=dt;
+  if(s.drillStarted&&s.drillElapsed>=stage.duration&&working===5 ||
+     s.drillStarted&&s.drillElapsed>=stage.duration+6 || s.elapsed>70){
+   releaseStage(s);setStage(s);
+  }
+  return;
+ }
  for(let i=0;i<5;i++){
   const n=s.members[i],current=s.active.get(n.id);
   if(s.done.has(n.id)){
@@ -325,74 +367,121 @@ function trainSquad(s,dt,now,all,playerPos){
   }
   current.travel+=dt;
   if(stage.id==='obstacle'){
-   // One jump, one landing, then walk FORWARD away from the hurdle.
-   // Original GLB pelvis translation is already rendered while jumping.
-   // On the final frame, hand off that distance to the actor's world position,
-   // then switch to Walking without blending the old 3.9m hip translation back.
+   // One soldier: approach precisely -> jump 1 -> land -> walk AROUND the hurdle
+   // back to the same approved anchor -> jump 1 again -> finish on far side.
+   // The GLB's animated pelvis already carries forward motion until landing.
+   const goal=current.slot.pos;
+   if(current.obstaclePhase==='return'){
+    const waypoint=current.returnPath?.[current.returnIndex];
+    if(!waypoint){
+     current.obstaclePhase='approach';
+     n.route=null;n.routeGoal=null;n.routeIndex=0;n.replanAt=0;
+    }else if(dist(n.pos,waypoint)<.45){
+     current.returnIndex++;
+     n.route=null;n.routeGoal=null;n.routeIndex=0;n.replanAt=0;
+    }else{
+     moveSquadMember(n,waypoint,dt,false);
+    }
+    n.activity=`第${s.id+1}小隊 · 走回原位準備第二次跨欄`;
+    if(current.travel>75){releaseMemberSlot(s,n);s.done.add(n.id);}
+    continue;
+   }
    if(current.obstaclePhase==='exit'){
     const finish=current.exitPoint;
-    if(dist(n.pos,finish)>.66)moveSquadMember(n,finish,dt,false);
+    if(dist(n.pos,finish)>.65)moveSquadMember(n,finish,dt,false);
     else poseSquadMember(n,['Idle']);
-    n.activity=`第${s.id+1}小隊 · 跨欄落地後離場`;
-    if(dist(n.pos,finish)<.75||current.travel>18){releaseMemberSlot(s,n);s.done.add(n.id);}
+    n.activity=`第${s.id+1}小隊 · 完成兩次跨欄，離場`;
+    if(dist(n.pos,finish)<.75||current.travel>82){releaseMemberSlot(s,n);s.done.add(n.id);}
     continue;
    }
    if(current.obstaclePhase==='landing'){
     current.landingElapsed+=dt;
     if(current.landingElapsed>=.36){
-     current.obstaclePhase='exit';n.anim.setClip('Walking',{restart:true});
+     n.anim.setClip('Walking',{restart:true});
      n.anim.prevClip=null;n.anim.transition=0;
      poseSquadMember(n,['Walking']);
+     if(current.obstacleReps<2){
+      // Cross the side corridor between hurdle posts rather than the bar itself.
+      const p=current.slot.fixture;
+      const side=(i%2===0?1:-1)*1.24;
+      const a=p.yaw||0,c=Math.cos(a),si=Math.sin(a);
+      const sideX=p.x+side*c,sideZ=p.z-side*si;
+      const forwardX=Math.sin(current.slot.angle),forwardZ=Math.cos(current.slot.angle);
+      current.returnPath=[
+       W(sideX+forwardX*.85,sideZ+forwardZ*.85),
+       W(sideX-forwardX*2.05,sideZ-forwardZ*2.05),
+       {...goal}
+      ];
+      current.returnIndex=0;current.obstaclePhase='return';
+     }else current.obstaclePhase='exit';
+     n.route=null;n.routeGoal=null;n.routeIndex=0;n.replanAt=0;
     }else{
-     n.anim.setClip(current.landingMotion);n.anim.clock=current.landingElapsed;
+     n.anim.setClip(current.landingMotion||'Walking');
+     n.anim.clock=current.landingElapsed;
      n.anim.prevClip=null;n.anim.transition=0;
-     n.activity=`第${s.id+1}小隊 · 跨欄落地收尾`;n.state='training';
+     n.activity=`第${s.id+1}小隊 · 跨欄落地收尾`;
+     n.state='training';
     }
     continue;
    }
    if(current.obstaclePhase==='jump'){
     const duration=n.anim.clips[current.motion]?.duration||1;
-    current.obstacleTime+=dt;
+    // Honor the exported calibration's 0.7x clip speed even off camera.
+    current.obstacleTime+=dt*(current.slot.speed||1);
     if(current.obstacleTime>=duration){
      const offset=jumpLandingDisplacement(n.anim,current.motion);
-     const c=Math.cos(n.angle),si=Math.sin(n.angle);
+     const c=Math.cos(current.slot.angle),si=Math.sin(current.slot.angle);
      n.pos={x:current.jumpStart.x+offset.x*c+offset.z*si,
             z:current.jumpStart.z-offset.x*si+offset.z*c};
-     current.exitPoint={x:n.pos.x+(i-2)*.9+Math.sin(n.angle)*1.35,z:n.pos.z+Math.cos(n.angle)*1.35};
+     n.renderLift=0;
+     current.obstacleReps++;
+     // Exit farther away from the bar after the SECOND crossing only.
+     current.exitPoint={x:n.pos.x+si*.90,z:n.pos.z+c*.90};
      current.obstaclePhase='landing';current.landingElapsed=0;
      current.landingMotion=prepareLandingClip(n.anim,current.motion);
      n.route=null;n.routeGoal=null;n.routeIndex=0;
      n.anim.setClip(current.landingMotion||'Walking',{restart:true});
      n.anim.prevClip=null;n.anim.transition=0;
-     n.activity=`第${s.id+1}小隊 · 跨欄完成，落地收尾`;n.state='training';
+     n.activity=`第${s.id+1}小隊 · 第${current.obstacleReps}次跨欄完成`;
+     n.state='training';
     }else{
-     // Clock synchronization also works for offscreen NPCs whose skeleton
-     // isn't evaluated/rendered every frame by the main loop.
-     n.anim.setClip(current.motion);n.anim.clock=current.obstacleTime;
+     // A one-shot cannot auto-loop or restart from a random approached position.
+     n.anim.setClip(current.motion);
+     n.anim.speed=current.slot.speed||1;
+     n.anim.clock=current.obstacleTime;
      n.anim.prevClip=null;n.anim.transition=0;
-     n.angle=0;
-     n.activity=`第${s.id+1}小隊 · 跨越障礙`;n.state='training';
+     n.angle=current.slot.angle;
+     n.renderLift=current.slot.lift||0;
+     n.activity=`第${s.id+1}小隊 · 第${current.obstacleReps+1}次跨越障礙`;
+     n.state='training';
     }
     continue;
    }
-   const goal=current.slot.pos;
-   if(dist(n.pos,goal)>.60){
-    moveSquadMember(n,goal,dt,false);
-    n.activity=`第${s.id+1}小隊 · 跨欄起點就位`;
-    if(current.travel>35){releaseMemberSlot(s,n);s.done.add(n.id);}
+   // Do not use the default pathfinder's 0.75m arrival threshold to play
+   // the hurdle clip. Require exact positioning and stable facing at 0.12m.
+   const near=dist(n.pos,goal);
+   if(near>.12){
+    if(near<.9)settleSquadTrainingSpot(n,goal,dt);
+    else moveSquadMember(n,goal,dt,false);
+    n.activity=`第${s.id+1}小隊 · 跨欄起點精確就位`;
+    if(current.travel>70){releaseMemberSlot(s,n);s.done.add(n.id);}
    }else{
-    current.obstaclePhase='jump';current.jumpStart={...n.pos};current.obstacleTime=0;
-    n.angle=0;n.anim.setClip(current.motion,{restart:true});
+    current.obstaclePhase='jump';current.jumpStart={...goal};current.obstacleTime=0;
+    n.pos={...goal};n.angle=current.slot.angle;
+    n.renderLift=current.slot.lift||0;
+    n.route=null;n.routeGoal=null;n.routeIndex=0;
+    n.anim.setClip(current.motion,{restart:true});
     n.anim.transition=0;n.anim.prevClip=null;n.anim.clock=0;
-    poseSquadMember(n,[current.motion]);
-    n.activity=`第${s.id+1}小隊 · 起跑跨欄`;n.state='training';
+    poseSquadMember(n,[current.motion],current.slot.speed||1);
+    n.activity=`第${s.id+1}小隊 · 第${current.obstacleReps+1}次起跑跨欄`;
+    n.state='training';
    }
    continue;
   }
   const goal=current.motionPose?.pos||current.slot.pos;
   const near=dist(n.pos,goal);
-  if(near>(stage.id==='grenade'?.12:.65)){
-   if(stage.id==='grenade'&&near<.9)settleSquadTrainingSpot(n,goal,dt);
+  if(near>(stage.id==='grenade'||stage.id==='pullup'?.12:.65)){
+   if((stage.id==='grenade'||stage.id==='pullup')&&near<.9)settleSquadTrainingSpot(n,goal,dt);
    else moveSquadMember(n,goal,dt,false);
    n.activity=`第${s.id+1}小隊 · 就位${stage.name}`;
    if(current.travel>(stage.id==='grenade'?23:35)){
@@ -401,13 +490,13 @@ function trainSquad(s,dt,now,all,playerPos){
     }
    continue;
   }
-  if(stage.id==='grenade'||stage.id==='weed')settleSquadTrainingSpot(n,goal,dt);
+  if(stage.id==='grenade'||stage.id==='pullup')settleSquadTrainingSpot(n,goal,dt);
   trainPose(n,stage,dt,now,current);
   current.elapsed+=dt;
   if(current.elapsed>=stage.duration){releaseMemberSlot(s,n);s.done.add(n.id);}
  }
  if(s.done.size===5){releaseStage(s);setStage(s);}
- else if(s.elapsed>(stage.id==='grenade'?67:100)){ // Never leave a platoon queuing forever.
+ else if(s.elapsed>(stage.id==='grenade'?67:stage.id==='obstacle'?145:100)){ // Never leave a platoon queuing forever.
   releaseStage(s);setStage(s);
  }
 }

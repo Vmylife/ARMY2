@@ -3,7 +3,7 @@ import {CampBuildings,BUILDING_MODELS} from './buildings/buildingRenderer.js?v=1
 import {CampProps,PROP_MODELS} from './props/propRenderer.js?v=120';
 import {loadGlb} from './core/glb111.js?v=111';
 import {ArmyRenderer} from './core/renderer.js?v=116';
-import {RigAnimator} from './characters/rigAnimator.js?v=119';
+import {RigAnimator} from './characters/rigAnimator.js?v=121';
 import {TwoHandBroomRenderer} from './characters/twoHandBroomRenderer119.js?v=119';
 import {RifleRenderer} from './training/rifleRenderer.js?v=117';
 import {createRangeAudio} from './training/rangeTraining.js?v=111';
@@ -14,7 +14,7 @@ import {drawMinimap} from './ui/minimap.js?v=093';
 import {initWorldMap} from './ui/worldMap.js?v=093';
 import {setupInput} from './ui/input.js?v=062';
 import {options} from './systems/settings.js?v=060';
-import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=120';
+import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=121';
 
 const $=id=>document.getElementById(id);
 const debug=new URLSearchParams(location.search).has('debug');
@@ -103,6 +103,7 @@ async function boot(){
   progress('模型完成，正在準備第一個畫面…');
 
   step='建立主角骨架';const player={pos:{...CAMP.spawn},angle:0,anim:new RigAnimator(heroGlb)};
+  delete player.anim.clips.Jump_Over_Obstacle_2;
   player.anim.setClip('Idle');player.anim.evaluate(0);
   const npcs=createCampNPCs(npcGlb);
   progress('30 名 NPC：4 支小隊＋10 名自由活動士兵已就位…');
@@ -174,7 +175,7 @@ async function boot(){
       if(b.activity.textContent!==label)b.activity.textContent=label;
       b.root.classList.toggle('npc-paired',Boolean(npc.task?.group));
       b.root.classList.toggle('npc-placeholder',Boolean(npc.task&&[
-        'basketball','pullup','dining','wash',
+        'basketball','dining','wash',
         'sentry','basketballCoach','grenade'].includes(npc.task.type)));
       b.root.style.transform=`translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-100%)`;
     }

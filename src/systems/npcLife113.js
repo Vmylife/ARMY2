@@ -4,11 +4,12 @@
 // No generative API, remote services, or new meshes are required by the brains.
 import {RigAnimator} from '../characters/rigAnimator.js?v=119';
 import {installArmyProceduralActions,ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
+import {installSimplePullupPreview,SIMPLE_PULLUP} from '../animation-lab/simplePullup120.js?v=121';
 import {updateRangeShooter} from '../training/rangeTraining.js?v=111';
 import {canOccupy,moveNpc,moveWithCollision,staticClearance,NPC_RADIUS,PLAYER_RADIUS} from '../map/navCollision109.js?v=109';
 import {PROPS,ROADS,BUILDINGS} from '../map/camp.js?v=093';
 import {chooseGrenadeMotion,calibratedGrenadePose,GRENADE_MOTIONS} from '../training/grenadeCalibration112.js?v=125';
-import {SAVED_ACTION_CALIBRATIONS,fixtureActorPose} from '../characters/fixturePose115.js?v=127';
+import {SAVED_ACTION_CALIBRATIONS,fixtureActorPose} from '../characters/fixturePose115.js?v=121';
 
 const TAU=Math.PI*2;
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
@@ -18,11 +19,12 @@ const rand=(a,b)=>a+Math.random()*(b-a);
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const HEADS=['阿宏','阿明','阿杰','小林','阿偉','小陳','阿國','阿正','大雄','小張','阿哲','阿凱','阿軒','阿智',
  '阿豪','阿倫','小蔡','阿翔','阿廷','阿仁','小吳','阿勇','阿翔哥','小黃','阿彬','小陸','阿良','阿昇','小謝','阿達'];
-const ANIM_LOOPS=new Set(['Stand_and_Chat','Sit_Cross_Legged_on_Floor','Chair_Sit_Idle_M','Sit_and_Doze_Off','Pull_Radish',ARMY_PULLUP,ARMY_SWEEP,'Sweeping_Both_Hands',...GRENADE_MOTIONS]);
+const ANIM_LOOPS=new Set(['Stand_and_Chat','Sit_Cross_Legged_on_Floor','Chair_Sit_Idle_M','Sit_and_Doze_Off','Pull_Radish',SIMPLE_PULLUP,ARMY_PULLUP,ARMY_SWEEP,'Sweeping_Both_Hands',...GRENADE_MOTIONS]);
 const CALIBRATION={
  chair:SAVED_ACTION_CALIBRATIONS['Chair_Sit_Idle_M@@chair'],
  doze:SAVED_ACTION_CALIBRATIONS['Sit_and_Doze_Off@@chair'],
- weed:SAVED_ACTION_CALIBRATIONS['Pull_Radish@@weed']
+ weed:SAVED_ACTION_CALIBRATIONS['Pull_Radish@@weed'],
+ pullup:SAVED_ACTION_CALIBRATIONS['Army_Pullup_Simple@@pullup']
 };
 const NAV={xMin:-46,xMax:45,zMin:-35,zMax:37,step:1.0};
 const NX=Math.floor((NAV.xMax-NAV.xMin)/NAV.step)+1,NZ=Math.floor((NAV.zMax-NAV.zMin)/NAV.step)+1,N=NX*NZ;
@@ -162,7 +164,10 @@ function fixtureInit(){
   }
  }
  for(const [j,x] of [2.1,5.5,8.9,12.3,15.7,19.1].entries())SHOOT.push({key:`shoot-${j}`,pos:W(x,16.85),angle:0});
- for(const [j,p] of PROPS.filter(p=>p.type==='pullup').entries())PULLUPS.push({key:`pullup-${j}`,pos:W(p.x,p.z+1.5),angle:Math.PI});
+ for(const [j,p] of PROPS.filter(p=>p.type==='pullup').entries()){
+  const mark=fixtureActorPose(p,CALIBRATION.pullup);
+  if(mark)PULLUPS.push({key:`pullup-${j}`,pos:mark.pos,angle:mark.angle,lift:mark.lift,fixture:p});
+ }
  for(const [j,p] of PROPS.filter(p=>p.type==='grenadeCrate').sort((a,b)=>b.z-a.z).entries()) {
   // Facility center and rotation are authoritative. A neutral approach point
   // gets the recruit near the box; the selected clip calculates its EXACT
@@ -176,7 +181,7 @@ const A={
  jog:{label:'操場跑步',base:1.5,tags:['active'],speed:2.02},
  walk:{label:'結伴散步',base:1.2,tags:['social']},
  basketball:{label:'打籃球',base:1.1,tags:['active'],placeholder:true},
- pullup:{label:'拉單槓',base:1.2,tags:['active'],placeholder:true},
+ pullup:{label:'拉單槓',base:1.2,tags:['active']},
  shoot:{label:'靶場打靶',base:1.35,tags:['training']},
  grenade:{label:'手榴彈投擲',base:1.0,tags:['training'],placeholder:true},
  pushup:{label:'伏地挺身',base:1.4,tags:['active']},
@@ -214,13 +219,13 @@ const STATIC={
  assembly:[W(12.7,-8.3),W(14.7,-8.3),W(16.7,-8.3),W(18.7,-8.3)],
  basketballCoach:[W(-33.1,25.7),W(-39,25.7)],
 };
-const NEED_ANIM={bench:['Chair_Sit_Idle_M'],doze:['Sit_and_Doze_Off','Chair_Sit_Idle_M'],floor:['Sit_Cross_Legged_on_Floor'],weed:['Pull_Radish'],pushup:['push_up'],situp:['situps'],chat:['Stand_and_Chat'],greet:['Stand_and_Chat'],pullup:[ARMY_PULLUP,'Climb_Up_Rope','Idle'],sweep:['Sweeping_Both_Hands',ARMY_SWEEP,'Idle']};
+const NEED_ANIM={bench:['Chair_Sit_Idle_M'],doze:['Sit_and_Doze_Off','Chair_Sit_Idle_M'],floor:['Sit_Cross_Legged_on_Floor'],weed:['Pull_Radish'],pushup:['push_up'],situp:['situps'],chat:['Stand_and_Chat'],greet:['Stand_and_Chat'],pullup:[SIMPLE_PULLUP,'Idle'],sweep:['Sweeping_Both_Hands',ARMY_SWEEP,'Idle']};
 function pose(n,names=['Idle'],rate=1){
  let clip='Idle';for(const c of names){if(n.anim.hasClip(c)){clip=c;break;}}
  if(n.anim.clip!==clip)n.anim.setClip(clip);
  n.anim.speed=rate;
  // Per-animation height offsets from the latest animation-lab calibration.
- n.renderLift=clip==='Chair_Sit_Idle_M'?CALIBRATION.chair.y:clip==='Sit_and_Doze_Off'?CALIBRATION.doze.y:clip==='Pull_Radish'?CALIBRATION.weed.y:0;
+ n.renderLift=clip==='Chair_Sit_Idle_M'?CALIBRATION.chair.y:clip==='Sit_and_Doze_Off'?CALIBRATION.doze.y:clip==='Pull_Radish'?CALIBRATION.weed.y:clip===SIMPLE_PULLUP?CALIBRATION.pullup.y:0;
  const dur=n.anim.clips[clip]?.duration;
  if(ANIM_LOOPS.has(clip)&&dur>0&&n.anim.clock>dur)n.anim.clock%=dur;
 }
@@ -406,20 +411,20 @@ function perform(n,dt,now){
  }else {n.state='action';n.activity=A[kind].label;}
  pose(n,kind==='grenade'?(task.grenadeMotion?[task.grenadeMotion]:['Idle']):(NEED_ANIM[kind]||['Idle']),task.grenadePose?.speed||1);
  if(kind==='grenade')n.renderLift=task.grenadePose?.lift||0;
- if(kind==='weed'||kind==='sentry')n.renderLift=task.actionLift||0;
+ if(kind==='weed'||kind==='sentry'||kind==='pullup')n.renderLift=task.actionLift||0;
  if(kind==='chat'||kind==='greet'){
   const p=task.joined;if(p){face(n,p.pos.x-n.pos.x,p.pos.z-n.pos.z,dt);}
  }else if(kind==='grenade'&&task.grenadePose){
   // Lab-confirmed heading is clip-specific. Do not override it with a generic
   // 'face the field' calculation, or the crouch clip turns the wrong way.
   n.angle=task.grenadePose.angle;
- }else if((kind==='weed'||kind==='sentry')&&Number.isFinite(task.angle)){
+ }else if((kind==='weed'||kind==='sentry'||kind==='pullup')&&Number.isFinite(task.angle)){
   n.angle=task.angle; // Precisely face the calibrated plant / guardhouse.
  }else if(Number.isFinite(task.angle)&&kind!=='bench'&&kind!=='doze'){
   const dx=Math.sin(task.angle),dz=Math.cos(task.angle);face(n,dx,dz,dt);
  }
  else if(kind==='basketball')face(n,-1,0,dt);
- else if(kind==='pullup')face(n,0,-1,dt);
+ // Pull-up heading comes from the calibrated fixture pose, never an arbitrary facing.
 }
 function endTask(n){
  const last=n.task?.type||'';if(last){n.lastType=last;n.history[last]=(n.history[last]||0)+1;}
@@ -497,7 +502,8 @@ export function createCampNPCs(glb){
  navInit();fixtureInit();
  // Parsing 18 GLB animation clips 14 times wastes CPU and memory on mobile.
  // Share immutable clip data while giving each recruit its own bones and clock.
- const prototype=installArmyProceduralActions(new RigAnimator(glb));
+ const prototype=installSimplePullupPreview(installArmyProceduralActions(new RigAnimator(glb)));
+ delete prototype.clips.Jump_Over_Obstacle_2; // Retired runtime animation; source GLB unchanged.
  const makeAnimator=()=>{
    const anim=Object.assign(Object.create(Object.getPrototypeOf(prototype)),prototype);
    anim.bones=new Float32Array(prototype.bones.length);
@@ -568,7 +574,7 @@ export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
       // Don't walk in place forever against a bench or the next recruit.
       closeGroup(n,npcs);endTask(n);n.cooldown=4;continue;
     }
-    const aligned=(task.type==='grenade'||task.type==='weed'||task.type==='sentry')&&d(n.pos,desired)<.9
+    const aligned=(task.type==='grenade'||task.type==='weed'||task.type==='sentry'||task.type==='pullup')&&d(n.pos,desired)<.9
       ?settleTrainingSpot(n,desired,dt):arrived;
     // The shared journey ends when the leader reaches the destination; the
     // follower first needs to be close, not at the exact same point.
@@ -577,7 +583,7 @@ export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
     // only near the chair itself, not just close to A*'s adjusted goal.
     const closeToSeat=d(n.pos,task.approach||task.goal)<.80;
     const atDestination=seatedTask ? closeToSeat
-      : (task.type==='weed'||task.type==='sentry') ? d(n.pos,task.goal)<.18
+      : (task.type==='weed'||task.type==='sentry'||task.type==='pullup') ? d(n.pos,task.goal)<.18
       : task.type==='walk'&&task.joined&&n.id>task.joined.id
         ? task.joined.task?.phase==='do'&&d(n.pos,task.joined.pos)<1.8 : arrived;
     if(atDestination){
