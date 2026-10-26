@@ -4,8 +4,8 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=125';
-import {canOccupy,moveNpc} from '../map/navCollision109.js?v=109';
+ faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=126';
+import {canOccupy,moveNpc,moveWithCollision} from '../map/navCollision109.js?v=109';
 import {PROPS} from '../map/camp.js?v=093';
 import {ARMY_PULLUP,ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
 import {chooseGrenadeMotion,calibratedGrenadePose} from '../training/grenadeCalibration112.js?v=125';
@@ -20,7 +20,7 @@ const STAGES=[
   points:[W(12.2,-6.9),W(15.3,-6.9),W(18.4,-6.9),W(13.75,-10.1),W(16.85,-10.1)],clip:['push_up','Idle']},
  {id:'pullup',name:'拉單槓',rally:W(19,-12.6),duration:10,limited:true,clip:[ARMY_PULLUP,'Climb_Up_Rope','Idle']},
  {id:'shoot',name:'靶場打靶',rally:W(10.7,14.3),duration:11,limited:true,clip:['Idle']},
- {id:'grenade',name:'手榴彈投擲',rally:W(-29.2,-23.1),duration:9,limited:true,clip:['Idle']},
+ {id:'grenade',name:'手榴彈投擲',rally:W(-37.4,-29.3),duration:9,limited:true,clip:['Idle']},
  {id:'obstacle',name:'障礙訓練',rally:W(9,7.2),duration:12,
   // Five exact hurdle fixtures from the latest editor layout. Approaching
   // slightly from the southern side leaves room for the jump animation.
@@ -35,14 +35,29 @@ const FORM=[{back:0,side:0},{back:1.48,side:-.65},{back:1.48,side:.65},{back:2.9
 const GROUPS=[];
 const FREE_IDS=new Set([0,3,7,8,11,12,19,23,26,29]);
 const WAIT_DISTANCE=7.0;
+const STATION_COOLDOWN={grenade:0};
+let CAMP_T=0;
 function setIdle(n,label){poseSquadMember(n,['Idle']);n.activity=label;n.state='squad';n.anim.rifleAim=0;n.home.job='life';}
 function releaseMemberSlot(s,n){const cur=s.active.get(n.id);if(cur?.slot?.key)releaseSquadSlot(cur.slot,cur.token);s.active.delete(n.id);n.anim.rifleAim=0;n.home.job='life';n.grenadeMotion=null;n.grenadeMotionUntil=0;n.renderLift=0;}
-function releaseStage(s){for(const n of s.members)releaseMemberSlot(s,n);if(s.stage)releaseSquadStation(s.stage.id,s.id);s.stage=null;s.active.clear();s.done.clear();}
+function releaseStage(s){
+ const departingGrenade=s.stage?.id==='grenade';
+ for(const n of s.members)releaseMemberSlot(s,n);
+ if(s.stage){
+  releaseSquadStation(s.stage.id,s.id);
+  // The same grenade field must get time to clear before another 5-man squad enters.
+  if(s.stage.id==='grenade')STATION_COOLDOWN.grenade=CAMP_T+12;
+ }
+ s.stage=null;s.active.clear();s.done.clear();
+ // Explicit egress: squads leave the south-west queue area via the open
+ // north-west corridor before plotting the next training route.
+ if(departingGrenade){s.exitPoint=W(-36.2,-24.0);s.exitStall=0;}
+}
 function setStage(s){
  // Start with the next item. If another squad is already in that station,
  // take another item rather than crowding the equipment or waiting forever.
  for(let skip=0;skip<STAGES.length;skip++){
   const index=(s.nextIndex+skip)%STAGES.length,stage=STAGES[index];
+  if(stage.id==='grenade'&&CAMP_T<STATION_COOLDOWN.grenade)continue;
   if(!claimSquadStation(stage.id,s.id))continue;
   s.stage=stage;s.index=index;s.nextIndex=(index+1)%STAGES.length;
   s.phase='march';s.elapsed=0;s.blocked=0;s.runIndex=0;s.runTimer=0;
@@ -111,20 +126,46 @@ function march(s,dt,all,playerPos){
  const leader=s.leader;
  const farthest=Math.max(...s.members.slice(1).map(n=>dist(n.pos,leader.pos)));
  const halt=farthest>WAIT_DISTANCE;
- if(!halt){moveSquadMember(leader,s.goal,dt,false);recordTrail(s);}
+ if(!halt||s.exitPoint&&s.elapsed>4){
+  const point=s.exitPoint||s.goal;
+  const before={...leader.pos};
+  moveSquadMember(leader,point,dt,false);
+  if(s.exitPoint){
+   // The five-person group can otherwise deadlock each other beside the fence.
+   // As a last-resort EGRESS ONLY, bypass actor-actor steering, but still obey
+   // static buildings, walls and the camp perimeter. Never teleport the squad.
+   s.exitStall=dist(before,leader.pos)<.014?(s.exitStall||0)+dt:0;
+   if(s.exitStall>1.25){
+    const dx=point.x-leader.pos.x,dz=point.z-leader.pos.z,len=Math.hypot(dx,dz);
+    if(len>.10){const previous={...leader.pos};
+     const next=moveWithCollision(previous,dx/len*Math.min(len,dt*.95),dz/len*Math.min(len,dt*.95),.33);
+     if(dist(previous,next)>.001){leader.pos=next;faceSquadMember(leader,next.x-previous.x,next.z-previous.z,dt);s.exitStall=0;leader.route=null;}
+    }
+   }
+  }
+  recordTrail(s);
+  if(s.exitPoint&&dist(leader.pos,s.exitPoint)<1.45){
+   s.exitPoint=null;leader.route=null;leader.routeGoal=null;leader.routeIndex=0;
+  }
+ }
  else setIdle(leader,`第${s.id+1}小隊 · 等候隊員`);
  for(let i=1;i<5;i++)follow(s,s.members[i],i,dt,all,playerPos);
  leader.activity=`第${s.id+1}小隊 · 前往${s.stage.name}`;
  // Proceed once the leader reaches the muster point and most of the team is
  // nearby. Delayed recruits will catch up while approaching individual slots.
  const close=s.members.filter(n=>dist(n.pos,s.goal)<6.5).length;
- if(dist(leader.pos,s.goal)<1.3&&close>=4){s.phase='train';s.elapsed=0;s.done.clear();s.active.clear();}
+ if(!s.exitPoint&&dist(leader.pos,s.goal)<1.3&&close>=4){s.phase='train';s.elapsed=0;s.done.clear();s.active.clear();}
  else if(s.elapsed>85||leader.retries>9){releaseStage(s);setStage(s);}
 }
 function queuePoint(stage,index){
  // Grenade stand-by area is east of the throwing lanes (blue marked region).
  if(stage.id==='grenade') {
-  const q=W(-31.0+(index%2)*1.10,-25.1-Math.floor(index/2)*1.45);
+  // The red-circled area is south-west of the throwers, INSIDE the fence.
+  // These 5 distinct marks serve BOTH queueing and post-training assembly.
+  // Do not wait behind the sandbags, on the grenade crates, or downrange.
+  const marks=[W(-38.8,-29.4),W(-37.4,-29.4),W(-36.0,-29.4),
+               W(-38.2,-30.8),W(-36.8,-30.8)];
+  const q=marks[index%marks.length];
   return squadWorldGoal(q)||q;
  }
  const offset=(index-2)*1.15;
@@ -256,7 +297,10 @@ function trainSquad(s,dt,now,all,playerPos){
    if(stage.id==='grenade'&&near<.9)settleSquadTrainingSpot(n,goal,dt);
    else moveSquadMember(n,goal,dt,false);
    n.activity=`第${s.id+1}小隊 · 就位${stage.name}`;
-   if(current.travel>35){releaseMemberSlot(s,n);s.done.add(n.id);}
+   if(current.travel>(stage.id==='grenade'?23:35)){
+     // A blocked mark cannot trap 5 recruits: release reservation and regroup.
+     releaseMemberSlot(s,n);s.done.add(n.id);
+    }
    continue;
   }
   if(stage.id==='grenade')settleSquadTrainingSpot(n,goal,dt);
@@ -265,11 +309,12 @@ function trainSquad(s,dt,now,all,playerPos){
   if(current.elapsed>=stage.duration){releaseMemberSlot(s,n);s.done.add(n.id);}
  }
  if(s.done.size===5){releaseStage(s);setStage(s);}
- else if(s.elapsed>100){ // A jammed fixture must not freeze the whole squad.
+ else if(s.elapsed>(stage.id==='grenade'?67:100)){ // Never leave a platoon queuing forever.
   releaseStage(s);setStage(s);
  }
 }
 export function createCampNPCs(glb){
+ CAMP_T=0;STATION_COOLDOWN.grenade=0;
  const npcs=createRecruits(glb);
  if(npcs.length!==30)throw new Error('小隊配置需要 30 名 NPC');
  GROUPS.length=0;
@@ -310,6 +355,7 @@ export function updateCampNPCs(npcs,dt,now,playerPos){
  // Only 10 free recruits use the utility/social AI; it still avoids ALL 30 bodies.
  updateIndividuals(npcs.filter(n=>FREE_IDS.has(n.id)),dt,now,playerPos,npcs);
  dt=clamp(dt,0,.05);
+ CAMP_T+=dt;
  for(const s of GROUPS){
   s.elapsed+=dt;
   for(const n of s.members)n.clock+=dt;

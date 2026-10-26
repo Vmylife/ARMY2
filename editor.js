@@ -1,6 +1,6 @@
 // Army independent scene editor v0.10.3 (root-level deployment fix).
 // Uses the current camp geometry and GLB renderers; does not load the gameplay loop.
-import './src/map/activeCampLayout116.js?v=120';
+import './src/map/activeCampLayout116.js?v=126';
 import './src/lighting96.js?v=096';
 import {BUILDINGS as modelBuildings,PROPS as modelProps} from './src/map/camp.js?v=092';
 import {BUILDINGS as gameBuildings,PROPS as gameProps,FEATURES as gameFeatures} from './src/map/camp.js?v=093';
@@ -15,7 +15,7 @@ const round=(n,places=3)=>Number(n.toFixed(places));
 const rad=d=>d*Math.PI/180,deg=r=>r*180/Math.PI;
 const copy=value=>JSON.parse(JSON.stringify(value));
 // New baseline: don't auto-restore incompatible/old editor snapshots. They remain available for manual import.
-const storageKey='army-scene-editor-v0113-v120';
+const storageKey='army-scene-editor-v0116-v126';
 // Older localStorage drafts are deliberately left untouched; import saved JSON when needed.
 const names={weed:'雜草',streetlamp:'路燈',treeA:'樹木 A',treeB:'樹木 B',sandbag:'沙包',target:'靶子',crate:'木箱',barrel:'油桶',bench:'長椅',signboard:'標示牌',hurdle:'跨欄',pullup:'單槓',flagpole:'旗桿',podium:'司令台',fence:'圍欄',basketballHoop:'籃框',grenadeCrate:'手榴彈箱'};
 // Weed is now a normal, deployable main-game prop and is loaded by PROP_MODELS.
@@ -225,7 +225,7 @@ function select(item,{focus=false}={}){
  if(focus&&item){pivot={x:item.state.x,z:item.state.z};zoom=clamp(item.kind==='building'?25:15,8,95);}
 }
 function exportLayout(){
- const result={format:'army-camp-layout',schemaVersion:2,baseVersion:'v0.11.6',editorVersion:'v0.11.6',exportedAt:new Date().toISOString(),
+ const result={format:'army-camp-layout',schemaVersion:2,baseVersion:'v0.11.6',editorVersion:'v0.11.16',exportedAt:new Date().toISOString(),
   note:'This is an editable preview snapshot; apply building collision, features, static shadows and other derived positions during integration.',
   changedCount:changedCount(),deletedOriginals:originalDescriptors.filter(d=>!byKey.has(d.key)).map(d=>({key:d.key,kind:d.kind,id:d.kind==='building'?d.base.id:null,type:d.type??null,label:d.label,index:d.index})),
   items:sceneSnapshot().objects,scene:sceneSnapshot(),

@@ -125,8 +125,19 @@ function fixtureInit(){
   // Same relative transform as the Animation Lab, including possible yaw calibration.
   const seat=fixtureActorPose(p,CALIBRATION.chair),doze=fixtureActorPose(p,CALIBRATION.doze);
   const key=`bench-${i}`;
-  SEATS.push({key,pos:seat.pos,angle:seat.angle,benchIndex:i});
-  DOZE_SEATS.push({key,pos:doze.pos,angle:doze.angle,benchIndex:i});
+  // Approach the bench from its open/front side first. The exact sitting
+  // position is intentionally INSIDE the bench collision envelope, so A*
+  // must never be asked to walk to it directly. The final step is a snap.
+  const approach=(cal)=>{
+   for(const extra of [1.10,.82,1.48,-1.18]){
+    const c={...cal,z:cal.z+extra};
+    const v=fixtureActorPose(p,c).pos;
+    if(canStand(v.x,v.z))return v;
+   }
+   return fixtureActorPose(p,{...cal,z:cal.z+1.30}).pos;
+  };
+  SEATS.push({key,pos:seat.pos,angle:seat.angle,approach:approach(CALIBRATION.chair),benchIndex:i});
+  DOZE_SEATS.push({key,pos:doze.pos,angle:doze.angle,approach:approach(CALIBRATION.doze),benchIndex:i});
  }
  for(const [j,x] of [2.1,5.5,8.9,12.3,15.7,19.1].entries())SHOOT.push({key:`shoot-${j}`,pos:W(x,16.85),angle:0});
  for(const [j,p] of PROPS.filter(p=>p.type==='pullup').entries())PULLUPS.push({key:`pullup-${j}`,pos:W(p.x,p.z+1.5),angle:Math.PI});
@@ -241,7 +252,7 @@ function selectSpot(n,type,requiredKey=null){
  if(data){const available=data.filter(s=>!SLOTS[s.key]||SLOTS[s.key]===n.id);
   if(!available.length)return null;
   const s=requiredKey?available.find(x=>x.key===requiredKey):pick(available);
-  if(!s)return null;return {pos:{...s.pos},key:s.key,angle:s.angle,fixture:s.fixture};
+  if(!s)return null;return {pos:{...s.pos},key:s.key,angle:s.angle,fixture:s.fixture,approach:s.approach};
  }
  const locations=STATIC[type] || [W(n.pos.x,n.pos.z)];
  const shuffled=[...locations].sort(()=>Math.random()-.5);
@@ -265,7 +276,8 @@ function begin(n,type,settings={}){
  const grenadePose=type==='grenade'?calibratedGrenadePose(s,grenadeMotion):null;
  const goal=grenadePose?.pos||s.pos;
  const dur=settings.duration||rand(type==='jog'?24:11,type==='jog'?43:26);
- n.task={type,goal,angle:grenadePose?.angle??s.angle,grenadeMotion,grenadePose,
+ n.task={type,goal,approach:(type==='bench'||type==='doze')?s.approach:null,
+   angle:grenadePose?.angle??s.angle,grenadeMotion,grenadePose,
    phase:type==='walk'?'do':'go',remaining:dur,joined:settings.joined||null,group:settings.group||null,walkPause:0,walkStep:0};
  n.state='pause';n.renderLift=0;
  n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;n.activity=`前往${A[type].label}`;n.home.job='life';n.anim.rifleAim=0;n.decisionAfter=rand(1.5,3);
@@ -509,7 +521,7 @@ export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
     n.activity=`前往${A[task.type].label}`;
     // For a paired walk, one recruit follows on the leader's side rather than
     // independently marching across the whole map to an unrelated waypoint.
-    let desired=task.goal;
+    let desired=task.approach||task.goal;
     if(task.type==='walk'&&task.joined&&n.id>task.joined.id&&
        task.joined.task?.group===task.group&&d(n.pos,task.joined.pos)<5.5){
       const leader=task.joined;
@@ -517,7 +529,19 @@ export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
       const alongside=W(leader.pos.x+lateral.x,leader.pos.z+lateral.z);
       if(canStand(alongside.x,alongside.z))desired=alongside;
     }
+    const distanceBefore=d(n.pos,desired);
     const arrived=to(n,desired,dt,task.type==='jog');
+    if(task.type==='bench'||task.type==='doze'){
+      // A* may keep toggling Walking while stuck in a row of seats.
+      // Check actual progress instead of trusting the walk animation.
+      if(d(n.pos,desired)<distanceBefore-.008)task.seatStall=0;
+      else task.seatStall=(task.seatStall||0)+dt;
+      if(task.seatStall>3.6){closeGroup(n,npcs);endTask(n);n.cooldown=4;continue;}
+    }
+    if((task.type==='bench'||task.type==='doze')&&task.travel>6&&n.retries>=2){
+      // Don't walk in place forever against a bench or the next recruit.
+      closeGroup(n,npcs);endTask(n);n.cooldown=4;continue;
+    }
     const aligned=task.type==='grenade'&&d(n.pos,desired)<.9
       ?settleTrainingSpot(n,desired,dt):arrived;
     // The shared journey ends when the leader reaches the destination; the
@@ -525,7 +549,7 @@ export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
     const seatedTask=task.type==='bench'||task.type==='doze';
     // Allow a reserved seat to be approached with ordinary navigation. Finish
     // only near the chair itself, not just close to A*'s adjusted goal.
-    const closeToSeat=d(n.pos,task.goal)<.72;
+    const closeToSeat=d(n.pos,task.approach||task.goal)<.80;
     const atDestination=seatedTask ? closeToSeat
       : task.type==='walk'&&task.joined&&n.id>task.joined.id
         ? task.joined.task?.phase==='do'&&d(n.pos,task.joined.pos)<1.8 : arrived;
@@ -537,7 +561,10 @@ export function updateCampNPCs(npcs,dt,now,playerPos=null,allColliders=npcs){
       }
       task.phase='do';n.route=null;n.routeGoal=null;n.retries=0;
       if(task.type==='jog')n.loopAngle=Math.atan2((n.pos.z+2.2)/8.2,(n.pos.x+21.5)/5.6);
-    }else if(n.retries>=4||task.travel>45){closeGroup(n,npcs);endTask(n);n.cooldown=.5;}
+    }else if(n.retries>=4||task.travel>((task.type==='bench'||task.type==='doze')?22:45)){
+      // Release the seat lock promptly if its approach is genuinely blocked.
+      closeGroup(n,npcs);endTask(n);n.cooldown=2;
+    }
   }else{
     perform(n,dt,now);
     if(task.remaining<=0){closeGroup(n,npcs);endTask(n);}

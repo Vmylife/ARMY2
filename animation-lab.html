@@ -10,7 +10,7 @@
 <body>
 <div class="app">
   <header class="topbar">
-    <div><div class="eyebrow">ARMY · ANIMATION LAB</div><h1>3D 動畫測試器 <span>v0.3</span></h1></div>
+    <div><div class="eyebrow">ARMY · ANIMATION LAB</div><h1>3D 動畫測試器 <span>v0.3.1</span></h1></div>
     <div class="head-actions"><a href="./index.html">返回軍營</a><button id="resetAll" class="light" type="button" title="只重設本測試器的校正資料">重設設定</button></div>
   </header>
   <main>
@@ -22,7 +22,7 @@
     <aside class="panel">
       <div class="panel-head"><h2>動畫與道具控制</h2><p>選擇動畫 → 選道具 → 播放 → 微調站位 → 匯出校正數值</p></div>
       <div class="section"><label for="clip">要測試的動畫</label><select id="clip" disabled><option>模型載入中…</option></select><p class="hint" id="clipHint">目前會使用你提供的完整 18 組動畫模型，沒有動畫的動作暫不會偽裝成已完成。</p></div>
-      <div class="section"><label for="anchor">靠近哪個設施測試</label><select id="anchor"><option value="chair">椅子</option><option value="pullup">單槓</option><option value="grenade">手榴彈投擲箱</option><option value="hurdle">跨欄</option><option value="ground">空地</option></select><p class="hint">四樣實際道具都保留在場景中；切換這個選項只會讓鏡頭和士兵靠近目標。</p></div>
+      <div class="section"><label for="anchor">靠近哪個設施測試</label><select id="anchor"><option value="chair">椅子</option><option value="pullup">單槓</option><option value="grenade">手榴彈投擲箱</option><option value="hurdle">跨欄</option><option value="guard">哨口建築</option><option value="weed">雜草</option><option value="ground">空地</option></select><p class="hint">六樣實際道具都保留在場景中；切換這個選項只會讓鏡頭和士兵靠近目標。</p></div>
       <div class="section transport"><button id="play" class="primary" disabled>▶ 播放</button><button id="pause" disabled>暫停</button><button id="restart" disabled>重播</button><label class="check"><input id="loop" type="checkbox" checked> 循環播放</label><div class="track"><input id="timeline" type="range" min="0" max="1000" value="0" step="1" disabled><span id="timeLabel">0.00 / 0.00 秒</span></div></div>
       <div class="section"><h3>站位校正（相對於設施）</h3><div class="slider" data-key="x"><label>左右偏移 X <output id="xVal"></output></label><input id="x" type="range" min="-2.5" max="2.5" step="0.02" value="0"></div><div class="slider" data-key="z"><label>前後偏移 Z <output id="zVal"></output></label><input id="z" type="range" min="-2.5" max="2.5" step="0.02" value="0"></div><div class="slider" data-key="y"><label>高度偏移 Y <output id="yVal"></output></label><input id="y" type="range" min="-1" max="1.5" step="0.01" value="0"></div><div class="slider" data-key="yaw"><label>角色朝向 <output id="yawVal"></output></label><input id="yaw" type="range" min="-180" max="180" step="1" value="0"></div><div class="slider" data-key="speed"><label>播放速度 <output id="speedVal"></output></label><input id="speed" type="range" min="0.2" max="2" step="0.05" value="1"></div><div class="buttons"><button id="resetPose">重設這個動作</button><button id="savePose" class="primary">儲存本動作校正</button></div><p class="hint" id="saveStatus">可分別儲存每個動畫／設施組合的偏移設定。</p></div>
       <div class="section"><h3>直接測試新 GLB 動畫</h3><p class="hint">之後有新的士兵動畫模型，可以直接在這裡選擇完整 GLB 檔預覽，不需要先修改主遊戲或上傳 GitHub。須為含網格、骨架及動畫的 GLB。</p><div class="buttons"><button id="loadModelBtn">選擇新士兵 GLB</button><button id="restoreModelBtn">還原內建動畫</button></div><input type="file" id="modelFile" accept=".glb,model/gltf-binary" hidden></div>
@@ -31,6 +31,6 @@
     </aside>
   </main>
 </div>
-<script type="module" src="./src/animation-lab/lab.js?v=125"></script>
+<script type="module" src="./src/animation-lab/lab.js?v=126"></script>
 </body>
 </html>
