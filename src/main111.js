@@ -138,43 +138,7 @@ async function boot(){
     ratio=>{if(!worldMap.isOpen()&&Number.isFinite(ratio)&&ratio>0)targetZoom=Math.max(minZoom,Math.min(maxZoom,targetZoom*ratio))}
   );
   let last=performance.now(),lastMap=0,lastDebug=0;
-  // NPC names follow head positions; hide activity descriptions for clean play.
-  // They are intentionally pointer-events:none so they never block the joystick.
-  const labelsLayer=document.createElement('div');
-  labelsLayer.id='npcLifeLabels';labelsLayer.setAttribute('aria-hidden','true');
-  document.body.appendChild(labelsLayer);
-  const badges=npcs.map(n=>{
-    const root=document.createElement('div');root.className='npc-life-label';
-    const name=document.createElement('span');name.className='npc-name';name.textContent=n.name;
-    root.append(name);labelsLayer.appendChild(root);
-    return {root};
-  });
-  let lastLabels=0;
-  function updateLifeLabels(now){
-    if(now-lastLabels<100)return;lastLabels=now;
-    const m=renderer.vp,bounds=renderer.canvas.getBoundingClientRect();
-    const midX=bounds.left+bounds.width/2,midY=bounds.top+bounds.height/2;
-    // 35 brains run continuously, but only the nearest 12 nameplates render on mobile.
-    // Otherwise 35 overlapping DOM labels can hide the soldier sprites.
-    const visible=npcs.map((npc,i)=>({i,dist:Math.hypot(npc.pos.x-player.pos.x,npc.pos.z-player.pos.z)}))
-      .filter(o=>o.dist<24&&renderer.isActorVisible(npcs[o.i].pos))
-      .sort((a,b)=>a.dist-b.dist).slice(0,12);
-    const show=new Set(visible.map(o=>o.i));
-    for(let i=0;i<npcs.length;i++){
-      const npc=npcs[i],b=badges[i];
-      if(!show.has(i)){b.root.hidden=true;continue;}
-      const x=npc.pos.x,y=1.9,z=npc.pos.z;
-      const w=m[3]*x+m[7]*y+m[11]*z+m[15];
-      const xx=m[0]*x+m[4]*y+m[8]*z+m[12];
-      const yy=m[1]*x+m[5]*y+m[9]*z+m[13];
-      if(w<=.05){b.root.hidden=true;continue;}
-      const sx=midX+(xx/w)*bounds.width*.5;
-      const sy=midY-(yy/w)*bounds.height*.5;
-      if(sx<12||sx>innerWidth-12||sy<15||sy>innerHeight-80){b.root.hidden=true;continue;}
-      b.root.hidden=false;
-      b.root.style.transform=`translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-100%)`;
-    }
-  }
+  // NPC names and action labels are intentionally not drawn above soldiers.
 
   let fpsFrames=0,fpsSince=last,measuredFps=0;
   let mapYaw=camYaw,mapFacing=Math.PI-player.angle+mapYaw;
@@ -222,7 +186,6 @@ async function boot(){
        if(npc.home.job==='shoot')rifleRenderer.draw(renderer.vp,npc,now);
       }
     }
-    updateLifeLabels(now);
     blanketPortal.update(player.pos,worldMap.isOpen());
     showNavDebug?.(renderer.vp,player.pos,npcs,now);
     mapFacing=Math.PI-player.angle+mapYaw;

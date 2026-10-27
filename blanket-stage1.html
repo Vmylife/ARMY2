@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
 <meta name="theme-color" content="#203229" />
-<title>豆腐干棉被｜第一到三階段：水火刷洗＋實體對折＋最後整理 v1.8</title>
+<title>報告長官！這不是豆腐乾｜v2.1 介面精簡</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f6f6e8;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -308,6 +308,14 @@ button{touch-action:manipulation;}
 @media(max-width:560px){.collection-panel{max-height:94dvh;padding:12px}.collection-preview{grid-template-columns:1fr;gap:7px;padding:8px}.collection-preview-art{min-height:116px;height:135px}.collection-preview-art svg{min-height:0}.collection-preview-meta{gap:3px}.collection-preview-title{font-size:18px}.collection-preview-desc{font-size:12px;line-height:1.4}.collection-preview-tip{font-size:10px}.collection-preview-rarity{font-size:11px;padding:3px 9px}.collection-tile{min-height:66px}.collection-grid{min-height:135px}}
 @media(max-height:680px){.home-content{min-height:auto;gap:7px}.home-hero svg{max-height:21dvh}.home-title{font-size:27px}.home-title span{font-size:29px}.home-action{min-height:50px;font-size:18px}.collection-preview-art{height:105px}.collection-preview{gap:4px}}
 
+
+/* v2.1 — clean three-stage UI, hide only redundant wording; preserve scoring internally. */
+#stageSubtitle{display:none!important}
+#stage1State{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important}
+#stage1State .next-stage{margin-top:0;min-height:58px;font-size:18px;border-radius:15px;box-shadow:0 5px 18px #04130a50}
+.stage2-buttons[hidden],.stage2-tip[hidden]{display:none!important}
+#stage2Controls.completed .stage2-extra{margin-top:0}
+
 </style>
 </head>
 <body>
@@ -547,7 +555,7 @@ button{touch-action:manipulation;}
  </div>
  <div class="stage2-controls" id="stage2Controls" hidden>
    <div class="stage2-tip" id="stage2Tip">白色線條只出現 1 秒，消失後用手指畫出來</div>
-   <div class="stage2-buttons">
+   <div class="stage2-buttons" id="stage2ActionButtons">
      <button class="redraw-btn" id="redrawBtn" type="button">重畫</button>
      <button class="fold-btn" id="foldBtn" type="button" disabled>開折</button>
    </div>
@@ -614,7 +622,6 @@ button{touch-action:manipulation;}
      <div class="summary-stat"><span>三次開折平均</span><strong id="summaryFolds">0 分</strong></div>
      <div class="summary-stat"><span>最後整理</span><strong id="summaryTidy">0 分</strong></div>
    </div>
-   <div class="summary-detail" id="summaryDetail"></div>
    <button id="collectionBtn" class="collection-link" type="button">📖 棉被圖鑑（100 / 100）</button>
    <button id="stage3RestartBtn" class="again-btn" type="button">再折一次！</button><button id="summaryHomeBtn" class="result-home-btn" type="button">返回首頁</button>
  </div>
@@ -636,7 +643,7 @@ button{touch-action:manipulation;}
    <div id="collectionGrid" class="collection-grid"></div>
    <button id="collectionClose" class="collection-close" type="button">返回結算</button>
  </div>
- <div class="state" id="stage1State" aria-live="polite"><div class="state-name"><span id="stateName">蓬鬆乾爽</span><span class="state-tag" id="stateTag">軍綠棉被</span></div><div class="state-desc" id="stateDesc">先灑水，再用手指把每個垃圾往床邊掃出去。濕太久還會發霉長香菇！</div><button id="nextStageBtn" class="next-stage" type="button">下一階段：記憶折線 <span aria-hidden="true">→</span></button></div>
+ <div class="state" id="stage1State"><button id="nextStageBtn" class="next-stage" type="button">下一階段：記憶折線 <span aria-hidden="true">→</span></button></div>
  <div class="controls" id="stage1Controls"><button id="waterBtn" class="tool water" type="button"><span>💧</span><div>灑水<small>長按持續加水</small></div></button><button id="fireBtn" class="tool fire" type="button"><span>🔥</span><div>打火機<small>長按烘乾 / 燒焦</small></div></button></div>
 </div>
   <svg id="memoryOverlay" viewBox="0 0 390 844" preserveAspectRatio="none" aria-label="全螢幕記憶折線畫布" hidden>
@@ -825,15 +832,7 @@ button{touch-action:manipulation;}
     return ['泡水長香菇','最濕','整張棉被濕爛到開始長菇！霉斑、香菇越來越多，快變成軍中菇菇農場。'];
   }
   function update(){
-    const m=moisture/100,b=burn/100, [name,tag,desc]=state();
-    $('stateName').textContent=name; $('stateTag').textContent=tag;
-    let fullDesc=desc;
-    if(!ash && dirt>6){
-      fullDesc += moisture>=38 ? ' 現在可以直接用手在棉被上來回猛刷，刷越久，髒亂度才會慢慢下降。' : ' 先灑水把棉被弄濕，才能開始刷洗。';
-    } else if(!ash){
-      fullDesc += ' 棉被已經刷得很乾淨了。';
-    }
-    $('stateDesc').textContent=fullDesc;
+    const m=moisture/100,b=burn/100;
     waterLabel.textContent=`${Math.round(moisture)}%`;burnLabel.textContent=`${Math.round(burn)}%`;dirtyLabel.textContent=`${Math.round(dirt)}%`;
     waterBar.style.width=`${moisture}%`;burnBar.style.width=`${burn}%`;dirtyBar.style.width=`${dirt}%`;
     let color=blend(dry,fresh,clamp(moisture/32,0,1));
@@ -1548,10 +1547,6 @@ button{touch-action:manipulation;}
     $('summaryTotal').textContent=String(total);
     $('summaryFolds').textContent=foldAvg+' 分';
     $('summaryTidy').textContent=tidyScore+' 分';
-    $('summaryDetail').textContent=
-      `三次開折：${roundScores.map((v,i)=>`第${i+1}折 ${v}分`).join('／')}。`+
-      `最後整理命中 ${Math.round(tidyLockedValue)} / 100。`+
-      `棉被狀態：含水量 ${Math.round(moisture)}%、焦化 ${Math.round(burn)}%、髒亂 ${Math.round(dirt)}%。`;
     resultBackdrop.hidden=false;resultBackdrop.classList.add('visible');
     stage3Summary.hidden=false;restartAnimation(stage3Summary,'show');
     mode='summary';vibrate([22,50,42]);impactSound('fold');
@@ -1865,21 +1860,16 @@ button{touch-action:manipulation;}
     restoreFoldState();
   }
   function showFinishStage2(){
-    const avg=Math.round(roundScores.reduce((a,b)=>a+b,0)/3);
     mode='done';lastDrawPointer=null;
     svgHide(memoryTarget,true);svgHide(memoryGhost,true);svgHide(memoryInk,true);
-    memorySplash.textContent='三折完成！';
-    roundLabel.textContent='三次開折完成';
-    memoryInstruction.textContent='按下最後整理，進入第三階段';
-    scoresMini.textContent=roundScores.map((v,i)=>`第${i+1}次 ${v}分`).join('　');
-    stage2Tip.textContent='棉被已經對折三次，現在可以進入最後整理。';
-    stage2Result.hidden=false;
-    stage2ResultTitle.textContent=`平均 ${avg} 分`;
-    stage2ResultSubtitle.textContent=roundScores.map((v,i)=>`第 ${i+1} 次 ${v} 分`).join('　');
-    redrawBtn.textContent='回第一階段';
-    redrawBtn.disabled=false;
+    memorySplash.textContent='';
+    $('stage2Info').hidden=true;
+    stage2Result.hidden=true;
+    stage2Tip.hidden=true;
+    redrawBtn.hidden=true;
     foldBtn.hidden=true;
-    finalTidyBtn.hidden=false; finalTidyBtn.disabled=false;
+    $('stage2Controls').classList.add('completed');$('stage2ActionButtons').hidden=true;
+    finalTidyBtn.hidden=false;finalTidyBtn.disabled=false;
   }
   function enterStage3(){
     stage=3; mode='tidy'; clearStageTimers(); setAction(null); scrubbing=false;
@@ -1900,7 +1890,8 @@ button{touch-action:manipulation;}
     targetPoints=buildOutline(round);
     memoryTarget.setAttribute('d',polyPath(targetPoints,true));
     svgHide(memoryTarget,false);svgHide(memoryGhost,true);svgHide(memoryInk,false);memoryInk.setAttribute('d','');
-    stage2Result.hidden=true; finalTidyBtn.hidden=true; foldBtn.hidden=false; redrawBtn.hidden=false; stage3Panel.hidden=true;
+    stage2Result.hidden=true;finalTidyBtn.hidden=true;foldBtn.hidden=false;redrawBtn.hidden=false;stage3Panel.hidden=true;
+    stage2Tip.hidden=false;$('stage2Info').hidden=false;$('stage2Controls').classList.remove('completed');$('stage2ActionButtons').hidden=false;
     memorySplash.textContent='記住這條白線！';
     roundLabel.textContent=`第 ${round+1} / 3 題`;
     memoryInstruction.textContent='白線只有 1 秒鐘！';
@@ -1932,6 +1923,7 @@ button{touch-action:manipulation;}
     stage3Play.hidden=false;
     clearStageTimers();stage=1;mode='idle';lastDrawPointer=null;foldStep=0;renderFoldState();
     svgHide(overlay,true);$('stage2Info').hidden=true;$('stage2Controls').hidden=true;stage2Result.hidden=true;stage3Panel.hidden=true;
+    $('stage2Controls').classList.remove('completed');stage2Tip.hidden=false;$('stage2ActionButtons').hidden=false;
     redrawBtn.hidden=false; foldBtn.hidden=false; finalTidyBtn.hidden=true;
     $('stage1Meters').hidden=false;$('stage1State').hidden=false;$('stage1Controls').hidden=false;
     $('stageSubtitle').textContent='第一階段｜棉被乾濕度、焦化與刷洗';
@@ -2050,7 +2042,7 @@ button{touch-action:manipulation;}
       memoryGhost.setAttribute('d',polyPath(targetPoints,true));svgHide(memoryGhost,false);
       svgHide(memoryInk,false);
       stage2ResultTitle.textContent=`${score} 分`;
-      stage2ResultSubtitle.textContent=thisRound===2?'三次開折完成！':'白色虛線是正確形狀；青色是你畫的';
+      stage2ResultSubtitle.textContent='白色虛線是正確形狀；青色是你畫的';
       stage2Result.hidden=false;
       memorySplash.textContent='';
       memoryInstruction.textContent=thisRound===2?'第三折完成，棉被還在床上！':'這回合的貼合度';
