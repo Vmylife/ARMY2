@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#132018">
-<title>國軍手榴彈｜調配與投擲試玩 v0.3.1</title>
+<title>國軍手榴彈｜調配與投擲試玩 v1.0</title>
 <style>
 :root{--ink:#eaf1da;--muted:#a9baa5;--gold:#efc977;--good:#a1d991;--bad:#f29b76;--panel:rgba(18,34,26,.95);--edge:#ffffff20}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:#132119;color:var(--ink);font-family:system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;touch-action:manipulation;user-select:none;-webkit-user-select:none}
@@ -53,13 +53,31 @@ button{font:inherit;font-weight:800;border:0;cursor:pointer;color:var(--ink);tou
 body.workmode #guide{display:none!important}
 body.workmode #controls{margin-top:auto;margin-bottom:0;flex-shrink:0}
 @media(max-height:540px){body.workmode #head .headingSub{display:none}body.workmode #steps{margin:4px 0}body.workmode #stats .stat{padding:4px 8px}body.workmode .statValue strong{font-size:20px}body.workmode #workTitle{margin-bottom:5px}body.workmode .actionThree .btn{min-height:59px;padding:5px 3px}body.workmode #pourBtn{height:59px;min-height:59px}body.workmode .underText{margin-top:5px;font-size:10px}body.workmode #controls{padding:7px}}
+
+/* v1.0: true 3D world; original workshop HUD remains unchanged. */
+#scene{z-index:2;pointer-events:none}body.fieldmode #world3d-cpu{display:block!important}
+#world3d{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:none;touch-action:none;background:linear-gradient(#85aeac,#628770)}
+#root{z-index:5}#screenTint{z-index:3}#intro,#endOverlay{z-index:11}
+body.fieldmode #screenTint{background:linear-gradient(transparent 75%,#10291a55)}
+body.blastmode #head,body.blastmode #controls,body.blastmode #guide{display:none!important}
+#impactHud{display:none;position:fixed;z-index:7;left:50%;top:calc(15px + env(safe-area-inset-top));transform:translateX(-50%);width:min(calc(100% - 24px),520px);background:#0c1e18df;border:1px solid #e6cf9761;border-radius:17px;padding:13px 14px;box-shadow:0 8px 24px #0009;pointer-events:none;backdrop-filter:blur(10px)}
+#impactHud.show{display:block}.impactGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:9px 0}.impactCell{background:#182f25c9;border:1px solid #ffffff1b;padding:10px;border-radius:12px}.impactCell span{font-size:11px;color:#bbcbbe;display:block}.impactCell strong{font-variant-numeric:tabular-nums;font-size:clamp(21px,5.2vw,29px);display:block;margin-top:2px;white-space:nowrap}
+#blastPhase{font-size:12px;color:#f7d69d;letter-spacing:1px;font-weight:900}#landmarkToast{margin-top:7px;color:#ffdc9a;font-size:13px;font-weight:800;min-height:18px}
+#blastFlash{position:fixed;inset:0;z-index:6;background:radial-gradient(circle,#fff9d5 0%,#ffbd703b 40%,transparent 70%);pointer-events:none;opacity:0}
+#gallery{position:fixed;inset:0;z-index:20;display:none;background:#07150ef0;overflow:auto;padding:calc(30px + env(safe-area-inset-top)) 16px calc(25px + env(safe-area-inset-bottom))}
+#gallery.show{display:block}.galInner{max-width:500px;margin:auto}.galCards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:16px 0}.galCard{background:#1a3025;border:1px solid #c9d9b12c;border-radius:12px;padding:12px;min-height:76px}.galCard.locked{opacity:.36}.galCard small{display:block;color:#c1c9b1;margin-bottom:5px}.galCard strong{font-size:14px}#galleryBtn,#endGalleryBtn{margin-top:8px}
+body.fieldmode #guide{margin-bottom:8px}body.fieldmode #scene{pointer-events:none}body.fieldmode #head{background:transparent}
+#aimLegend{font-size:12px;color:#f1d7ac;text-align:center;margin-bottom:8px}
+#resultCounts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}#resultCounts .outcomeCell{padding:10px 4px}#resultCounts strong{font-size:20px}
+#landmarkResults{color:#edce8d;font-size:12px;line-height:1.6;margin:8px 0}
+@media(max-height:650px){#impactHud{padding:7px 11px}.impactCell{padding:6px}.impactGrid{margin:5px 0}}
 </style>
 </head>
 <body>
-<canvas id="scene" aria-label="遊戲場景"></canvas><div id="screenTint"></div>
+<canvas id="world3d" aria-label="3D 爆炸戰場"></canvas><canvas id="scene" aria-label="遊戲場景"></canvas><div id="screenTint"></div>
 <div id="root">
   <header id="head">
-    <div class="heading"><div class="logo">💣</div><div class="headingText"><div class="headingTitle">手榴彈製作訓練 <span style="color:#eaca8c;font-size:10px">PROTOTYPE 0.3.1</span></div><div class="headingSub" id="headerSub">軍械庫 · 綠桶實驗區</div></div><button id="restart" aria-label="重新開始">↻</button></div>
+    <div class="heading"><div class="logo">💣</div><div class="headingText"><div class="headingTitle">手榴彈製作訓練 <span style="color:#eaca8c;font-size:10px">PROTOTYPE 1.0</span></div><div class="headingSub" id="headerSub">軍械庫 · 綠桶實驗區</div></div><button id="restart" aria-label="重新開始">↻</button></div>
     <div id="steps"><div class="step active"></div><div class="step"></div><div class="step"></div><div class="step"></div></div>
     <div id="stats"><div class="stat" id="gramStat"><label>目前火藥</label><div class="statValue"><strong id="gramText">0</strong><small>克</small></div></div><div class="stat" id="densityStat"><label>遊戲密度</label><div class="statValue"><strong id="densityText">0.60</strong><small>密度值</small></div></div></div>
   </header>
@@ -67,29 +85,35 @@ body.workmode #controls{margin-top:auto;margin-bottom:0;flex-shrink:0}
   <div id="guide"><div id="stageRound">已壓實 0 次</div><div id="stageName">自由裝填與壓實</div><div id="stageDesc">留意桶口：快滿時才會看見火藥；想倒就倒、想壓就壓。</div></div>
   <div id="controls" class="hidden"></div>
 </div>
-<div id="intro"><div class="modal"><div class="kicker">國軍訓練中心 · 獨立試玩</div><div class="introMark">🛢️</div><h1>這桶東西，真的能丟嗎？</h1><p>從一只軍綠色大桶子開始，自由加入火藥、反覆壓實。隨時可以收手，但千萬別倒到滿出來！最後親手把大桶轉成手榴彈，再試試看能丟多準。</p><div class="introSteps"><div class="introStep"><span>1</span>按住倒火藥；桶身不透明，火藥接近桶口才看得見，溢出會強制停機</div><div class="introStep"><span>2</span>隨時壓實 QTE，也可以連續倒入或連續壓實</div><div class="introStep"><span>3</span>主動進轉輪定型，或因溢出、破殼被迫進入</div><div class="introStep"><span>4</span>控制左右和遠近 · 完成投擲測試</div></div><button class="btn primary full" id="startBtn">開始訓練　→</button><div class="underText">這版只做到投擲落地，不含爆炸與破壞。</div></div></div>
-<div id="endOverlay"><div class="modal"><div class="kicker">投擲訓練 · 本回合完成</div><div style="font-size:43px;margin-bottom:6px">🎯</div><h2 id="endHeading">投擲完成！</h2><p id="endDesc">你丟出的成品已經落地，爆炸效果將在後續版本加入。</p><div id="outcomeCoords"><div class="outcomeCell"><small>投擲距離</small><strong id="distVal">0.0 m</strong></div><div class="outcomeCell"><small>偏離目標</small><strong id="missVal">0.0 m</strong></div></div><div class="outcomeCell" style="margin-bottom:16px"><small>本次火藥／密度</small><strong id="finalVal" style="font-size:20px">0 克 · 0.00</strong></div><button class="btn primary full" id="retryBtn">再製作一顆　↻</button><div class="underText">不顯示外殼耐久、定型品質或失敗原因。</div></div></div>
+<div id="impactHud"><div id="blastPhase">💥 衝擊波擴散中</div><div class="impactGrid"><div class="impactCell"><span>摧毀建築</span><strong id="deadBuildings">0</strong></div><div class="impactCell"><span>擊殺人數</span><strong id="deadPeople">0</strong></div></div><div id="landmarkToast"></div></div><div id="blastFlash"></div>
+<div id="gallery"><div class="galInner"><div class="kicker">軍旅訓練 · 地標圖鑑</div><h2>💥 被你炸掉的地標</h2><p style="color:#b8c9b5;font-size:12px">只有爆炸實際波及才會解鎖。地標位置和宇宙尺度均為遊戲化示意。</p><div class="galCards" id="galCards"></div><button id="closeGallery" class="btn primary full">返回遊戲</button></div></div>
+<div id="intro"><div class="modal"><div class="kicker">國軍訓練中心 · 獨立試玩</div><div class="introMark">🛢️</div><h1>這桶東西，真的能丟嗎？</h1><p>從一只軍綠色大桶子開始，自由加入火藥、反覆壓實。隨時可以收手，但千萬別倒到滿出來！最後親手把大桶轉成手榴彈，再試試看能丟多準。</p><div class="introSteps"><div class="introStep"><span>1</span>按住倒火藥；桶身不透明，火藥接近桶口才看得見，溢出會強制停機</div><div class="introStep"><span>2</span>隨時壓實 QTE，也可以連續倒入或連續壓實</div><div class="introStep"><span>3</span>主動進轉輪定型，或因溢出、破殼被迫進入</div><div class="introStep"><span>4</span>控制左右和遠近 · 讓 3D 建築真正被爆炸波及</div></div><button class="btn primary full" id="startBtn">開始訓練　→</button><div class="underText">這次可以一路玩到爆炸、即時計數與地標圖鑑。所有火藥與威力數值均為虛構遊戲設定。<button id="galleryBtn" class="btn ghost full">🗂 查看地標圖鑑</button></div></div></div>
+<div id="endOverlay"><div class="modal"><div class="kicker">爆炸演習 · 本回合完成</div><div style="font-size:43px;margin-bottom:6px">🎯</div><h2 id="endHeading">投擲完成！</h2><p id="endDesc">爆炸已經結束。</p><div id="outcomeCoords"><div class="outcomeCell"><small>投擲距離</small><strong id="distVal">0.0 m</strong></div><div class="outcomeCell"><small>偏離目標</small><strong id="missVal">0.0 m</strong></div></div><div class="outcomeCell" style="margin-bottom:16px"><small>本次火藥／密度</small><strong id="finalVal" style="font-size:20px">0 克 · 0.00</strong></div><div id="resultCounts"><div class="outcomeCell"><small>摧毀建築</small><strong id="endBuildings">0</strong></div><div class="outcomeCell"><small>擊殺人數</small><strong id="endPeople">0</strong></div></div><div class="outcomeCell" style="margin:10px 0;padding:10px 12px;text-align:left"><small>投擲精準成績</small><strong id="accuracyScore" style="font-size:21px">—</strong><div id="teamResult" style="font-size:12px;color:#c4d7bd;margin-top:4px"></div></div><div id="landmarkResults"></div><button class="btn primary full" id="retryBtn">再製作一顆　↻</button><button class="btn ghost full" id="endGalleryBtn">🗂 查看地標圖鑑</button><div class="underText">不顯示外殼耐久、定型品質或失敗原因。</div></div></div>
+<script src="./grenade-3d.js"></script>
 <script>
 (()=>{'use strict';
-const $=id=>document.getElementById(id);const cv=$('scene'),ctx=cv.getContext('2d');let W=0,H=0,DPR=1;
+const $=id=>document.getElementById(id);const cv=$('scene'),ctx=cv.getContext('2d');
+const WORLD=window.GrenadeWorld;let hadNewLandmarks=new Set(),lastLandmarkShown=0;const saveKey='ARMY2_grenade_landmarks_v1';function loadGallery(){try{return JSON.parse(localStorage.getItem(saveKey)||'[]')}catch(e){return []}}function storeGallery(n){try{localStorage.setItem(saveKey,JSON.stringify([...new Set([...loadGallery(),...n])]))}catch(e){}}
+function showGallery(){const gotten=new Set(loadGallery());$('galCards').innerHTML=window.GrenadeLandmarks.map(l=>`<div class="galCard ${gotten.has(l.name)?'':'locked'}"><small>${l.kind}　${gotten.has(l.name)?'✓ 已解鎖':'🔒 未解鎖'}</small><strong>${gotten.has(l.name)?l.name:'？？？？'}</strong></div>`).join('');$('gallery').classList.add('show')}
+let W=0,H=0,DPR=1;
 let S={},rafTime=0,lastT=0,pouring=false,shapeDragging=false,lastAngle=0,qtePos=0,aimPos=0,toastClock=0;
 const BARREL_SPACE=1000; /* abstract game-only visual capacity, not a physical formula */
 const powderLevel=()=>S.powder/(Math.max(.1,S.density)*BARREL_SPACE);
 const TAU=Math.PI*2, clamp=(v,l,h)=>Math.max(l,Math.min(h,v)),rnd=(a,b)=>a+Math.random()*(b-a),ease=t=>t*t*(3-2*t),fmt=n=>Math.floor(n).toLocaleString('en-US');
-function reset(){S={phase:'intro',powder:0,density:0.60,round:1,totalPressed:0,lastPourPress:0,hp:100,broken:false,spillTime:0,shape:0,shapeTarget:rnd(.91,1.08),power:0,qteCenter:.5,qteSpeed:1.8,qteClock:0,compressT:0,compressMode:'',aimX:0,aimZ:0,aimClock:0,throwT:0,shotX:0,shotZ:0,particles:[],shake:0,shotRot:0};pouring=false;shapeDragging=false;lastT=0;renderHUD();$('intro').style.display='flex';$('endOverlay').classList.remove('show');$('controls').classList.add('hidden');$('guide').classList.add('hidden');}
+function reset(){S={phase:'intro',powder:0,density:0.60,round:1,totalPressed:0,lastPourPress:0,hp:100,broken:false,spillTime:0,shape:0,shapeTarget:rnd(.91,1.08),power:0,qteCenter:.5,qteSpeed:1.8,qteClock:0,compressT:0,compressMode:'',aimX:0,aimZ:0,aimClock:0,throwT:0,shotX:0,shotZ:0,particles:[],shake:0,shotRot:0};pouring=false;shapeDragging=false;lastT=0;renderHUD();$('intro').style.display='flex';$('endOverlay').classList.remove('show');$('impactHud').classList.remove('show');$('world3d').style.display='none';document.body.classList.remove('fieldmode','blastmode');if(WORLD){WORLD.radius=-1;WORLD.mode='field';WORLD.counter={buildings:0,kills:0};}hadNewLandmarks=new Set();lastLandmarkShown=0;$('controls').classList.add('hidden');$('guide').classList.add('hidden');}
 function phase(p){S.phase=p;renderHUD();}
 function toast(text,ms=1300){const el=$('toast');el.textContent=text;el.classList.add('show');toastClock=performance.now()+ms;}
 function stepIndex(){return ['fill','press'].includes(S.phase)?0:S.phase==='shape'?1:['aimX','aimZ'].includes(S.phase)?2:3;}
 function renderHUD(){
  const ph=S.phase,work=ph==='fill'||ph==='press';
- document.body.classList.toggle('workmode',work);
- $('stats').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='flight');
- $('steps').classList.toggle('hidden',ph==='intro'||ph==='end');
- $('guide').classList.toggle('hidden',ph==='intro'||ph==='end');
- $('controls').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='flight');
+ document.body.classList.toggle('workmode',work);const field=['aimX','aimZ','flight','blast','end'].includes(ph);document.body.classList.toggle('fieldmode',field);document.body.classList.toggle('blastmode',ph==='blast');$('world3d').style.display=field?'block':'none';$('impactHud').classList.toggle('show',ph==='blast');
+ $('stats').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='blast'||ph==='flight');
+ $('steps').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='blast');
+ $('guide').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='blast');
+ $('controls').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='blast'||ph==='flight');
  $('gramText').textContent=fmt(S.powder);$('densityText').textContent=S.density.toFixed(2);
  const sti=stepIndex();document.querySelectorAll('.step').forEach((el,i)=>{el.classList.toggle('active',i===sti);el.classList.toggle('done',i<sti)});
- $('headerSub').textContent=['aimX','aimZ','flight'].includes(ph)?'投擲訓練場 · 目標校準':'軍械庫 · 綠桶實驗區';
+ $('headerSub').textContent=['aimX','aimZ','flight','blast','end'].includes(ph)?'投擲訓練場 · 目標校準':'軍械庫 · 綠桶實驗區';
  $('stageRound').textContent=work?`已壓實 ${S.totalPressed} 次`:['aimX','aimZ'].includes(ph)?'投擲模擬訓練':ph==='flight'?'投擲中……':'最後定型';
  const titles={fill:'自由裝填與壓實',press:'抓準時機壓實！',shape:'把大桶轉成手榴彈',aimX:'左右方向',aimZ:'投擲遠近',flight:'投擲中……'};
  const desc={fill:'桶身不透明，火藥快到桶口才看得見。',press:'指針就在桶子上！按下方按鈕或直接點桶子壓實。',shape:'沿著轉輪順時針旋轉，覺得外型像手榴彈時就停手。',aimX:'抓準指針，決定落點偏左或偏右。',aimZ:'再次抓準指針，決定落點遠近。',flight:'正在飛向訓練目標……'};
@@ -153,9 +177,30 @@ function triggerOverflow(){if(S.phase!=='fill')return;
 function startShape(){S.shape=0;S.shapeTarget=rnd(.88,1.07)+Math.min(.13,S.round*.009);phase('shape')}
 function startAim(){// Play-only quality score. Hidden from the player.
  const closeness=Math.abs(S.shape-S.shapeTarget);S.shapeQuality=Math.max(.08,1/(1+Math.pow(closeness/.23,2)));S.aimClock=0;phase('aimX');}
-function startFlight(){S.phase='flight';S.throwT=0;S.shotX=(S.aimX-.5)*18;S.shotZ=5+(1-S.aimZ)*24;S.shotRot=rnd(-3,3);S.shake=.25;renderHUD();}
-function endFlight(){phase('end');const lateral=S.shotX;const forward=S.shotZ;const dist=Math.hypot(lateral,forward);const off=Math.hypot(lateral,forward-17);$('distVal').textContent=dist.toFixed(1)+' m';$('missVal').textContent=off.toFixed(1)+' m';$('finalVal').textContent=`${fmt(S.powder)} 克 · ${S.density.toFixed(2)}`;$('endHeading').textContent=off<2.2?'正中目標！':off<5?'很接近了！':'手榴彈已落地！';$('endDesc').textContent='本次投擲測試完成。爆炸、建築破壞和地標圖鑑將在下一階段製作。';$('endOverlay').classList.add('show');}
-function boot(){reset();$('startBtn').addEventListener('click',()=>{$('intro').style.display='none';S.phase='fill';S.round=1;phase('fill')});$('retryBtn').addEventListener('click',()=>{reset();$('intro').style.display='none';S.phase='fill';phase('fill')});$('restart').addEventListener('click',()=>{if(confirm('要重新開始這次訓練嗎？'))reset()});cv.addEventListener('pointerdown',e=>{
+function startFlight(){S.phase='flight';S.throwT=0;S.shotX=(S.aimX-.5)*18;S.shotZ=5+(1-S.aimZ)*24;S.shotRot=rnd(-3,3);S.shake=.25;if(WORLD)WORLD.setLanding(S.shotX,S.shotZ);renderHUD();}
+function endFlight(){
+ phase('blast');if(WORLD)WORLD.begin(S.powder,S.density,S.shapeQuality,S.broken);
+ $('deadBuildings').textContent='0';$('deadPeople').textContent='0';$('blastPhase').textContent='💥 衝擊波開始擴散！';$('landmarkToast').textContent='';
+ $('blastFlash').style.opacity='.83';
+}
+function finishBlast(){
+ phase('end');const lateral=S.shotX,forward=S.shotZ;
+ const dist=Math.hypot(lateral,forward),off=Math.hypot(lateral,forward-17);
+ $('distVal').textContent=dist.toFixed(1)+' m';$('missVal').textContent=off.toFixed(1)+' m';
+ $('finalVal').textContent=`${fmt(S.powder)} 克 · ${S.density.toFixed(2)}`;
+ const rad=WORLD?WORLD.blastMax:0,cnt=WORLD?WORLD.counter:{buildings:0,kills:0};
+ $('endBuildings').textContent=fmt(cnt.buildings);$('endPeople').textContent=fmt(cnt.kills);
+ const precise=clamp(Math.round(Math.min(100,(cnt.red||0)*11)-(cnt.green||0)*20-Math.min(90,cnt.buildings*3)),0,100);
+ $('accuracyScore').textContent=precise+' 分';$('teamResult').textContent=`擊中紅軍 ${fmt(cnt.red||0)} 人 · 誤傷友軍 ${fmt(cnt.green||0)} 人`;
+
+ const title=rad>1050000?'銀河系級':rad>340000?'恆星級':rad>2100?'星球級':rad>600?'都市級':rad>105?'城鎮級':rad>35?'營區級':rad>9?'建築級':'一般手榴彈';
+ $('endHeading').textContent=title+'！';
+ $('endDesc').textContent=`爆炸演習結束。最大衝擊範圍約 ${fmt(rad)} 遊戲公尺。`;
+ const found=WORLD?WORLD.newLandmarks:[],already=new Set(loadGallery()),newly=found.filter(n=>!already.has(n));storeGallery(found);
+ $('landmarkResults').textContent=newly.length?'🗂 新解鎖：'+newly.join('、'):found.length?'🗂 本次摧毀：'+found.join('、'):'這次沒有波及地標。';
+ $('endOverlay').classList.add('show');
+}
+function boot(){reset();$('startBtn').addEventListener('click',()=>{$('intro').style.display='none';S.phase='fill';S.round=1;phase('fill')});$('galleryBtn').addEventListener('click',showGallery);$('endGalleryBtn').addEventListener('click',showGallery);$('closeGallery').addEventListener('click',()=>$('gallery').classList.remove('show'));$('retryBtn').addEventListener('click',()=>{reset();$('intro').style.display='none';S.phase='fill';phase('fill')});$('restart').addEventListener('click',()=>{if(confirm('要重新開始這次訓練嗎？'))reset()});cv.addEventListener('pointerdown',e=>{
  if(S.phase!=='press')return;
  const hb=$('head').getBoundingClientRect().bottom,cb=$('controls').getBoundingClientRect().top,cy=clamp((hb+cb)*.5+19,H*.34,H*.60);const bw=Math.min(W*.55,222),bx=W*.5-bw*.5,by=cy-73;
  if(e.clientX>=bx-9&&e.clientX<=bx+bw+9&&e.clientY>=by-40&&e.clientY<=by+55){e.preventDefault();finishPress()}
@@ -269,19 +314,13 @@ function drawCan(px,base,t,tm,sc=1){ctx.save();ctx.translate(px+Math.sin(tm*23)*
        ctx.globalAlpha=alpha*mouthAlpha;
        ellipse(xi,yi,.75+(i%3)*.36,1.15+(i%4)*.38,i%3===0?'#ffe8ac':'#d1ac63');
      }
-     // Brief inner-wall dust and oval ripples make the entry legible on small screens;
-     // neither persists when pouring stops or indicates the hidden powder level.
+     // Soft scatter on the inner wall makes the falling material visibly land inside.
      for(let i=0;i<15;i++){
        const phase=(tm*5+i*.41)%1;
        const dx=Math.sin(i*9.71)*phase*33;
        const dy=y+7-Math.cos(phase*Math.PI)*3;
-       ctx.globalAlpha=(1-phase)*.60*mouthAlpha;
-       ellipse(dx,dy,.9+phase*.85,.65,'#f5d99a');
-     }
-     for(let i=0;i<2;i++){
-       const phase=(tm*3.3+i*.5)%1;
-       ctx.globalAlpha=(1-phase)*.39*mouthAlpha;
-       ellipse(0,y+8,3+phase*23,.7+phase*.7,null,'#e8c87a',1);
+       ctx.globalAlpha=(1-phase)*.32*mouthAlpha;
+       ellipse(dx,dy,.7+phase*.6,.55,'#f5d99a');
      }
      ctx.globalAlpha=mouthAlpha;
    }
@@ -338,8 +377,14 @@ function sceneField(t){const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorSto
  if(S.phase==='flight'){const u=clamp(S.throwT/1.42,0,1);const sx=W*.52,sy=H*.78;const ex=W*.5+S.shotX*9,ey=H*.47-(S.shotZ-17)*5;let xx=sx+(ex-sx)*u,yy=sy+(ey-sy)*u-Math.sin(u*Math.PI)*H*.22;ctx.save();ctx.translate(xx,yy);ctx.rotate(u*11);drawCan(0,10,S.shape,t,Math.max(.14,(1-u)*.48));ctx.restore();}
 }
 function drawDummy(x,y,c,i){ctx.save();ctx.translate(x,y);ctx.fillStyle='#102d22a8';ellipse(4,10,14,7);rr(-7,-1,14,17,3,c,'#173d29',1);ellipse(0,-6,8,7,c,'#193929',1);line(-6,11,-10,20,'#1c3325',3);line(6,11,10,20,'#1c3325',3);ctx.restore()}
-function render(t){ctx.clearRect(0,0,W,H);if(['aimX','aimZ','flight','end'].includes(S.phase))sceneField(t);else drawWorkshop(t);}
-function loop(ms){const t=ms/1000,dt=Math.min(.055,lastT?t-lastT:0);lastT=t;rafTime=t;
+function render(t){ctx.clearRect(0,0,W,H);if(['aimX','aimZ','flight','blast','end'].includes(S.phase)){
+   if(S.phase==='flight'){
+      const u=clamp(S.throwT/1.6,0,1),x=W*.53+(S.shotX/20)*W*.35*u,y=H*.68-H*.34*u-Math.sin(Math.PI*u)*H*.22;
+      ctx.save();ctx.translate(x,y);ctx.rotate(u*9);ctx.scale(.25*(1-u)+.06,.25*(1-u)+.06);drawCan(0,10,S.shape,t,1);ctx.restore();
+   }
+ }else drawWorkshop(t);}
+
+function loop(ms){const t=ms/1000,actualDt=Math.max(0,lastT?t-lastT:0),dt=Math.min(.055,actualDt);lastT=t;rafTime=t;
  if(pouring&&S.phase==='fill'){
    // This is an abstract visual fill system for the game, not real powder compaction data.
    const add=dt*(180+Math.min(110,S.totalPressed*9));
@@ -350,6 +395,19 @@ function loop(ms){const t=ms/1000,dt=Math.min(.055,lastT?t-lastT:0);lastT=t;rafT
  if(S.phase==='press'){S.qteClock+=dt;const v=Math.asin(Math.sin(S.qteClock*S.qteSpeed*2.3))/Math.PI+.5;qtePos=clamp(v,0,1)}
  if(S.phase==='aimX'||S.phase==='aimZ'){S.aimClock+=dt;aimPos=(Math.sin(S.aimClock*(S.phase==='aimX'?5.3:6.6)-1.25)+1)/2;const el=$('aimPointer');if(el)el.style.left=(aimPos*100)+'%'}
  if(S.phase==='flight'){S.throwT+=dt;if(S.throwT>1.6)endFlight()}
+ if(WORLD&&['aimX','aimZ','flight','blast','end'].includes(S.phase)){
+   if(S.phase==='blast'){
+     const finished=WORLD.advance(Math.min(.25,actualDt));
+     $('deadBuildings').textContent=fmt(WORLD.counter.buildings);$('deadPeople').textContent=fmt(WORLD.counter.kills);
+     const rad=WORLD.radius;
+     $('blastPhase').textContent=rad>1050000?'🌌 銀河級衝擊！':rad>2100?'🌍 星球災害擴散中':rad>650?'🏙 都市持續崩塌':rad>90?'🏘 建築連鎖毀滅':'💥 衝擊波擴散中';
+     const lm=WORLD.newLandmarks;if(lm.length>lastLandmarkShown){$('landmarkToast').textContent='🗂 地標摧毀：'+lm[lm.length-1];lastLandmarkShown=lm.length;}
+     $('blastFlash').style.opacity=String(Math.max(0,.8-WORLD.timer*1.5));
+     if(finished)finishBlast();
+   }
+   WORLD.draw();
+ }
+
  if(S.compressT>0)S.compressT=Math.max(0,S.compressT-dt*1.7);if(S.shake>0)S.shake=Math.max(0,S.shake-dt*.94);if(S.spillTime>0)S.spillTime=Math.max(0,S.spillTime-dt);
  if(toastClock&&ms>toastClock){$('toast').classList.remove('show');toastClock=0}
  render(t);requestAnimationFrame(loop)}
