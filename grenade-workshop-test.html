@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#132018">
-<title>國軍手榴彈｜調配與投擲試玩 v0.3</title>
+<title>國軍手榴彈｜調配與投擲試玩 v0.3.1</title>
 <style>
 :root{--ink:#eaf1da;--muted:#a9baa5;--gold:#efc977;--good:#a1d991;--bad:#f29b76;--panel:rgba(18,34,26,.95);--edge:#ffffff20}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:#132119;color:var(--ink);font-family:system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;touch-action:manipulation;user-select:none;-webkit-user-select:none}
@@ -53,28 +53,13 @@ button{font:inherit;font-weight:800;border:0;cursor:pointer;color:var(--ink);tou
 body.workmode #guide{display:none!important}
 body.workmode #controls{margin-top:auto;margin-bottom:0;flex-shrink:0}
 @media(max-height:540px){body.workmode #head .headingSub{display:none}body.workmode #steps{margin:4px 0}body.workmode #stats .stat{padding:4px 8px}body.workmode .statValue strong{font-size:20px}body.workmode #workTitle{margin-bottom:5px}body.workmode .actionThree .btn{min-height:59px;padding:5px 3px}body.workmode #pourBtn{height:59px;min-height:59px}body.workmode .underText{margin-top:5px;font-size:10px}body.workmode #controls{padding:7px}}
-
-/* Short landscape screens: reserve the left for the barrel and dock all controls on the right. */
-@media (orientation:landscape) and (min-width:600px) and (max-height:520px){
- body.workmode #root{padding:8px 13px}
- body.workmode #head{width:min(340px,45vw);margin-left:auto;margin-right:0}
- body.workmode #controls{width:min(340px,45vw);margin-left:auto;margin-right:0;margin-top:auto;margin-bottom:0}
- body.workmode .heading{padding:5px 8px}
- body.workmode .statValue strong{font-size:19px}
- body.workmode #stats .stat{padding:4px 8px}
- body.workmode #workTitle .dim{max-width:150px;text-align:right;font-size:10px}
- body.workmode .actionThree .btn{min-height:63px;font-size:10px}
- body.workmode #pourBtn{height:63px;min-height:63px}
- body.workmode .actionThree .btn .ico{font-size:18px}
- body.workmode #controls .underText{font-size:10px}
-}
 </style>
 </head>
 <body>
 <canvas id="scene" aria-label="遊戲場景"></canvas><div id="screenTint"></div>
 <div id="root">
   <header id="head">
-    <div class="heading"><div class="logo">💣</div><div class="headingText"><div class="headingTitle">手榴彈製作訓練 <span style="color:#eaca8c;font-size:10px">PROTOTYPE 0.3</span></div><div class="headingSub" id="headerSub">軍械庫 · 綠桶實驗區</div></div><button id="restart" aria-label="重新開始">↻</button></div>
+    <div class="heading"><div class="logo">💣</div><div class="headingText"><div class="headingTitle">手榴彈製作訓練 <span style="color:#eaca8c;font-size:10px">PROTOTYPE 0.3.1</span></div><div class="headingSub" id="headerSub">軍械庫 · 綠桶實驗區</div></div><button id="restart" aria-label="重新開始">↻</button></div>
     <div id="steps"><div class="step active"></div><div class="step"></div><div class="step"></div><div class="step"></div></div>
     <div id="stats"><div class="stat" id="gramStat"><label>目前火藥</label><div class="statValue"><strong id="gramText">0</strong><small>克</small></div></div><div class="stat" id="densityStat"><label>遊戲密度</label><div class="statValue"><strong id="densityText">0.60</strong><small>密度值</small></div></div></div>
   </header>
@@ -111,7 +96,7 @@ function renderHUD(){
  $('stageName').textContent=titles[ph]||'';$('stageDesc').textContent=desc[ph]||'';
  const ctl=$('controls');ctl.replaceChildren();
  if(work){
-   ctl.innerHTML=`<div id="workTitle"><div class="smallTitle">${ph==='press'?'壓實時機 · 注意桶上的指針':'自由操作 · 留意桶口'}</div><span class="dim" id="workHint">${ph==='press'?'點桶上的指針也能壓實':'快到桶口才看得到火藥'}</span></div>
+   ctl.innerHTML=`<div id="workTitle"><div class="smallTitle">${ph==='press'?'壓實時機 · 注意桶上的指針':'自由操作 · 觀察火藥高度'}</div><span class="dim" id="workHint">${ph==='press'?'點桶上的指針也能壓實':'快到桶口才看得到火藥'}</span></div>
    <div class="actionThree">
     <button id="pourBtn" class="btn" ${ph==='press'?'disabled':''}><span class="ico">⬇</span><span>按住倒火藥</span><small>放開就停</small></button>
     <button id="pressBtn" class="btn ${ph==='press'?'live':'primary'}" ${S.powder<15?'disabled':''}><span class="ico">${ph==='press'?'🎯':'⚙'}</span><span>${ph==='press'?'立即壓實！':'啟動壓實'}</span><small>${ph==='press'?'抓準 QTE':'可連續壓實'}</small></button>
@@ -172,7 +157,7 @@ function startFlight(){S.phase='flight';S.throwT=0;S.shotX=(S.aimX-.5)*18;S.shot
 function endFlight(){phase('end');const lateral=S.shotX;const forward=S.shotZ;const dist=Math.hypot(lateral,forward);const off=Math.hypot(lateral,forward-17);$('distVal').textContent=dist.toFixed(1)+' m';$('missVal').textContent=off.toFixed(1)+' m';$('finalVal').textContent=`${fmt(S.powder)} 克 · ${S.density.toFixed(2)}`;$('endHeading').textContent=off<2.2?'正中目標！':off<5?'很接近了！':'手榴彈已落地！';$('endDesc').textContent='本次投擲測試完成。爆炸、建築破壞和地標圖鑑將在下一階段製作。';$('endOverlay').classList.add('show');}
 function boot(){reset();$('startBtn').addEventListener('click',()=>{$('intro').style.display='none';S.phase='fill';S.round=1;phase('fill')});$('retryBtn').addEventListener('click',()=>{reset();$('intro').style.display='none';S.phase='fill';phase('fill')});$('restart').addEventListener('click',()=>{if(confirm('要重新開始這次訓練嗎？'))reset()});cv.addEventListener('pointerdown',e=>{
  if(S.phase!=='press')return;
- const hb=$('head').getBoundingClientRect().bottom,cb=$('controls').getBoundingClientRect().top,wide=W>H*1.35&&H<560,cy=wide?H*.52:clamp((hb+cb)*.5+19,H*.34,H*.60);const px=wide?W*.30:W*.5;const bw=Math.min(W*.55,222),bx=px-bw*.5,by=cy-73;
+ const hb=$('head').getBoundingClientRect().bottom,cb=$('controls').getBoundingClientRect().top,cy=clamp((hb+cb)*.5+19,H*.34,H*.60);const bw=Math.min(W*.55,222),bx=W*.5-bw*.5,by=cy-73;
  if(e.clientX>=bx-9&&e.clientX<=bx+bw+9&&e.clientY>=by-40&&e.clientY<=by+55){e.preventDefault();finishPress()}
 });window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden)pouring=false});resize();requestAnimationFrame(loop)}
 function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=Math.max(1,window.innerWidth);H=Math.max(1,window.innerHeight);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0)}
@@ -180,14 +165,14 @@ function rr(x,y,w,h,r,fill,stroke,lw=1){ctx.beginPath();ctx.roundRect(x,y,w,h,r)
 function line(x1,y1,x2,y2,color,width=2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
 function ellipse(x,y,rx,ry,fill,stroke,lw=1){ctx.beginPath();ctx.ellipse(x,y,Math.max(.1,rx),Math.max(.1,ry),0,0,TAU);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
 function colorGrad(x0,y0,x1,y1,a,b){let g=ctx.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,a);g.addColorStop(1,b);return g}
-function drawWorkshop(t){const visibleTop=$('head').getBoundingClientRect().bottom,controlBox=$('controls').getBoundingClientRect();const visibleBottom=$('controls').classList.contains('hidden')?H-30:controlBox.top;const wide=W>H*1.35&&H<560;const cy=wide?H*.52:clamp((visibleTop+visibleBottom)*.5+19,H*.34,H*.60);let bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#354f3f');bg.addColorStop(.53,'#172e25');bg.addColorStop(1,'#091b16');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+function drawWorkshop(t){const visibleTop=$('head').getBoundingClientRect().bottom,controlBox=$('controls').getBoundingClientRect();const visibleBottom=$('controls').classList.contains('hidden')?H-30:controlBox.top;const cy=clamp((visibleTop+visibleBottom)*.5+19,H*.34,H*.60);let bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#354f3f');bg.addColorStop(.53,'#172e25');bg.addColorStop(1,'#091b16');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
  // vertical wall sheets and seams
  for(let x=-100,i=0;x<W+110;x+=99,i++){ctx.fillStyle=i%2?'#ffffff05':'#00000010';ctx.fillRect(x,0,98,H*.7);line(x+98,0,x+98,H*.73,'#aec3a018',2)}
  const v=ctx.createRadialGradient(W*.50,cy-60,25,W*.50,cy+10,W*.72);v.addColorStop(0,'#a6c79526');v.addColorStop(1,'#08191000');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
  // pipe rails and backlit window
  line(0,H*.265,W,H*.265,'#71877967',8);line(0,H*.275,W,H*.275,'#091a13b0',5);
  for(let x=28;x<W;x+=116){rr(x,H*.29,12,H*.28,4,'#0c231d63','#8ca68620',2)}
- const px=wide?W*.30:W*.5,py=cy+124;
+ const px=W*.5,py=cy+124;
  // platform shadow and ground
  ellipse(px,py+50,Math.min(W*.44,225),31,'#00000060');rr(Math.max(10,px-Math.min(W*.44,226)),py,Math.min(W*.88,452),43,9,colorGrad(0,py,0,py+43,'#64745a','#293d31'),'#aab59d44',3);rr(Math.max(17,px-Math.min(W*.4,206)),py+34,Math.min(W*.8,412),15,3,'#14251d');
  // side mounting posts
@@ -200,7 +185,17 @@ function drawWorkshop(t){const visibleTop=$('head').getBoundingClientRect().bott
  if(S.phase==='fill'||S.phase==='press'||S.spillTime>0){
  // hopper and falling powder
  rr(px-41,cy-232,82,30,4,'#495c51','#d5dcc058',2);ctx.beginPath();ctx.moveTo(px-35,cy-204);ctx.lineTo(px+35,cy-204);ctx.lineTo(px+12,cy-177);ctx.lineTo(px-12,cy-177);ctx.closePath();ctx.fillStyle='#b3ab6c';ctx.fill();rr(px-10,cy-181,20,16,3,'#a8aa7c');
- if(pouring||S.spillTime>0){for(let i=0;i<34;i++){const y=(t*260+i*19)%90;const x=px+Math.sin(i*81)*10;ellipse(x,cy-165+y,1.2+i%3,2.2,'#e3d091dc')}}
+ // Granules descend exactly to the mouth, then continue *inside* the dark opening.
+ // The inside-mouth segment is deliberately rendered later than the barrel body.
+ if(pouring||S.spillTime>0){
+   const streamEnd=cy-119;
+   for(let i=0;i<30;i++){
+     const y=cy-164+(t*240+i*11.7)%52;
+     if(y>streamEnd)continue;
+     const x=px+Math.sin(i*91.7)*((i%5)+2)*1.1;
+     ellipse(x,y,1.1+i%3*.55,1.4+i%4*.5,i%3===0?'#f5e0a1':'#cfb878');
+   }
+ }
  }
  // side light panel
  let x=px-spread+29;if(W>350){rr(x,cy-144,63,33,5,'#0b2a1e','#aec79354',1);ctx.font='bold 9px system-ui';ctx.textAlign='center';ctx.fillStyle='#b4deae';ctx.fillText('MFG-01',x+31,cy-131);ctx.fillStyle=S.broken?'#e6a173':'#85d3a5';ctx.fillText(S.broken?'FAULT':'READY',x+31,cy-118)}
@@ -255,8 +250,42 @@ function drawCan(px,base,t,tm,sc=1){ctx.save();ctx.translate(px+Math.sin(tm*23)*
  if(p<.77){
    const mouthAlpha=1-clamp((p-.35)*2.5,0,1);
    ctx.save();ctx.globalAlpha=mouthAlpha;
+   // A recessed cavity: the back inner wall catches some light while the bottom stays dark.
    ellipse(0,y+9,radiusTop,12,'#90a582','#c5d5b185',2.1); // outer steel lip
-   ellipse(0,y+9,radiusTop-7,7.5,'#122920','#172f25',1.1); // dark deep opening
+   ellipse(0,y+9,radiusTop-7,8.0,'#0b2019','#172f25',1.1); // shadowed interior, NOT a side window
+   ctx.save();ctx.beginPath();ctx.ellipse(0,y+9,radiusTop-8,7.2,0,0,TAU);ctx.clip();
+   const recess=ctx.createLinearGradient(0,y+1,0,y+17);
+   recess.addColorStop(0,'#546a4c');recess.addColorStop(.29,'#1c3225');recess.addColorStop(1,'#081b15');
+   ctx.fillStyle=recess;ctx.fillRect(-radiusTop,y-1,radiusTop*2,22);
+   // While pouring, a visible narrow stream crosses the lip and fades into the barrel.
+   // Tiny transient splashes mark entry; they do NOT reveal the hidden fill level.
+   if(pouring&&S.phase==='fill'){
+     const innerEnd=y+16;
+     for(let i=0;i<25;i++){
+       const fall=(tm*255+i*4.7)%19;
+       const xi=Math.sin(i*71.9)*((i%4)+1)*1.45;
+       const yi=y-3+fall;
+       const alpha=clamp((innerEnd-yi)/16,.06,.84);
+       ctx.globalAlpha=alpha*mouthAlpha;
+       ellipse(xi,yi,.75+(i%3)*.36,1.15+(i%4)*.38,i%3===0?'#ffe8ac':'#d1ac63');
+     }
+     // Brief inner-wall dust and oval ripples make the entry legible on small screens;
+     // neither persists when pouring stops or indicates the hidden powder level.
+     for(let i=0;i<15;i++){
+       const phase=(tm*5+i*.41)%1;
+       const dx=Math.sin(i*9.71)*phase*33;
+       const dy=y+7-Math.cos(phase*Math.PI)*3;
+       ctx.globalAlpha=(1-phase)*.60*mouthAlpha;
+       ellipse(dx,dy,.9+phase*.85,.65,'#f5d99a');
+     }
+     for(let i=0;i<2;i++){
+       const phase=(tm*3.3+i*.5)%1;
+       ctx.globalAlpha=(1-phase)*.39*mouthAlpha;
+       ellipse(0,y+8,3+phase*23,.7+phase*.7,null,'#e8c87a',1);
+     }
+     ctx.globalAlpha=mouthAlpha;
+   }
+   ctx.restore();
    if(['fill','press'].includes(S.phase) && S.powder>0){
      const near=clamp((powderLevel()-.78)/.22,0,1);
      if(near>0){
@@ -272,7 +301,10 @@ function drawCan(px,base,t,tm,sc=1){ctx.save();ctx.translate(px+Math.sin(tm*23)*
        }ctx.restore();
      }
    }
-   ellipse(0,y+9,radiusTop,11,null,'#d7e5c183',2.3); // front rim glint
+   // The front edge sits over the particles, so the flow reads as entering the barrel.
+   ctx.beginPath();ctx.ellipse(0,y+9,radiusTop,11,0,0,Math.PI,false);
+   ctx.strokeStyle='#d7e5c1b0';ctx.lineWidth=2.9;ctx.stroke();
+   ellipse(0,y+9,radiusTop,11,null,'#d7e5c15c',1.4); // subdued full rim glint
    ctx.restore();
  }else{
    ellipse(0,y+9,radiusTop,10-5*p,'#6f8964','#c2d3b06b',2.2);
