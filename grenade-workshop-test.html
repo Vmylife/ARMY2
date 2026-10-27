@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#132018">
+<title>國軍手榴彈｜調配與投擲試玩 v0.1</title>
+<style>
+:root{--ink:#eaf1da;--muted:#a9baa5;--gold:#efc977;--good:#a1d991;--bad:#f29b76;--panel:rgba(18,34,26,.95);--edge:#ffffff20}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:#132119;color:var(--ink);font-family:system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+button{font:inherit;font-weight:800;border:0;cursor:pointer;color:var(--ink);touch-action:manipulation}button:disabled{opacity:.34;cursor:default}
+#scene{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#screenTint{pointer-events:none;position:fixed;inset:0;background:radial-gradient(ellipse at 50% 52%,transparent 32%,#07110b77 100%)}
+#root{position:fixed;inset:0;display:flex;flex-direction:column;padding:calc(9px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));pointer-events:none}
+#root button,#root input,#wheelPad{pointer-events:auto}
+#head{width:min(520px,100%);margin:0 auto;flex:0 0 auto}
+.heading{display:flex;align-items:center;gap:9px;background:#11271dcc;border:1px solid #b5d2a436;border-radius:16px;padding:8px 11px;backdrop-filter:blur(9px)}
+.logo{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:#bbd4932b;border:1px solid #c8dda847;font-size:19px}
+.headingText{min-width:0;flex:1}.headingTitle{font-size:14px;font-weight:900;letter-spacing:.4px}.headingSub{font-size:10px;color:#aebfb0;margin-top:2px}
+#restart{width:32px;height:32px;border-radius:9px;background:#73856735;font-size:20px;color:#d6e9d1}
+#steps{display:flex;gap:4px;margin:8px 0 7px}.step{height:3px;border-radius:8px;flex:1;background:#94a18e44;transition:background .2s}.step.done{background:#87ad77}.step.active{background:#f1c77c}
+#stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{padding:10px 13px;background:#0b2219e8;border:1px solid #b1d4a83c;border-radius:13px;box-shadow:0 10px 24px #08140e33}.stat label{display:block;font-size:11px;color:#acbdac}.statValue{display:flex;align-items:baseline;gap:5px;margin-top:3px}.statValue strong{font-size:28px;line-height:1.05;letter-spacing:.3px;font-variant-numeric:tabular-nums}.statValue small{font-size:12px;color:#b3c3af}.stat.flash{animation:statFlash .24s ease}@keyframes statFlash{from{border-color:#e9d092;box-shadow:0 0 30px #eed48f5c}to{border-color:#b1d4a83c}}
+#toast{position:absolute;top:calc(177px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:2;text-align:center;min-width:170px;max-width:min(85%,420px);padding:9px 14px;background:#101e16df;border:1px solid #ffffff34;border-radius:100px;font-size:13px;font-weight:850;opacity:0;transition:opacity .2s;pointer-events:none}#toast.show{opacity:1}
+#guide{margin:auto auto 5px;max-width:440px;text-align:center;text-shadow:0 2px 9px #040d0b;width:100%;transform:translateY(-6px)}#stageName{font-size:clamp(19px,4.5vw,25px);font-weight:950;letter-spacing:1px}#stageDesc{font-size:12px;color:#d8e3d4;margin-top:5px;line-height:1.5}#stageRound{font-size:11px;font-weight:900;letter-spacing:2px;color:#f4d58d;margin-bottom:5px}
+#controls{pointer-events:auto;width:min(520px,100%);margin:0 auto;flex:0 0 auto;background:var(--panel);border:1px solid #b4cdad38;border-radius:22px;padding:14px;box-shadow:0 16px 46px #060f09ab;backdrop-filter:blur(16px)}
+#controls.hidden,#stats.hidden,#steps.hidden,#guide.hidden{display:none!important}.btn{border-radius:12px;min-height:53px;padding:11px 13px;display:flex;align-items:center;justify-content:center;text-align:center;gap:7px;font-size:15px;background:#354a3b;border:1px solid #c8dcba37;box-shadow:inset 0 1px #ffffff15}.btn.primary{color:#172719;background:linear-gradient(155deg,#f4d993,#e9ba68);border:1px solid #fff0bb65;box-shadow:0 4px 16px #d9b46c36}.btn.ghost{background:#657b5c43;color:#e7efde}.btn.danger{background:#634a3c}.btn:active:not(:disabled){transform:scale(.985)}.btn.full{width:100%}.btn .ico{font-size:19px}
+.smallTitle{font-weight:900;font-size:13px;margin-bottom:7px}.dim{font-size:11px;color:#a3b6aa}.split{display:grid;grid-template-columns:1fr 1fr;gap:8px}.underText{font-size:11px;color:#a6b8a9;text-align:center;margin-top:9px}
+.fillMeter{height:9px;border-radius:50px;background:#091910;border:1px solid #d4e9bf29;margin:11px 0 11px;overflow:hidden}.fillValue{height:100%;background:linear-gradient(90deg,#b5bf6d,#f2d994);width:0%;transition:width .07s linear;border-radius:50px}
+#pourBtn{height:69px;background:linear-gradient(160deg,#a9bb7d,#7b9b64);color:#162416;touch-action:none;display:flex;flex-direction:column;gap:3px}#pourBtn.isHeld{background:linear-gradient(160deg,#efd28f,#ad9b59);box-shadow:0 0 0 3px #e8d28830}#pourBtn small{font-size:10px;font-weight:750;opacity:.8}
+#qteTrack{height:35px;border-radius:10px;border:1px solid #c7d3ae54;background:linear-gradient(180deg,#1b3827,#16291f);position:relative;margin:12px 0 10px;overflow:hidden}#qteAim{position:absolute;top:0;bottom:0;background:#cfda9250;border-inline:1px solid #e5eeba91;width:15%;left:40%}#qteAim:before{content:"";position:absolute;top:0;bottom:0;width:25%;left:37.5%;background:#d9e99f61}#qteNeedle{position:absolute;top:-2px;bottom:-2px;width:5px;border-radius:5px;background:#fff6d4;box-shadow:0 0 11px #fee4a0;left:0;transform:translateX(-50%)}
+#pressureBanner{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#bccbb5}#qteHint{text-align:center;font-size:12px;color:#d9e4d1;margin-bottom:11px}
+#decisionHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px}#conditionIcon{font-size:21px}
+#wheelLayout{display:flex;justify-content:center;align-items:center;gap:16px;margin:1px 0 12px}#wheelPad{width:154px;height:154px;border-radius:50%;touch-action:none;cursor:grab;position:relative;background:radial-gradient(circle at 40% 29%,#899b81 0%,#516b53 35%,#263f30 67%,#101e17 68%,#344d3b 76%,#131f19 78%);box-shadow:0 9px 26px #030b064d,inset 0 3px 4px #e9f8d327;border:3px solid #839b77;flex:0 0 auto}#wheelPad:active{cursor:grabbing}#wheelFace{position:absolute;inset:9px;border-radius:50%;background:repeating-conic-gradient(from 0deg,#9ba98c 0 5deg,#384b3a 6deg 13deg,#6d866b 14deg 19deg);mask:radial-gradient(circle,transparent 0 51%,#000 53%);-webkit-mask:radial-gradient(circle,transparent 0 51%,#000 53%)}#wheelRot{position:absolute;inset:0;border-radius:50%;transform:rotate(0deg);pointer-events:none}#wheelGrip{position:absolute;top:13px;left:calc(50% - 10px);width:20px;height:20px;border-radius:50%;background:linear-gradient(#ede6bf,#898e76);border:3px solid #536558;box-shadow:0 3px 8px #0009}#wheelCenter{position:absolute;inset:43px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #bdd3ad70;background:linear-gradient(#223c2b,#183023);color:#f9e2ab;font-size:14px;font-weight:900;pointer-events:none}
+#rotateInstructions{max-width:155px;font-size:12px;line-height:1.75;color:#d3dfd0}#rotateInstructions b{color:#ffdb87;font-size:14px}#roundBadge{font-size:11px;border:1px solid #c8d6ab54;background:#d7e69d16;border-radius:10px;padding:6px 9px;white-space:nowrap;color:#d1dcbd}
+#intro,#endOverlay{position:fixed;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;padding:calc(15px + env(safe-area-inset-top)) 16px calc(15px + env(safe-area-inset-bottom));background:#07180abf;backdrop-filter:blur(9px)}.modal{width:min(450px,100%);max-height:100%;overflow:auto;border-radius:24px;background:linear-gradient(155deg,#294131,#15291f 70%);border:1px solid #bccfa464;padding:23px 20px 19px;box-shadow:0 30px 75px #020902bb}.introMark{font-size:47px;line-height:1;margin:0 0 9px}.modal h1{font-size:26px;letter-spacing:1px;margin:0 0 7px}.modal h2{font-size:25px;margin:0 0 12px}.modal p{font-size:13px;color:#c5d2c0;line-height:1.72;margin:0 0 18px}.introSteps{display:grid;gap:8px;margin:15px 0 22px}.introStep{display:flex;align-items:center;gap:11px;background:#101f17ae;border:1px solid #c9d7a020;padding:10px 11px;border-radius:12px;font-size:13px}.introStep span{display:grid;place-items:center;background:#bad89436;border-radius:8px;width:28px;height:28px;font-weight:900;color:#efcf8b}.kicker{color:#e4c987;font-size:11px;letter-spacing:2px;font-weight:900;margin-bottom:8px}
+#aimPanel{padding-top:15px}#aimTrack{height:35px;border:1px solid #e4e6c05a;border-radius:9px;background:linear-gradient(#1e3c28,#142b1e);position:relative;overflow:hidden;margin:10px 0 13px}#aimPerfect{position:absolute;background:#acc77a64;height:100%;left:46%;width:8%;border-inline:1px solid #d3e6aa}#aimPointer{position:absolute;width:5px;height:100%;background:#ffde91;box-shadow:0 0 10px #ffdb7d;left:50%}
+#endOverlay{display:none}#endOverlay.show{display:flex}#outcomeCoords{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.outcomeCell{background:#0c2219;border-radius:12px;padding:14px 10px;text-align:center}.outcomeCell small{display:block;color:#abc3a8;font-size:11px}.outcomeCell strong{display:block;font-size:24px;font-variant-numeric:tabular-nums;margin-top:3px}.note{font-size:11px;color:#9fb4a3;line-height:1.55}
+@media(max-height:740px){#root{padding-top:calc(5px + env(safe-area-inset-top));padding-bottom:calc(7px + env(safe-area-inset-bottom))}#stats .stat{padding:7px 10px}.statValue strong{font-size:24px}#controls{padding:11px}#guide{margin-bottom:2px}#stageName{font-size:18px}#stageDesc{margin-top:2px;font-size:11px}#wheelPad{width:129px;height:129px}#wheelCenter{inset:36px}#wheelLayout{margin-bottom:6px}}
+@media(min-width:750px){#root{padding-top:20px;padding-bottom:20px}#guide{margin-bottom:18px}}
+</style>
+</head>
+<body>
+<canvas id="scene" aria-label="遊戲場景"></canvas><div id="screenTint"></div>
+<div id="root">
+  <header id="head">
+    <div class="heading"><div class="logo">💣</div><div class="headingText"><div class="headingTitle">手榴彈製作訓練 <span style="color:#eaca8c;font-size:10px">PROTOTYPE 0.1</span></div><div class="headingSub" id="headerSub">軍械庫 · 綠桶實驗區</div></div><button id="restart" aria-label="重新開始">↻</button></div>
+    <div id="steps"><div class="step active"></div><div class="step"></div><div class="step"></div><div class="step"></div></div>
+    <div id="stats"><div class="stat" id="gramStat"><label>目前火藥</label><div class="statValue"><strong id="gramText">0</strong><small>克</small></div></div><div class="stat" id="densityStat"><label>遊戲密度</label><div class="statValue"><strong id="densityText">0.00</strong><small>密度值</small></div></div></div>
+  </header>
+  <div id="toast"></div>
+  <div id="guide"><div id="stageRound">第 1 輪</div><div id="stageName">填充火藥</div><div id="stageDesc">按住倒入火藥，自己決定這輪的份量。</div></div>
+  <div id="controls" class="hidden"></div>
+</div>
+<div id="intro"><div class="modal"><div class="kicker">國軍訓練中心 · 獨立試玩</div><div class="introMark">🛢️</div><h1>這桶東西，真的能丟嗎？</h1><p>從一只軍綠色大桶子開始，一輪一輪加入火藥、壓實。見好就收，或冒險再來一次？最後親手把大桶轉成手榴彈，再試試看能丟多準。</p><div class="introSteps"><div class="introStep"><span>1</span>按住倒入火藥 · 決定裝填量</div><div class="introStep"><span>2</span>壓實 QTE · 失誤會傷害隱藏外殼耐久</div><div class="introStep"><span>3</span>反覆累積或收手 · 旋轉轉輪定型</div><div class="introStep"><span>4</span>控制左右和遠近 · 完成投擲測試</div></div><button class="btn primary full" id="startBtn">開始訓練　→</button><div class="underText">這版只做到投擲落地，不含爆炸與破壞。</div></div></div>
+<div id="endOverlay"><div class="modal"><div class="kicker">投擲訓練 · 本回合完成</div><div style="font-size:43px;margin-bottom:6px">🎯</div><h2 id="endHeading">投擲完成！</h2><p id="endDesc">你丟出的成品已經落地，爆炸效果將在後續版本加入。</p><div id="outcomeCoords"><div class="outcomeCell"><small>投擲距離</small><strong id="distVal">0.0 m</strong></div><div class="outcomeCell"><small>偏離目標</small><strong id="missVal">0.0 m</strong></div></div><div class="outcomeCell" style="margin-bottom:16px"><small>本次火藥／密度</small><strong id="finalVal" style="font-size:20px">0 克 · 0.00</strong></div><button class="btn primary full" id="retryBtn">再製作一顆　↻</button><div class="underText">不顯示外殼耐久、定型品質或失敗原因。</div></div></div>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);const cv=$('scene'),ctx=cv.getContext('2d');let W=0,H=0,DPR=1;
+let S={},rafTime=0,lastT=0,pouring=false,shapeDragging=false,lastAngle=0,qtePos=0,aimPos=0,toastClock=0;
+const TAU=Math.PI*2, clamp=(v,l,h)=>Math.max(l,Math.min(h,v)),rnd=(a,b)=>a+Math.random()*(b-a),ease=t=>t*t*(3-2*t),fmt=n=>Math.floor(n).toLocaleString('en-US');
+function reset(){S={phase:'intro',powder:0,density:0.00,round:1,roundGrams:0,totalPressed:0,hp:100,broken:false,shape:0,shapeTarget:rnd(.91,1.08),power:0,qteCenter:.5,qteSpeed:1.8,qteClock:0,compressT:0,compressMode:'',aimX:0,aimZ:0,aimClock:0,throwT:0,shotX:0,shotZ:0,particles:[],shake:0,shotRot:0};pouring=false;shapeDragging=false;lastT=0;renderHUD();$('intro').style.display='flex';$('endOverlay').classList.remove('show');$('controls').classList.add('hidden');$('guide').classList.add('hidden');}
+function phase(p){S.phase=p;if(['shape','aimX','aimZ','flight'].includes(p)){$('toast').classList.remove('show');toastClock=0}renderHUD();}
+function toast(text,ms=1300){const el=$('toast');el.textContent=text;el.classList.add('show');toastClock=performance.now()+ms;}
+function stepIndex(){return ['fill','press','decide'].includes(S.phase)?0:S.phase==='shape'?1:['aimX','aimZ'].includes(S.phase)?2:3;}
+function renderHUD(){const ph=S.phase;$('stats').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='flight');$('steps').classList.toggle('hidden',ph==='intro'||ph==='end');$('guide').classList.toggle('hidden',ph==='intro'||ph==='end');$('controls').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='flight');$('gramText').textContent=fmt(S.powder);$('densityText').textContent=S.density.toFixed(2);const sti=stepIndex();document.querySelectorAll('.step').forEach((el,i)=>{el.classList.toggle('active',i===sti);el.classList.toggle('done',i<sti)});$('headerSub').textContent=['aimX','aimZ','flight'].includes(ph)?'投擲訓練場 · 目標校準':'軍械庫 · 綠桶實驗區';$('stageRound').textContent=['fill','press','decide'].includes(ph)?`第 ${S.round} 輪`:['aimX','aimZ'].includes(ph)?'投擲模擬訓練':ph==='flight'?'投擲中……':'最後定型';
+const titles={fill:'填充火藥',press:'壓實 QTE',decide:S.broken?'外殼損壞！':'繼續挑戰？',shape:'把大桶轉成手榴彈',aimX:'左右方向',aimZ:'投擲遠近',flight:'投擲中……'};const desc={fill:'按住倒入火藥，自己決定這輪的份量。',press:'指針進入亮色區域時按下「壓實」。',decide:S.broken?'外殼已經損壞，必須停止裝填。':'保住目前成果，還是再裝填一輪？',shape:'沿著轉輪順時針旋轉，覺得外型像手榴彈時就停手。',aimX:'抓準指針，決定落點偏左或偏右。',aimZ:'再次抓準指針，決定落點遠近。',flight:'正在飛向訓練目標……'};
+$('stageName').textContent=titles[ph]||'';$('stageDesc').textContent=desc[ph]||'';
+const ctl=$('controls');ctl.replaceChildren();if(ph==='fill'){
+ ctl.innerHTML=`<div class="smallTitle">倒入火藥　<span class="dim" id="roundMass">本輪 0 克</span></div><div class="fillMeter"><div class="fillValue" id="fillValue"></div></div><div class="split"><button id="pourBtn" class="btn"><span>⬇　按住倒入</span><small>鬆手就停止</small></button><button id="compressBtn" class="btn primary" disabled>開始壓實　→</button></div><div class="underText">每輪最多倒入 480 克（純遊戲設定）</div>`;
+ const btn=$('pourBtn');btn.addEventListener('pointerdown',e=>{e.preventDefault();btn.setPointerCapture(e.pointerId);pouring=true;btn.classList.add('isHeld')});const stop=()=>{pouring=false;btn.classList.remove('isHeld')};btn.addEventListener('pointerup',stop);btn.addEventListener('pointercancel',stop);btn.addEventListener('lostpointercapture',stop);$('compressBtn').addEventListener('click',startPress);
+}else if(ph==='press'){
+ ctl.innerHTML=`<div id="pressureBanner"><span>壓縮機運作中</span><span>抓準時機！</span></div><div id="qteTrack"><div id="qteAim"></div><div id="qteNeedle"></div></div><div id="qteHint">亮區中央最精準 · 完美壓實不傷外殼</div><button class="btn primary full" id="pressButton">⬇　壓實！</button>`;
+ $('qteAim').style.left=(S.qteCenter*100-7.5)+'%';$('pressButton').addEventListener('click',finishPress);
+}else if(ph==='decide'){
+ const bad=S.broken;ctl.innerHTML=`<div id="decisionHead"><div><div class="smallTitle" style="font-size:16px;margin:0">${bad?'外殼破裂，必須停機！':'還要再裝一輪嗎？'}</div><div class="dim" style="margin-top:4px">目前 ${fmt(S.powder)} 克　·　遊戲密度 ${S.density.toFixed(2)}</div></div><div id="conditionIcon">${bad?'💥':'🛢️'}</div></div>${bad?'<button id="nextShape" class="btn primary full">前往轉輪定型　→</button>':'<div class="split"><button id="nextShape" class="btn ghost">見好就收</button><button id="addMore" class="btn primary">＋ 再加一輪！</button></div>'}`;
+ $('nextShape').addEventListener('click',startShape);if(!bad)$('addMore').addEventListener('click',()=>{S.round++;S.roundGrams=0;phase('fill')});
+}else if(ph==='shape'){
+ ctl.innerHTML=`<div id="wheelLayout"><div id="wheelPad"><div id="wheelFace"></div><div id="wheelRot"><div id="wheelGrip"></div></div><div id="wheelCenter">↻ 旋轉</div></div><div id="rotateInstructions"><b>將桶子慢慢定型</b><br>順時針轉動轉輪。<br>覺得外觀適合了，就按完成。<br><span class="dim">超過頭不能轉回去。</span></div></div><button id="shapeDone" class="btn primary full">完成定型 · 前往投擲　→</button>`;
+ const wheel=$('wheelPad');wheel.addEventListener('pointerdown',e=>{e.preventDefault();wheel.setPointerCapture(e.pointerId);shapeDragging=true;lastAngle=pointerAngle(e,wheel)});wheel.addEventListener('pointermove',e=>{if(!shapeDragging||S.phase!=='shape')return;e.preventDefault();const a=pointerAngle(e,wheel);let d=a-lastAngle;if(d>Math.PI)d-=TAU;if(d<-Math.PI)d+=TAU;lastAngle=a;if(d>0&&d<1.3){S.shape=clamp(S.shape+d/TAU*.38,0,1.65);S.shake=Math.min(.4,S.shake+.012);updateWheel();}});const stop=()=>{shapeDragging=false};wheel.addEventListener('pointerup',stop);wheel.addEventListener('pointercancel',stop);wheel.addEventListener('lostpointercapture',stop);$('shapeDone').addEventListener('click',startAim);updateWheel();
+}else if(ph==='aimX'||ph==='aimZ'){
+ const ax=ph==='aimX';ctl.innerHTML=`<div class="smallTitle">${ax?'第 1 步：左右方向':'第 2 步：投擲遠近'}</div><div id="aimTrack"><div id="aimPerfect"></div><div id="aimPointer"></div></div><button id="lockAim" class="btn primary full">${ax?'鎖定左右方向　→':'投擲！　↗'}</button><div class="underText">金色指針會快速來回移動，靠近中央越準</div>`;
+ $('lockAim').addEventListener('click',()=>{if(S.phase==='aimX'){S.aimX=aimPos;S.aimClock=0;phase('aimZ')}else{S.aimZ=aimPos;startFlight()}});
+}}
+function pointerAngle(e,el){const r=el.getBoundingClientRect();return Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2));}
+function updateWheel(){const el=$('wheelRot');if(el)el.style.transform=`rotate(${S.shape/.38*360}deg)`;}
+function updateStats(){if(S.phase==='intro')return;const g=$('gramText'),d=$('densityText');if(g)g.textContent=fmt(S.powder);if(d)d.textContent=S.density.toFixed(2);if(S.phase==='fill'){$('roundMass').textContent=`本輪 ${fmt(S.roundGrams)} 克`;$('fillValue').style.width=(S.roundGrams/480*100).toFixed(2)+'%';$('compressBtn').disabled=S.roundGrams<45;}}
+function startPress(){if(S.roundGrams<45)return;pouring=false;S.qteClock=0;S.qteCenter=rnd(.32,.68);S.qteSpeed=1.4+Math.min(2.8,S.round*.19);phase('press');}
+function finishPress(){if(S.phase!=='press')return;const deviation=Math.abs(qtePos-S.qteCenter);const score=clamp(1-deviation/.38,0,1);let label,loss,gain;if(deviation<=.024){label='PERFECT！';loss=0;gain=.40}else if(deviation<=.072){label='GREAT！';loss=4;gain=.29}else if(deviation<=.14){label='GOOD！';loss=10;gain=.20}else if(deviation<=.24){label='BAD…';loss=23;gain=.10}else{label='MISS！';loss=42;gain=.035}
+ S.totalPressed++;S.hp=clamp(S.hp-loss,0,100);S.broken=S.hp<=0;S.density=clamp(S.density+gain*(1+Math.log1p(S.round)*.16),.3,9.99);S.power=latentPower(1);S.shake=.85;S.compressT=1;S.compressMode=label;S.particles=[];toast(label+(S.broken?'　外殼破裂！':''),S.broken?1500:1100);phase('decide');}
+function startShape(){S.shape=0;S.shapeTarget=rnd(.88,1.07)+Math.min(.13,S.round*.009);phase('shape')}
+function latentPower(shaping){return S.powder*Math.pow(1.32,S.totalPressed)*S.density*(S.broken?.55:1)*shaping;}
+function startAim(){// Pure game score, hidden and reserved for future explosion gameplay.
+ const closeness=Math.abs(S.shape-S.shapeTarget);S.shapeQuality=Math.max(.08,1/(1+Math.pow(closeness/.23,2)));S.power=latentPower(S.shapeQuality);S.aimClock=0;phase('aimX');}
+function startFlight(){S.phase='flight';S.throwT=0;S.shotX=(S.aimX-.5)*18;S.shotZ=5+(1-S.aimZ)*24;S.shotRot=rnd(-3,3);S.shake=.25;renderHUD();}
+function endFlight(){phase('end');const lateral=S.shotX;const forward=S.shotZ;const dist=Math.hypot(lateral,forward);const off=Math.hypot(lateral,forward-17);$('distVal').textContent=dist.toFixed(1)+' m';$('missVal').textContent=off.toFixed(1)+' m';$('finalVal').textContent=`${fmt(S.powder)} 克 · ${S.density.toFixed(2)}`;$('endHeading').textContent=off<2.2?'正中目標！':off<5?'很接近了！':'手榴彈已落地！';$('endDesc').textContent='本次投擲測試完成。爆炸、建築破壞和地標圖鑑將在下一階段製作。';$('endOverlay').classList.add('show');}
+function boot(){reset();$('startBtn').addEventListener('click',()=>{$('intro').style.display='none';S.phase='fill';S.round=1;S.roundGrams=0;phase('fill')});$('retryBtn').addEventListener('click',()=>{reset();$('intro').style.display='none';S.phase='fill';phase('fill')});$('restart').addEventListener('click',()=>{if(confirm('要重新開始這次訓練嗎？'))reset()});window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden)pouring=false});resize();requestAnimationFrame(loop)}
+function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=Math.max(1,window.innerWidth);H=Math.max(1,window.innerHeight);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0)}
+function rr(x,y,w,h,r,fill,stroke,lw=1){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+function line(x1,y1,x2,y2,color,width=2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
+function ellipse(x,y,rx,ry,fill,stroke,lw=1){ctx.beginPath();ctx.ellipse(x,y,Math.max(.1,rx),Math.max(.1,ry),0,0,TAU);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+function colorGrad(x0,y0,x1,y1,a,b){let g=ctx.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,a);g.addColorStop(1,b);return g}
+function drawWorkshop(t){const cy=H*.50;let bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#354f3f');bg.addColorStop(.53,'#172e25');bg.addColorStop(1,'#091b16');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+ // vertical wall sheets and seams
+ for(let x=-100,i=0;x<W+110;x+=99,i++){ctx.fillStyle=i%2?'#ffffff05':'#00000010';ctx.fillRect(x,0,98,H*.7);line(x+98,0,x+98,H*.73,'#aec3a018',2)}
+ const v=ctx.createRadialGradient(W*.50,cy-60,25,W*.50,cy+10,W*.72);v.addColorStop(0,'#a6c79526');v.addColorStop(1,'#08191000');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+ // pipe rails and backlit window
+ line(0,H*.265,W,H*.265,'#71877967',8);line(0,H*.275,W,H*.275,'#091a13b0',5);
+ for(let x=28;x<W;x+=116){rr(x,H*.29,12,H*.28,4,'#0c231d63','#8ca68620',2)}
+ const px=W*.5,py=cy+124;
+ // platform shadow and ground
+ ellipse(px,py+50,Math.min(W*.44,225),31,'#00000060');rr(Math.max(10,px-Math.min(W*.44,226)),py,Math.min(W*.88,452),43,9,colorGrad(0,py,0,py+43,'#64745a','#293d31'),'#aab59d44',3);rr(Math.max(17,px-Math.min(W*.4,206)),py+34,Math.min(W*.8,412),15,3,'#14251d');
+ // side mounting posts
+ const spread=Math.min(W*.34,185);for(let s of [-1,1]){const x=px+s*spread;rr(x-12,cy-177,23,294,4,colorGrad(x-15,0,x+13,0,'#364c40','#809281'),'#142e23',2);rr(x-9,cy-173,4,284,2,'#c3d0a128')}
+ // top overhead hydraulic press assembly
+ rr(px-spread-15,cy-192,spread*2+30,24,6,colorGrad(0,cy-192,0,cy-165,'#859580','#344b3b'),'#afc7a36e',2);
+ for(let x=px-spread+28;x<px+spread-18;x+=43){ellipse(x,cy-181,3,3,'#26382f','#a4b7a085',1)}
+ const pressY=cy-157+(S.phase==='press'||S.compressT>0?Math.sin(t*7)*3+S.compressT*8:0);
+ rr(px-41,pressY,82,20,5,colorGrad(0,pressY,0,pressY+21,'#a2aaa0','#3c5441'),'#d8dfc34d',2);rr(px-19,pressY-13,38,17,4,'#63756b','#cedbbe58',2);
+ if(S.phase==='fill'){
+ // hopper and falling powder
+ rr(px-41,cy-232,82,30,4,'#495c51','#d5dcc058',2);ctx.beginPath();ctx.moveTo(px-35,cy-204);ctx.lineTo(px+35,cy-204);ctx.lineTo(px+12,cy-177);ctx.lineTo(px-12,cy-177);ctx.closePath();ctx.fillStyle='#b3ab6c';ctx.fill();rr(px-10,cy-181,20,16,3,'#a8aa7c');
+ if(pouring){for(let i=0;i<21;i++){const y=(t*240+i*29)%62;const x=px+Math.sin(i*81)*8;ellipse(x,cy-161+y,1.5+i%3,2.5,'#e3d091c5')}}
+ }
+ // side light panel
+ let x=px-spread+29;if(W>350){rr(x,cy-144,63,33,5,'#0b2a1e','#aec79354',1);ctx.font='bold 9px system-ui';ctx.textAlign='center';ctx.fillStyle='#b4deae';ctx.fillText('MFG-01',x+31,cy-131);ctx.fillStyle=S.broken?'#e6a173':'#85d3a5';ctx.fillText(S.broken?'FAULT':'READY',x+31,cy-118)}
+ // shadow
+ ellipse(px,cy+107,114,17,'#06180cb0');
+ const shape=['shape','aimX','aimZ','flight','end'].includes(S.phase)?S.shape:0;
+ drawCan(px,cy+32,shape,t,1);
+ // foreground edge
+ rr(0,py+22,W,Math.max(0,H-py-20),0,colorGrad(0,py,0,H,'#172b21','#0c1b15'));
+ line(0,py+22,W,py+22,'#acc7a043',3);
+ ctx.font='900 11px system-ui';ctx.textAlign='center';ctx.fillStyle='#c3d2b577';ctx.fillText('ARMY   /   MOCK TRAINING EQUIPMENT',px,Math.min(H-12,py+42));
+}
+function drawCan(px,base,t,tm,sc=1){ctx.save();ctx.translate(px+Math.sin(tm*23)*S.shake*3,base+Math.sin(tm*17)*S.shake*1.4);ctx.scale(sc,sc);
+ const p=clamp(t,0,1),over=clamp((t-1)/.62,0,1);
+ // approximate smoothly morphed game prop: barrel -> grenade -> squashed metal puck
+ const height=208-(p*77)-(over*102);const width=154-p*36+over*65;const y=-height+53;const rad=width/2;const radiusTop=rad*(1-.17*p);const bulge=rad*(.08+.19*p);const bottom=50;
+ const bodyGradient=ctx.createLinearGradient(-rad,y,rad,bottom);bodyGradient.addColorStop(0,S.broken?'#344b3b':'#293f31');bodyGradient.addColorStop(.25,S.broken?'#667159':'#7e9972');bodyGradient.addColorStop(.52,S.broken?'#5e6c58':'#657f59');bodyGradient.addColorStop(.79,'#415b43');bodyGradient.addColorStop(1,'#203629');
+ // rear handle near grenade form
+ if(p>.59){ctx.globalAlpha=clamp((p-.59)*4,0,1);ctx.strokeStyle='#bac7aa';ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(15,y+3);ctx.lineTo(38,y-15);ctx.lineTo(51,y+19);ctx.stroke();ctx.globalAlpha=1}
+ // main body shape, top becomes rounded shoulder toward grenade
+ ctx.beginPath();ctx.moveTo(-radiusTop,y+11);ctx.bezierCurveTo(-rad-bulge,y+height*.12,-rad-bulge,y+height*.76,-rad*.66,bottom-7);ctx.quadraticCurveTo(0,bottom+7,rad*.66,bottom-7);ctx.bezierCurveTo(rad+bulge,y+height*.76,rad+bulge,y+height*.12,radiusTop,y+11);ctx.quadraticCurveTo(0,y-13,-radiusTop,y+11);ctx.closePath();ctx.fillStyle=bodyGradient;ctx.fill();ctx.strokeStyle='#11271f';ctx.lineWidth=4;ctx.stroke();
+ ctx.save();ctx.clip();const rows=p>.42?5:3;const cols=p>.56?5:3;
+ for(let i=1;i<rows;i++){const q=i/rows,yy=y+18+(bottom-y-34)*q;ctx.beginPath();ctx.moveTo(-rad-24,yy);ctx.quadraticCurveTo(0,yy+7*p,rad+24,yy);ctx.strokeStyle=`rgba(21,45,30,${.39+.14*p})`;ctx.lineWidth=3.3;ctx.stroke();ctx.beginPath();ctx.moveTo(-rad,yy-3);ctx.lineTo(rad,yy-3);ctx.strokeStyle='#a8b99420';ctx.lineWidth=1;ctx.stroke()}
+ if(p>.40){ctx.globalAlpha=clamp((p-.4)*2.7,0,1);for(let i=1;i<cols;i++){const xx=-rad+2*rad*i/cols;ctx.beginPath();ctx.moveTo(xx*.81,y+12);ctx.bezierCurveTo(xx*1.09,y+height*.29,xx*1.12,y+height*.7,xx*.74,bottom);ctx.strokeStyle='#263c2d';ctx.lineWidth=3.8;ctx.stroke()}ctx.globalAlpha=1}
+ // powder fill line visible through stylized inspection window, not blueprint
+ if(S.phase==='fill'||S.phase==='press'||S.phase==='decide'){
+ rr(-34,y+height*.24,68,9,3,'#1b3326d9','#bed59d42');rr(-30,y+height*.26,60*clamp(S.roundGrams/480,0,1),5,2,'#efc77a');
+ }
+ ctx.restore();
+ // top ellipse lip, becomes grenade shoulder
+ ellipse(0,y+9,radiusTop,10-5*p,'#6f8964','#c2d3b06b',2.2);
+ if(p<.77){ctx.globalAlpha=1-clamp((p-.35)*2.5,0,1);ellipse(0,y+8,radiusTop-9,6,'#304839','#b0c49660',1.4);ctx.globalAlpha=1}
+ // grenade top fuse/handle emerges
+ if(p>.55){ctx.globalAlpha=clamp((p-.55)*3.6,0,1);rr(-18,y-27,36,35,4,colorGrad(-18,0,18,0,'#65796b','#354f3e'),'#20362b',2);rr(-12,y-36,24,10,2,'#b5bba5','#495a4b',2);line(-9,y-22,8,y-22,'#d9e8c348',2);ctx.globalAlpha=1}
+ if(S.broken){ctx.beginPath();ctx.moveTo(rad*.36,y+height*.2);ctx.lineTo(rad*.17,y+height*.37);ctx.lineTo(rad*.47,y+height*.47);ctx.lineTo(rad*.25,y+height*.65);ctx.strokeStyle='#172a22';ctx.lineWidth=4;ctx.stroke();ctx.strokeStyle='#dcc18e66';ctx.lineWidth=1;ctx.stroke()}
+ if(over>.09){ctx.globalAlpha=clamp(over*1.5,0,1);ctx.beginPath();ctx.moveTo(-rad*.43,y+height*.42);ctx.lineTo(rad*.16,y+height*.47);ctx.lineTo(-rad*.09,y+height*.72);ctx.strokeStyle='#d7b487';ctx.lineWidth=3.5;ctx.stroke();ctx.globalAlpha=1}
+ // specular highlight
+ ctx.globalAlpha=.29;ctx.beginPath();ctx.ellipse(-rad*.57,(y+bottom)/2,8,Math.max(12,height*.23),-.05,0,TAU);ctx.fillStyle='#c8dfa4';ctx.fill();ctx.globalAlpha=1;
+ ctx.restore();}
+function sceneField(t){const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#a3b9a5');bg.addColorStop(.49,'#5a8c6b');bg.addColorStop(1,'#1e5237');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+ const x0=W*.5,y0=H*.52;const sky=H*.32;const groundGrad=ctx.createLinearGradient(0,sky,0,H);groundGrad.addColorStop(0,'#7d946b');groundGrad.addColorStop(1,'#305c3d');ctx.fillStyle=groundGrad;ctx.fillRect(0,sky,W,H-sky);
+ // top-down isometric-ish training range grid
+ const Sx=Math.min(1,W/520);ctx.save();ctx.translate(x0,y0);ctx.transform(1,0,-.20,.65,0,0);const k=Sx;
+ rr(-190*k,-195,380*k,380,7,'#648659','#becb963f',2);
+ for(let i=-5;i<=5;i++){line(-190*k,i*32,190*k,i*32,'#1b513d3d',1);line(i*33*k,-190,i*33*k,190,'#1b513d3d',1)}
+ // stripes and markers
+ for(let x=-150;x<=150;x+=75){rr(x*k-10,-130,20,35,4,'#e3bd7259','#2b4b36',1)}
+ // dummy soldiers
+ for(let i=0;i<11;i++){let x=((i%4)-1.5)*70*k+(i%2?14:-8);let y=-90+Math.floor(i/4)*62;drawDummy(x,y,'#ac4c47',i)}
+ for(let i=0;i<4;i++)drawDummy((i*65-98)*k,118,'#5a9575',i+20);
+ // target marker central
+ ctx.strokeStyle='#fff6bfdb';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-5,26,0,TAU);ctx.stroke();line(-42,-5,-17,-5,'#ffdc8c',2);line(17,-5,42,-5,'#ffdc8c',2);line(0,-47,0,-22,'#ffdc8c',2);line(0,12,0,34,'#ffdc8c',2);
+ const markerX=S.phase==='aimX'?(aimPos-.5)*152:S.phase==='aimZ'?S.aimX*152-76:S.shotX*8.5;const markerY=S.phase==='aimX'?-5:S.phase==='aimZ'?((aimPos-.5)*-170-5):-(S.shotZ-17)*9;
+ if(S.phase!=='flight' && S.phase!=='end'){ctx.globalAlpha=.85;ellipse(markerX,markerY,9,9,'#f7d99050','#f1e39c',2);line(markerX-15,markerY,markerX+15,markerY,'#ffdb87',1);line(markerX,markerY-15,markerX,markerY+15,'#ffdb87',1);ctx.globalAlpha=1}
+ if(S.phase==='flight'||S.phase==='end'){ellipse(S.shotX*8.5,-(S.shotZ-17)*9,15+S.throwT*3,7+S.throwT*3,'#1d39275c','#f2d990',2)}
+ ctx.restore();
+ // front thrower seen over bottom
+ ctx.save();ctx.translate(W*.50,H*.81);const r=Math.min(1,W/440);ctx.scale(r,r);ellipse(0,35,98,18,'#091d146c');ctx.fillStyle='#253f32';ctx.beginPath();ctx.ellipse(0,20,72,63,0,0,TAU);ctx.fill();rr(-38,-65,77,74,18,'#6a8b6e','#294f38',3);ellipse(0,-67,30,17,'#b4a78a','#d0c4a2',2);ctx.restore();
+ if(S.phase==='flight'){const u=clamp(S.throwT/1.42,0,1);const sx=W*.52,sy=H*.78;const ex=W*.5+S.shotX*9,ey=H*.47-(S.shotZ-17)*5;let xx=sx+(ex-sx)*u,yy=sy+(ey-sy)*u-Math.sin(u*Math.PI)*H*.22;ctx.save();ctx.translate(xx,yy);ctx.rotate(u*11);drawCan(0,10,S.shape,t,Math.max(.14,(1-u)*.48));ctx.restore();}
+}
+function drawDummy(x,y,c,i){ctx.save();ctx.translate(x,y);ctx.fillStyle='#102d22a8';ellipse(4,10,14,7);rr(-7,-1,14,17,3,c,'#173d29',1);ellipse(0,-6,8,7,c,'#193929',1);line(-6,11,-10,20,'#1c3325',3);line(6,11,10,20,'#1c3325',3);ctx.restore()}
+function render(t){ctx.clearRect(0,0,W,H);if(['aimX','aimZ','flight','end'].includes(S.phase))sceneField(t);else drawWorkshop(t);}
+function loop(ms){const t=ms/1000,dt=Math.min(.055,lastT?t-lastT:0);lastT=t;rafTime=t;
+ if(pouring&&S.phase==='fill'){let add=Math.min(480-S.roundGrams,dt*(158+Math.min(120,S.round*9)));if(add>0){if(S.powder===0)S.density=.6;S.roundGrams+=add;S.powder+=add;S.density=clamp(S.density-dt*.038,.4,9.99)}else pouring=false;updateStats()}
+ if(S.phase==='press'){S.qteClock+=dt;const v=Math.asin(Math.sin(S.qteClock*S.qteSpeed*2.3))/Math.PI+.5;qtePos=clamp(v,0,1);const el=$('qteNeedle');if(el)el.style.left=(qtePos*100)+'%'}
+ if(S.phase==='aimX'||S.phase==='aimZ'){S.aimClock+=dt;aimPos=(Math.sin(S.aimClock*(S.phase==='aimX'?5.3:6.6)-1.25)+1)/2;const el=$('aimPointer');if(el)el.style.left=(aimPos*100)+'%'}
+ if(S.phase==='flight'){S.throwT+=dt;if(S.throwT>1.6)endFlight()}
+ if(S.compressT>0)S.compressT=Math.max(0,S.compressT-dt*1.7);if(S.shake>0)S.shake=Math.max(0,S.shake-dt*.94);
+ if(toastClock&&ms>toastClock){$('toast').classList.remove('show');toastClock=0}
+ render(t);requestAnimationFrame(loop)}
+boot();
+})();
+</script>
+</body></html>
