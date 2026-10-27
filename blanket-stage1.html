@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
 <meta name="theme-color" content="#203229" />
-<title>豆腐干棉被｜第一階段：水火與髒污 v0.6</title>
+<title>豆腐干棉被｜第一、二階段：水火刷洗＋記憶開折 v0.7</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f6f6e8;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -20,6 +20,7 @@ body{display:flex;justify-content:center;align-items:center}
 .meters{margin-top:15px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .meter{background:#17251cbb;border:1px solid #9daa8a56;border-radius:13px;padding:9px 10px;box-shadow:0 7px 12px #07100a35}
 .meter.clean{grid-column:1 / -1}
+[hidden]{display:none!important}
 .meter-label{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#e9eedb;margin-bottom:6px}
 .meter-label strong{font-variant-numeric:tabular-nums;color:white}
 .track{background:#101a14;border-radius:100px;height:9px;overflow:hidden}
@@ -92,16 +93,39 @@ body{display:flex;justify-content:center;align-items:center}
 .tool:disabled{opacity:.55;filter:grayscale(.8);cursor:default}
 @media(max-height:720px){.artframe{top:20%;height:54%}.state{padding:9px 12px;bottom:calc(95px + env(safe-area-inset-bottom))}.state-name{font-size:16px}.tool{min-height:67px}.controls{padding-top:7px}}
 @media(max-width:390px){.header{padding-left:12px;padding-right:12px}.toprow h1{font-size:20px}.subtitle{font-size:11px}.state{left:11px;right:11px}.controls{gap:8px;padding-left:11px;padding-right:11px}}
+
+/* Standalone second stage: memorise an outline for one second, then draw it from memory. */
+.next-stage{width:100%;margin-top:10px;padding:9px 13px;background:linear-gradient(135deg,#83a45d,#537e55);border:1px solid #cfefaa80;border-radius:12px;color:#fcffeb;font:inherit;font-size:14px;font-weight:900;min-height:40px;cursor:pointer;touch-action:manipulation}
+.next-stage:active{filter:brightness(1.2)}
+#memoryOverlay{position:absolute;inset:0;width:100%;height:100%;max-width:580px;margin:auto;touch-action:none;z-index:4;pointer-events:auto;overscroll-behavior:none}
+#drawingSurface{pointer-events:all;cursor:crosshair}
+#memoryTarget,#memoryGhost,#memoryInk,#memorySplash{pointer-events:none}
+.stage2-info{position:absolute;z-index:9;left:14px;right:14px;top:calc(130px + env(safe-area-inset-top));text-align:center;padding:9px 12px;border-radius:16px;background:#14231ddf;border:1px solid #b5c7ab75;box-shadow:0 8px 20px #07140b70}
+.memory-round{font-weight:900;font-size:14px;color:#f4ecd0;letter-spacing:1px}
+.memory-instruction{margin-top:5px;font-size:15px;font-weight:800;color:#e3f7e1}
+.scores-mini{font-size:12px;color:#b6d3be;margin-top:5px}
+.stage2-result{position:absolute;z-index:10;top:calc(65% - 85px);left:50%;transform:translateX(-50%);width:min(84%,320px);background:#0c1b17eb;border:1px solid #c4d9bda0;border-radius:18px;box-shadow:0 9px 34px #020905a8;text-align:center;padding:16px 13px;pointer-events:none}
+.result-title{font-size:32px;line-height:1.15;color:#fff0b5;font-weight:1000}
+.result-subtitle{margin-top:6px;font-size:13px;color:#d2e6d7}
+.stage2-controls{position:absolute;z-index:9;bottom:0;left:0;right:0;padding:13px 14px calc(15px + env(safe-area-inset-bottom));background:linear-gradient(180deg,transparent,#101a16ed 17%,#0a1310 70%)}
+.stage2-tip{font-size:12px;color:#d6e9d4;text-align:center;margin-bottom:9px}
+.stage2-buttons{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.stage2-buttons button{min-height:66px;border-radius:15px;font:inherit;font-weight:900;font-size:20px;touch-action:manipulation}
+.redraw-btn{background:#405a4d;color:#f2f6e7;border:1px solid #9daf9f74}
+.fold-btn{background:linear-gradient(145deg,#e8b969,#bb732e);color:#22190c;border:1px solid #ffe2a4}
+.fold-btn:disabled{filter:grayscale(.7);opacity:.53}
+@media(max-height:730px){.stage2-info{top:calc(100px + env(safe-area-inset-top));padding:6px 9px}.memory-instruction{font-size:13px}.stage2-buttons button{min-height:56px}.stage2-controls{padding-top:6px}.stage2-result{top:58%}}
+@media(max-width:410px){.stage2-info{left:10px;right:10px;top:calc(128px + env(safe-area-inset-top));padding:7px 9px}.stage2-result{width:82%}}
 </style>
 </head>
 <body>
 <div class="app">
  <div class="header">
   <div class="toprow">
-   <div><h1>報告長官！這不是豆腐乾</h1><div class="subtitle">第一階段｜棉被乾濕度試驗（獨立版本）</div></div>
+   <div><h1>報告長官！這不是豆腐乾</h1><div class="subtitle" id="stageSubtitle">第一階段｜棉被乾濕度、焦化與刷洗</div></div>
    <button class="reset" id="reset" type="button">重新開始</button>
   </div>
-  <div class="meters">
+  <div class="meters" id="stage1Meters">
    <div class="meter"><div class="meter-label">💧 含水量 <strong id="waterValue">32%</strong></div><div class="track"><div class="progress" id="waterProgress"></div></div></div>
    <div class="meter"><div class="meter-label">🔥 焦化度 <strong id="burnValue">0%</strong></div><div class="track"><div class="progress" id="burnProgress"></div></div></div>
    <div class="meter clean"><div class="meter-label">🗑️ 髒亂度 <strong id="dirtyValue">82%</strong></div><div class="track"><div class="progress" id="dirtyProgress"></div></div></div>
@@ -288,9 +312,33 @@ body{display:flex;justify-content:center;align-items:center}
    <g id="steamFx" stroke="#b5d8d9" stroke-opacity=".6" stroke-width="5" fill="none" stroke-linecap="round"><path d="M265 262Q241 236 273 219Q303 196 282 170"/><path d="M350 244Q332 213 362 190"/></g>
    <g id="smokeFx" stroke="#b8bbba" stroke-opacity=".65" stroke-width="10" fill="none" stroke-linecap="round"><path d="M285 261Q261 241 279 211Q304 186 291 166"/><path d="M347 255Q328 213 354 193Q381 166 368 139"/><path d="M425 280Q408 257 435 228Q447 214 438 186"/></g>
   </svg>
+  <svg id="memoryOverlay" viewBox="0 0 640 560" aria-label="依照記憶用手指描出剛才的白色封閉線條" hidden>
+    <rect id="drawingSurface" x="70" y="200" width="505" height="255" rx="20" fill="#0a1718" fill-opacity=".28" />
+    <path id="memoryTarget" fill="none" stroke="#fff9e7" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0" filter="url(#traceGlow)" />
+    <path id="memoryGhost" fill="none" stroke="#fff3b0" stroke-width="5" stroke-opacity=".92" stroke-dasharray="10 8" stroke-linecap="round" stroke-linejoin="round" hidden />
+    <path id="memoryInk" fill="none" stroke="#7cf3ea" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+    <text id="memorySplash" x="320" y="186" font-size="23" font-weight="900" text-anchor="middle" fill="#fff8dc" paint-order="stroke" stroke="#19302a" stroke-width="6"></text>
+    <defs><filter id="traceGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  </svg>
  </div>
- <div class="state" aria-live="polite"><div class="state-name"><span id="stateName">蓬鬆乾爽</span><span class="state-tag" id="stateTag">軍綠棉被</span></div><div class="state-desc" id="stateDesc">一開始棉被會很髒很亂。先灑水弄濕，再直接在棉被上來回猛刷，把整堆垃圾和髒污刷掉。</div></div>
- <div class="controls"><button id="waterBtn" class="tool water" type="button"><span>💧</span><div>灑水<small>長按持續加水</small></div></button><button id="fireBtn" class="tool fire" type="button"><span>🔥</span><div>打火機<small>長按烘乾 / 燒焦</small></div></button></div>
+ <div class="stage2-info" id="stage2Info" hidden>
+   <div class="memory-round" id="roundLabel">第 1 / 3 題</div>
+   <div class="memory-instruction" id="memoryInstruction" aria-live="polite">記住接下來的白色線條！</div>
+   <div class="scores-mini" id="scoresMini">目前尚未計分</div>
+ </div>
+ <div class="stage2-result" id="stage2Result" hidden aria-live="polite">
+   <div class="result-title" id="stage2ResultTitle">0 分</div>
+   <div class="result-subtitle" id="stage2ResultSubtitle">你的線條與標準形狀</div>
+ </div>
+ <div class="stage2-controls" id="stage2Controls" hidden>
+   <div class="stage2-tip" id="stage2Tip">白色線條只出現 1 秒，消失後用手指畫出來</div>
+   <div class="stage2-buttons">
+     <button class="redraw-btn" id="redrawBtn" type="button">重畫</button>
+     <button class="fold-btn" id="foldBtn" type="button" disabled>開折</button>
+   </div>
+ </div>
+ <div class="state" id="stage1State" aria-live="polite"><div class="state-name"><span id="stateName">蓬鬆乾爽</span><span class="state-tag" id="stateTag">軍綠棉被</span></div><div class="state-desc" id="stateDesc">一開始棉被會很髒很亂。先灑水弄濕，再直接在棉被上來回猛刷，把整堆垃圾和髒污刷掉。</div><button id="nextStageBtn" class="next-stage" type="button">下一階段：記憶折線 <span aria-hidden="true">→</span></button></div>
+ <div class="controls" id="stage1Controls"><button id="waterBtn" class="tool water" type="button"><span>💧</span><div>灑水<small>長按持續加水</small></div></button><button id="fireBtn" class="tool fire" type="button"><span>🔥</span><div>打火機<small>長按烘乾 / 燒焦</small></div></button></div>
 </div>
 <script>
 (()=>{'use strict';
@@ -307,6 +355,7 @@ body{display:flex;justify-content:center;align-items:center}
   const blend=(a,b,t)=>a.map((n,i)=>Math.round(lerp(n,b[i],clamp(t,0,1))));
   const rgb=a=>`rgb(${a[0]},${a[1]},${a[2]})`;
   let moisture=32,burn=0,dirt=82,ash=false,action=null,last=performance.now(),lastRender=0;
+  let stage=1;
   let scrubbing=false,lastScrubPoint=null,scrubAccum=0;
   const dirtPieces=Array.from(document.querySelectorAll('#trashPieces .trash'));
   const dirtStains=Array.from(document.querySelectorAll('#dirtSmudges .stain'));
@@ -441,7 +490,7 @@ body{display:flex;justify-content:center;align-items:center}
     }
   }
   function scrubMove(e){
-    if(!scrubbing || ash) return;
+    if(stage!==1 || !scrubbing || ash) return;
     const pt=svgPoint(e);
     if(lastScrubPoint){
       const dx=pt.x-lastScrubPoint.x, dy=pt.y-lastScrubPoint.y;
@@ -457,7 +506,7 @@ body{display:flex;justify-content:center;align-items:center}
     e.preventDefault();
   }
   scrubArea.addEventListener('pointerdown',e=>{
-    if(ash) return;
+    if(stage!==1 || ash) return;
     if(action) setAction(null);
     scrubbing=true; lastScrubPoint=svgPoint(e);
     try{scrubArea.setPointerCapture(e.pointerId);}catch(_){ }
@@ -469,7 +518,7 @@ body{display:flex;justify-content:center;align-items:center}
     scrubArea.addEventListener(evt,()=>{scrubbing=false; lastScrubPoint=null; update();});
   }
   function setAction(which){
-    if(ash && which)return;
+    if((ash || stage!==1) && which)return;
     action=which;
     watBtn.classList.toggle('active',which==='water'); firBtn.classList.toggle('active',which==='fire');
     update();
@@ -477,7 +526,7 @@ body{display:flex;justify-content:center;align-items:center}
   function bind(btn,which){
     let pressedAt=0;
     btn.addEventListener('pointerdown',e=>{
-      if(ash)return;
+      if(ash || stage!==1)return;
       e.preventDefault();
       pressedAt=performance.now();
       try{btn.setPointerCapture(e.pointerId);}catch(_){}
@@ -488,12 +537,12 @@ body{display:flex;justify-content:center;align-items:center}
     }
     // A quick tap still changes the blanket; a long hold won't get an extra boost on release.
     btn.addEventListener('click',()=>{
-      if(ash)return;
+      if(ash || stage!==1)return;
       if(performance.now()-pressedAt<170){step(which,.25);update();}
     });
   }
   function step(which,dt){
-    if(ash)return;
+    if(ash || stage!==1)return;
     if(which==='water'){
       moisture=clamp(moisture+dt*26);
       // Moisture stops active combustion, but char marks do not vanish magically.
@@ -507,9 +556,182 @@ body{display:flex;justify-content:center;align-items:center}
   bind(watBtn,'water');bind(firBtn,'fire');
   window.addEventListener('blur',()=>setAction(null));
   function rerollDirt(){ dirt=Math.round(72 + Math.random()*28); }
-  $('reset').addEventListener('click',()=>{moisture=32;burn=0;ash=false;rerollDirt(); scrubbing=false; lastScrubPoint=null; setAction(null); update();});
+  $('reset').addEventListener('click',()=>{leaveStage2();moisture=32;burn=0;ash=false;rerollDirt();scrubbing=false;lastScrubPoint=null;setAction(null);update();});
   function frame(now){const dt=Math.min((now-last)/1000,.05);last=now;if(action)step(action,dt);if(now-lastRender>60){update();lastRender=now;} requestAnimationFrame(frame);}
-  window.__blanketStageDebug=()=>({moisture,burn,dirt,ash,action,scrubbing,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
+  // Stage 2: one-second memory challenge; three independently generated outlines.
+  const overlay=$('memoryOverlay'),memoryTarget=$('memoryTarget'),memoryGhost=$('memoryGhost'),memoryInk=$('memoryInk'),memorySplash=$('memorySplash');
+  const roundLabel=$('roundLabel'),memoryInstruction=$('memoryInstruction'),scoresMini=$('scoresMini');
+  const stage2Tip=$('stage2Tip'),stage2Result=$('stage2Result'),stage2ResultTitle=$('stage2ResultTitle'),stage2ResultSubtitle=$('stage2ResultSubtitle');
+  const redrawBtn=$('redrawBtn'),foldBtn=$('foldBtn');
+  let round=0,mode='idle',roundScores=[],targetPoints=[],drawPoints=[],lastDrawPointer=null,previewTimer=null,feedbackTimer=null;
+  const C={x:320,y:329}, TAU=Math.PI*2;
+  // SVG nodes do not reliably implement HTMLElement.hidden on mobile Safari.
+  const svgShow=(el,visible)=>{if(visible)el.removeAttribute('hidden');else el.setAttribute('hidden','');};
+  function clearStageTimers(){if(previewTimer!==null)clearTimeout(previewTimer);if(feedbackTimer!==null)clearTimeout(feedbackTimer);previewTimer=feedbackTimer=null;}
+  function buildOutline(n){
+    // Round difficulty grows: larger number of bends in the enclosed white outline.
+    const templates=[
+      [{a:0,r:1},{a:.15,r:.77},{a:.31,r:1.14},{a:.49,r:.86},{a:.64,r:1.06},{a:.84,r:.81}],
+      [{a:0,r:1.03},{a:.13,r:.67},{a:.27,r:1.12},{a:.42,r:.80},{a:.57,r:1.07},{a:.72,r:.72},{a:.89,r:1.12}],
+      [{a:0,r:1.06},{a:.10,r:.76},{a:.22,r:1.13},{a:.34,r:.80},{a:.47,r:1.13},{a:.60,r:.73},{a:.73,r:1.11},{a:.86,r:.78},{a:.96,r:1.03}]
+    ];
+    const template=templates[n];
+    const turn=Math.random()*TAU;
+    return template.map(v=>{
+      const a=v.a*TAU+turn;
+      const ratio=v.r*(.89+Math.random()*.21);
+      return {x:C.x+Math.cos(a)*135*ratio,y:C.y+Math.sin(a)*71*ratio};
+    });
+  }
+  function polyPath(points,close){
+    if(!points.length)return '';
+    return 'M'+points.map((p,i)=>(i?'L':'')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' ') +(close?' Z':'');
+  }
+  function svgDrawPoint(e){
+    const p=overlay.createSVGPoint();p.x=e.clientX;p.y=e.clientY;
+    const t=overlay.getScreenCTM();
+    return t?p.matrixTransform(t.inverse()):{x:p.x,y:p.y};
+  }
+  function showScoreSummary(){
+    const avg=Math.round(roundScores.reduce((a,b)=>a+b,0)/3);
+    mode='done';lastDrawPointer=null;
+    svgShow(memoryTarget,false);svgShow(memoryGhost,false);svgShow(memoryInk,false);
+    memorySplash.textContent='挑戰完成！';
+    roundLabel.textContent='三次開折結束';
+    memoryInstruction.textContent='三次的貼合分數已經結算';
+    scoresMini.textContent=roundScores.map((v,i)=>`第${i+1}次 ${v}分`).join('　');
+    stage2Tip.textContent='想重新挑戰，可以再抽三個新圖形。';
+    stage2Result.hidden=false;
+    stage2ResultTitle.textContent=`平均 ${avg} 分`;
+    stage2ResultSubtitle.textContent=roundScores.map((v,i)=>`第 ${i+1} 次 ${v} 分`).join('　');
+    redrawBtn.textContent='回第一階段';
+    redrawBtn.disabled=false;
+    foldBtn.disabled=false;foldBtn.textContent='重新挑戰';
+  }
+  function startRound(){
+    clearStageTimers();
+    if(stage!==2)return;
+    if(round>=3){showScoreSummary();return;}
+    mode='preview';drawPoints=[];lastDrawPointer=null;
+    targetPoints=buildOutline(round);
+    memoryTarget.setAttribute('d',polyPath(targetPoints,true));
+    svgShow(memoryTarget,true);svgShow(memoryGhost,false);svgShow(memoryInk,true);memoryInk.setAttribute('d','');
+    stage2Result.hidden=true;
+    memorySplash.textContent='記住這條白線！';
+    roundLabel.textContent=`第 ${round+1} / 3 題`;
+    memoryInstruction.textContent='白線只有 1 秒鐘！';
+    scoresMini.textContent=roundScores.length?roundScores.map((v,i)=>`第${i+1}次 ${v}分`).join('　'):'目前尚未計分';
+    stage2Tip.textContent='記住形狀！線條消失後就能開始畫';
+    redrawBtn.disabled=true;foldBtn.disabled=true;foldBtn.textContent='開折';
+    previewTimer=setTimeout(()=>{
+      if(stage!==2 || mode!=='preview')return;
+      previewTimer=null;mode='draw';
+      svgShow(memoryTarget,false);memorySplash.textContent='輪到你了！';
+      memoryInstruction.textContent='憑記憶畫出剛才的封閉線條';
+      stage2Tip.textContent='直接在棉被上畫線，畫好按「開折」';
+      redrawBtn.disabled=false;
+    },1000);
+  }
+  function startStage2(){
+    stage=2;setAction(null);scrubbing=false;
+    round=0;roundScores=[];drawPoints=[];clearStageTimers();
+    $('stage1Meters').hidden=true;$('stage1State').hidden=true;$('stage1Controls').hidden=true;
+    $('stageSubtitle').textContent='第二階段｜白線記憶開折（共 3 次）';
+    svgShow(overlay,true);$('stage2Info').hidden=false;$('stage2Controls').hidden=false;
+    redrawBtn.textContent='重畫';
+    startRound();
+  }
+  function leaveStage2(){
+    clearStageTimers();stage=1;mode='idle';lastDrawPointer=null;
+    svgShow(overlay,false);$('stage2Info').hidden=true;$('stage2Controls').hidden=true;stage2Result.hidden=true;
+    $('stage1Meters').hidden=false;$('stage1State').hidden=false;$('stage1Controls').hidden=false;
+    $('stageSubtitle').textContent='第一階段｜棉被乾濕度、焦化與刷洗';
+  }
+  function length(points,closed){
+    let L=0;for(let i=1;i<points.length;i++)L+=Math.hypot(points[i].x-points[i-1].x,points[i].y-points[i-1].y);
+    if(closed&&points.length>=3)L+=Math.hypot(points[0].x-points.at(-1).x,points[0].y-points.at(-1).y);
+    return L;
+  }
+  function samplePolyline(points,closed,n=96){
+    if(points.length<2)return [];
+    const segments=[];let total=0;
+    const end=closed?points.length:points.length-1;
+    for(let i=0;i<end;i++){
+      const a=points[i],b=points[(i+1)%points.length],L=Math.hypot(a.x-b.x,a.y-b.y);
+      if(L<.01)continue;segments.push({a,b,L,begin:total});total+=L;
+    }
+    if(!total)return [];
+    const out=[];let segIndex=0;
+    for(let i=0;i<n;i++){
+      const dist=total*(closed?i/n:i/(n-1));
+      while(segIndex<segments.length-1&&dist>segments[segIndex].begin+segments[segIndex].L)segIndex++;
+      const s=segments[segIndex],r=clamp((dist-s.begin)/s.L,0,1);
+      out.push({x:s.a.x+(s.b.x-s.a.x)*r,y:s.a.y+(s.b.y-s.a.y)*r});
+    }
+    return out;
+  }
+  function nearestDistance(p,points){
+    let d=1e9;for(const q of points){const m=(p.x-q.x)**2+(p.y-q.y)**2;if(m<d)d=m;}
+    return Math.sqrt(d);
+  }
+  function similarity(){
+    if(drawPoints.length<8||length(drawPoints,false)<35)return 0;
+    const T=samplePolyline(targetPoints,true),U=samplePolyline(drawPoints,false);
+    if(!T.length||!U.length)return 0;
+    const tDist=T.map(p=>nearestDistance(p,U)),uDist=U.map(p=>nearestDistance(p,T));
+    const mean=(tDist.reduce((a,b)=>a+b,0)/T.length + uDist.reduce((a,b)=>a+b,0)/U.length)/2;
+    const coverage=tDist.filter(d=>d<25).length/T.length;
+    const detail=clamp(1-mean/70,0,1);
+    const tLen=length(targetPoints,true),uLen=length(drawPoints,false);
+    const lenQuality=Math.exp(-1.55*Math.abs(Math.log(Math.max(1,uLen)/tLen)));
+    const closure=clamp(1-Math.hypot(drawPoints[0].x-drawPoints.at(-1).x,drawPoints[0].y-drawPoints.at(-1).y)/100,0,1);
+    return Math.round(clamp((.62*detail+.23*coverage+.10*lenQuality+.05*closure)*100,0,100));
+  }
+  $('nextStageBtn').addEventListener('click',startStage2);
+  overlay.addEventListener('pointerdown',e=>{
+    if(stage!==2||mode!=='draw'||e.button>0)return;
+    drawPoints=[svgDrawPoint(e)];lastDrawPointer=e.pointerId;
+    memoryInk.setAttribute('d',polyPath(drawPoints,false));
+    memorySplash.textContent='';
+    foldBtn.disabled=true;
+    try{overlay.setPointerCapture(e.pointerId)}catch(_){}
+    e.preventDefault();
+  });
+  overlay.addEventListener('pointermove',e=>{
+    if(stage!==2||mode!=='draw'||lastDrawPointer!==e.pointerId)return;
+    const p=svgDrawPoint(e),lastPoint=drawPoints.at(-1);
+    if(!lastPoint||Math.hypot(p.x-lastPoint.x,p.y-lastPoint.y)>2){
+      drawPoints.push(p);memoryInk.setAttribute('d',polyPath(drawPoints,false));
+    }
+    foldBtn.disabled=drawPoints.length<5;
+    e.preventDefault();
+  });
+  const endStroke=e=>{if(lastDrawPointer!==e.pointerId)return;lastDrawPointer=null;foldBtn.disabled=drawPoints.length<5;};
+  overlay.addEventListener('pointerup',endStroke);overlay.addEventListener('pointercancel',endStroke);
+  overlay.addEventListener('lostpointercapture',()=>{lastDrawPointer=null;});
+  redrawBtn.addEventListener('click',()=>{
+    if(stage!==2)return;
+    if(mode==='done'){leaveStage2();return;}
+    if(mode!=='draw')return;
+    drawPoints=[];memoryInk.setAttribute('d','');memorySplash.textContent='';foldBtn.disabled=true;
+  });
+  foldBtn.addEventListener('click',()=>{
+    if(stage!==2)return;
+    if(mode==='done'){round=0;roundScores=[];redrawBtn.textContent='重畫';startRound();return;}
+    if(mode!=='draw'||foldBtn.disabled)return;
+    const score=similarity();roundScores.push(score);mode='feedback';lastDrawPointer=null;
+    svgShow(memoryTarget,false);memoryGhost.setAttribute('d',polyPath(targetPoints,true));svgShow(memoryGhost,true);
+    stage2ResultTitle.textContent=`${score} 分`;
+    stage2ResultSubtitle.textContent=round===2?'三次開折完成！':'白色虛線是正確形狀；青色是你畫的';
+    stage2Result.hidden=false;
+    memorySplash.textContent='';
+    memoryInstruction.textContent=round===2?'正在結算三次分數…':'這回合的貼合度';
+    scoresMini.textContent=roundScores.map((v,i)=>`第${i+1}次 ${v}分`).join('　');
+    stage2Tip.textContent='對照正確白線與你畫出的線條';
+    foldBtn.disabled=true;redrawBtn.disabled=true;
+    feedbackTimer=setTimeout(()=>{feedbackTimer=null;round++;startRound();},1900);
+  });
+  window.__blanketStageDebug=()=>({stage,round,mode,roundScores:[...roundScores],previewVisible:!memoryTarget.hasAttribute('hidden'),drawPoints:drawPoints.length,moisture,burn,dirt,ash,action,scrubbing,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
   rerollDirt();
   update();requestAnimationFrame(frame);
 })();
