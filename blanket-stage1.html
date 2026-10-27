@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
 <meta name="theme-color" content="#203229" />
-<title>豆腐干棉被｜第一階段：水與火 v0.3</title>
+<title>豆腐干棉被｜第一階段：水與火 v0.4</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f6f6e8;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -53,18 +53,22 @@ body{display:flex;justify-content:center;align-items:center}
 #flameFx path{animation:flicker .22s infinite alternate ease-in-out;transform-origin:344px 313px}
 #flameFx path:nth-child(2){animation-delay:-.11s;transform-origin:386px 290px}
 
-#wateringCan,#lighterFx{transition:opacity .18s linear;pointer-events:none}
-#wateringCan{opacity:0}
-#lighterFx{opacity:0}
-#wateringCan .can-bob{animation:canBob 1.4s ease-in-out infinite;transform-origin:498px 96px}
-#lighterFx .lighter-bob{animation:lighterBob .8s ease-in-out infinite alternate;transform-origin:334px 471px}
-#lighterFx .flameCore{animation:flicker .18s infinite alternate ease-in-out;transform-origin:332px 429px}
-#lighterFx .flameGlow{animation:flicker .24s infinite alternate ease-in-out;transform-origin:332px 429px}
-@keyframes canBob{0%{transform:rotate(-6deg) translateY(0)}50%{transform:rotate(-4deg) translateY(2px)}100%{transform:rotate(-6deg) translateY(0)}}
-@keyframes lighterBob{0%{transform:translateY(0)}100%{transform:translateY(1px)}}
-#drips path{animation:fallDrop 1.15s infinite linear}
-#drips path:nth-child(2){animation-delay:-.56s}
-#drips path:nth-child(3){animation-delay:-.27s}
+/* Both tools are detailed SVG props, not emojis or floating circles. */
+#wateringCan,#lighterFx{opacity:0;transition:opacity .15s ease;pointer-events:none}
+#wateringCan .can-group{animation:tipCan 1.3s ease-in-out infinite;transform-origin:187px 105px}
+@keyframes tipCan{0%,100%{transform:rotate(-1deg) translateY(0)}50%{transform:rotate(2deg) translateY(-3px)}}
+#waterFx .stream{stroke-dasharray:3 11;animation:rainFlow .52s linear infinite;stroke-linecap:round}
+#waterFx .stream:nth-child(2n){animation-duration:.67s;animation-delay:-.17s}
+#waterFx .splash{animation:splashPulse .44s ease-in-out infinite alternate;transform-origin:center}
+#waterFx .splash:nth-child(2n){animation-delay:-.23s}
+@keyframes rainFlow{from{stroke-dashoffset:0}to{stroke-dashoffset:-42}}
+@keyframes splashPulse{from{opacity:.3;transform:scale(.85)}to{opacity:1;transform:scale(1.09)}}
+#lighterFx .lighter{animation:lighterBob .7s ease-in-out infinite alternate;transform-origin:333px 494px}
+#lighterFx .flameOutline{animation:flicker .2s infinite alternate ease-in-out;transform-origin:331px 448px}
+#lighterFx .flameHeart{animation:flicker .16s infinite alternate ease-in-out;transform-origin:331px 448px;animation-delay:-.08s}
+#flameFx .heat-wave{animation:heatDance .6s ease-in-out infinite alternate}
+@keyframes heatDance{from{transform:translateY(2px);opacity:.18}to{transform:translateY(-3px);opacity:.55}}
+@keyframes lighterBob{from{transform:translateY(0)}to{transform:translateY(1.5px)}}
 @keyframes floatUp{0%{transform:translateY(8px) scale(.8);opacity:.2}33%{opacity:.8}100%{transform:translateY(-44px) scale(1.3);opacity:0}}
 @keyframes flicker{0%{transform:scaleY(.83) skewX(-4deg)}100%{transform:scaleY(1.15) skewX(4deg)}}
 @keyframes fallDrop{0%{transform:translateY(-12px);opacity:0}25%{opacity:1}100%{transform:translateY(47px);opacity:0}}
@@ -114,6 +118,13 @@ body{display:flex;justify-content:center;align-items:center}
     <radialGradient id="ashGradient"><stop stop-color="#7d7c70"/><stop offset=".58" stop-color="#5d5f58"/><stop offset=".9" stop-color="#2b302d"/><stop offset="1" stop-color="#212b25" stop-opacity="0"/></radialGradient>
     <radialGradient id="ashBright"><stop stop-color="#acaaa1" stop-opacity=".7"/><stop offset="1" stop-color="#acaaa1" stop-opacity="0"/></radialGradient>
     <linearGradient id="flameColor" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#ff5221"/><stop offset=".45" stop-color="#ff9a25"/><stop offset="1" stop-color="#ffe889"/></linearGradient>
+
+    <!-- Gradients: recognizable painted metal watering can and disposable lighter -->
+    <linearGradient id="canBody" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b2d9aa"/><stop offset=".25" stop-color="#78a985"/><stop offset=".6" stop-color="#407a69"/><stop offset="1" stop-color="#235a4f"/></linearGradient>
+    <linearGradient id="canSpout" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#cde8b8"/><stop offset=".35" stop-color="#78ada1"/><stop offset="1" stop-color="#2c655f"/></linearGradient>
+    <linearGradient id="lighterBody" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#7e221f"/><stop offset=".17" stop-color="#e74e30"/><stop offset=".6" stop-color="#d73827"/><stop offset="1" stop-color="#84221b"/></linearGradient>
+    <linearGradient id="chromeMetal" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#4a575d"/><stop offset=".25" stop-color="#d4dfdd"/><stop offset=".55" stop-color="#7e969d"/><stop offset=".85" stop-color="#e4e9e7"/><stop offset="1" stop-color="#54646c"/></linearGradient>
+    <radialGradient id="burnGlow" cx="50%" cy="45%" r="58%"><stop stop-color="#fff3a1" stop-opacity=".47"/><stop offset=".34" stop-color="#ffac4f" stop-opacity=".28"/><stop offset="1" stop-color="#ff7313" stop-opacity="0"/></radialGradient>
     <clipPath id="fabricClip"><path id="fabricClipPath" d="M139 222 C175 210 206 219 237 218 L462 223 Q485 230 494 257 L544 389 Q553 410 527 416 L104 440 Q82 443 81 418 Q88 378 105 315 L119 254 Q124 234 139 222 Z"/></clipPath>
     <pattern id="quiltWeave" width="9" height="9" patternUnits="userSpaceOnUse"><path d="M0 0H9M0 0V9" stroke="#faf7dc" stroke-opacity=".10" stroke-width=".55"/><path d="M0 5H9" stroke="#142317" stroke-opacity=".07" stroke-width=".5"/></pattern>
     <filter id="shadow" x="-30%" y="-45%" width="160%" height="200%"><feGaussianBlur stdDeviation="12"/></filter>
@@ -169,52 +180,81 @@ body{display:flex;justify-content:center;align-items:center}
      <ellipse cx="322" cy="405" rx="104" ry="23" fill="url(#ashBright)"/>
      <path d="M206 410L244 415M351 404L407 421M282 427L321 419M433 406L448 408" stroke="#cac8b5" stroke-opacity=".7" stroke-width="2"/>
    </g>
-   <!-- Tool props -->
-
-   <g id="wateringCan">
-    <g class="can-bob" transform="translate(0 0)">
-      <g transform="translate(462 72) rotate(-18)">
-        <ellipse cx="34" cy="30" rx="42" ry="25" fill="#7fb7be"/>
-        <ellipse cx="36" cy="28" rx="34" ry="19" fill="#95cdd2"/>
-        <path d="M70 20 Q96 18 114 28 L125 34 L120 42 L108 38 Q95 31 75 33" fill="#7fb7be"/>
-        <path d="M112 29 Q127 26 138 30" stroke="#a8dee4" stroke-width="6" fill="none" stroke-linecap="round"/>
-        <path d="M10 12 Q-16 13 -17 35 Q-16 56 9 56" fill="none" stroke="#9fd5db" stroke-width="8" stroke-linecap="round"/>
-        <circle cx="135" cy="30" r="4" fill="#c9f4ff"/>
-        <rect x="8" y="46" width="55" height="6" rx="3" fill="#5e8b90" opacity=".45"/>
-      </g>
-    </g>
-   </g>
-   <g id="lighterFx">
-     <g class="lighter-bob">
-       <g transform="translate(296 438)">
-         <rect x="0" y="16" width="72" height="40" rx="11" fill="#242f39"/>
-         <rect x="4" y="20" width="64" height="32" rx="9" fill="#d34c2c"/>
-         <rect x="12" y="12" width="26" height="12" rx="4" fill="#c4ccd0"/>
-         <rect x="34" y="12" width="14" height="12" rx="2" fill="#59656e"/>
-         <rect x="48" y="10" width="18" height="14" rx="3" fill="#d7d9dd"/>
-         <circle cx="44" cy="18" r="5" fill="#434b52"/>
+   <!-- Detailed classic garden watering can: hollow loop handle, tapered tank, long raised spout, perforated shower rose -->
+   <g id="wateringCan" aria-label="澆花灑水壺">
+     <g class="can-group">
+       <!-- shadow & handle behind the can body -->
+       <path d="M128 87 C89 61 64 92 72 131 Q80 156 119 143" fill="none" stroke="#254e47" stroke-width="17" stroke-linecap="round"/>
+       <path d="M128 85 C89 59 66 89 73 126 Q79 146 117 139" fill="none" stroke="#9dcab0" stroke-width="10" stroke-linecap="round"/>
+       <path d="M126 87 C94 71 78 89 81 114" fill="none" stroke="#d5ebc7" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+       <!-- domed top / open cap -->
+       <path d="M140 79 Q159 65 185 66 Q209 67 222 82 L225 95 L135 96 Z" fill="#609985" stroke="#2e6357" stroke-width="4"/>
+       <ellipse cx="181" cy="82" rx="40" ry="10" fill="#294e46" stroke="#b9d8b8" stroke-width="5"/>
+       <ellipse cx="181" cy="82" rx="32" ry="5" fill="#244d44" opacity=".7"/>
+       <!-- gallon-sized tapered body (not UFO) -->
+       <path d="M131 91 Q125 105 123 121 L119 161 Q120 175 151 181 L210 181 Q239 177 240 160 L232 108 Q230 95 221 90 Z" fill="url(#canBody)" stroke="#244e44" stroke-width="4" stroke-linejoin="round"/>
+       <path d="M141 105 L137 158 Q140 169 163 173" fill="none" stroke="#cbe8b8" stroke-width="7" stroke-linecap="round" opacity=".65"/>
+       <path d="M223 112 L229 159" fill="none" stroke="#1d5a4b" stroke-width="6" opacity=".4"/>
+       <path d="M125 153 Q182 170 239 156" fill="none" stroke="#2d6857" stroke-width="4" opacity=".4"/>
+       <!-- spout: wide at base, tapering to a perforated sprinkler head -->
+       <path d="M228 127 L254 131 Q270 132 282 141 L358 163 L369 155 L378 168 L368 177 L280 159 Q267 159 250 150 L232 146 Z" fill="url(#canSpout)" stroke="#2d655c" stroke-width="4" stroke-linejoin="round"/>
+       <path d="M246 135 Q260 136 280 148 L354 167" fill="none" stroke="#e1f1cb" stroke-opacity=".65" stroke-width="4" stroke-linecap="round"/>
+       <g transform="translate(375 177) rotate(-18)">
+         <path d="M-20 -8 Q-7 -18 8 -8 L15 12 Q0 22 -16 12 Z" fill="url(#chromeMetal)" stroke="#2f5956" stroke-width="3"/>
+         <ellipse cx="0" cy="13" rx="17" ry="7" fill="#acc9c1" stroke="#34605a" stroke-width="3"/>
+         <g fill="#315f60"><circle cx="-9" cy="11" r="2"/><circle cx="-3" cy="15" r="2"/><circle cx="4" cy="14" r="2"/><circle cx="10" cy="11" r="2"/></g>
        </g>
-       <g class="flameGlow" opacity=".38">
-         <ellipse cx="333" cy="430" rx="28" ry="40" fill="#ffb347"/>
-       </g>
-       <g class="flameCore">
-         <path d="M333 449 C315 431 320 413 331 396 C336 410 346 411 351 390 C366 410 367 435 349 449 Z" fill="#ff7a24"/>
-         <path d="M336 444 C328 434 331 420 338 409 C341 418 346 418 349 404 C357 416 356 434 346 444 Z" fill="#ffe99a"/>
-       </g>
+       <path d="M147 177 Q184 190 216 181" fill="none" stroke="#132b26" stroke-width="3" opacity=".35"/>
      </g>
    </g>
-   <!-- Tool effects are ABOVE quilt -->
-   <g id="waterFx">
-     <path d="M546 113 Q505 143 457 202 Q410 260 347 289" fill="none" stroke="#91d8ff" stroke-opacity=".72" stroke-width="7" stroke-dasharray="10 11" stroke-linecap="round"/>
-     <ellipse cx="493" cy="159" rx="6" ry="13" fill="#d5f4ff"/>
-     <ellipse cx="458" cy="205" rx="6" ry="12" fill="#b4e9ff"/>
-     <ellipse cx="420" cy="243" rx="5" ry="11" fill="#83c9fa"/>
-     <ellipse cx="382" cy="274" rx="5" ry="11" fill="#83c9fa"/>
-     <path d="M297 246Q333 224 373 244 M292 254Q334 239 379 251" fill="none" stroke="#b2e9ff" stroke-opacity=".8" stroke-width="3"/>
+   <!-- Sprinkler-head shower: distinct falling streams, not one dotted pipe -->
+   <g id="waterFx" fill="none">
+     <g stroke="#9edafa" stroke-width="4.5" opacity=".90">
+       <path class="stream" d="M363 193 Q330 248 221 289"/>
+       <path class="stream" d="M368 195 Q346 247 264 309"/>
+       <path class="stream" d="M374 196 Q368 247 303 320"/>
+       <path class="stream" d="M380 196 Q381 254 344 333"/>
+       <path class="stream" d="M385 194 Q403 257 389 327"/>
+       <path class="stream" d="M389 191 Q427 254 438 319"/>
+       <path class="stream" d="M392 188 Q451 250 475 299"/>
+     </g>
+     <g fill="#d1f0ff" stroke="#8bc5e9" stroke-width=".7" opacity=".92">
+       <ellipse cx="306" cy="265" rx="3.2" ry="7" transform="rotate(35 306 265)"/>
+       <ellipse cx="343" cy="274" rx="3" ry="7" transform="rotate(23 343 274)"/>
+       <ellipse cx="397" cy="277" rx="3" ry="7" transform="rotate(-15 397 277)"/>
+       <ellipse cx="438" cy="285" rx="3" ry="6" transform="rotate(-25 438 285)"/>
+     </g>
+     <g class="splash" stroke="#9bd8ed" stroke-width="3" opacity=".65"><path d="M214 286q9 -9 18 0 M298 319q9 -11 18 0 M382 327q10 -10 18 0 M468 296q9 -9 17 0"/></g>
    </g>
-   <g id="flameFx" fill="url(#flameColor)">
-     <path d="M333 449 C315 431 320 413 331 396 C336 410 346 411 351 390 C366 410 367 435 349 449 Z"/>
-     <path d="M336 444 C328 434 331 420 338 409 C341 418 346 418 349 404 C357 416 356 434 346 444 Z" fill="#fff1b2"/>
+   <!-- A disposable pocket lighter held upright BELOW the quilt, silver spark wheel, tiny gas outlet -->
+   <g id="lighterFx" aria-label="打火機">
+     <g class="lighter">
+       <ellipse cx="332" cy="535" rx="34" ry="8" fill="#08160f" opacity=".27"/>
+       <!-- body -->
+       <rect x="307" y="469" width="49" height="73" rx="9" fill="url(#lighterBody)" stroke="#651e1b" stroke-width="3"/>
+       <path d="M312 478 L312 532 Q312 537 317 536" fill="none" stroke="#ffb48b" stroke-opacity=".58" stroke-width="3"/>
+       <path d="M347 479L347 533" stroke="#66221c" stroke-width="4" opacity=".7"/>
+       <rect x="314" y="501" width="37" height="20" rx="2" fill="#bd2f24" opacity=".65"/>
+       <path d="M316 496Q330 497 345 495" stroke="#ff956c" stroke-width="2" opacity=".48"/>
+       <!-- metal head -->
+       <path d="M312 469 L312 454 Q315 448 325 448 L341 448 Q349 451 349 456 L350 470 Z" fill="url(#chromeMetal)" stroke="#485860" stroke-width="2.2"/>
+       <rect x="315" y="451" width="11" height="16" rx="4" fill="#727a7c" stroke="#e1e3df" stroke-width="1"/>
+       <path d="M318 452V464 M321 452V464 M324 452V464" stroke="#333d41" stroke-width="1"/>
+       <path d="M332 448Q339 447 342 452" fill="none" stroke="#eff4ed" stroke-width="3"/>
+       <rect x="330" y="445" width="8" height="5" rx="2" fill="#1f292c"/>
+       <!-- flame rising from gas outlet -->
+       <ellipse cx="334" cy="437" rx="20" ry="26" fill="url(#burnGlow)"/>
+       <g class="flameOutline">
+         <path d="M334 450 Q315 436 325 421 Q333 410 333 390 Q352 408 351 427 Q359 442 337 450 Z" fill="#ff7924" stroke="#feca57" stroke-width="1.5"/>
+       </g>
+       <g class="flameHeart"><path d="M335 450 Q325 439 332 429 Q339 420 340 408 Q352 436 340 449Z" fill="#fff1af"/></g>
+     </g>
+   </g>
+   <!-- Gentle heat underneath quilt when the flame can reach it -->
+   <g id="flameFx" fill="none" stroke-linecap="round">
+     <ellipse cx="337" cy="429" rx="43" ry="19" fill="url(#burnGlow)" opacity=".35"/>
+     <path class="heat-wave" d="M303 416 Q295 399 307 383" stroke="#ffbc6b" stroke-width="2.7" opacity=".28"/>
+     <path class="heat-wave" d="M366 415 Q358 397 369 378" stroke="#ffd790" stroke-width="2.7" opacity=".24"/>
    </g>
    <g id="steamFx" stroke="#b5d8d9" stroke-opacity=".6" stroke-width="5" fill="none" stroke-linecap="round"><path d="M265 262Q241 236 273 219Q303 196 282 170"/><path d="M350 244Q332 213 362 190"/></g>
    <g id="smokeFx" stroke="#b8bbba" stroke-opacity=".65" stroke-width="10" fill="none" stroke-linecap="round"><path d="M285 261Q261 241 279 211Q304 186 291 166"/><path d="M347 255Q328 213 354 193Q381 166 368 139"/><path d="M425 280Q408 257 435 228Q447 214 438 186"/></g>
@@ -292,7 +332,7 @@ body{display:flex;justify-content:center;align-items:center}
     smokeFx.style.opacity=String((burn>49&&!ash)?clamp((burn-49)/32,0,.9):(ash?.35:0));
     waterFx.style.opacity=String(action==='water'&&!ash?1:0);
     $('wateringCan').style.opacity=String(action==='water'&&!ash?1:0);
-    flameFx.style.opacity=String(action==='fire'&&!ash?clamp((42-moisture)/36,0,1):0);
+    flameFx.style.opacity=String(action==='fire'&&!ash?clamp((72-moisture)/50,.18,.82):0);
     $('lighterFx').style.opacity=String(action==='fire'&&!ash?1:0);
     // Keep even burnt quilt visually textured, never pure black.
     firBtn.disabled=watBtn.disabled=ash;
