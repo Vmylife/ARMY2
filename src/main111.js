@@ -10,6 +10,7 @@ import {createRangeAudio} from './training/rangeTraining.js?v=111';
 import {CAMP} from './map/camp.js?v=093';
 import {movePlayer} from './map/navCollision109.js?v=124';
 import {createNavDebugger} from './ui/navDebug109.js?v=109';
+import {createBlanketPortal} from './ui/blanketPortal128.js?v=128';
 import {drawMinimap} from './ui/minimap.js?v=093';
 import {initWorldMap} from './ui/worldMap.js?v=093';
 import {setupInput} from './ui/input.js?v=062';
@@ -106,6 +107,7 @@ async function boot(){
   delete player.anim.clips.Jump_Over_Obstacle_2;
   player.anim.setClip('Idle');player.anim.evaluate(0);
   const npcs=createCampNPCs(npcGlb);
+  const blanketPortal=createBlanketPortal(renderer);
   progress('35 名 NPC：5 支小隊＋10 名自由活動士兵已就位…');
   const showNavDebug=debug?createNavDebugger():null;
   // The new cross-legged clip drops the hips below the original standing root.
@@ -136,7 +138,7 @@ async function boot(){
     ratio=>{if(!worldMap.isOpen()&&Number.isFinite(ratio)&&ratio>0)targetZoom=Math.max(minZoom,Math.min(maxZoom,targetZoom*ratio))}
   );
   let last=performance.now(),lastMap=0,lastDebug=0;
-  // Lightweight labels follow projected head positions in the SAME 3D camera.
+  // NPC names follow head positions; hide activity descriptions for clean play.
   // They are intentionally pointer-events:none so they never block the joystick.
   const labelsLayer=document.createElement('div');
   labelsLayer.id='npcLifeLabels';labelsLayer.setAttribute('aria-hidden','true');
@@ -144,9 +146,8 @@ async function boot(){
   const badges=npcs.map(n=>{
     const root=document.createElement('div');root.className='npc-life-label';
     const name=document.createElement('span');name.className='npc-name';name.textContent=n.name;
-    const activity=document.createElement('span');activity.className='npc-act';
-    root.append(name,activity);labelsLayer.appendChild(root);
-    return {root,activity};
+    root.append(name);labelsLayer.appendChild(root);
+    return {root};
   });
   let lastLabels=0;
   function updateLifeLabels(now){
@@ -171,12 +172,6 @@ async function boot(){
       const sy=midY-(yy/w)*bounds.height*.5;
       if(sx<12||sx>innerWidth-12||sy<15||sy>innerHeight-80){b.root.hidden=true;continue;}
       b.root.hidden=false;
-      const label=npc.activity||'發呆';
-      if(b.activity.textContent!==label)b.activity.textContent=label;
-      b.root.classList.toggle('npc-paired',Boolean(npc.task?.group));
-      b.root.classList.toggle('npc-placeholder',Boolean(npc.task&&[
-        'basketball','dining','wash',
-        'sentry','basketballCoach','grenade'].includes(npc.task.type)));
       b.root.style.transform=`translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-100%)`;
     }
   }
@@ -216,6 +211,7 @@ async function boot(){
     renderer.setCamera({yaw:camYaw,pitch:camPitch,zoom:cameraZoom});renderer.startFrame(player.pos);
     buildings.draw(renderer.vp,player.pos);
     props.draw(renderer.vp,player.pos);
+    blanketPortal.draw();
     renderer.drawActor('recruit',player);
     for(const npc of npcs){
       const distance=Math.hypot(npc.pos.x-player.pos.x,npc.pos.z-player.pos.z);
@@ -227,13 +223,14 @@ async function boot(){
       }
     }
     updateLifeLabels(now);
+    blanketPortal.update(player.pos,worldMap.isOpen());
     showNavDebug?.(renderer.vp,player.pos,npcs,now);
     mapFacing=Math.PI-player.angle+mapYaw;
     if(now-lastMap>=16){
       if(!worldMap.isOpen())drawMinimap(player.pos,null,false,mapFacing,mapYaw);
       worldMap.update(player.pos,null,player.angle);lastMap=now;
     }
-    if(debug&&now-lastDebug>150){$('debug').hidden=false;$('debug').textContent=`fps: ${measuredFps}\nNPC: ${npcs.length} (10自由＋4x5小隊)\n${squadDebug().map(s=>`隊${s.squad}: ${s.stage} ${s.phase} (${s.done}/5)`).join('\n')}\nmode: ${m.clip}\npos: ${player.pos.x.toFixed(2)},${player.pos.z.toFixed(2)}\ninput: ${stick.magnitude.toFixed(2)}\nzoom: ${cameraZoom.toFixed(2)}\nrenderer: webgl2`;lastDebug=now}
+    if(debug&&now-lastDebug>150){$('debug').hidden=false;$('debug').textContent=`fps: ${measuredFps}\nNPC: ${npcs.length} (10自由＋5x5小隊)\n${squadDebug().map(s=>`隊${s.squad}: ${s.stage} ${s.phase} (${s.done}/5)`).join('\n')}\nmode: ${m.clip}\npos: ${player.pos.x.toFixed(2)},${player.pos.z.toFixed(2)}\ninput: ${stick.magnitude.toFixed(2)}\nzoom: ${cameraZoom.toFixed(2)}\nrenderer: webgl2`;lastDebug=now}
     // First frame (including ground + ALL models) must complete before reveal.
     if(!entered){entered=true;window.armyLoadComplete?.();last=now;}
     requestAnimationFrame(tick);

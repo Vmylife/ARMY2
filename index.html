@@ -9,6 +9,17 @@
 <link rel="stylesheet" href="./src/ui/playtest.css?v=077">
 <link rel="stylesheet" href="./src/ui/home105.css?v=105">
 <link rel="stylesheet" href="./src/ui/npcLabels107.css?v=107">
+<style>
+/* Standalone activity menu: does not intercept the joystick outside its card. */
+.blanket-portal-menu{position:fixed;z-index:19;left:50%;bottom:max(18px,calc(env(safe-area-inset-bottom) + 17px));transform:translateX(-50%);width:min(370px,calc(100% - 28px));padding:15px 17px 13px;border:2px solid #e8d47e;border-radius:19px;background:#18382eea;color:#fff9dc;box-shadow:0 9px 36px #06150a93;text-align:center;pointer-events:auto}
+.blanket-portal-menu[hidden]{display:none!important}
+.blanket-portal-title{font-size:20px;font-weight:900;line-height:1.25}
+.blanket-portal-detail{font-size:13px;line-height:1.4;margin:7px 0 13px;color:#e6e8c9}
+.blanket-portal-buttons{display:grid;grid-template-columns:1.65fr 1fr;gap:9px}
+.blanket-portal-buttons button{border:1px solid #f6e8a4;border-radius:12px;min-height:49px;font-weight:900;touch-action:manipulation}
+#blanketPortalStart{background:linear-gradient(145deg,#f3df7d,#e5aa38);color:#433014}
+#blanketPortalCancel{background:#425f4b;color:#f4f5df;border-color:#a8bd98}
+</style>
 </head>
 <body>
 <canvas id="world" aria-label="國軍模擬器 3D 軍營"></canvas>
@@ -17,6 +28,14 @@
   <div class="world-map-panel">
     <header class="world-map-header"><div><strong>🗺️ 新兵訓練營地圖</strong><small>固定營區方位 · 藍色箭頭為士兵面向</small></div><button id="closeWorldMap" type="button" aria-label="關閉大地圖">✕</button></header>
     <div class="world-map-body"><div class="map-canvas-holder"><canvas id="worldMapCanvas" aria-label="完整軍營地圖，顯示所有地點和自身方向"></canvas></div></div>
+  </div>
+</section>
+<section id="blanketPortalMenu" class="blanket-portal-menu" aria-label="折棉被訓練互動選單" hidden>
+  <div class="blanket-portal-title">🛏️ 折棉被訓練</div>
+  <div class="blanket-portal-detail">已抵達營舍訓練點，要開始整理內務嗎？</div>
+  <div class="blanket-portal-buttons">
+    <button id="blanketPortalStart" type="button">開始折棉被</button>
+    <button id="blanketPortalCancel" type="button">稍後再說</button>
   </div>
 </section>
 <div id="floatingStick" aria-hidden="true"><div class="stick-base"><div id="stickThumb" class="stick-thumb"></div></div></div>
@@ -41,6 +60,6 @@
 <script type="importmap">
 {"imports":{"./src/map/campGeometry.js?v=092":"./src/map/ground103.js?v=124","./src/map/mapDrawing.js?v=093":"./src/map/drawMap95.js?v=095","./src/map/roadMesh.js?v=071":"./src/map/roadMesh104.js?v=125"}}
 </script>
-<script type="module" src="./src/bootstrap111.js?v=127"></script>
+<script type="module" src="./src/bootstrap111.js?v=128"></script>
 </body>
 </html>
