@@ -1149,53 +1149,157 @@ button{touch-action:manipulation;}
   ];
   const outcomeById=Object.fromEntries(outcomeBook.map(o=>[o.id,o]));
   const outcomeRarityColor={'普通':'#b8c4b8','稀有':'#92d3f1','史詩':'#e1aeff','傳說':'#ffdc86'};
-  const poolWeight={
-    tidy_fail: c => Math.max(0, 1.3 + Math.max(0,60-c.F)*0.025 + Math.max(0,58-c.P)*0.025 + c.D*0.003 + c.W*0.003),
-    cute_fail: c => Math.max(0, .9 + Math.max(0,72-c.F)*0.018 + Math.max(0,72-c.P)*0.015 + Math.max(0,38-c.B)*0.004),
-    pristine: c => (c.B<25&&c.D<32&&c.W<55&&c.F>60&&c.P>58) ? 1 + (c.F-60)*0.028 + (c.P-58)*0.028 + Math.max(0,25-c.D)*0.01 : 0,
-    elite_pristine: c => (c.B<18&&c.D<18&&c.W<32&&c.F>82&&c.P>82) ? 1 + (c.F-82)*0.05 + (c.P-82)*0.05 : 0,
-    military: c => (c.F>52&&c.P>52&&c.B<82) ? 1 + (c.F-52)*0.022 + (c.P-52)*0.024 + Math.max(0,28-c.D)*0.008 : 0,
-    naval: c => (c.W>46&&c.F>58&&c.P>56&&c.B<65) ? 1 + (c.W-46)*0.03 + (c.F-58)*0.012 : 0,
-    animal: c => (c.F>38&&c.P>38&&c.B<70) ? 1 + Math.max(0,100-Math.abs(c.F-68)-Math.abs(c.P-63))*0.010 : 0,
-    wet: c => (c.W>48&&c.B<70) ? 1 + (c.W-48)*0.028 + Math.max(0,35-c.D)*0.003 : 0,
-    mold: c => (c.W>58&&c.M>.18&&c.B<65) ? 1 + (c.W-58)*0.026 + c.M*0.75 + c.D*0.003 : 0,
-    dirty: c => (c.D>42) ? 1 + (c.D-42)*0.04 + Math.max(0,c.W-25)*0.01 : 0,
-    dirty_bug: c => (c.D>62&&c.B<72) ? 1 + (c.D-62)*0.055 + Math.max(0,c.W-12)*0.008 : 0,
-    food_soft: c => (c.B<28) ? .8 + c.W*0.012 + Math.max(0,55-c.F)*0.006 : 0,
-    food_baked: c => (c.B>12&&c.B<72) ? .9 + (c.B-12)*0.022 + Math.max(0,c.P-32)*0.01 : 0,
-    burn: c => (c.B>42) ? 1 + (c.B-42)*0.045 + Math.max(0,c.P-45)*0.008 : 0,
-    inferno: c => (c.B>68) ? 1 + (c.B-68)*0.055 + Math.max(0,c.P-60)*0.012 + Math.max(0,c.F-60)*0.008 : 0,
-    weird: c => .45 + c.total*0.0024 + Math.max(0,52-c.F)*0.006,
-    cosmic: c => ((c.F>74&&c.P>74) || (c.W>80&&c.D>58) || c.B>80) ? .7 + c.total*0.0034 + c.M*0.25 : 0,
-    object_clean: c => (c.D<38&&c.B<42&&c.F>50) ? .9 + (c.F-50)*0.018 + Math.max(0,c.P-45)*0.016 : 0,
-    object_dirty: c => (c.D>30&&c.F>42) ? .8 + c.D*0.014 + Math.max(0,c.P-35)*0.012 : 0
+  // v2.0 outcome balancing: physical conditions decide the theme, then rarity, then a compatible shape.
+  // All 100 gallery entries remain visible; this affects only random outcome selection.
+  const RARITY_TARGET={普通:60,稀有:27,史詩:10,傳說:3};
+  const clampOutcome=(v,a,b)=>Math.min(b,Math.max(a,v));
+  const over=(v,min,max)=>clampOutcome((v-min)/(max-min),0,1);
+  const under=(v,max,min)=>clampOutcome((max-v)/(max-min),0,1);
+  function outcomeContext(total,foldAvg,tidy){
+    const scores=Array.isArray(roundScores)&&roundScores.length ? roundScores : [foldAvg,foldAvg,foldAvg];
+    return {
+      W:moisture,B:burn,D:dirt,F:foldAvg,P:tidy,M:moldAge,total,
+      spread:Math.max(...scores)-Math.min(...scores),
+      last:scores[scores.length-1],
+      imbalance:Math.abs(foldAvg-tidy)
+    };
+  }
+  // Pool gates are intentionally firm: burning a blanket into ash cannot produce a pristine swan.
+  // A few common outcomes exist for every valid gameplay state, so there is always a result.
+  const THEME_SCORE={
+    tidy_fail:c=> c.B<44&&c.D<68&&c.W<82&&(c.F<65 || c.P<50 || c.spread>50) ?
+      .35+1.3*under(c.F,75,5)+.9*under(c.P,60,0)+.5*over(c.spread,28,100):0,
+    cute_fail:c=>c.B<=25&&c.D<55&&(c.F<72||c.P<65)?
+      .4+1.4*under(c.F,80,15)+.45*over(c.W,40,100):0,
+    pristine:c=>c.B<=9&&c.D<=27&&c.W<=48&&c.F>=58&&c.P>=54?
+      .6+1.3*over(c.F,58,100)+1.1*over(c.P,54,100)+.5*under(c.D,27,0):0,
+    elite_pristine:c=>c.B<=5&&c.D<=12&&c.W<=30&&c.F>=85&&c.P>=84?
+      .65+1.4*over(c.F,85,100)+1.3*over(c.P,84,100):0,
+    military:c=>c.B<=36&&c.D<=48&&c.W<=55&&c.F>=53&&c.P>=55?
+      .4+1.3*over(c.F,53,100)+1.35*over(c.P,55,100):0,
+    naval:c=>c.B<=24&&c.D<=48&&c.W>=54&&c.F>=55&&c.P>=55?
+      .65+1.7*over(c.W,54,100)+.8*over(c.F,55,100):0,
+    animal:c=>c.B<=26&&c.D<=54&&c.W<76&&c.F>=24&&c.P>=24?
+      .75+.8*over(c.F,24,78)+.35*under(c.P,92,0):0,
+    wet:c=>c.B<=24&&c.W>=56?
+      .55+2.0*over(c.W,56,100)+.3*under(c.D,70,0):0,
+    mold:c=>c.B<=18&&c.W>=73&&c.M>=.5?
+      .4+1.5*over(c.W,73,100)+1.1*over(c.M,.5,9)+.2*over(c.D,35,100):0,
+    dirty:c=>c.D>=48&&c.B<=55?
+      .65+1.9*over(c.D,48,100)+.5*over(c.W,45,100):0,
+    dirty_bug:c=>c.D>=68&&c.B<=40?
+      .55+1.55*over(c.D,68,100)+.25*over(c.W,25,100):0,
+    food_soft:c=>c.B<=19&&c.D<60&&c.W<=82&&(c.F<83||c.W>38||(c.F>=85&&c.P<30))?
+      .55+.65*under(c.F,85,0)+.5*over(c.W,25,100):0,
+    food_baked:c=>c.B>=12&&c.B<=75?
+      .55+1.55*over(c.B,12,75)+.3*over(c.P,45,100):0,
+    burn:c=>c.B>=44?
+      .7+1.9*over(c.B,44,100):0,
+    inferno:c=>c.B>=76?
+      .6+1.65*over(c.B,76,100)+.3*over(c.P,55,100):0,
+    weird:c=>c.B<=45&&c.D<=70&&c.W<=80&&(c.F<42||c.P<32||c.spread>=48||c.imbalance>=52)?
+      .35+1.35*under(c.F,47,0)+.65*under(c.P,40,0)+.7*over(c.spread,45,100):0,
+    cosmic:c=>c.B<=25&&((c.F>=93&&c.P>=88)||(c.W>=86&&c.D>=75&&c.M>=3))?
+      .65+.8*over(c.F,90,100)+.7*over(c.P,80,100)+.7*over(c.W+c.D,155,200):0,
+    object_clean:c=>c.B<=20&&c.D<=35&&c.W<=50&&c.F>=55&&c.P>=48?
+      .6+1.2*over(c.F,55,100)+.7*over(c.P,48,100):0,
+    object_dirty:c=>c.B<=45&&c.D>=35&&c.F>=35?
+      .45+1.1*over(c.D,35,100)+.65*over(c.P,30,100):0
   };
-  function decideOutcome(total,foldAvg,tidy){
-    const c={W:moisture,B:burn,D:dirt,F:foldAvg,P:tidy,M:moldAge,total};
-    const rarityFactor={'普通':1,'稀有':.88,'史詩':.68,'傳說':.52};
-    const entries=[];
+  // Specific identities can have stricter conditions than their broad theme.
+  const SPECIAL_GATE={
+    tofu:c=>c.B<=3&&c.D<=19&&c.W<=37,
+    diamond:c=>c.B===0&&c.D<=5&&c.W<=12&&c.F>=96&&c.P>=95,
+    swan:c=>c.D<=12&&c.W<=33&&c.F>=72,
+    tank:c=>c.B<=15&&c.D<=18&&c.F>=78&&c.P>=76,
+    fighter:c=>c.B<=12&&c.D<=14&&c.W<=22&&c.F>=83&&c.P>=77,
+    carrier:c=>c.W>=75&&c.F>=76&&c.P>=72,
+    phoenix:c=>c.B>=91&&c.P>=76&&c.F>=66,
+    cthulhu:c=>c.W>=87&&c.D>=78&&c.M>=2.5&&c.F<=75,
+    blackhole:c=>c.F>=96&&c.P>=94&&c.B<=18&&c.D<=22,
+    moldking:c=>c.W>=89&&c.M>=5,
+    soldier:c=>c.D>=75&&c.F<=65,
+    stinky:c=>c.W>=45&&c.D>=64,
+    roach:c=>c.D>=78,
+    kraken:c=>c.W>=90&&c.M>=2&&c.F<=78,
+    charcoalking:c=>c.B>=88&&c.P>=67,
+    lava:c=>c.B>=78,
+    submarine:c=>c.W>=69,
+    bbq:c=>c.B>=25&&c.B<=72,
+    burnttoast:c=>c.B>=18&&c.B<=62,
+    kiln:c=>c.B>=52,
+    meteor:c=>c.B>=55,
+    washingmachine:c=>c.D>=62,
+    fridge:c=>c.W<=36&&c.D<=27,
+    papercrane:c=>c.D<=18&&c.F>=70,
+    monolith:c=>c.F>=92&&c.P>=85,
+    robot:c=>c.F>=92&&c.P>=90,
+    mechfort:c=>c.F>=87&&c.P>=88,
+    shrine:c=>c.F<=28&&c.P>=70,
+    portal:c=>c.F>=93&&c.P>=89,
+    dragon:c=>c.F>=89&&c.P>=90,
+    crown:c=>c.F>=89&&c.P>=87,
+    coffin:c=>c.B>=58,
+    petri:c=>c.W>=77&&c.M>=2,
+    swamp:c=>c.W>=75&&c.D>=57,
+    landfill:c=>c.D>=78,
+    cloud:c=>c.W<=45&&c.B<=8,
+    canpile:c=>c.D>=72,
+    coral:c=>c.W>=82,
+    seaweed:c=>c.F>=66,
+    pig:c=>c.F<=85,
+    cash:c=>c.F>=63,
+    dice:c=>c.F>=66,
+    barricade:c=>c.D<=80,
+    pizza:c=>(c.F<=82||c.P<=35)
+  };
+  const SPECIAL_WEIGHT={
+    tofu:1.35,tank:1.05,fighter:.93,carrier:.75,diamond:.65,
+    phoenix:.72,blackhole:.72,cthulhu:.85,robot:.9,portal:.88,
+    mushroom:1.12,coal:1.15,garbage:1.15,ashpile:1.1,
+    burnttoast:1.1,moldking:.85,monolith:.85,soldier:.92,
+    kraken:.94,lava:1.03
+  };
+  function outcomeCandidates(c){
+    const groups={普通:[],稀有:[],史詩:[],傳說:[]};
     for(const item of outcomeBook){
-      const fn=poolWeight[item.pool];
-      let w=fn?fn(c):0;
-      if(item.id==='diamond' && !(c.W<18&&c.B<10&&c.D<10&&c.F>90&&c.P>90)) w*=.35;
-      if(item.id==='tofu' && c.B>55) w*=.45;
-      if(item.id==='stinky' && c.D<52) w*=.3;
-      if(item.id==='phoenix' && c.B<78) w*=.18;
-      if(item.id==='blackhole' && c.total<255) w*=.22;
-      if(item.id==='carrier' && c.W<70) w*=.4;
-      if(item.id==='soldier' && c.D<55) w*=.36;
-      if(item.id==='moldking' && (c.W<76||c.M<.52)) w*=.25;
-      if(item.id==='bbq' && (c.B<28||c.B>74)) w*=.45;
-      if(item.id==='washingmachine' && c.D<55) w*=.25;
-      w*=item.bias||1;
-      w*=rarityFactor[item.rarity]||1;
-      if(w>0.02) entries.push({item,w});
+      const theme=THEME_SCORE[item.pool];
+      const themeScore=theme?theme(c):0;
+      if(themeScore<=0)continue;
+      if(SPECIAL_GATE[item.id]&&!SPECIAL_GATE[item.id](c))continue;
+      // A sudden disastrous final fold, despite a good average, favours twisted shapes.
+      let compat=1;
+      if((item.pool==='weird'||item.pool==='tidy_fail')&&c.spread>=45)compat+=.48*over(c.spread,45,100);
+      if(item.pool==='pristine'||item.pool==='elite_pristine')compat*=1-.28*over(c.spread,40,100);
+      if(item.pool==='military'||item.pool==='object_clean')compat*=1-.20*over(c.spread,45,100);
+      // Item bias only selects *within* a theme. 100 artworks do not give a large theme 100 extra chances.
+      const w=clampOutcome((item.bias||1)*(SPECIAL_WEIGHT[item.id]||1)*compat,.08,4);
+      groups[item.rarity].push({item,pool:item.pool,themeScore,w});
     }
-    let sum=entries.reduce((a,b)=>a+b.w,0);
-    if(!sum) return outcomeById.tofu;
-    let pick=Math.random()*sum;
-    for(const e of entries){ pick-=e.w; if(pick<=0) return e.item; }
-    return entries[entries.length-1].item;
+    return groups;
+  }
+  function weightedPick(options,getWeight){
+    const total=options.reduce((sum,o)=>sum+getWeight(o),0);
+    if(total<=0)return options[0]||null;
+    let pick=Math.random()*total;
+    for(const o of options){pick-=getWeight(o);if(pick<=0)return o;}
+    return options[options.length-1];
+  }
+  function decideOutcome(total,foldAvg,tidy){
+    const c=outcomeContext(total,foldAvg,tidy);
+    const candidates=outcomeCandidates(c);
+    // Rarity comes before items, avoiding 30 ordinary items drowning out 1 legendary.
+    const rarityOptions=Object.keys(RARITY_TARGET).filter(r=>candidates[r].length);
+    if(!rarityOptions.length)return outcomeById.tofu; // defensive only, should be unreachable.
+    const rarity=weightedPick(rarityOptions,r=>RARITY_TARGET[r]);
+    // Themes are weighted once, regardless of how many pictures belong to a theme.
+    const pools=new Map();
+    for(const choice of candidates[rarity]){
+      if(!pools.has(choice.pool))pools.set(choice.pool,{pool:choice.pool,score:choice.themeScore});
+    }
+    const theme=weightedPick([...pools.values()],o=>o.score);
+    const eligible=candidates[rarity].filter(choice=>choice.pool===theme.pool);
+    return weightedPick(eligible,choice=>choice.w).item;
   }
 
   // All result artwork is native SVG, offline and in the SAME HTML. No remote image assets.
