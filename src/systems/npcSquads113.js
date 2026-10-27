@@ -100,7 +100,7 @@ function setStage(s){
   if(!claimSquadStation(stage.id,s.id))continue;
   s.stage=stage;s.index=index;s.nextIndex=(index+1)%STAGES.length;
   s.phase='march';s.elapsed=0;s.blocked=0;s.runIndex=0;s.runTimer=0;
-  s.done.clear();s.active.clear();s.trail=[];s.drillStarted=false;s.drillElapsed=0;
+  s.done.clear();s.active.clear();s.trail=[];s.drillStarted=false;s.drillElapsed=0;s.waitForTail=0;
   for(const n of s.members){n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;n.blocked=0;n.replanAt=0;n.squadMoveSpeed=0;n.squadEscape=null;n.squadEscapeTime=0;n.squadStall=0;
    n.activity=`第${s.id+1}小隊 · 前往${stage.name}`;n.anim.rifleAim=0;n.home.job='life';}
   const rally=squadWorldGoal(stage.rally);s.goal=rally||{...stage.rally};
@@ -140,7 +140,13 @@ function formationGoal(s,index){
   const candidate=W(anchor.x+Math.cos(heading)*f.side*width,anchor.z-Math.sin(heading)*f.side*width);
   if(canOccupy(candidate,.34))return candidate;
  }
- return canOccupy(anchor,.34)?anchor:{...s.members[index].pos};
+ // Do not return the recruit's CURRENT position when a rear formation mark
+ // overlaps equipment or a building: that creates a permanent self-target.
+ // Instead, move toward a nearby navigable point behind the leader and recover
+ // the normal 1-2-2 offset as soon as the path clears.
+ const fallback=squadWorldGoal(anchor);
+ if(fallback)return fallback;
+ return {...s.leader.pos};
 }
 function follow(s,n,index,dt,all,playerPos,run=false){
  let goal=formationGoal(s,index);
@@ -189,10 +195,17 @@ function follow(s,n,index,dt,all,playerPos,run=false){
 function march(s,dt,all,playerPos){
  const leader=s.leader;
  const farthest=Math.max(...s.members.slice(1).map(n=>dist(n.pos,leader.pos)));
+ // Wait briefly for stragglers, but never deadlock indefinitely. In
+ // particular, the fifth pull-up recruit can still be at a far bar (>10m).
+ // Previously the captain stopped forever while the blocked recruit was
+ // assigned its own (unreachable) formation mark.
  const halt=farthest>WAIT_DISTANCE;
- if(!halt||s.exitPoint&&s.elapsed>4){
+ s.waitForTail=halt?(s.waitForTail||0)+dt:0;
+ if(!halt||s.exitPoint&&s.elapsed>4||s.waitForTail>3.0){
   const point=s.exitPoint||s.goal;
   const before={...leader.pos};
+  // If still stretched beyond the normal formation length, allow the leader
+  // to keep the shared route moving; the followers use road-biased catch-up.
   moveSquadMember(leader,point,dt,false,true);
   if(s.exitPoint){
    // The five-person group can otherwise deadlock each other beside the fence.
