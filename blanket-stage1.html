@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
 <meta name="theme-color" content="#203229" />
-<title>豆腐干棉被｜第一到三階段：水火刷洗＋記憶開折 v1.0</title>
+<title>豆腐干棉被｜第一到三階段：水火刷洗＋實體對折 v1.1</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f6f6e8;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -108,7 +108,7 @@ body{display:flex;justify-content:center;align-items:center}
 .memory-round{font-weight:900;font-size:14px;color:#f4ecd0;letter-spacing:1px}
 .memory-instruction{margin-top:5px;font-size:15px;font-weight:800;color:#e3f7e1}
 .scores-mini{font-size:12px;color:#b6d3be;margin-top:5px}
-.stage2-result{position:fixed;z-index:24;top:calc(48% - 65px);left:50%;transform:translateX(-50%);width:min(84%,320px);background:#0c1b17f1;border:1px solid #c4d9bda0;border-radius:18px;box-shadow:0 9px 34px #020905a8;text-align:center;padding:16px 13px;pointer-events:none}
+.stage2-result{position:fixed;z-index:24;top:calc(30% - 65px);left:50%;transform:translateX(-50%);width:min(84%,320px);background:#0c1b17f1;border:1px solid #c4d9bda0;border-radius:18px;box-shadow:0 9px 34px #020905a8;text-align:center;padding:16px 13px;pointer-events:none}
 .result-title{font-size:32px;line-height:1.15;color:#fff0b5;font-weight:1000}
 .result-subtitle{margin-top:6px;font-size:13px;color:#d2e6d7}
 .stage2-controls{position:fixed;z-index:24;bottom:0;left:0;right:0;padding:8px 14px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(180deg,transparent,#101a16e8 15%,#0a1310 70%)}
@@ -120,11 +120,12 @@ body{display:flex;justify-content:center;align-items:center}
 .fold-btn:disabled{filter:grayscale(.7);opacity:.53}
 
 #memoryBgStage{pointer-events:none}
-#memoryBgBlanketWrap{transition:transform .62s cubic-bezier(.22,.8,.2,1),filter .42s ease,opacity .28s ease;transform-box:fill-box;transform-origin:50% 52%;}
-#memoryOverlay.folded-1 #memoryBgBlanketWrap{transform:translate(28px,14px) scale(.72,1) rotate(-1deg)}
-#memoryOverlay.folded-2 #memoryBgBlanketWrap{transform:translate(44px,52px) scale(.53,.88) rotate(-1.6deg)}
-#memoryOverlay.folded-3 #memoryBgBlanketWrap{transform:translate(58px,92px) scale(.39,.74) rotate(-2deg)}
-#memoryOverlay.folded-1 #memoryBgBlanketWrap use,#memoryOverlay.folded-2 #memoryBgBlanketWrap use,#memoryOverlay.folded-3 #memoryBgBlanketWrap use{filter:drop-shadow(0 9px 10px rgba(0,0,0,.18))}
+#memoryBgBlanketWrap{pointer-events:none;filter:drop-shadow(0 8px 5px rgba(0,0,0,.28))}
+#foldRig{transform-origin:300px 332px}
+#foldHingeShadow{pointer-events:none;opacity:0}
+#foldEdgeDetails{pointer-events:none}
+#foldEdgeDetails path{stroke-linejoin:round;stroke-linecap:round}
+#memoryOverlay.is-folding #memoryInk,#memoryOverlay.is-folding #memoryGhost{opacity:.20}
 .stage2-extra{margin-top:10px}
 .final-btn{width:100%;min-height:56px;border-radius:16px;border:1px solid #d9e1af8c;background:linear-gradient(145deg,#8fb267,#5f834e);color:#f7fde8;font:inherit;font-weight:1000;font-size:19px;touch-action:manipulation}
 .final-btn[hidden],#memoryOverlay[hidden],#stage2Controls[hidden],#stage2Info[hidden],#stage2Result[hidden],#stage3Panel[hidden]{display:none!important;pointer-events:none!important}
@@ -133,7 +134,7 @@ body{display:flex;justify-content:center;align-items:center}
 .stage3-panel p{margin:8px 0 0;font-size:14px;line-height:1.7;color:#d5e5d1}
 .stage3-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px}
 .stage3-actions button{min-height:54px;border-radius:15px;font:inherit;font-weight:900;font-size:17px;background:linear-gradient(145deg,#d8bb72,#b88734);color:#22190c;border:1px solid #ffe3af}
-@media(max-height:730px){.stage2-info{top:calc(4px + env(safe-area-inset-top));padding:6px 9px}.memory-instruction{font-size:13px}.stage2-buttons button{min-height:56px}.stage2-controls{padding-top:6px}.stage2-result{top:45%}}
+@media(max-height:730px){.stage2-info{top:calc(4px + env(safe-area-inset-top));padding:6px 9px}.memory-instruction{font-size:13px}.stage2-buttons button{min-height:56px}.stage2-controls{padding-top:6px}.stage2-result{top:25%}}
 @media(max-width:410px){.stage2-info{left:10px;right:10px;top:calc(6px + env(safe-area-inset-top));padding:7px 9px}.stage2-result{width:82%}}
 /* iOS Safari: game UI must not become selectable text / blue native handles. */
 html,body,.app,.app *,svg,svg *,#memoryOverlay,#memoryOverlay *{
@@ -368,6 +369,14 @@ button{touch-action:manipulation;}
       <linearGradient id="memEdgeGrad" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d3dfb8" stop-opacity=".65"/><stop offset="1" stop-color="#385d3c" stop-opacity=".35"/></linearGradient>
       <filter id="traceGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       <filter id="memShadow" x="-30%" y="-30%" width="160%" height="170%"><feGaussianBlur stdDeviation="18"/></filter>
+      <clipPath id="foldClipL"><rect x="40" y="180" width="275" height="320"/></clipPath>
+      <clipPath id="foldClipR"><rect x="315" y="180" width="270" height="320"/></clipPath>
+      <clipPath id="foldClipT"><rect x="40" y="180" width="560" height="152"/></clipPath>
+      <clipPath id="foldClipB"><rect x="40" y="332" width="560" height="180"/></clipPath>
+      <clipPath id="foldClipLL"><rect x="40" y="180" width="163" height="320"/></clipPath>
+      <clipPath id="foldClipRR"><rect x="203" y="180" width="180" height="320"/></clipPath>
+      <g id="foldPhysicsDefs"></g>
+      <clipPath id="tofuFaceClip"><path d="M189 319 Q204 308 227 308 L389 315 Q405 318 413 333 L433 384 Q436 396 416 402 L204 413 Q183 410 183 394 L179 347 Q180 330 189 319 Z"/></clipPath>
     </defs>
     <rect x="0" y="0" width="390" height="844" fill="url(#memBgGrad)"/>
     <g id="memoryBgStage" transform="translate(10 244) scale(.58)">
@@ -381,8 +390,13 @@ button{touch-action:manipulation;}
       <use href="#pillowTopLine"/>
       <g id="memoryBgBlanketWrap">
         <use href="#puddle"/>
-        <use href="#blanketGroup"/>
-        <use href="#ashes"/>
+        <g id="foldRig">
+          <use id="foldActive" href="#blanketGroup"/>
+          <path id="foldHingeShadow" d="M308 220 Q323 324 311 448" fill="none" stroke="#172618" stroke-opacity=".56" stroke-width="10"/>
+          <g id="foldEdgeDetails"></g>
+        </g>
+        <g id="finalTofu" opacity="0"></g>
+        <use id="stageAshes" href="#ashes"/>
       </g>
     </g>
     <rect id="drawingSurface" x="0" y="0" width="390" height="844" fill="transparent" />
@@ -683,11 +697,242 @@ button{touch-action:manipulation;}
   const redrawBtn=$('redrawBtn'),foldBtn=$('foldBtn');
   const finalTidyBtn=$('finalTidyBtn'),stage3Panel=$('stage3Panel'),stage3RestartBtn=$('stage3RestartBtn');
   let round=0,mode='idle',roundScores=[],targetPoints=[],drawPoints=[],lastDrawPointer=null,previewTimer=null,feedbackTimer=null,foldStep=0;
+  // 2.5D fabric folds are built from clipped views of the *actual first-stage quilt*.
+  // The SVG stays in local bed coordinates; bad drawings warp the packet but cannot
+  // translate it outside the bed. Each successive snapshot buries more of the trash.
+  const foldDefs=$('foldPhysicsDefs'),foldActive=$('foldActive'),foldRig=$('foldRig'),finalTofu=$('finalTofu');
+  const foldEdges=$('foldEdgeDetails'),foldHingeShadow=$('foldHingeShadow'),stageAshes=$('stageAshes');
+  let foldAnimation=null,foldFrames=[],foldScores=[];
+  const SVG_NS='http://www.w3.org/2000/svg';
+  function element(tag,attrs={}){
+    const el=document.createElementNS(SVG_NS,tag);
+    for(const [k,v] of Object.entries(attrs))el.setAttribute(k,String(v));
+    return el;
+  }
+  function makeForm(id,baseId,level,animate){
+    const form=element('g',{id});
+    const settings=[null,{clipA:'foldClipL',clipB:'foldClipR',flip:'X',pivot:315},
+      {clipA:'foldClipT',clipB:'foldClipB',flip:'Y',pivot:332},
+      {clipA:'foldClipLL',clipB:'foldClipRR',flip:'X',pivot:203}][level];
+    const left=element('g',{'clip-path':`url(#${settings.clipA})`});
+    left.appendChild(element('use',{href:`#${baseId}`}));form.appendChild(left);
+    const mover=element('g',{id:`${id}-hinge`});
+    const clipped=element('g',{'clip-path':`url(#${settings.clipB})`});
+    clipped.appendChild(element('use',{href:`#${baseId}`}));
+    mover.appendChild(clipped);form.appendChild(mover);foldDefs.appendChild(form);
+    let t=animate?0:1;
+    updateHinge(mover,level,t);
+    return mover;
+  }
+  function updateHinge(g,level,t){
+    const angle=Math.PI*t,cos=Math.cos(angle),lift=Math.sin(angle);
+    if(level===2){
+      // Lower half rises, rotates over the horizontal seam and lands on top.
+      g.setAttribute('transform',`matrix(1 0 0 ${cos.toFixed(4)} 0 ${(332*(1-cos)-lift*22).toFixed(2)})`);
+    }else{
+      const pivot=level===1?315:203;
+      // Right half rises across vertical seam. Height illusion from the lift.
+      g.setAttribute('transform',`matrix(${cos.toFixed(4)} 0 0 1 ${(pivot*(1-cos)).toFixed(2)} ${(-lift*21).toFixed(2)})`);
+    }
+  }
+  function createSnapshot(id,retain,mushroomShrink){
+    const content=blanket.cloneNode(true);
+    // Prevent duplicated element IDs from shadowing the live game object IDs.
+    for(const el of [content,...content.querySelectorAll('[id]')])el.removeAttribute('id');
+    const pieces=[...content.querySelectorAll('.trash')];
+    pieces.forEach((g,i)=>{
+      // Deterministic selection to keep a different (smaller) subset on each layer.
+      const rand=((i*73+29)%211)/211;
+      if(rand>retain)g.remove();
+    });
+    [...content.querySelectorAll('.mushroom')].forEach(g=>{
+      const tr=g.getAttribute('transform')||'';
+      // These props contain translate(x y) scale(s), inherited from stage one.
+      const sm=tr.match(/scale\(([^)]*)\)/);
+      if(sm){
+        const sc=parseFloat(sm[1]);
+        g.setAttribute('transform',tr.replace(sm[0],`scale(${Math.max(.001,sc*mushroomShrink).toFixed(4)})`));
+      }
+    });
+    const host=element('g',{id});host.appendChild(content);foldDefs.appendChild(host);
+  }
+  function constructFolds(){
+    foldDefs.replaceChildren(); foldFrames=[]; foldScores=[];foldEdges.replaceChildren();
+    createSnapshot('foldSource0',1,1);
+    for(let i=1;i<=3;i++){
+      // The wrapped portion conceals debris and compresses any mushrooms it covers.
+      createSnapshot(`foldSource${i}`,[1,.48,.29,.14][i],[1,.64,.28,.09][i]);
+      let input=`foldSource${i}`,hinges=[];
+      for(let k=1;k<=i;k++){
+        const id=`foldLevel${i}_${k}`;
+        hinges.push(makeForm(id,input,k,k===i)); input=id;
+      }
+      foldFrames[i]={id:input,hinge:hinges.at(-1),level:i};
+    }
+    foldActive.setAttribute('href','#foldSource0');
+    stageAshes.style.opacity=ash?'1':'0';
+    finalTofu.style.opacity='0';foldRig.style.opacity='1';
+    foldRig.setAttribute('transform','translate(0 0)');
+    foldHingeShadow.style.opacity='0';
+  }
+  function foldPosition(level){
+    // All packet bounds remain on the mattress (x roughly 255-416, y 250-440).
+    return [{x:0,y:0},{x:102,y:4},{x:205,y:25},{x:285,y:235}][level];
+  }
+  function scoreWarp(level,score){
+    const bad=Math.max(0,(82-score)/82);
+    const sign=(level%2===0)?-1:1;
+    return {dx:bad*(level===1?8:13)*sign,dy:bad*(level===2?11:-5),
+      rot:bad*7*sign,skew:bad*5*sign,bad};
+  }
+  function setFoldRig(level,score,t){
+    const prev=foldPosition(level-1),next=foldPosition(level),w=scoreWarp(level,score);
+    // Progressive recentering avoids the old bug where blanket leaves the bed.
+    const ease=t*t*(3-2*t);
+    const x=prev.x+(next.x-prev.x)*ease+w.dx*ease;
+    const y=prev.y+(next.y-prev.y)*ease+w.dy*ease;
+    const angle=(w.rot*ease).toFixed(2),skew=(w.skew*ease).toFixed(2);
+    // Each real fold quarters/halves the footprint, while the puffy layers
+    // gain visible volume. The final bundle occupies a useful fraction of the bed.
+    const size=[1,1.05,1.16,1.50];
+    const sx=1+(size[level]-1)*ease;
+    const press=level===3 && t>.61 ? Math.sin(Math.PI*Math.min(1,(t-.61)/.39))*.20 : 0;
+    const sy=sx*(1-press);
+    foldRig.setAttribute('transform',`translate(${x.toFixed(2)} ${y.toFixed(2)}) translate(203 332) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(-203 -332) rotate(${angle} 203 328) skewX(${skew})`);
+    foldHingeShadow.style.opacity=String(.12+.48*Math.sin(Math.PI*t));
+    foldHingeShadow.setAttribute('d',level===2?'M90 332 Q205 341 318 332':`M${level===1?315:203} 220 Q205 323 ${level===1?315:203} 445`);
+  }
+  function renderClothEdges(level,score,t=1){
+    foldEdges.replaceChildren(); if(!level)return;
+    const poor=Math.max(0,(75-score)/75),front=[null,428,333,332][level];
+    const y=[0,443,343,346][level],left=level===3?91:90,right=level===3?203:315;
+    const hem=element('path',{d:`M${left+2} ${y-2} Q${(left+right)/2} ${y+3+poor*6} ${right-2+poor*11} ${y-2-poor*7} L${right-4+poor*13} ${y+10+level*3+poor*7} Q${(left+right)/2} ${y+17+level*2} ${left+1} ${y+12+level*2} Z`,fill:'#3a583d',stroke:'#233b2f','stroke-width':'3',opacity:String(Math.min(1,t*1.2))});
+    foldEdges.appendChild(hem);
+    // Individual fabric layer seams get thicker as the quilt becomes tofu.
+    for(let i=1;i<=level*2;i++){
+      const yy=y+Math.min(i*2.5,level*5+4);
+      foldEdges.appendChild(element('path',{d:`M${left+5} ${yy.toFixed(1)} Q${(left+right)/2} ${(yy+3+poor*2).toFixed(1)} ${right-5+poor*8} ${(yy-poor*5).toFixed(1)}`,fill:'none',stroke:i%2?'#87a17b':'#263d2c','stroke-width':i%2?'1.4':'2',opacity:String(.35+.4*t)}));
+    }
+    if(poor>.12){
+      // Uneven folding leaves an ugly, protruding corner instead of a perfect cube.
+      foldEdges.appendChild(element('path',{d:`M${right-21} ${y-4} Q${right+poor*35} ${y-22*poor} ${right+poor*28} ${y+poor*15} Q${right+5} ${y+8} ${right-21} ${y-4}Z`,fill:'#769062',stroke:'#3b5c39','stroke-width':'3',opacity:String(Math.min(1,t*1.2))}));
+    }
+    if(level===3){
+      // Top-face quilting and a small central ridge make the final stack read as tofu.
+      foldEdges.appendChild(element('path',{d:`M98 231 Q155 222 198 235 M102 278 Q154 272 200 286`,fill:'none',stroke:'#e1efc0','stroke-opacity':'.32','stroke-width':2.4}));
+    }
+  }
+  function buildTofuResult(score){
+    finalTofu.replaceChildren();
+    const poor=clamp((75-score)/75,0,1);
+    if(ash){
+      finalTofu.appendChild(element('ellipse',{cx:300,cy:424,rx:126,ry:28,fill:'#202a26','fill-opacity':'.52'}));
+      finalTofu.appendChild(element('path',{d:'M194 405 Q223 365 264 394 Q290 375 325 396 Q375 370 425 403 Q419 445 361 439 L224 438Z',fill:'#676a65',stroke:'#333833','stroke-width':3}));
+      finalTofu.appendChild(element('ellipse',{cx:297,cy:407,rx:90,ry:16,fill:'#a0a196','fill-opacity':'.6'}));
+      return;
+    }
+    const sprite=(tag,attrs,parent=finalTofu)=>{const e=element(tag,attrs);parent.appendChild(e);return e;};
+    const fill=stops[2].getAttribute('stop-color')||'#799b68';
+    sprite('ellipse',{cx:307,cy:428,rx:148,ry:26,fill:'#081710','fill-opacity':'.42'});
+    // Thick cross-section under the top face: multiple visible stuffed layers.
+    sprite('path',{d:`M184 380 L433 ${384+poor*9} L430 ${426+poor*9} Q419 440 400 441 L209 ${441+poor*4} Q181 436 181 417 Z`,fill:'#324f38',stroke:'#1d3528','stroke-width':3});
+    sprite('path',{d:`M188 394 Q298 ${402+poor*6} 426 ${391+poor*5} L428 ${415+poor*7} Q311 ${426+poor*9} 187 418Z`,fill:'#56754a',stroke:'#344f38','stroke-width':2});
+    for(let i=0;i<5;i++){
+      const y=405+i*6.5;
+      sprite('path',{d:`M190 ${y} Q308 ${y+5+poor*6} ${423+poor*14} ${y-4}`,fill:'none',stroke:i%2?'#253c2a':'#a6b98a','stroke-opacity':i%2?'.55':'.44','stroke-width':i%2?3:2});
+    }
+    // Fabric top, visibly bulging on sloppy folds.
+    const mainTop=`M${189-poor*6} 319 Q${204-poor*15} ${308-poor*6} 227 308 L${389+poor*4} ${315-poor*12} Q405 318 413 333 L${433+poor*12} ${384+poor*8} Q436 396 416 402 L204 413 Q183 410 183 394 L${179-poor*6} 347 Q180 330 ${189-poor*6} 319 Z`;
+    sprite('path',{d:mainTop,fill:'url(#fabricGradient)',stroke:'#2b4c38','stroke-width':4});
+    sprite('path',{d:mainTop,fill:'url(#quiltWeave)','fill-opacity':'.92'});
+    sprite('path',{d:'M195 332 Q283 327 405 343 M191 373 Q297 365 422 380 M208 404 Q320 400 410 395',stroke:'#e1edc1','stroke-opacity':'.21','stroke-width':5,fill:'none','stroke-linecap':'round'});
+    sprite('path',{d:mainTop,fill:'none',stroke:'#c6d5a2','stroke-width':3,'stroke-opacity':'.62','stroke-dasharray':'7 6'});
+    if(moisture>42){
+      sprite('ellipse',{cx:260,cy:358,rx:49,ry:25,fill:'url(#darkWet)',opacity:String(clamp((moisture-42)/58,0,.8))});
+      sprite('ellipse',{cx:382,cy:377,rx:39,ry:25,fill:'url(#darkWet)',opacity:String(clamp((moisture-45)/55,0,.7))});
+    }
+    if(burn>0){
+      sprite('ellipse',{cx:294,cy:363,rx:66,ry:42,fill:'url(#burnGradient)',opacity:String(clamp(burn/75,0,1))});
+      sprite('ellipse',{cx:401,cy:381,rx:42,ry:27,fill:'url(#burnGradient)',opacity:String(clamp(burn/85,0,1))});
+    }
+    // Only a fraction of the debris survives on the outer face: the rest is
+    // caught between the eight fabric layers and no longer visible.
+    const trapped=sprite('g',{'clip-path':'url(#tofuFaceClip)'});
+    const present=trashObjects.filter(o=>!o.removed);
+    const kept=Math.min(21,Math.round(present.length*.075));
+    for(let i=0;i<kept;i++){
+      const obj=present[(i*17)%present.length];
+      if(!obj)continue;
+      const copy=obj.el.cloneNode(true);copy.removeAttribute('id');
+      const x=209+(i*57%192),y=329+(i*41%68);
+      copy.setAttribute('transform',`translate(${x} ${y}) rotate(${obj.deg}) scale(${(.46+obj.scale*.37).toFixed(2)})`);
+      trapped.appendChild(copy);
+    }
+    if(moisture>=70&&moldAge>.5){
+      // Mushrooms are not magically removed: caps are squashed sideways and
+      // stems buckle when caught between the stacked layers.
+      const qty=Math.ceil(Math.min(1,moldAge/3.5)*5);
+      for(let i=0;i<qty;i++){
+        const x=233+i*39,y=346+(i%2)*28;
+        const sh=element('g',{transform:`translate(${x} ${y}) rotate(${i%2?26:-30})`});
+        sh.appendChild(element('path',{d:'M-4 3 Q-9 -1 2 -7 L8 -10 Q11 -8 4 -1 L5 5Z',fill:'#e2d6bc',stroke:'#748570','stroke-width':1.6}));
+        sh.appendChild(element('path',{d:'M-20 -5 Q-11 -16 5 -13 Q19 -13 23 -3 Q2 4 -20 -5Z',fill:i%2?'#c9986e':'#e5c8a1',stroke:'#777453','stroke-width':2}));
+        sh.appendChild(element('ellipse',{cx:2,cy:-6,rx:9,ry:2.5,fill:'#fae5c2','fill-opacity':'.57'}));
+        trapped.appendChild(sh);
+      }
+    }
+    if(poor>.22){
+      // A badly aligned fold leaves one corner sticking up off the bundle.
+      sprite('path',{d:`M385 316 Q${420+poor*20} ${288-poor*14} ${434+poor*32} 315 Q440 341 413 342 Z`,fill,stroke:'#426342','stroke-width':3});
+      sprite('path',{d:`M${205-poor*12} 413 Q193 ${425+poor*13} 183 404`,stroke:'#c5d6a1',fill:'none','stroke-width':3});
+    }
+    // Soft top edge rather than a featureless gray square.
+    sprite('path',{d:'M192 321 Q285 303 387 317',stroke:'#e5f0c6','stroke-opacity':'.44','stroke-width':3,fill:'none'});
+  }
+  function finalizeFoldVisual(level,score){
+    foldStep=level;
+    foldScores[level-1]=score;
+    foldActive.setAttribute('href',`#${foldFrames[level].id}`);
+    updateHinge(foldFrames[level].hinge,level,1);
+    setFoldRig(level,score,1);renderClothEdges(level,score,1);
+    if(level===3){finalTofu.style.opacity='1';foldRig.style.opacity='0';}
+    else {finalTofu.style.opacity='0';foldRig.style.opacity='1';}
+  }
+  function animateFold(level,score,onDone){
+    const duration=900; const start=performance.now();
+    mode='folding';overlay.classList.add('is-folding');
+    const form=foldFrames[level];
+    foldActive.setAttribute('href',`#${form.id}`);
+    function tick(now){
+      if(stage!==2||mode!=='folding')return;
+      const p=Math.min(1,(now-start)/duration),smooth=p*p*(3-2*p);
+      updateHinge(form.hinge,level,smooth);
+      setFoldRig(level,score,smooth);
+      renderClothEdges(level,score,smooth);
+      if(level===3){
+        const arrival=clamp((smooth-.72)/.28,0,1);
+        finalTofu.style.opacity=String(arrival);
+        foldRig.style.opacity=String(1-arrival);
+      }
+      if(p<1){requestAnimationFrame(tick);} else{
+        foldAnimation=null;overlay.classList.remove('is-folding');
+        finalizeFoldVisual(level,score);mode='feedback';onDone();
+      }
+    }
+    foldAnimation=requestAnimationFrame(tick);
+  }
+  function restoreFoldState(){
+    overlay.classList.remove('is-folding');
+    if(!foldStep){foldActive.setAttribute('href','#foldSource0');foldRig.setAttribute('transform','translate(0 0)');foldEdges.replaceChildren();foldRig.style.opacity='1';finalTofu.style.opacity='0';return;}
+    finalizeFoldVisual(foldStep,foldScores[foldStep-1]??80);
+  }
   const TAU=Math.PI*2;
   let canvasW=390,canvasH=844;
   function fitMemoryCanvas(){
     canvasW=Math.max(280,window.innerWidth); canvasH=Math.max(480,window.innerHeight);
     overlay.setAttribute('viewBox',`0 0 ${canvasW} ${canvasH}`);
+    // Keep the entire bed and folded packet centred on different phone sizes.
+    $('memoryBgStage').setAttribute('transform',`translate(${(canvasW-390)/2+10} ${(canvasH-844)/2+244}) scale(.58)`);
     $('drawingSurface').setAttribute('width',String(canvasW));
     $('drawingSurface').setAttribute('height',String(canvasH));
     memorySplash.setAttribute('x',String(canvasW/2));
@@ -729,8 +974,7 @@ button{touch-action:manipulation;}
     return t?p.matrixTransform(t.inverse()):{x:p.x,y:p.y};
   }
   function renderFoldState(){
-    overlay.classList.remove('folded-1','folded-2','folded-3');
-    if(foldStep>0)overlay.classList.add(`folded-${Math.min(3,foldStep)}`);
+    restoreFoldState();
   }
   function showFinishStage2(){
     const avg=Math.round(roundScores.reduce((a,b)=>a+b,0)/3);
@@ -788,6 +1032,7 @@ button{touch-action:manipulation;}
   function startStage2(){
     stage=2;setAction(null);scrubbing=false;fitMemoryCanvas();
     round=0;roundScores=[];drawPoints=[];foldStep=0;clearStageTimers();
+    constructFolds();
     $('stage1Meters').hidden=true;$('stage1State').hidden=true;$('stage1Controls').hidden=true;
     $('stageSubtitle').textContent='第二階段｜記憶折線＋對折動畫（共 3 次）';
     svgHide(overlay,false);$('stage2Info').hidden=false;$('stage2Controls').hidden=false;
@@ -877,20 +1122,31 @@ button{touch-action:manipulation;}
   foldBtn.addEventListener('click',()=>{
     if(stage!==2)return;
     if(mode!=='draw'||foldBtn.disabled)return;
-    const score=similarity();roundScores.push(score);mode='feedback';lastDrawPointer=null;
-    svgHide(memoryTarget,true);memoryGhost.setAttribute('d',polyPath(targetPoints,true));svgHide(memoryGhost,false);
-    stage2ResultTitle.textContent=`${score} 分`;
-    stage2ResultSubtitle.textContent=round===2?'第三次開折完成！':'白色虛線是正確形狀；青色是你畫的';
-    stage2Result.hidden=false;
-    memorySplash.textContent='';
-    memoryInstruction.textContent=round===2?'棉被已經完成第三次對折':'這回合的貼合度';
-    scoresMini.textContent=roundScores.map((v,i)=>`第${i+1}次 ${v}分`).join('　');
-    stage2Tip.textContent=round===2?'三次對折都完成了':'按下開折後，棉被會真的再折一次';
+    const score=similarity();roundScores.push(score);lastDrawPointer=null;
+    svgHide(memoryTarget,true);svgHide(memoryGhost,true);svgHide(memoryInk,true);
+    stage2Result.hidden=true;
+    memorySplash.textContent=round===2?'最後壓實！':'正在翻折棉被…';
+    memoryInstruction.textContent=`第 ${round+1} 次：${['右半邊向左翻','下半邊向上翻','最後翻折並壓成豆腐乾'][round]}`;
+    stage2Tip.textContent=round===2?'布層壓緊，最後定型':'棉被正沿著折線翻起並落下';
     foldBtn.disabled=true;redrawBtn.disabled=true;
-    foldStep=Math.min(3,foldStep+1);renderFoldState();
-    feedbackTimer=setTimeout(()=>{feedbackTimer=null; if(round===2){showFinishStage2();} else {round++; startRound();}},1750);
+    const thisRound=round;
+    const visualScore=roundScores.reduce((a,b)=>a+b,0)/roundScores.length;
+    if(round===2)buildTofuResult(visualScore);
+    animateFold(round+1,visualScore,()=>{
+      if(stage!==2)return;
+      memoryGhost.setAttribute('d',polyPath(targetPoints,true));svgHide(memoryGhost,false);
+      svgHide(memoryInk,false);
+      stage2ResultTitle.textContent=`${score} 分`;
+      stage2ResultSubtitle.textContent=thisRound===2?'三次開折完成！':'白色虛線是正確形狀；青色是你畫的';
+      stage2Result.hidden=false;
+      memorySplash.textContent='';
+      memoryInstruction.textContent=thisRound===2?'第三折完成，棉被還在床上！':'這回合的貼合度';
+      scoresMini.textContent=roundScores.map((v,i)=>`第${i+1}次 ${v}分`).join('　');
+      stage2Tip.textContent=thisRound===2?'三次對折都完成了':'按下開折後，棉被已真正對折一次';
+      feedbackTimer=setTimeout(()=>{feedbackTimer=null;if(stage!==2)return;if(thisRound===2){showFinishStage2();}else{round++;startRound();}},1120);
+    });
   });
-  window.__blanketStageDebug=()=>({stage,round,mode,foldStep,roundScores:[...roundScores],previewVisible:!memoryTarget.hasAttribute('hidden'),drawPoints:drawPoints.length,moisture,burn,dirt,trashRemaining:trashObjects.filter(o=>!o.removed).length,trashInitial,moldAge,ash,action,scrubbing,canvasW,canvasH,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
+  window.__blanketStageDebug=()=>({stage,round,mode,foldStep,foldForm:foldActive.getAttribute('href'),foldScores:[...foldScores],roundScores:[...roundScores],previewVisible:!memoryTarget.hasAttribute('hidden'),drawPoints:drawPoints.length,moisture,burn,dirt,trashRemaining:trashObjects.filter(o=>!o.removed).length,trashInitial,moldAge,ash,action,scrubbing,canvasW,canvasH,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
   // Native text selection and Safari's callout obscured the game after long presses.
   document.addEventListener('selectstart',e=>e.preventDefault());
   document.addEventListener('dragstart',e=>e.preventDefault());
