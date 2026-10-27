@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
 <meta name="theme-color" content="#203229" />
-<title>豆腐干棉被｜第一到三階段：水火刷洗＋實體對折＋最後整理 v1.4</title>
+<title>豆腐干棉被｜第一到三階段：水火刷洗＋實體對折＋最後整理 v1.6</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f6f6e8;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -271,14 +271,91 @@ button{touch-action:manipulation;}
 .collection-grid{max-height:48vh;overflow:auto}
 @media(max-width:560px){.collection-preview{grid-template-columns:1fr}.collection-preview-art{min-height:160px}.collection-grid{max-height:42vh}}
 
+
+/* v1.6: a separate title screen plus an always-visible gallery preview. */
+.header-buttons{display:flex;flex-shrink:0;gap:6px}
+.header-buttons .reset{min-width:56px;padding:7px 8px}
+#homeBtn{background:#263e30cc}
+.result-home-btn{width:100%;min-height:41px;border-radius:13px;margin-top:8px;background:#25402fd9;border:1px solid #b9d6ab9c;color:#e9f4e3;font:inherit;font-size:14px;font-weight:850;touch-action:manipulation}
+.blanket-home{position:fixed;inset:0;z-index:48;background:radial-gradient(ellipse at 50% 30%,#365541 0%,#1e392c 49%,#0d2018 96%);overflow-y:auto;overscroll-behavior:contain;display:flex;align-items:center;justify-content:center;isolation:isolate}
+.blanket-home[hidden]{display:none!important}
+.home-noise{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(115deg,transparent 0 92px,#b3cc9433 93px,transparent 95px 194px);opacity:.19;z-index:-1}
+.home-content{width:min(94vw,465px);min-height:min(790px,90dvh);padding:calc(16px + env(safe-area-inset-top)) 12px calc(24px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center}
+.home-overline{font-size:12px;letter-spacing:2px;color:#d8e8c1;font-weight:850}
+.home-title{font-size:clamp(28px,7vw,39px);line-height:1.2;font-weight:1000;color:#f6f4d6;margin:5px 0 0;text-shadow:0 4px 12px #030e0bb9}
+.home-title span{display:block;font-size:clamp(29px,7.7vw,42px);color:#e4efb7}
+.home-subtitle{max-width:340px;font-size:13px;line-height:1.6;color:#c6d9bc}
+.home-hero{width:min(100%,385px);position:relative;margin:4px 0 6px;filter:drop-shadow(0 20px 17px #04130d66)}
+.home-hero svg{width:100%;max-height:min(34dvh,255px);display:block}
+.home-hero-caption{font-size:12px;color:#e6edca;opacity:.8;margin:-12px 0 0}
+.home-action-group{width:min(100%,360px);display:flex;flex-direction:column;gap:12px}
+.home-action{width:100%;min-height:62px;border-radius:17px;padding:11px 17px;font:inherit;font-weight:1000;font-size:20px;display:flex;align-items:center;justify-content:center;gap:12px;touch-action:manipulation;cursor:pointer}
+.home-action:active{transform:scale(.98)}
+.home-action-start{background:linear-gradient(135deg,#b1ce85,#719851);color:#1c3727;border:2px solid #e8f5c4;box-shadow:0 5px 0 #335a3e,0 12px 19px #010a0566}
+.home-action-gallery{background:linear-gradient(135deg,#365641,#263e32);color:#f2f7df;border:1.5px solid #a2ba8d;box-shadow:0 4px 0 #10241a}
+.home-action-gallery span{font-size:12px;color:#cbdac2;font-weight:700}
+.home-footer{font-size:11px;color:#a4bf9e;letter-spacing:.4px}
+.collection-backdrop,.collection-panel{z-index:61}
+.collection-backdrop{z-index:60}
+.collection-panel{display:flex;flex-direction:column;overflow:hidden;max-height:min(91dvh,865px)}
+.collection-panel[hidden]{display:none!important}
+.collection-close-top{position:absolute;right:16px;top:16px;float:none;margin:0}
+.collection-note{flex-shrink:0;margin:4px 0 9px}
+.collection-preview{flex:none;min-height:0}
+.collection-preview-art svg{width:100%;height:100%;min-height:132px;display:block}
+.collection-grid{flex:1;min-height:125px;max-height:none;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:3px 2px 5px;align-content:start}
+.collection-close{flex-shrink:0;margin-top:9px}
+@media(max-width:560px){.collection-panel{max-height:94dvh;padding:12px}.collection-preview{grid-template-columns:1fr;gap:7px;padding:8px}.collection-preview-art{min-height:116px;height:135px}.collection-preview-art svg{min-height:0}.collection-preview-meta{gap:3px}.collection-preview-title{font-size:18px}.collection-preview-desc{font-size:12px;line-height:1.4}.collection-preview-tip{font-size:10px}.collection-preview-rarity{font-size:11px;padding:3px 9px}.collection-tile{min-height:66px}.collection-grid{min-height:135px}}
+@media(max-height:680px){.home-content{min-height:auto;gap:7px}.home-hero svg{max-height:21dvh}.home-title{font-size:27px}.home-title span{font-size:29px}.home-action{min-height:50px;font-size:18px}.collection-preview-art{height:105px}.collection-preview{gap:4px}}
+
 </style>
 </head>
 <body>
+<div id="blanketHome" class="blanket-home" role="region" aria-label="折棉被遊戲首頁">
+  <div class="home-noise" aria-hidden="true"></div>
+  <div class="home-content">
+    <div class="home-overline">國軍內務整理模擬器 · 獨立小遊戲</div>
+    <h1 class="home-title">報告長官！<span>這不是豆腐乾</span></h1>
+    <div class="home-subtitle">灑水、燒焦、掃垃圾，最後把棉被折出奇怪的東西。</div>
+    <div class="home-hero" aria-hidden="true">
+      <svg viewBox="0 0 360 248" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="homeSheet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aec78b"/><stop offset=".55" stop-color="#769661"/><stop offset="1" stop-color="#375e47"/></linearGradient>
+          <linearGradient id="homeBed" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d4dbc9"/><stop offset="1" stop-color="#899b8d"/></linearGradient>
+          <radialGradient id="homeSun"><stop stop-color="#e5d68a" stop-opacity=".45"/><stop offset="1" stop-color="#e5d68a" stop-opacity="0"/></radialGradient>
+        </defs>
+        <ellipse cx="178" cy="204" rx="160" ry="37" fill="#07150e" opacity=".45"/>
+        <ellipse cx="180" cy="126" rx="174" ry="100" fill="url(#homeSun)"/>
+        <path d="M27 149 L301 144 L340 202 L39 218Z" fill="url(#homeBed)" stroke="#e5eddb" stroke-width="5"/>
+        <path d="M39 218 L340 202 L331 219 L48 237Z" fill="#607363"/>
+        <path d="M76 132 L291 128 L319 181 L63 202Z" fill="#355b40" stroke="#243e31" stroke-width="5"/>
+        <path d="M79 113 Q78 98 100 95 L267 97 Q288 98 291 113 L297 166 Q296 178 278 183 L83 192 Q67 188 68 177Z" fill="url(#homeSheet)" stroke="#314e36" stroke-width="5"/>
+        <path d="M87 126 L281 122 M82 146 Q174 133 289 147 M80 166 Q162 153 289 168" fill="none" stroke="#e4f0bd" stroke-width="4" opacity=".55"/>
+        <path d="M85 114 L276 114 M86 178 L274 174" fill="none" stroke="#eaf3c7" stroke-width="2" stroke-dasharray="7 6" opacity=".6"/>
+        <path d="M122 90 L232 88 L253 106 L143 109Z" fill="#a4c189" stroke="#33563e" stroke-width="4"/>
+        <path d="M143 109 L253 106 L254 120 L144 124Z" fill="#537c4e" stroke="#33563e" stroke-width="3"/>
+        <path d="M157 75 L218 75 L237 91 L167 93Z" fill="#b9d4a0" stroke="#33563e" stroke-width="3"/>
+        <path d="M167 93 L237 91 L237 105 L166 109Z" fill="#436d44" stroke="#33563e" stroke-width="3"/>
+        <path d="M173 54 L220 55 L219 76 L175 77Z" fill="#85a969" stroke="#33563e" stroke-width="4"/>
+        <path d="M197 24 L203 42 L222 44 L207 54 L212 70 L198 60 L181 69 L187 53 L173 42 L192 40Z" fill="#f0d585" stroke="#fff2c1" stroke-width="2"/>
+        <path d="M42 75 L47 87 L60 90 L49 97 L50 111 L40 101 L26 106 L33 93 L25 85 L37 85Z" fill="#f2d683" opacity=".85"/>
+        <path d="M297 66 L301 80 L315 85 L303 89 L305 102 L294 94 L282 97 L289 84 L281 78 L294 78Z" fill="#f2d683" opacity=".7"/>
+      </svg>
+      <div class="home-hero-caption">軍規豆腐乾？還是國軍秘密武器？</div>
+    </div>
+    <div class="home-action-group">
+      <button id="homeStartBtn" class="home-action home-action-start" type="button">開始遊戲 <span aria-hidden="true">▶</span></button>
+      <button id="homeCollectionBtn" class="home-action home-action-gallery" type="button">棉被圖鑑 <span>100 種成品</span></button>
+    </div>
+    <div class="home-footer">三階段挑戰 · 40 張專屬插畫 · 100 種荒謬成品</div>
+  </div>
+</div>
 <div class="app">
+
  <div class="header">
   <div class="toprow">
    <div><h1>報告長官！這不是豆腐乾</h1><div class="subtitle" id="stageSubtitle">第一階段｜棉被乾濕度、焦化與刷洗</div></div>
-   <button class="reset" id="reset" type="button">重新開始</button>
+   <div class="header-buttons"><button class="reset" id="homeBtn" type="button">首頁</button><button class="reset" id="reset" type="button">重新開始</button></div>
   </div>
   <div class="meters" id="stage1Meters">
    <div class="meter"><div class="meter-label">💧 含水量 <strong id="waterValue">32%</strong></div><div class="track"><div class="progress" id="waterProgress"></div></div></div>
@@ -539,7 +616,7 @@ button{touch-action:manipulation;}
    </div>
    <div class="summary-detail" id="summaryDetail"></div>
    <button id="collectionBtn" class="collection-link" type="button">📖 棉被圖鑑（100 / 100）</button>
-   <button id="stage3RestartBtn" class="again-btn" type="button">再折一次！</button>
+   <button id="stage3RestartBtn" class="again-btn" type="button">再折一次！</button><button id="summaryHomeBtn" class="result-home-btn" type="button">返回首頁</button>
  </div>
 
  <div id="collectionBackdrop" class="collection-backdrop" hidden></div>
@@ -1159,6 +1236,30 @@ button{touch-action:manipulation;}
     cthulhu:()=>`${Array.from({length:8},(_,i)=>{const x=183+(i-3.5)*15;return line(`M${x} 134 Q${x+(i-4)*19} 101 ${x+(i-3)*26} ${164+(i%2)*24}`,'#607d67',12)}).join('')}${ellipse(184,105,58,45,'#6a8f70',`stroke="#34523d" stroke-width="5"`)}${shape('M142 79 L123 39 L163 65Z','#769976')}${shape('M219 79 L245 38 L203 66Z','#769976')}${ellipse(165,103,10,15,'#f5cb77')}${ellipse(205,103,10,15,'#f5cb77')}${circle(166,104,4,'#342b28')}${circle(204,104,4,'#342b28')}`,
     soldier:()=>`${commonCube(158,47,102,131,'#7b9a70')}${ellipse(111,105,24,25,'#e4bf9d',`stroke="#815f4a" stroke-width="3"`)}${rect(132,87,116,40,14,'#6e8c64',`stroke="#3c5641" stroke-width="4"`)}${rect(241,100,47,15,6,'#4e6951')}${rect(244,121,47,16,6,'#4e6951')}${rect(90,77,34,14,8,'#536b4c')}${line('M105 110 q9 6 17 0','#785645',2)}<text x="252" y="69" font-size="22" font-weight="900" fill="#f9eab3">Zzz</text>`
   };
+  // v1.6: 20 newly hand-drawn, clearly distinct SVG result silhouettes.
+  Object.assign(artTemplates,{
+    fortress:()=>`${rect(75,119,216,49,6,'#6d8c58',`stroke="#2d5236" stroke-width="5"`)}${[83,128,173,218,263].map(x=>rect(x,96,28,31,3,'#8ead70',`stroke="#35563d" stroke-width="3"`)).join('')}${rect(160,127,44,41,6,'#344e37')}${shape('M160 129 Q182 108 204 129Z','#344e37')}${line('M83 145 H155 M210 145 H285','#c9d9a3',3)}${shine(275,68)}`,
+    artillery:()=>`${rect(80,132,213,34,14,'#233d32',`stroke="#152821" stroke-width="4"`)}${[111,144,177,210,243,276].map(x=>circle(x,149,10,'#90a66f',`stroke="#253c2d" stroke-width="4"`)).join('')}${shape('M96 129 L120 103 L245 102 L267 129Z','#708e5b',`stroke="#304b39" stroke-width="4"`)}${rect(172,75,73,31,12,'#93a779',`stroke="#365540" stroke-width="4"`)}${rect(229,79,94,13,5,'#627c59',`stroke="#263e2d" stroke-width="3"`)}${rect(309,77,20,17,3,'#415542')}${smoke(316,65,'#a9b8aa')}`,
+    missile:()=>`${rect(77,131,214,29,10,'#364d3e',`stroke="#22382b" stroke-width="4"`)}${[105,155,236,275].map(x=>circle(x,161,12,'#232b2a',`stroke="#8cac77" stroke-width="5"`)).join('')}${shape('M145 126 L232 50 L244 61 L158 136Z','#9cb38a',`stroke="#3d6247" stroke-width="5"`)}${shape('M232 50 L250 44 L244 61Z','#e2ba81')}${shape('M157 108 L222 52 L215 41 L151 97Z','#6c906f',`stroke="#365543" stroke-width="3"`)}${rect(104,115,42,17,4,'#a2bb8b')}${line('M80 138 H296','#cad7a7',2)}`,
+    helicopter:()=>`${shape('M76 117 Q94 77 191 77 Q248 79 255 110 L273 127 L259 146 L110 148 Q84 142 76 117Z','#819d71',`stroke="#2a523f" stroke-width="5"`)}${shape('M113 102 Q123 86 183 88 Q198 91 203 114 L104 117Z','#80b6bf',`stroke="#e1eddb" stroke-width="3"`)}${shape('M248 114 L309 86 L319 91 L275 137Z','#688a68',`stroke="#2a523f" stroke-width="4"`)}${line('M183 74 V54 M107 54 H263','#d5e6c0',7)}${line('M122 156 H240 M132 156 L118 139 M229 156 L241 139','#d5e6c0',5)}${circle(189,53,7,'#dce9cb')}`,
+    drone:()=>`${rect(143,96,76,33,13,'#86a375',`stroke="#2c513f" stroke-width="5"`)}${circle(181,110,14,'#a9c6ae')}${circle(181,111,7,'#346c76')}${[90,275].map(x=>`${rect(x-12,103,43,8,4,'#5f8869')}${circle(x,107,23,'none',`stroke="#c1d8c2" stroke-width="5"`)}${line(`M${x-20} 107 H${x+20}`,'#e9ebc9',3)}`).join('')}${[72,292].map(x=>circle(x,107,6,'#d1debf')).join('')}${line('M162 130 L153 143 H209 L202 130','#d5e8cb',4)}`,
+    submarine:()=>`${ellipse(175,133,116,34,'#4d8076',`stroke="#294e4b" stroke-width="6"`)}${shape('M268 111 L318 89 L318 160 L269 151Z','#476a65',`stroke="#294e4b" stroke-width="5"`)}${rect(166,81,60,35,8,'#6e9b84',`stroke="#345b51" stroke-width="5"`)}${line('M192 81 V60 H222','#b6cbb3',7)}${circle(222,60,7,'#d3e4c6')}${[116,153,198,237].map(x=>circle(x,131,9,'#bed8ca',`stroke="#2c605d" stroke-width="4"`)).join('')}${ellipse(171,170,113,8,'#5bb4c9',`opacity=".5"`)}${[91,248].map(x=>circle(x,65,6,'#b9f6ff',`opacity=".6"`)).join('')}`,
+    apc:()=>`${rect(91,112,185,42,10,'#789664',`stroke="#314e37" stroke-width="5"`)}${shape('M111 111 L138 74 H240 L259 112Z','#648452',`stroke="#314e37" stroke-width="5"`)}${[111,145,179,213,248].map(x=>circle(x,153,14,'#344b40',`stroke="#95a779" stroke-width="4"`)).join('')}${[150,184,218].map(x=>rect(x,89,24,14,2,'#405d53',`stroke="#b2d2ba" stroke-width="2"`)).join('')}${rect(265,122,20,17,3,'#556b50')}${line('M104 121 H269','#d1dcaa',3)}`,
+    rabbit:()=>`${ellipse(178,137,89,42,'#a9c394',`stroke="#587f5c" stroke-width="5"`)}${ellipse(241,108,38,35,'#bed0ad')}${ellipse(225,60,15,46,'#c5d7b5',`stroke="#648767" stroke-width="4"`)}${ellipse(259,55,14,44,'#c5d7b5',`stroke="#648767" stroke-width="4"`)}${ellipse(226,61,6,35,'#ecaeba')}${ellipse(259,56,6,34,'#ecaeba')}${circle(254,108,5,'#2a4035')}${circle(273,122,5,'#e6abb0')}${ellipse(108,132,19,18,'#f6f0d9')}`,
+    cat:()=>`${ellipse(166,144,79,37,'#8eac88',`stroke="#456e56" stroke-width="5"`)}${shape('M207 116 L214 67 L235 92 L266 70 L273 117 Q272 148 240 152 Q206 149 207 116Z','#aac2a0',`stroke="#50755c" stroke-width="5"`)}${shape('M218 86 L218 109 L230 98Z','#e4b0a6')}${shape('M263 86 L261 109 L250 98Z','#e4b0a6')}${ellipse(228,118,5,7,'#315448')}${ellipse(252,118,5,7,'#315448')}${shape('M235 134 L241 139 L247 134Z','#df9a98')}${line('M200 134 L170 127 M275 132 L309 125','#e9f0d0',3)}${line('M104 144 Q49 127 78 88','#7a9f76',10)}`,
+    dog:()=>`${ellipse(173,148,86,36,'#b8b68c',`stroke="#716e51" stroke-width="4"`)}${ellipse(247,115,44,39,'#d2c99b')}${ellipse(219,105,17,32,'#997d54',`transform="rotate(25 219 105)"`)}${ellipse(283,110,16,33,'#997d54',`transform="rotate(-18 283 110)"`)}${ellipse(266,119,7,7,'#27372c')}${ellipse(279,138,12,9,'#e8ddbd')}${circle(285,134,5,'#443729')}${line('M90 128 Q63 105 74 84','#b8b68c',11)}`,
+    penguin:()=>`${ellipse(180,116,60,77,'#344b47',`stroke="#273b36" stroke-width="5"`)}${ellipse(183,125,38,58,'#f0efe0')}${ellipse(143,114,20,43,'#526f61',`transform="rotate(18 143 114)"`)}${ellipse(221,114,20,43,'#526f61',`transform="rotate(-18 221 114)"`)}${circle(162,75,6,'#f5f4db')}${circle(201,75,6,'#f5f4db')}${circle(162,76,3,'#2b3b38')}${circle(201,76,3,'#2b3b38')}${shape('M175 89 L188 89 L181 103Z','#e9ae5d')}${ellipse(153,184,27,9,'#d3a35f')}${ellipse(206,184,27,9,'#d3a35f')}`,
+    whale:()=>`${shape('M69 117 Q98 78 194 85 Q251 87 271 122 L316 83 L319 145 L277 137 Q259 172 178 164 Q99 158 69 117Z','#6d9a9a',`stroke="#315d62" stroke-width="5"`)}${ellipse(165,133,90,25,'#9bc4c0',`opacity=".42"`)}${circle(243,112,6,'#2f5961')}${line('M139 90 Q157 53 179 41','#a7d6e0',7)}${[177,204,219].map(x=>circle(x,31,5,'#bcecf2',`opacity=".8"`)).join('')}`,
+    dragon:()=>`${shape('M63 150 Q84 113 112 121 Q132 70 165 90 Q174 57 210 63 Q254 61 263 103 Q291 95 312 125 L285 151 L246 140 Q219 172 188 153 Q151 174 127 146Z','#79a268',`stroke="#345e47" stroke-width="5"`)}${shape('M170 89 L175 63 L188 83 L202 54 L218 84 L232 67 L232 101Z','#b5c988')}${circle(247,101,6,'#ffdc88')}${circle(249,101,2,'#304a37')}${line('M272 122 Q305 115 314 95','#c2dba2',5)}${shape('M79 149 Q48 119 69 85 Q40 90 43 125 Q41 151 79 164Z','#91ba7e')}${shine(263,51)}`,
+    dinosaur:()=>`${ellipse(173,136,81,44,'#86a46d',`stroke="#426749" stroke-width="5"`)}${shape('M222 133 Q227 80 260 69 L273 101 L244 145Z','#7f9e69',`stroke="#416748" stroke-width="5"`)}${ellipse(261,82,29,22,'#9cba7a')}${circle(275,75,5,'#253d2c')}${[100,133,168,200].map(x=>shape(`M${x-10} 110 l12 -26 l14 29 Z`,'#bed39a')).join('')}${[137,197].map(x=>rect(x,166,19,20,6,'#64895d')).join('')}${shape('M99 137 Q56 123 55 90 Q75 101 111 126Z','#79985e')}`,
+    jellyfish:()=>`${ellipse(183,100,87,58,'#81beb4',`stroke="#3e8082" stroke-width="5" opacity=".97"`)}${ellipse(164,87,49,19,'#c0e2d6',`opacity=".35"`)}${[110,140,167,200,233,256].map((x,i)=>line(`M${x} 134 Q${x+(i%2?18:-13)} 158 ${x+(i%2?1:10)} 190`,'#87d1c9',8,`opacity=".88"`)).join('')}${circle(161,99,5,'#2f5d65')}${circle(206,99,5,'#2f5d65')}${ellipse(185,118,8,5,'#509ba4')}${[85,280,258].map((x,i)=>circle(x,65+i*15,5,'#beeff0',`opacity=".6"`)).join('')}`,
+    moldking:()=>`${commonCube(171,43,94,128,'#5a855e')}${[118,160,203,253].map((x,i)=>fungus(x,128+(i%2)*12,.75+(i%3)*.12)).join('')}${fungus(186,124,1.7)}${shape('M164 64 L169 43 L184 59 L198 37 L205 63 L219 45 L221 69Z','#e8cc74',`stroke="#9d7842" stroke-width="3"`)}${circle(169,64,4,'#ffd67b')}${circle(198,57,4,'#f4b25b')}${circle(218,63,4,'#ffd67b')}${shine(275,43)}`,
+    lava:()=>`${shape('M79 163 L111 97 L144 119 L167 55 L209 102 L233 82 L278 161Z','#3b3432',`stroke="#201d1c" stroke-width="6"`)}${shape('M165 61 L165 112 L188 143 L202 162 L220 161 L199 120 L195 105Z','#ff7c26')}${shape('M110 101 L132 133 L119 162 L145 162 L154 139Z','#ef9a36')}${line('M98 155 L133 146 M205 145 L248 137','#fdb34f',5)}${[92,240,258].map((x,i)=>circle(x,75+i*13,5+i,'#eec35c')).join('')}${smoke(178,63,'#968878')}`,
+    portal:()=>`${commonCube(176,47,91,129,'#58785d')}${ellipse(184,121,78,45,'#1f4d60',`stroke="#a4c7ac" stroke-width="5"`)}${ellipse(184,121,61,37,'#327d8f')}${ellipse(184,121,45,26,'#6eafd0')}${ellipse(184,121,29,17,'#162c50')}${ellipse(184,121,15,10,'#11152a')}${[116,247].map((x,i)=>shine(x,91+i*22)).join('')}`,
+    robot:()=>`${rect(131,84,101,73,17,'#7f9e78',`stroke="#304b42" stroke-width="6"`)}${rect(144,36,76,49,9,'#a3b9a2',`stroke="#304b42" stroke-width="6"`)}${[164,199].map(x=>circle(x,57,10,'#6dd4d5',`stroke="#386c73" stroke-width="3"`)).join('')}${line('M161 74 H202','#3a685c',4)}${rect(88,92,38,56,9,'#608466',`stroke="#344f41" stroke-width="4"`)}${rect(239,92,38,56,9,'#608466',`stroke="#344f41" stroke-width="4"`)}${[153,201].map(x=>rect(x,154,26,30,6,'#425e4e')).join('')}${circle(182,115,14,'#e0d088')}${line('M182 98 V132','#ffffff',2)}`,
+    blackhole:()=>`${commonCube(162,55,100,117,'#425b4a')}${ellipse(181,120,99,42,'#668887',`stroke="#8ba77d" stroke-width="3"`)}${ellipse(182,120,78,34,'#558c91')}${ellipse(182,120,58,29,'#183746')}${ellipse(182,120,38,22,'#0a1b26')}${ellipse(182,120,20,13,'#02090e')}${line('M77 93 Q179 22 291 93','#b7dddc',5,`opacity=".8"`)}${[85,277].map((x,i)=>shine(x,63+i*35)).join('')}`
+  });
+
   function resultArt(product){
     const fallback=()=>`${commonCube(156,66,102,98,'#6f915d')}${rect(118,112,122,38,12,'#89a976',`opacity=".48"`)}<text x="180" y="116" text-anchor="middle" font-size="54">${product.icon||'🧱'}</text><text x="180" y="165" text-anchor="middle" font-size="18" font-weight="900" fill="#f4f6de">${product.name.replace(/棉被$/,'')}</text>`;
     const b=artTemplates[product.id]||fallback;
@@ -1202,6 +1303,7 @@ button{touch-action:manipulation;}
     [...$('collectionGrid').children].forEach(el=>el.classList.toggle('selected', el.dataset.id===item.id));
   }
   function openCollection(initialId){
+    $('collectionClose').textContent=galleryOpenedFromHome?'返回首頁':'返回結算';
     const panel=$('collectionPanel'),grid=$('collectionGrid');
     grid.replaceChildren();
     $('collectionCount').textContent=`${collected.size} / ${outcomeBook.length}`;
@@ -1220,8 +1322,9 @@ button{touch-action:manipulation;}
     showCollectionPreview(target);
     $('collectionBackdrop').hidden=false;panel.hidden=false;
   }
-  function closeCollection(){ $('collectionBackdrop').hidden=true;$('collectionPanel').hidden=true; }
-  $('collectionBtn').addEventListener('click',()=>openCollection(lastOutcome?lastOutcome.id:null));
+  function closeCollection(){ $('collectionBackdrop').hidden=true;$('collectionPanel').hidden=true; if(galleryOpenedFromHome){$('blanketHome').hidden=false;galleryOpenedFromHome=false;} }
+  let galleryOpenedFromHome=false;
+  $('collectionBtn').addEventListener('click',()=>{galleryOpenedFromHome=false;openCollection(lastOutcome?lastOutcome.id:null);});
   $('collectionClose').addEventListener('click',closeCollection);
   $('collectionCloseTop').addEventListener('click',closeCollection);
   $('collectionBackdrop').addEventListener('click',closeCollection);
@@ -1696,6 +1799,25 @@ button{touch-action:manipulation;}
     const closure=clamp(1-Math.hypot(drawPoints[0].x-drawPoints.at(-1).x,drawPoints[0].y-drawPoints.at(-1).y)/100,0,1);
     return Math.round(clamp((.62*detail+.23*coverage+.10*lenQuality+.05*closure)*100,0,100));
   }
+  function returnToHome(){
+    closeCollection();
+    leaveStage2();
+    setAction(null);
+    scrubbing=false;
+    $('blanketHome').hidden=false;
+  }
+  $('homeBtn').addEventListener('click',returnToHome);
+  $('summaryHomeBtn').addEventListener('click',returnToHome);
+  $('homeStartBtn').addEventListener('click',()=>{
+    $('blanketHome').hidden=true;
+    galleryOpenedFromHome=false;
+    $('reset').click();
+  });
+  $('homeCollectionBtn').addEventListener('click',()=>{
+    galleryOpenedFromHome=true;
+    $('blanketHome').hidden=true;
+    openCollection(collectionSelectedId);
+  });
   // Players may proceed at any time, regardless of water, burn, dirt or ash.
   $('nextStageBtn').addEventListener('click',startStage2);
   finalTidyBtn.addEventListener('click',enterStage3);
