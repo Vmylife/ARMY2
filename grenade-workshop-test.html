@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#132018">
-<title>國軍手榴彈｜調配與投擲試玩 v0.2</title>
+<title>國軍手榴彈｜調配與投擲試玩 v0.3</title>
 <style>
 :root{--ink:#eaf1da;--muted:#a9baa5;--gold:#efc977;--good:#a1d991;--bad:#f29b76;--panel:rgba(18,34,26,.95);--edge:#ffffff20}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:#132119;color:var(--ink);font-family:system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;touch-action:manipulation;user-select:none;-webkit-user-select:none}
@@ -48,21 +48,41 @@ button{font:inherit;font-weight:800;border:0;cursor:pointer;color:var(--ink);tou
 @media(max-width:360px){.actionThree{gap:5px}.actionThree .btn{font-size:11px;min-height:72px}#pourBtn{height:72px;min-height:72px}}
 @media(max-height:740px){.actionThree .btn{min-height:65px}#pourBtn{height:65px;min-height:65px}#workTitle{margin-bottom:7px}}
 @media(max-height:740px){body.workmode #guide{display:none}}
+/* v0.3: the workbench is an anchored bottom control dock, never a floating cover over the barrel. */
+#controls{margin-top:auto;margin-bottom:0;position:relative;z-index:1}
+body.workmode #guide{display:none!important}
+body.workmode #controls{margin-top:auto;margin-bottom:0;flex-shrink:0}
+@media(max-height:540px){body.workmode #head .headingSub{display:none}body.workmode #steps{margin:4px 0}body.workmode #stats .stat{padding:4px 8px}body.workmode .statValue strong{font-size:20px}body.workmode #workTitle{margin-bottom:5px}body.workmode .actionThree .btn{min-height:59px;padding:5px 3px}body.workmode #pourBtn{height:59px;min-height:59px}body.workmode .underText{margin-top:5px;font-size:10px}body.workmode #controls{padding:7px}}
+
+/* Short landscape screens: reserve the left for the barrel and dock all controls on the right. */
+@media (orientation:landscape) and (min-width:600px) and (max-height:520px){
+ body.workmode #root{padding:8px 13px}
+ body.workmode #head{width:min(340px,45vw);margin-left:auto;margin-right:0}
+ body.workmode #controls{width:min(340px,45vw);margin-left:auto;margin-right:0;margin-top:auto;margin-bottom:0}
+ body.workmode .heading{padding:5px 8px}
+ body.workmode .statValue strong{font-size:19px}
+ body.workmode #stats .stat{padding:4px 8px}
+ body.workmode #workTitle .dim{max-width:150px;text-align:right;font-size:10px}
+ body.workmode .actionThree .btn{min-height:63px;font-size:10px}
+ body.workmode #pourBtn{height:63px;min-height:63px}
+ body.workmode .actionThree .btn .ico{font-size:18px}
+ body.workmode #controls .underText{font-size:10px}
+}
 </style>
 </head>
 <body>
 <canvas id="scene" aria-label="遊戲場景"></canvas><div id="screenTint"></div>
 <div id="root">
   <header id="head">
-    <div class="heading"><div class="logo">💣</div><div class="headingText"><div class="headingTitle">手榴彈製作訓練 <span style="color:#eaca8c;font-size:10px">PROTOTYPE 0.2</span></div><div class="headingSub" id="headerSub">軍械庫 · 綠桶實驗區</div></div><button id="restart" aria-label="重新開始">↻</button></div>
+    <div class="heading"><div class="logo">💣</div><div class="headingText"><div class="headingTitle">手榴彈製作訓練 <span style="color:#eaca8c;font-size:10px">PROTOTYPE 0.3</span></div><div class="headingSub" id="headerSub">軍械庫 · 綠桶實驗區</div></div><button id="restart" aria-label="重新開始">↻</button></div>
     <div id="steps"><div class="step active"></div><div class="step"></div><div class="step"></div><div class="step"></div></div>
     <div id="stats"><div class="stat" id="gramStat"><label>目前火藥</label><div class="statValue"><strong id="gramText">0</strong><small>克</small></div></div><div class="stat" id="densityStat"><label>遊戲密度</label><div class="statValue"><strong id="densityText">0.60</strong><small>密度值</small></div></div></div>
   </header>
   <div id="toast"></div>
-  <div id="guide"><div id="stageRound">已壓實 0 次</div><div id="stageName">自由裝填與壓實</div><div id="stageDesc">看桶內的火藥高度；想倒就倒、想壓就壓。</div></div>
+  <div id="guide"><div id="stageRound">已壓實 0 次</div><div id="stageName">自由裝填與壓實</div><div id="stageDesc">留意桶口：快滿時才會看見火藥；想倒就倒、想壓就壓。</div></div>
   <div id="controls" class="hidden"></div>
 </div>
-<div id="intro"><div class="modal"><div class="kicker">國軍訓練中心 · 獨立試玩</div><div class="introMark">🛢️</div><h1>這桶東西，真的能丟嗎？</h1><p>從一只軍綠色大桶子開始，自由加入火藥、反覆壓實。隨時可以收手，但千萬別倒到滿出來！最後親手把大桶轉成手榴彈，再試試看能丟多準。</p><div class="introSteps"><div class="introStep"><span>1</span>按住倒火藥，直接看桶內高度，滿出來會強制停機</div><div class="introStep"><span>2</span>隨時壓實 QTE，也可以連續倒入或連續壓實</div><div class="introStep"><span>3</span>主動進轉輪定型，或因溢出、破殼被迫進入</div><div class="introStep"><span>4</span>控制左右和遠近 · 完成投擲測試</div></div><button class="btn primary full" id="startBtn">開始訓練　→</button><div class="underText">這版只做到投擲落地，不含爆炸與破壞。</div></div></div>
+<div id="intro"><div class="modal"><div class="kicker">國軍訓練中心 · 獨立試玩</div><div class="introMark">🛢️</div><h1>這桶東西，真的能丟嗎？</h1><p>從一只軍綠色大桶子開始，自由加入火藥、反覆壓實。隨時可以收手，但千萬別倒到滿出來！最後親手把大桶轉成手榴彈，再試試看能丟多準。</p><div class="introSteps"><div class="introStep"><span>1</span>按住倒火藥；桶身不透明，火藥接近桶口才看得見，溢出會強制停機</div><div class="introStep"><span>2</span>隨時壓實 QTE，也可以連續倒入或連續壓實</div><div class="introStep"><span>3</span>主動進轉輪定型，或因溢出、破殼被迫進入</div><div class="introStep"><span>4</span>控制左右和遠近 · 完成投擲測試</div></div><button class="btn primary full" id="startBtn">開始訓練　→</button><div class="underText">這版只做到投擲落地，不含爆炸與破壞。</div></div></div>
 <div id="endOverlay"><div class="modal"><div class="kicker">投擲訓練 · 本回合完成</div><div style="font-size:43px;margin-bottom:6px">🎯</div><h2 id="endHeading">投擲完成！</h2><p id="endDesc">你丟出的成品已經落地，爆炸效果將在後續版本加入。</p><div id="outcomeCoords"><div class="outcomeCell"><small>投擲距離</small><strong id="distVal">0.0 m</strong></div><div class="outcomeCell"><small>偏離目標</small><strong id="missVal">0.0 m</strong></div></div><div class="outcomeCell" style="margin-bottom:16px"><small>本次火藥／密度</small><strong id="finalVal" style="font-size:20px">0 克 · 0.00</strong></div><button class="btn primary full" id="retryBtn">再製作一顆　↻</button><div class="underText">不顯示外殼耐久、定型品質或失敗原因。</div></div></div>
 <script>
 (()=>{'use strict';
@@ -87,16 +107,16 @@ function renderHUD(){
  $('headerSub').textContent=['aimX','aimZ','flight'].includes(ph)?'投擲訓練場 · 目標校準':'軍械庫 · 綠桶實驗區';
  $('stageRound').textContent=work?`已壓實 ${S.totalPressed} 次`:['aimX','aimZ'].includes(ph)?'投擲模擬訓練':ph==='flight'?'投擲中……':'最後定型';
  const titles={fill:'自由裝填與壓實',press:'抓準時機壓實！',shape:'把大桶轉成手榴彈',aimX:'左右方向',aimZ:'投擲遠近',flight:'投擲中……'};
- const desc={fill:'看桶內粉末高度，自行決定何時倒、何時壓。',press:'指針就在桶子上！按下方按鈕或直接點桶子壓實。',shape:'沿著轉輪順時針旋轉，覺得外型像手榴彈時就停手。',aimX:'抓準指針，決定落點偏左或偏右。',aimZ:'再次抓準指針，決定落點遠近。',flight:'正在飛向訓練目標……'};
+ const desc={fill:'桶身不透明，火藥快到桶口才看得見。',press:'指針就在桶子上！按下方按鈕或直接點桶子壓實。',shape:'沿著轉輪順時針旋轉，覺得外型像手榴彈時就停手。',aimX:'抓準指針，決定落點偏左或偏右。',aimZ:'再次抓準指針，決定落點遠近。',flight:'正在飛向訓練目標……'};
  $('stageName').textContent=titles[ph]||'';$('stageDesc').textContent=desc[ph]||'';
  const ctl=$('controls');ctl.replaceChildren();
  if(work){
-   ctl.innerHTML=`<div id="workTitle"><div class="smallTitle">${ph==='press'?'壓實時機 · 注意桶上的指針':'自由操作 · 觀察火藥高度'}</div><span class="dim" id="workHint">${ph==='press'?'點桶上的指針也能壓實':'不要讓火藥滿出桶口'}</span></div>
+   ctl.innerHTML=`<div id="workTitle"><div class="smallTitle">${ph==='press'?'壓實時機 · 注意桶上的指針':'自由操作 · 留意桶口'}</div><span class="dim" id="workHint">${ph==='press'?'點桶上的指針也能壓實':'快到桶口才看得到火藥'}</span></div>
    <div class="actionThree">
     <button id="pourBtn" class="btn" ${ph==='press'?'disabled':''}><span class="ico">⬇</span><span>按住倒火藥</span><small>放開就停</small></button>
     <button id="pressBtn" class="btn ${ph==='press'?'live':'primary'}" ${S.powder<15?'disabled':''}><span class="ico">${ph==='press'?'🎯':'⚙'}</span><span>${ph==='press'?'立即壓實！':'啟動壓實'}</span><small>${ph==='press'?'抓準 QTE':'可連續壓實'}</small></button>
     <button id="shapeBtn" class="btn ghost" ${ph==='press'||S.powder<15?'disabled':''}><span class="ico">↻</span><span>轉輪定型</span><small>隨時收手</small></button>
-   </div><div class="underText">${ph==='press'?'指針跑到亮區時按「立即壓實」；失誤可能弄壞外殼。':'上方直接看得到桶內火藥；壓實後粉末會下降，騰出空間。'}</div>`;
+   </div><div class="underText">${ph==='press'?'指針跑到亮區時按「立即壓實」；失誤可能弄壞外殼。':'桶身不透明；等火藥快到桶口才會露出，注意別倒滿。'}</div>`;
    const btn=$('pourBtn');
    if(ph==='fill'){
      btn.addEventListener('pointerdown',e=>{e.preventDefault();if(S.phase!=='fill')return;btn.setPointerCapture(e.pointerId);pouring=true;btn.classList.add('isHeld')});
@@ -152,7 +172,7 @@ function startFlight(){S.phase='flight';S.throwT=0;S.shotX=(S.aimX-.5)*18;S.shot
 function endFlight(){phase('end');const lateral=S.shotX;const forward=S.shotZ;const dist=Math.hypot(lateral,forward);const off=Math.hypot(lateral,forward-17);$('distVal').textContent=dist.toFixed(1)+' m';$('missVal').textContent=off.toFixed(1)+' m';$('finalVal').textContent=`${fmt(S.powder)} 克 · ${S.density.toFixed(2)}`;$('endHeading').textContent=off<2.2?'正中目標！':off<5?'很接近了！':'手榴彈已落地！';$('endDesc').textContent='本次投擲測試完成。爆炸、建築破壞和地標圖鑑將在下一階段製作。';$('endOverlay').classList.add('show');}
 function boot(){reset();$('startBtn').addEventListener('click',()=>{$('intro').style.display='none';S.phase='fill';S.round=1;phase('fill')});$('retryBtn').addEventListener('click',()=>{reset();$('intro').style.display='none';S.phase='fill';phase('fill')});$('restart').addEventListener('click',()=>{if(confirm('要重新開始這次訓練嗎？'))reset()});cv.addEventListener('pointerdown',e=>{
  if(S.phase!=='press')return;
- const bw=Math.min(W*.55,222),bx=W*.5-bw*.5,by=H*.5-73;
+ const hb=$('head').getBoundingClientRect().bottom,cb=$('controls').getBoundingClientRect().top,wide=W>H*1.35&&H<560,cy=wide?H*.52:clamp((hb+cb)*.5+19,H*.34,H*.60);const px=wide?W*.30:W*.5;const bw=Math.min(W*.55,222),bx=px-bw*.5,by=cy-73;
  if(e.clientX>=bx-9&&e.clientX<=bx+bw+9&&e.clientY>=by-40&&e.clientY<=by+55){e.preventDefault();finishPress()}
 });window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden)pouring=false});resize();requestAnimationFrame(loop)}
 function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=Math.max(1,window.innerWidth);H=Math.max(1,window.innerHeight);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0)}
@@ -160,14 +180,14 @@ function rr(x,y,w,h,r,fill,stroke,lw=1){ctx.beginPath();ctx.roundRect(x,y,w,h,r)
 function line(x1,y1,x2,y2,color,width=2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
 function ellipse(x,y,rx,ry,fill,stroke,lw=1){ctx.beginPath();ctx.ellipse(x,y,Math.max(.1,rx),Math.max(.1,ry),0,0,TAU);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
 function colorGrad(x0,y0,x1,y1,a,b){let g=ctx.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,a);g.addColorStop(1,b);return g}
-function drawWorkshop(t){const cy=H*.50;let bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#354f3f');bg.addColorStop(.53,'#172e25');bg.addColorStop(1,'#091b16');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+function drawWorkshop(t){const visibleTop=$('head').getBoundingClientRect().bottom,controlBox=$('controls').getBoundingClientRect();const visibleBottom=$('controls').classList.contains('hidden')?H-30:controlBox.top;const wide=W>H*1.35&&H<560;const cy=wide?H*.52:clamp((visibleTop+visibleBottom)*.5+19,H*.34,H*.60);let bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#354f3f');bg.addColorStop(.53,'#172e25');bg.addColorStop(1,'#091b16');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
  // vertical wall sheets and seams
  for(let x=-100,i=0;x<W+110;x+=99,i++){ctx.fillStyle=i%2?'#ffffff05':'#00000010';ctx.fillRect(x,0,98,H*.7);line(x+98,0,x+98,H*.73,'#aec3a018',2)}
  const v=ctx.createRadialGradient(W*.50,cy-60,25,W*.50,cy+10,W*.72);v.addColorStop(0,'#a6c79526');v.addColorStop(1,'#08191000');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
  // pipe rails and backlit window
  line(0,H*.265,W,H*.265,'#71877967',8);line(0,H*.275,W,H*.275,'#091a13b0',5);
  for(let x=28;x<W;x+=116){rr(x,H*.29,12,H*.28,4,'#0c231d63','#8ca68620',2)}
- const px=W*.5,py=cy+124;
+ const px=wide?W*.30:W*.5,py=cy+124;
  // platform shadow and ground
  ellipse(px,py+50,Math.min(W*.44,225),31,'#00000060');rr(Math.max(10,px-Math.min(W*.44,226)),py,Math.min(W*.88,452),43,9,colorGrad(0,py,0,py+43,'#64745a','#293d31'),'#aab59d44',3);rr(Math.max(17,px-Math.min(W*.4,206)),py+34,Math.min(W*.8,412),15,3,'#14251d');
  // side mounting posts
@@ -224,31 +244,39 @@ function drawCan(px,base,t,tm,sc=1){ctx.save();ctx.translate(px+Math.sin(tm*23)*
  // main body shape, top becomes rounded shoulder toward grenade
  ctx.beginPath();ctx.moveTo(-radiusTop,y+11);ctx.bezierCurveTo(-rad-bulge,y+height*.12,-rad-bulge,y+height*.76,-rad*.66,bottom-7);ctx.quadraticCurveTo(0,bottom+7,rad*.66,bottom-7);ctx.bezierCurveTo(rad+bulge,y+height*.76,rad+bulge,y+height*.12,radiusTop,y+11);ctx.quadraticCurveTo(0,y-13,-radiusTop,y+11);ctx.closePath();ctx.fillStyle=bodyGradient;ctx.fill();ctx.strokeStyle='#11271f';ctx.lineWidth=4;ctx.stroke();
  ctx.save();ctx.clip();
- // Visible fictional powder with granules, using a game-only barrel-fill ratio.
- if((S.phase==='fill'||S.phase==='press'||(S.phase==='shape'&&S.spillTime>0))&&S.powder>0){
-   const fill=clamp(powderLevel(),0,1.03);
-   const innerBottom=bottom-7,innerTop=y+24,fillY=innerBottom-(innerBottom-innerTop)*fill;
-   const powderG=ctx.createLinearGradient(0,fillY,0,innerBottom);
-   powderG.addColorStop(0,'#d9be74');powderG.addColorStop(.43,'#bda368');powderG.addColorStop(1,'#766b42');
-   ctx.fillStyle=powderG;ctx.beginPath();ctx.moveTo(-rad-18,innerBottom+20);ctx.lineTo(-rad-18,fillY+5);
-   ctx.quadraticCurveTo(-rad*.48,fillY-4,0,fillY+5);ctx.quadraticCurveTo(rad*.5,fillY+13,rad+18,fillY+5);
-   ctx.lineTo(rad+18,innerBottom+20);ctx.closePath();ctx.fill();
-   ctx.strokeStyle='#f4d991aa';ctx.lineWidth=2;
-   ctx.beginPath();ctx.moveTo(-rad-6,fillY+5);ctx.quadraticCurveTo(0,fillY+2,rad+6,fillY+5);ctx.stroke();
-   ctx.fillStyle='#f5d9957a';
-   for(let i=0;i<83;i++){
-     const gx=-rad+(Math.sin(i*12.183+4)*.5+.5)*rad*2;
-     const gy=fillY+11+((i*29)%138)/138*Math.max(0,innerBottom-fillY-19);
-     if(gy<innerBottom-2){ctx.beginPath();ctx.arc(gx,gy,i%3===0?1.7:.9,0,TAU);ctx.fill()}
-   }
- }
+ // OPAQUE casing: no powder can be seen through the sides (including when nearly full).
+ // The only visual filling clue is the mouth, drawn after the opaque body.
  const rows=p>.42?5:3;const cols=p>.56?5:3;
  for(let i=1;i<rows;i++){const q=i/rows,yy=y+18+(bottom-y-34)*q;ctx.beginPath();ctx.moveTo(-rad-24,yy);ctx.quadraticCurveTo(0,yy+7*p,rad+24,yy);ctx.strokeStyle=`rgba(21,45,30,${.39+.14*p})`;ctx.lineWidth=3.3;ctx.stroke();ctx.beginPath();ctx.moveTo(-rad,yy-3);ctx.lineTo(rad,yy-3);ctx.strokeStyle='#a8b99420';ctx.lineWidth=1;ctx.stroke()}
  if(p>.40){ctx.globalAlpha=clamp((p-.4)*2.7,0,1);for(let i=1;i<cols;i++){const xx=-rad+2*rad*i/cols;ctx.beginPath();ctx.moveTo(xx*.81,y+12);ctx.bezierCurveTo(xx*1.09,y+height*.29,xx*1.12,y+height*.7,xx*.74,bottom);ctx.strokeStyle='#263c2d';ctx.lineWidth=3.8;ctx.stroke()}ctx.globalAlpha=1}
  ctx.restore();
- // top ellipse lip, becomes grenade shoulder
- ellipse(0,y+9,radiusTop,10-5*p,'#6f8964','#c2d3b06b',2.2);
- if(p<.77){ctx.globalAlpha=1-clamp((p-.35)*2.5,0,1);ellipse(0,y+8,radiusTop-9,6,'#304839','#b0c49660',1.4);ctx.globalAlpha=1}
+ // A recessed, opaque barrel mouth. The surface only becomes visible near the rim.
+ // No side window, fill gauge, or transparent strip.
+ if(p<.77){
+   const mouthAlpha=1-clamp((p-.35)*2.5,0,1);
+   ctx.save();ctx.globalAlpha=mouthAlpha;
+   ellipse(0,y+9,radiusTop,12,'#90a582','#c5d5b185',2.1); // outer steel lip
+   ellipse(0,y+9,radiusTop-7,7.5,'#122920','#172f25',1.1); // dark deep opening
+   if(['fill','press'].includes(S.phase) && S.powder>0){
+     const near=clamp((powderLevel()-.78)/.22,0,1);
+     if(near>0){
+       // Perspective: the powder rises from a faint central patch to cover the full opening.
+       ctx.save();ctx.beginPath();ctx.ellipse(0,y+9,radiusTop-8,7,0,0,TAU);ctx.clip();
+       const pr=(radiusTop-8)*(.20+.82*ease(near));
+       const surface=ctx.createLinearGradient(-pr,y+8,pr,y+12);
+       surface.addColorStop(0,'#8a7947');surface.addColorStop(.5,'#dfc783');surface.addColorStop(1,'#ac9157');
+       ellipse(0,y+10+(1-near)*2,pr,Math.max(.8,6.2*near),surface,'#e6d49a80',1);
+       ctx.fillStyle='#f6e5ae';for(let i=0;i<21;i++){
+         const gx=Math.sin(i*32.123)*pr*.86,gy=y+10+Math.sin(i*18.312)*Math.max(.2,4.7*near);
+         if(Math.abs(gx)<pr*.85){ctx.globalAlpha=.24+.4*near;ctx.beginPath();ctx.arc(gx,gy,.45+(i%3)*.25,0,TAU);ctx.fill()}
+       }ctx.restore();
+     }
+   }
+   ellipse(0,y+9,radiusTop,11,null,'#d7e5c183',2.3); // front rim glint
+   ctx.restore();
+ }else{
+   ellipse(0,y+9,radiusTop,10-5*p,'#6f8964','#c2d3b06b',2.2);
+ }
  // grenade top fuse/handle emerges
  if(p>.55){ctx.globalAlpha=clamp((p-.55)*3.6,0,1);rr(-18,y-27,36,35,4,colorGrad(-18,0,18,0,'#65796b','#354f3e'),'#20362b',2);rr(-12,y-36,24,10,2,'#b5bba5','#495a4b',2);line(-9,y-22,8,y-22,'#d9e8c348',2);ctx.globalAlpha=1}
  if(S.broken){ctx.beginPath();ctx.moveTo(rad*.36,y+height*.2);ctx.lineTo(rad*.17,y+height*.37);ctx.lineTo(rad*.47,y+height*.47);ctx.lineTo(rad*.25,y+height*.65);ctx.strokeStyle='#172a22';ctx.lineWidth=4;ctx.stroke();ctx.strokeStyle='#dcc18e66';ctx.lineWidth=1;ctx.stroke()}
