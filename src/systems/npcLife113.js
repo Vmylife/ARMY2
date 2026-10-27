@@ -8,6 +8,7 @@ import {installSimplePullupPreview,SIMPLE_PULLUP} from '../animation-lab/simpleP
 import {updateRangeShooter} from '../training/rangeTraining.js?v=111';
 import {canOccupy,moveNpc,moveWithCollision,staticClearance,NPC_RADIUS,PLAYER_RADIUS} from '../map/navCollision109.js?v=124';
 import {PROPS,ROADS,BUILDINGS} from '../map/camp.js?v=093';
+import {ROAD_FILL_SHAPES} from '../map/roadMesh.js?v=071';
 import {chooseGrenadeMotion,calibratedGrenadePose,GRENADE_MOTIONS} from '../training/grenadeCalibration112.js?v=125';
 import {SAVED_ACTION_CALIBRATIONS,fixtureActorPose} from '../characters/fixturePose115.js?v=121';
 
@@ -28,14 +29,42 @@ const CALIBRATION={
 };
 const NAV={xMin:-46,xMax:45,zMin:-35,zMax:37,step:1.0};
 const NX=Math.floor((NAV.xMax-NAV.xMin)/NAV.step)+1,NZ=Math.floor((NAV.zMax-NAV.zMin)/NAV.step)+1,N=NX*NZ;
-let pass=null,roadCost=null;
+let pass=null,roadCost=null,pavedCost=null;
 let ALL_NPCS=[],PLAYER_POS=null;
 const spot=(x,z)=>({x,z});
-// Visual connector is part of the unified road mesh. Add the same strip to
-// A* pavement preference without mutating the camp layout or collision models.
-const NAV_ROADS=[...ROADS,{id:'visitor-west-link',width:1.9,
- points:[[-11.0,-13.9],[-9.5,-12.65],[-8.0,-12.4]]}];
-function canStand(x,z){return canOccupy({x,z},NPC_RADIUS);}
+// Road marching uses the ACTUAL rendered pavement, not old ROADS centre-lines:
+// several historical west-side paths were drawn outside the paved polygons.
+const PAVEMENT_RINGS=ROAD_FILL_SHAPES.map(poly=>poly.map(ring=>ring.map(([x,z])=>({x,z}))));
+function insideRing(x,z,ring){
+ let yes=false;
+ for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+  const a=ring[i],b=ring[j];
+  if((a.z>z)!==(b.z>z)&&x<(b.x-a.x)*(z-a.z)/(b.z-a.z)+a.x)yes=!yes;
+ }
+ return yes;
+}
+function pavedClearance(x,z){
+ let paved=false,edge=Infinity;
+ for(const poly of PAVEMENT_RINGS){
+  let inside=false;
+  for(const ring of poly){
+   if(insideRing(x,z,ring))inside=!inside;
+   for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+    const a=ring[j],b=ring[i],dx=b.x-a.x,dz=b.z-a.z;
+    if(Math.max(a.x,b.x)+2<x||Math.min(a.x,b.x)-2>x||
+       Math.max(a.z,b.z)+2<z||Math.min(a.z,b.z)-2>z)continue;
+    const t=clamp(((x-a.x)*dx+(z-a.z)*dz)/(dx*dx+dz*dz||1),0,1);
+    const gap=Math.hypot(x-a.x-t*dx,z-a.z-t*dz);
+    if(gap<edge)edge=gap;
+   }
+  }
+  if(inside)paved=true;
+ }
+ return paved?(Number.isFinite(edge)?edge:9):(Number.isFinite(edge)?-edge:-9);
+}
+// Preserve legacy individual NPC planning costs; only squad forceRoads mode
+// uses the real road surface and rewards being at least 0.6-1m from edges.
+const NAV_ROADS=[...ROADS];
 function roadDistance(x,z){
  let closest=Infinity;
  for(const road of NAV_ROADS){const points=road.points||[];
@@ -48,14 +77,19 @@ function roadDistance(x,z){
  }
  return closest;
 }
+function canStand(x,z){return canOccupy({x,z},NPC_RADIUS);}
 function navInit(){
  if(pass)return;
- pass=new Uint8Array(N);roadCost=new Float32Array(N);
+ pass=new Uint8Array(N);roadCost=new Float32Array(N);pavedCost=new Float32Array(N);
  for(let iz=0;iz<NZ;iz++)for(let ix=0;ix<NX;ix++){
   const x=NAV.xMin+ix*NAV.step,z=NAV.zMin+iz*NAV.step,k=iz*NX+ix;
   pass[k]=canStand(x,z)?1:0;
-  const gap=roadDistance(x,z);
+  const gap=roadDistance(x,z),inset=pavedClearance(x,z);
+  // Cost table for regular NPCs (unchanged philosophy); the marching squad
+  // below uses the real-pavement inset so the lane edge is NOT a cheap route.
   roadCost[k]=gap<=.2?1:gap<=1.2?1.75:gap<=2.3?2.65:3.35;
+  pavedCost[k]=inset>=.95?1:inset>=.65?1.32:inset>=.35?2.0:
+               inset>=0?3.3:5.0+Math.min(4,-inset)*2.0;
  }
 }
 function node(ix,iz){return iz*NX+ix;}
@@ -94,7 +128,7 @@ function pathTo(from,to,forceRoads=false){
    const n=node(xx,zz);if(!pass[n]||closed[n])continue;
    if(dx&&dz&&(!pass[node(x+dx,z)]||!pass[node(x,z+dz)]))continue;
    // Marching squads strongly prefer paved roads; free recruits keep existing costs.
-   const cost=forceRoads?(roadCost[n]<=1.01?1:roadCost[n]*2.1):(preferRoads?roadCost[n]*.95:1);
+   const cost=forceRoads?pavedCost[n]*2.0:(preferRoads?roadCost[n]*.95:1);
    const next=score[k]+c*cost;if(next>=score[n])continue;score[n]=next;parent[n]=k;push(n,next+heuristic(n));
   }
  }
@@ -109,9 +143,14 @@ function pathTo(from,to,forceRoads=false){
   for(let i=1;i<=samples;i++){
    const t=i/samples,x=a.x+(b.x-a.x)*t,z=a.z+(b.z-a.z)*t;
    if(!canStand(x,z))return false;
-   if(roadPreferred&&roadDistance(x,z)>1.25)away++;
+   // Allow a short transition off pavement at the facility itself. All
+   // middle portions of a march stay on the *actual* paved surface.
+   if(roadPreferred){
+    const entry=d({x,z},from)<2.0||d({x,z},to)<4.5;
+    if(!entry&&pavedClearance(x,z)<.38)away++;
+   }
   }
-  return !roadPreferred||away/samples<.28;
+  return !roadPreferred||away===0;
  };
  for(let i=0;i<steps.length;){let j=Math.min(i+6,steps.length-1);
   while(j>i&&!clear(prev,steps[j],preferRoads&&d(prev,to)>4.5))j--;

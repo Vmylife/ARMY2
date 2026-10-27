@@ -4,7 +4,7 @@
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=124';
+ faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=125';
 import {canOccupy,moveNpc,moveWithCollision} from '../map/navCollision109.js?v=124';
 import {PROPS} from '../map/camp.js?v=093';
 import {ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
@@ -45,9 +45,10 @@ const STAGES=[
  {id:'sweep',name:'營舍周邊掃地',rally:W(-34,-7.4),duration:16,
   points:[W(-34,-5.6),W(-33.5,-3.7),W(-33,-1.8),W(-32.5,.1),W(-32,2)],clip:['Sweeping_Both_Hands',ARMY_SWEEP,'Idle']}
 ];
-// Single-file marching with 1.65m separation prevents squad members
-// crowding each other in narrow junctions and blocking their own leader.
-const FORM=[{back:0,side:0},{back:1.65,side:0},{back:3.30,side:0},{back:4.95,side:0},{back:6.60,side:0}];
+// Approved 1-2-2 squad marching formation: leader, two behind, two behind.
+// Pair width stays inside the 2.9-3.5m paved lanes and never becomes single-file.
+const FORM=[{back:0,side:0},{back:1.48,side:-.65},{back:1.48,side:.65},
+ {back:2.98,side:-.65},{back:2.98,side:.65}];
 const GROUPS=[];
 const FREE_IDS=new Set([0,3,7,8,11,12,19,23,26,29]);
 const WAIT_DISTANCE=10.0;
@@ -124,31 +125,27 @@ function recordTrail(s){const p=s.leader.pos,pts=s.trail;if(!pts.length){pts.pus
  if(pts.length>150)pts.length=150;
 }
 function formationGoal(s,index){
- // A trail shorter than the assigned follow distance has NO historical mark.
- // Previously all four people chased the very same oldest point -> pile-up.
+ const f=FORM[index];
+ // A fresh group has only one trail point. Extrapolate the missing rear
+ // distance along travel heading instead of freezing the rear four members.
  let available=0;
  for(let k=1;k<s.trail.length;k++)available+=dist(s.trail[k-1],s.trail[k]);
- const back=FORM[index].back;
- if(available<back-.18){
-  // When the leader hasn't yet walked far enough to create this marker,
-  // follow the immediately preceding soldier at a safe 1.65m distance.
-  // Freezing here would deadlock the leader's WAIT_DISTANCE gate forever.
-  const me=s.members[index],front=s.members[index-1];
-  const dx=me.pos.x-front.pos.x,dz=me.pos.z-front.pos.z,len=Math.hypot(dx,dz);
-  if(len<1.85)return {...me.pos};
-  const mark=W(front.pos.x+dx/len*1.65,front.pos.z+dz/len*1.65);
-  return canOccupy(mark,.35)?mark:{...me.pos};
+ const sample=trailPoint(s,Math.min(f.back,available));
+ const heading=available>.15?sample.angle:Math.atan2(s.goal.x-s.leader.pos.x,s.goal.z-s.leader.pos.z);
+ const missing=Math.max(0,f.back-available);
+ const anchor=W(sample.pos.x-Math.sin(heading)*missing,sample.pos.z-Math.cos(heading)*missing);
+ // Stay paired even at turns. A little width compression is okay in a narrow
+ // gap; NEVER put the group into an unrequested single-file marching order.
+ for(const width of [1,.82,.68]){
+  const candidate=W(anchor.x+Math.cos(heading)*f.side*width,anchor.z-Math.sin(heading)*f.side*width);
+  if(canOccupy(candidate,.34))return candidate;
  }
- const mark=trailPoint(s,back).pos;
- return canOccupy(mark,.35)?{...mark}:{...s.members[index].pos};
+ return canOccupy(anchor,.34)?anchor:{...s.members[index].pos};
 }
 function follow(s,n,index,dt,all,playerPos,run=false){
  let goal=formationGoal(s,index);
- // A stopped leader needs an unclogged corridor in front of them.
- if(!run&&dist(n.pos,s.leader.pos)<1.05){
-  const clear=trailPoint(s,Math.max(2.4,FORM[index].back+.45)).pos;
-  if(dist(clear,s.leader.pos)>1.25&&canOccupy(clear,.40))goal={...clear};
- }
+ // The assigned place is always one of the four paired 1-2-2 positions.
+ // Collision recovery may redirect movement, but must not alter formation.
  const separation=dist(n.pos,goal);
  // Smooth chase: followers USED TO toggle Idle/Walking on every 0.30m threshold,
  // making all four figures twitch. Keep the locomotion clip stable during a march.
@@ -178,7 +175,7 @@ function follow(s,n,index,dt,all,playerPos,run=false){
  if(n.blocked>1.3&&separation>.65){
   // Do not keep squeezing the same formation gap. Follow a distinct rear
   // mark by road, using the persistent squad collision recovery if necessary.
-  const recovery=trailPoint(s,FORM[index].back+.65).pos;
+  const recovery=formationGoal(s,index);
   moveSquadMember(n,recovery,dt,false,true);
   n.activity=`第${s.id+1}小隊 · 避讓後追上隊伍`;
   n.state='march';
@@ -572,6 +569,18 @@ export function createCampNPCs(glb){
   setStage(s);
   const rally=s.goal;
   if(!rally)continue;
+  // The third squad always begins at the official grenade waiting marks.
+  // The generic 'behind rally' offsets previously spawned people into sandbags.
+  if(s.id===2&&s.stage?.id==='grenade'&&s.stage.queuePoints?.length===5){
+   for(let i=0;i<5;i++){
+    const n=s.members[i],q=s.stage.queuePoints[i];
+    n.pos={...q};n.angle=0;n.route=null;n.routeGoal=null;n.routeIndex=0;
+    n.activity='第3小隊 · 手榴彈投擲集合';
+   }
+   s.phase='train';s.elapsed=0;
+   s.trail=[{...s.leader.pos}];
+   continue;
+  }
   const occupied=npcs.filter(n=>FREE_IDS.has(n.id)).map(n=>n.pos);
   for(let i=0;i<5;i++){
    const n=s.members[i];const f=FORM[i];
