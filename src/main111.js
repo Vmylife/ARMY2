@@ -14,7 +14,7 @@ import {drawMinimap} from './ui/minimap.js?v=093';
 import {initWorldMap} from './ui/worldMap.js?v=093';
 import {setupInput} from './ui/input.js?v=062';
 import {options} from './systems/settings.js?v=060';
-import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=126';
+import {createCampNPCs,updateCampNPCs,squadDebug} from './systems/npcSquads113.js?v=127';
 
 const $=id=>document.getElementById(id);
 const debug=new URLSearchParams(location.search).has('debug');
@@ -106,7 +106,7 @@ async function boot(){
   delete player.anim.clips.Jump_Over_Obstacle_2;
   player.anim.setClip('Idle');player.anim.evaluate(0);
   const npcs=createCampNPCs(npcGlb);
-  progress('30 名 NPC：4 支小隊＋10 名自由活動士兵已就位…');
+  progress('35 名 NPC：5 支小隊＋10 名自由活動士兵已就位…');
   const showNavDebug=debug?createNavDebugger():null;
   // The new cross-legged clip drops the hips below the original standing root.
   // Lift only the cross-legged skin pose to ground contact; the existing
@@ -153,8 +153,8 @@ async function boot(){
     if(now-lastLabels<100)return;lastLabels=now;
     const m=renderer.vp,bounds=renderer.canvas.getBoundingClientRect();
     const midX=bounds.left+bounds.width/2,midY=bounds.top+bounds.height/2;
-    // 30 brains run continuously, but only the nearest 12 nameplates render on mobile.
-    // Otherwise 30 overlapping DOM labels can hide the soldier sprites.
+    // 35 brains run continuously, but only the nearest 12 nameplates render on mobile.
+    // Otherwise 35 overlapping DOM labels can hide the soldier sprites.
     const visible=npcs.map((npc,i)=>({i,dist:Math.hypot(npc.pos.x-player.pos.x,npc.pos.z-player.pos.z)}))
       .filter(o=>o.dist<24&&renderer.isActorVisible(npcs[o.i].pos))
       .sort((a,b)=>a.dist-b.dist).slice(0,12);

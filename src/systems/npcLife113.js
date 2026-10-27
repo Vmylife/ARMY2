@@ -1,4 +1,4 @@
-// Army v0.10.9 — autonomous, lightweight utility AI for 30 camp recruits.
+// Army v0.10.9 — autonomous, lightweight utility AI for 35 camp recruits.
 // Every actor owns needs/personality, chooses actions independently, and can
 // accept a two-way social invite. Facility positions use the approved layout103.
 // No generative API, remote services, or new meshes are required by the brains.
@@ -564,10 +564,13 @@ const INITIAL=[W(-23.4,-1.5),W(-21.8,-2.2),W(-19.8,-3.6),W(-21,1.4),
  W(-36.6,8.5),W(-33.1,9.2),W(-28.0,1.0),W(-17.0,4.0),
  W(-19.0,-6.5),W(-26.0,-9.5),W(-35.5,15.7),W(-28.4,22.0),
  W(-37.8,25.2),W(-29.0,26.1),W(8.0,-8.5),W(20.5,-8.5),
- W(24,-14.5),W(27.8,-9.5),W(27.8,8.8),W(31.2,-3.8)];
+ W(24,-14.5),W(27.8,-9.5),W(27.8,8.8),W(31.2,-3.8),
+ // Five extra recruits: assigned exclusively to the fifth class squad.
+ W(9.04,-1.40),W(8.18,1.95),W(9.70,1.95),W(8.18,3.05),W(9.70,3.05)];
 const INITIAL_TASKS=['jog','jog','jog','basketball','patrol','sweep','patrol','chat','greet','pushup','situp','shoot','shoot','walk',
  'walk','weed','sweep','chat','grenade','weed','patrol','basketball',
- 'basketballCoach','basketball','patrol','floor','sentry','walk','wash','sentry'];
+ 'basketballCoach','basketball','patrol','floor','sentry','walk','wash','sentry',
+ 'walk','walk','walk','walk','walk'];
 export function createCampNPCs(glb){
  navInit();fixtureInit();
  // Parsing 18 GLB animation clips 14 times wastes CPU and memory on mobile.

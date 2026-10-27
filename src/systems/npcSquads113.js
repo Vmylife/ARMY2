@@ -1,10 +1,10 @@
-// Army v0.11.3 — 30 recruits: 10 individual decisions + four five-person drill squads.
+// Army v0.11.27 — 35 recruits: 10 independent soldiers + five 5-person drill squads.
 // Squads have shared orders and one leader route. Facility reservations are shared
 // with the independent NPC AI; occupied equipment is never forcibly vacated.
 import {createCampNPCs as createRecruits,updateCampNPCs as updateIndividuals,
  releaseForSquad,claimSquadStation,releaseSquadStation,availableSquadSlots,
  claimSquadSlot,releaseSquadSlot,moveSquadMember,poseSquadMember,
- faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=125';
+ faceSquadMember,squadWorldGoal,settleSquadTrainingSpot} from './npcLife113.js?v=127';
 import {canOccupy,moveNpc,moveWithCollision} from '../map/navCollision109.js?v=124';
 import {PROPS} from '../map/camp.js?v=093';
 import {ARMY_SWEEP} from '../characters/proceduralActions117.js?v=117';
@@ -15,6 +15,20 @@ import {grenadeQueueMarks} from '../training/grenadeQueue117.js?v=119';
 import {prepareLandingClip} from '../training/obstacleLanding120.js?v=120';
 const W=(x,z)=>({x,z});
 const OBSTACLE_MOTIONS=['Jump_Over_Obstacle_1'];
+// 單戰教學: teacher at screenshot 1 (9.04, -1.40), 2x2 audience
+// in front of screenshot 2 (8.94, 1.95). Front pair centers at z=1.95;
+// rear pair is placed farther north to avoid the static facility collision.
+// Angles face the actual person, not a fixed approximate compass axis.
+const SOLO_TEACHER=W(9.04,-1.40);
+const SOLO_AUDIENCE_CENTER=W(8.94,1.95);
+const SOLO_CLASS_POINTS=[SOLO_TEACHER,
+ W(8.18,1.95),W(9.70,1.95),W(8.18,3.05),W(9.70,3.05)];
+const SOLO_CLASS_ANGLES=SOLO_CLASS_POINTS.map((p,i)=>{
+ const target=i===0?SOLO_AUDIENCE_CENTER:SOLO_TEACHER;
+ return Math.atan2(target.x-p.x,target.z-p.z);
+});
+const SOLO_TEACH_CLIP='Talk_with_Left_Hand_on_Hip';
+const SOLO_SIT_CLIP='Sit_Cross_Legged_on_Floor';
 // Jump 1 contains 3.9m of pelvis travel: use it once per repetition.
 // Read the ORIGINAL data; never try to restart that movement at a fixed world X/Z.
 function jumpLandingDisplacement(anim,clipName){
@@ -43,7 +57,10 @@ const STAGES=[
    .slice(0,5).map(p=>({...fixtureActorPose(p,SAVED_ACTION_CALIBRATIONS['Jump_Over_Obstacle_1@@hurdle']),fixture:p})),clip:['Idle']},
  {id:'weed',name:'草地拔草',rally:W(-37,14),duration:16,limited:true,clip:['Pull_Radish','Idle']},
  {id:'sweep',name:'營舍周邊掃地',rally:W(-34,-7.4),duration:16,
-  points:[W(-34,-5.6),W(-33.5,-3.7),W(-33,-1.8),W(-32.5,.1),W(-32,2)],clip:['Sweeping_Both_Hands',ARMY_SWEEP,'Idle']}
+  points:[W(-34,-5.6),W(-33.5,-3.7),W(-33,-1.8),W(-32.5,.1),W(-32,2)],clip:['Sweeping_Both_Hands',ARMY_SWEEP,'Idle']},
+ // Squad-only. Never add this to npcLife113's individual activity registry.
+ {id:'soloClass',name:'上單戰',rally:SOLO_TEACHER,duration:22,
+  points:SOLO_CLASS_POINTS,clip:[SOLO_TEACH_CLIP,SOLO_SIT_CLIP]}
 ];
 // Approved 1-2-2 squad marching formation: leader, two behind, two behind.
 // Pair width stays inside the 2.9-3.5m paved lanes and never becomes single-file.
@@ -293,6 +310,43 @@ function runSquad(s,dt,all,playerPos){
 function trainSquad(s,dt,now,all,playerPos){
  const stage=s.stage;
  if(stage.id==='jog'){runSquad(s,dt,all,playerPos);return;}
+ if(stage.id==='soloClass'){
+  // One speaker + exactly four listeners; none of these spots is a shared
+  // training fixture, and independent NPCs never enter this activity.
+  let ready=0;
+  for(let i=0;i<5;i++){
+   const n=s.members[i],point=stage.points[i],distance=dist(n.pos,point);
+   if(distance>.17){
+    if(distance<.85)settleSquadTrainingSpot(n,point,dt);
+    else moveSquadMember(n,point,dt,false);
+    n.activity=`第${s.id+1}小隊 · 上單戰就位`;
+    n.state='training';n.anim.rifleAim=0;n.renderLift=0;
+   }else{
+    ready++;
+    // Nobody can push the seated players off their appointed 2x2 marks.
+    n.pos={...point};n.angle=SOLO_CLASS_ANGLES[i];
+    n.home.job='life';n.anim.rifleAim=0;n.renderLift=0;
+    if(i===0){
+     poseSquadMember(n,[SOLO_TEACH_CLIP,'Stand_and_Chat','Idle']);
+     // This clip isn't in RigAnimator's global loop list. Repeat ONLY the
+     // teacher locally, without changing any other character animation.
+     const length=n.anim.clips[n.anim.clip]?.duration||3;
+     if(n.anim.clock>=length)n.anim.clock=n.anim.clock%length;
+     n.state='training';n.activity=`第${s.id+1}小隊 · 上單戰講解`;
+    }else{
+     poseSquadMember(n,[SOLO_SIT_CLIP,'Idle']);
+     n.state='seated';n.activity=`第${s.id+1}小隊 · 盤腿坐著聽單戰`;
+    }
+   }
+  }
+  // Start the 22-second lesson once everyone is in place; never leave four
+  // sitting recruits frozen here forever if a member is path-blocked.
+  if(!s.drillStarted&&ready===5){s.drillStarted=true;s.drillElapsed=0;}
+  if(s.drillStarted){s.drillElapsed+=dt;
+   if(s.drillElapsed>=stage.duration){releaseStage(s);setStage(s);}
+  }else if(s.elapsed>55){releaseStage(s);setStage(s);}
+  return;
+ }
  // Allocate one exclusive slot per active recruit; all other recruits queue.
  // If a free recruit has one bar reserved, the squad only gets the other three.
  for(let i=0;i<5;i++){
@@ -563,11 +617,11 @@ function trainSquad(s,dt,now,all,playerPos){
 export function createCampNPCs(glb){
  CAMP_T=0;STATION_COOLDOWN.grenade=0;
  const npcs=createRecruits(glb);
- if(npcs.length!==30)throw new Error('小隊配置需要 30 名 NPC');
+ if(npcs.length!==35)throw new Error('小隊配置需要 35 名 NPC');
  GROUPS.length=0;
  const training=npcs.filter(n=>!FREE_IDS.has(n.id));
- for(let id=0;id<4;id++){
-  const members=training.slice(5*id,5*id+5),stageStart=[0,2,4,6][id];
+ for(let id=0;id<5;id++){
+  const members=training.slice(5*id,5*id+5),stageStart=[0,2,4,6,8][id];
   const s={id,members,leader:members[0],stage:null,nextIndex:stageStart,phase:'hold',
    index:stageStart,elapsed:0,done:new Set(),active:new Map(),trail:[],goal:null,runIndex:0};
   for(let i=0;i<5;i++){
@@ -576,12 +630,29 @@ export function createCampNPCs(glb){
   }
   GROUPS.push(s);
  }
- // Initialize four groups at distinct stations so the camp doesn't have a
+ // Initialize five groups at distinct stations so the camp doesn't have a
  // twenty-person crowd at the spawn. Existing independent NPCs are untouched.
  for(const s of GROUPS){
   setStage(s);
   const rally=s.goal;
   if(!rally)continue;
+  // The new fifth team begins ALREADY at the single-soldier-combat class.
+  // Initial formation for this lesson is 1 speaker / four cross-legged seats,
+  // but marching to ALL OTHER stations remains the approved 1-2-2 formation.
+  if(s.id===4&&s.stage?.id==='soloClass'){
+   for(let i=0;i<5;i++){
+    const n=s.members[i],point=s.stage.points[i];
+    n.pos={...point};n.angle=SOLO_CLASS_ANGLES[i];
+    n.route=null;n.routeGoal=null;n.routeIndex=0;n.retries=0;
+    n.anim.setClip(i===0?SOLO_TEACH_CLIP:SOLO_SIT_CLIP,{restart:true});
+    n.anim.prevClip=null;n.anim.transition=0;
+    n.activity=i===0?'第5小隊 · 上單戰講解':'第5小隊 · 盤腿聽單戰';
+    n.state=i===0?'training':'seated';
+   }
+   s.phase='train';s.elapsed=0;s.drillStarted=true;s.drillElapsed=0;
+   s.trail=[{...s.leader.pos}];
+   continue;
+  }
   // The third squad always begins at the official grenade waiting marks.
   // The generic 'behind rally' offsets previously spawned people into sandbags.
   if(s.id===2&&s.stage?.id==='grenade'&&s.stage.queuePoints?.length===5){
@@ -611,7 +682,7 @@ export function createCampNPCs(glb){
  return npcs;
 }
 export function updateCampNPCs(npcs,dt,now,playerPos){
- // Only 10 free recruits use the utility/social AI; it still avoids ALL 30 bodies.
+ // Only 10 free recruits use the utility/social AI; it still avoids ALL 35 bodies.
  updateIndividuals(npcs.filter(n=>FREE_IDS.has(n.id)),dt,now,playerPos,npcs);
  dt=clamp(dt,0,.05);
  CAMP_T+=dt;
@@ -623,7 +694,7 @@ export function updateCampNPCs(npcs,dt,now,playerPos){
   else if(s.phase==='train')trainSquad(s,dt,now,npcs,playerPos);
  }
 }
-export const SQUAD_CONFIG={total:30,free:10,squads:4,membersPerSquad:5,stations:STAGES.map(s=>s.name)};
+export const SQUAD_CONFIG={total:35,free:10,squads:5,membersPerSquad:5,stations:STAGES.map(s=>s.name)};
 export function squadDebug(){return GROUPS.map(s=>({squad:s.id+1,stage:s.stage?.name||'候命',phase:s.phase,
  done:s.done.size,active:s.active.size,leader:{...s.leader.pos}}));}
 
