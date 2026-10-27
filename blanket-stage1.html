@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
 <meta name="theme-color" content="#203229" />
-<title>豆腐干棉被｜第一到三階段：水火刷洗＋實體對折 v1.1</title>
+<title>豆腐干棉被｜第一到三階段：水火刷洗＋實體對折＋最後整理 v1.2</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f6f6e8;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -147,6 +147,30 @@ html,body,.app,.app *,svg,svg *,#memoryOverlay,#memoryOverlay *{
 img,svg{ -webkit-user-drag:none; }
 #scrubArea,#memoryOverlay,#drawingSurface{touch-action:none !important;}
 button{touch-action:manipulation;}
+
+/* 第三階段：高速反覆充滿／清空，直接點整理抓 MAX */
+#stage3Panel{top:calc(17px + env(safe-area-inset-top));bottom:auto;max-height:calc(100dvh - 45px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#stage3Panel .stage3-intro{font-size:13px;color:#d6e7d2;margin:4px 0 18px}
+.stage3-meter-labels{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:900;margin:0 0 7px;gap:8px}
+.stage3-meter-labels .max-label{color:#ffef9c;letter-spacing:1px;text-shadow:0 0 9px #ffe08e80}
+.stage3-meter{position:relative;height:40px;overflow:hidden;border:2px solid #bacda882;border-radius:12px;background:linear-gradient(180deg,#050f09,#132019);box-shadow:inset 0 2px 8px #0008}
+.stage3-meter::after{content:"";position:absolute;inset:0 0 0 auto;width:10%;background:linear-gradient(90deg,#fff1a000,#ffe78451);border-left:2px dashed #ffe8a7b3;pointer-events:none}
+.stage3-fill{height:100%;width:0%;background:linear-gradient(90deg,#3c875f,#80c66a 53%,#e1df6d 86%,#ffe69e 100%);box-shadow:0 0 16px #9ad27698;will-change:width}
+.stage3-needle{position:absolute;top:0;bottom:0;left:0%;width:3px;transform:translateX(-50%);background:#f6ffdf;box-shadow:0 0 10px #fffab3;pointer-events:none;will-change:left}
+.stage3-meter-readout{font-size:15px;color:#f2e9c5;margin-top:9px;font-weight:900;font-variant-numeric:tabular-nums}
+#tidyButton{width:100%;margin-top:18px;padding:14px;min-height:70px;border-radius:16px;border:1px solid #ffe8ad;background:linear-gradient(145deg,#f7d07e,#b77e31);color:#25190c;font:inherit;font-size:25px;font-weight:1000;touch-action:manipulation;box-shadow:0 5px 0 #68491f}
+#tidyButton:active{transform:translateY(3px);box-shadow:0 2px 0 #68491f}
+#stage3Panel.summary-mode{top:calc(14px + env(safe-area-inset-top));background:#102019}
+.summary-result-name{font-size:27px;font-weight:1000;letter-spacing:.6px;color:#f4e7a4;margin:5px 0 12px}
+.summary-total{font-size:44px;font-weight:1000;line-height:1.14;color:#fbe9b1;font-variant-numeric:tabular-nums}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 12px}
+.summary-stat{border:1px solid #a5b69a65;background:#ffffff0b;border-radius:13px;padding:10px 8px;line-height:1.4}
+.summary-stat strong{font-size:19px;display:block;color:#fff6ce}
+.summary-stat span{font-size:12px;color:#cfdfd1}
+.summary-detail{border-top:1px solid #ffffff26;padding-top:10px;font-size:13px;line-height:1.75;color:#d9e6d6;text-align:left}
+.summary-note{font-size:12px;color:#bdcdb7;margin:11px 0 2px}
+#stage3RestartBtn{width:100%}
+@media(max-height:740px){#stage3Panel{padding:12px;top:calc(7px + env(safe-area-inset-top));}.stage3-panel h2{font-size:21px}.summary-result-name{font-size:24px}.summary-total{font-size:37px}.summary-grid{gap:6px;margin:8px 0}.stage3-meter{height:33px}#tidyButton{min-height:58px}}
 </style>
 </head>
 <body>
@@ -353,10 +377,28 @@ button{touch-action:manipulation;}
    <div class="stage2-extra"><button class="final-btn" id="finalTidyBtn" type="button" hidden>最後整理</button></div>
  </div>
  <div class="stage3-panel" id="stage3Panel" hidden aria-live="polite">
-   <h2>第三階段｜最後整理</h2>
-   <p>你已經完成三次開折，棉被已經折成基本形狀。這裡先做成第三階段入口，之後我們可以再把最後整理的玩法細做出來。</p>
-   <div class="stage3-actions">
-     <button id="stage3RestartBtn" type="button">回到第一階段</button>
+   <div id="stage3Play">
+     <h2>第三階段｜最後整理</h2>
+     <p class="stage3-intro">計量條會快速充滿、清空。抓準接近 MAX 的瞬間，按下「整理」！</p>
+     <div class="stage3-meter-labels"><span>0</span><span>整理力道</span><span class="max-label">MAX 100</span></div>
+     <div class="stage3-meter" role="progressbar" aria-label="整理力道" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="tidyMeter">
+       <div class="stage3-fill" id="tidyFill"></div>
+       <div class="stage3-needle" id="tidyNeedle"></div>
+     </div>
+     <div class="stage3-meter-readout" id="tidyReadout">0 / 100</div>
+     <button id="tidyButton" type="button">整理！</button>
+   </div>
+   <div id="stage3Summary" hidden>
+     <h2>折棉被總結算</h2>
+     <div class="summary-result-name" id="productName">軍用豆腐乾（暫定）</div>
+     <div class="summary-total" id="summaryTotal">0 分</div>
+     <div class="summary-grid">
+       <div class="summary-stat"><span>三次開折平均</span><strong id="summaryFolds">0 分</strong></div>
+       <div class="summary-stat"><span>最後整理</span><strong id="summaryTidy">0 分</strong></div>
+     </div>
+     <div class="summary-detail" id="summaryDetail"></div>
+     <div class="summary-note">成品名稱先用豆腐乾佔位，荒謬造型下次再加入。</div>
+     <div class="stage3-actions"><button id="stage3RestartBtn" type="button">再折一次</button></div>
    </div>
  </div>
  <div class="state" id="stage1State" aria-live="polite"><div class="state-name"><span id="stateName">蓬鬆乾爽</span><span class="state-tag" id="stateTag">軍綠棉被</span></div><div class="state-desc" id="stateDesc">先灑水，再用手指把每個垃圾往床邊掃出去。濕太久還會發霉長香菇！</div><button id="nextStageBtn" class="next-stage" type="button">下一階段：記憶折線 <span aria-hidden="true">→</span></button></div>
@@ -696,6 +738,56 @@ button{touch-action:manipulation;}
   const stage2Tip=$('stage2Tip'),stage2Result=$('stage2Result'),stage2ResultTitle=$('stage2ResultTitle'),stage2ResultSubtitle=$('stage2ResultSubtitle');
   const redrawBtn=$('redrawBtn'),foldBtn=$('foldBtn');
   const finalTidyBtn=$('finalTidyBtn'),stage3Panel=$('stage3Panel'),stage3RestartBtn=$('stage3RestartBtn');
+  const stage3Play=$('stage3Play'),stage3Summary=$('stage3Summary'),tidyButton=$('tidyButton');
+  const tidyMeter=$('tidyMeter'),tidyFill=$('tidyFill'),tidyNeedle=$('tidyNeedle'),tidyReadout=$('tidyReadout');
+  let tidyRunning=false,tidyStartedAt=0,tidyFrame=0,tidyScore=null,tidyLockedValue=null;
+  const TIDY_CYCLE_MS=1450; // 從 0 → 100 → 0 共 1.45 秒，每秒近 1.4 個單程
+  function tidyValueAt(now){
+    const phase=((now-tidyStartedAt)%TIDY_CYCLE_MS+TIDY_CYCLE_MS)%TIDY_CYCLE_MS/TIDY_CYCLE_MS;
+    return 100*(1-Math.abs(2*phase-1));
+  }
+  function renderTidy(value){
+    const n=Math.max(0,Math.min(100,value));
+    tidyFill.style.width=n.toFixed(2)+'%';
+    tidyNeedle.style.left=n.toFixed(2)+'%';
+    tidyReadout.textContent=Math.round(n)+' / 100';
+    tidyMeter.setAttribute('aria-valuenow',String(Math.round(n)));
+  }
+  function stopTidy(){tidyRunning=false;if(tidyFrame)cancelAnimationFrame(tidyFrame);tidyFrame=0;}
+  function tickTidy(now){
+    if(!tidyRunning||stage!==3||mode!=='tidy')return;
+    renderTidy(tidyValueAt(now));
+    tidyFrame=requestAnimationFrame(tickTidy);
+  }
+  function startTidy(){
+    stopTidy();tidyScore=null;tidyLockedValue=null;
+    stage3Play.hidden=false;stage3Summary.hidden=true;stage3Panel.classList.remove('summary-mode');
+    tidyButton.disabled=false;
+    tidyStartedAt=performance.now();tidyRunning=true;renderTidy(0);
+    tidyFrame=requestAnimationFrame(tickTidy);
+  }
+  function finishTidy(){
+    if(stage!==3||mode!=='tidy'||!tidyRunning)return;
+    // 當下讀取時間，而不是使用上一張影格，避免手機掉幀造成評分不準。
+    const current=tidyValueAt(performance.now());
+    tidyLockedValue=current;tidyScore=Math.round(current);
+    stopTidy();renderTidy(current);tidyButton.disabled=true;
+    mode='summary';
+    const foldAvg=Math.round(roundScores.reduce((a,b)=>a+b,0)/Math.max(1,roundScores.length));
+    const total=Math.round(foldAvg*.65+tidyScore*.35);
+    $('productName').textContent='軍用豆腐乾（暫定）';
+    $('summaryTotal').textContent=total+' 分';
+    $('summaryFolds').textContent=foldAvg+' 分';
+    $('summaryTidy').textContent=tidyScore+' 分';
+    $('summaryDetail').textContent=
+      `開折成績：${roundScores.map((v,i)=>`第${i+1}折 ${v} 分`).join('／')}。`+
+      ` 最後整理停在 ${Math.round(current)} / 100，越靠近 MAX 分數越高。`+
+      ` 第一階段狀態：濕度 ${Math.round(moisture)}%、焦化 ${Math.round(burn)}%、髒亂 ${Math.round(dirt)}%。`+
+      ` 總分暫以三次開折平均占 65%、最後整理占 35% 計算。`;
+    stage3Play.hidden=true;stage3Summary.hidden=false;stage3Panel.classList.add('summary-mode');
+    memorySplash.textContent='';
+  }
+
   let round=0,mode='idle',roundScores=[],targetPoints=[],drawPoints=[],lastDrawPointer=null,previewTimer=null,feedbackTimer=null,foldStep=0;
   // 2.5D fabric folds are built from clipped views of the *actual first-stage quilt*.
   // The SVG stays in local bed coordinates; bad drawings warp the packet but cannot
@@ -994,16 +1086,15 @@ button{touch-action:manipulation;}
     finalTidyBtn.hidden=false; finalTidyBtn.disabled=false;
   }
   function enterStage3(){
-    stage=3; mode='stage3'; clearStageTimers(); setAction(null); scrubbing=false;
-    stage2Result.hidden=true;
-    finalTidyBtn.hidden=true;
+    stage=3; mode='tidy'; clearStageTimers(); setAction(null); scrubbing=false;
+    stage2Result.hidden=true;finalTidyBtn.hidden=true;
     $('stageSubtitle').textContent='第三階段｜最後整理';
-    roundLabel.textContent='第三階段';
-    memoryInstruction.textContent='最後整理入口';
-    scoresMini.textContent=roundScores.map((v,i)=>`第${i+1}次 ${v}分`).join('　');
-    stage2Tip.textContent='第三階段先留作入口，之後可再補最後整理玩法。';
-    redrawBtn.hidden=true; foldBtn.hidden=true;
+    // 讓第三階段真正只有一個高速計量條，不被上一關的提示/控制面板遮住。
+    $('stage2Info').hidden=true;$('stage2Controls').hidden=true;
+    redrawBtn.hidden=true;foldBtn.hidden=true;
     stage3Panel.hidden=false;
+    memorySplash.textContent='';
+    startTidy();
   }
   function startRound(){
     clearStageTimers();
@@ -1041,6 +1132,8 @@ button{touch-action:manipulation;}
     startRound();
   }
   function leaveStage2(){
+    stopTidy();tidyScore=null;tidyLockedValue=null;stage3Panel.classList.remove('summary-mode');
+    stage3Play.hidden=false;stage3Summary.hidden=true;
     clearStageTimers();stage=1;mode='idle';lastDrawPointer=null;foldStep=0;renderFoldState();
     svgHide(overlay,true);$('stage2Info').hidden=true;$('stage2Controls').hidden=true;stage2Result.hidden=true;stage3Panel.hidden=true;
     redrawBtn.hidden=false; foldBtn.hidden=false; finalTidyBtn.hidden=true;
@@ -1091,7 +1184,8 @@ button{touch-action:manipulation;}
   // Players may proceed at any time, regardless of water, burn, dirt or ash.
   $('nextStageBtn').addEventListener('click',startStage2);
   finalTidyBtn.addEventListener('click',enterStage3);
-  stage3RestartBtn.addEventListener('click',leaveStage2);
+  stage3RestartBtn.addEventListener('click',()=>{leaveStage2();moisture=32;burn=0;ash=false;moldAge=0;rerollDirt();scrubbing=false;lastScrubPoint=null;setAction(null);update();});
+  tidyButton.addEventListener('click',finishTidy);
   overlay.addEventListener('pointerdown',e=>{
     if(stage!==2||mode!=='draw'||e.button>0)return;
     drawPoints=[svgDrawPoint(e)];lastDrawPointer=e.pointerId;
@@ -1146,7 +1240,7 @@ button{touch-action:manipulation;}
       feedbackTimer=setTimeout(()=>{feedbackTimer=null;if(stage!==2)return;if(thisRound===2){showFinishStage2();}else{round++;startRound();}},1120);
     });
   });
-  window.__blanketStageDebug=()=>({stage,round,mode,foldStep,foldForm:foldActive.getAttribute('href'),foldScores:[...foldScores],roundScores:[...roundScores],previewVisible:!memoryTarget.hasAttribute('hidden'),drawPoints:drawPoints.length,moisture,burn,dirt,trashRemaining:trashObjects.filter(o=>!o.removed).length,trashInitial,moldAge,ash,action,scrubbing,canvasW,canvasH,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
+  window.__blanketStageDebug=()=>({stage,round,mode,foldStep,foldForm:foldActive.getAttribute('href'),foldScores:[...foldScores],roundScores:[...roundScores],tidyRunning,tidyScore,tidyLockedValue,tidyCurrent:tidyRunning?tidyValueAt(performance.now()):tidyLockedValue,previewVisible:!memoryTarget.hasAttribute('hidden'),drawPoints:drawPoints.length,moisture,burn,dirt,trashRemaining:trashObjects.filter(o=>!o.removed).length,trashInitial,moldAge,ash,action,scrubbing,canvasW,canvasH,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
   // Native text selection and Safari's callout obscured the game after long presses.
   document.addEventListener('selectstart',e=>e.preventDefault());
   document.addEventListener('dragstart',e=>e.preventDefault());
