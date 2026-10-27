@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#132018">
-<title>國軍手榴彈｜調配與投擲試玩 v0.1</title>
+<title>國軍手榴彈｜調配與投擲試玩 v0.2</title>
 <style>
 :root{--ink:#eaf1da;--muted:#a9baa5;--gold:#efc977;--good:#a1d991;--bad:#f29b76;--panel:rgba(18,34,26,.95);--edge:#ffffff20}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:#132119;color:var(--ink);font-family:system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;touch-action:manipulation;user-select:none;-webkit-user-select:none}
@@ -25,11 +25,7 @@ button{font:inherit;font-weight:800;border:0;cursor:pointer;color:var(--ink);tou
 #controls{pointer-events:auto;width:min(520px,100%);margin:0 auto;flex:0 0 auto;background:var(--panel);border:1px solid #b4cdad38;border-radius:22px;padding:14px;box-shadow:0 16px 46px #060f09ab;backdrop-filter:blur(16px)}
 #controls.hidden,#stats.hidden,#steps.hidden,#guide.hidden{display:none!important}.btn{border-radius:12px;min-height:53px;padding:11px 13px;display:flex;align-items:center;justify-content:center;text-align:center;gap:7px;font-size:15px;background:#354a3b;border:1px solid #c8dcba37;box-shadow:inset 0 1px #ffffff15}.btn.primary{color:#172719;background:linear-gradient(155deg,#f4d993,#e9ba68);border:1px solid #fff0bb65;box-shadow:0 4px 16px #d9b46c36}.btn.ghost{background:#657b5c43;color:#e7efde}.btn.danger{background:#634a3c}.btn:active:not(:disabled){transform:scale(.985)}.btn.full{width:100%}.btn .ico{font-size:19px}
 .smallTitle{font-weight:900;font-size:13px;margin-bottom:7px}.dim{font-size:11px;color:#a3b6aa}.split{display:grid;grid-template-columns:1fr 1fr;gap:8px}.underText{font-size:11px;color:#a6b8a9;text-align:center;margin-top:9px}
-.fillMeter{height:9px;border-radius:50px;background:#091910;border:1px solid #d4e9bf29;margin:11px 0 11px;overflow:hidden}.fillValue{height:100%;background:linear-gradient(90deg,#b5bf6d,#f2d994);width:0%;transition:width .07s linear;border-radius:50px}
 #pourBtn{height:69px;background:linear-gradient(160deg,#a9bb7d,#7b9b64);color:#162416;touch-action:none;display:flex;flex-direction:column;gap:3px}#pourBtn.isHeld{background:linear-gradient(160deg,#efd28f,#ad9b59);box-shadow:0 0 0 3px #e8d28830}#pourBtn small{font-size:10px;font-weight:750;opacity:.8}
-#qteTrack{height:35px;border-radius:10px;border:1px solid #c7d3ae54;background:linear-gradient(180deg,#1b3827,#16291f);position:relative;margin:12px 0 10px;overflow:hidden}#qteAim{position:absolute;top:0;bottom:0;background:#cfda9250;border-inline:1px solid #e5eeba91;width:15%;left:40%}#qteAim:before{content:"";position:absolute;top:0;bottom:0;width:25%;left:37.5%;background:#d9e99f61}#qteNeedle{position:absolute;top:-2px;bottom:-2px;width:5px;border-radius:5px;background:#fff6d4;box-shadow:0 0 11px #fee4a0;left:0;transform:translateX(-50%)}
-#pressureBanner{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#bccbb5}#qteHint{text-align:center;font-size:12px;color:#d9e4d1;margin-bottom:11px}
-#decisionHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px}#conditionIcon{font-size:21px}
 #wheelLayout{display:flex;justify-content:center;align-items:center;gap:16px;margin:1px 0 12px}#wheelPad{width:154px;height:154px;border-radius:50%;touch-action:none;cursor:grab;position:relative;background:radial-gradient(circle at 40% 29%,#899b81 0%,#516b53 35%,#263f30 67%,#101e17 68%,#344d3b 76%,#131f19 78%);box-shadow:0 9px 26px #030b064d,inset 0 3px 4px #e9f8d327;border:3px solid #839b77;flex:0 0 auto}#wheelPad:active{cursor:grabbing}#wheelFace{position:absolute;inset:9px;border-radius:50%;background:repeating-conic-gradient(from 0deg,#9ba98c 0 5deg,#384b3a 6deg 13deg,#6d866b 14deg 19deg);mask:radial-gradient(circle,transparent 0 51%,#000 53%);-webkit-mask:radial-gradient(circle,transparent 0 51%,#000 53%)}#wheelRot{position:absolute;inset:0;border-radius:50%;transform:rotate(0deg);pointer-events:none}#wheelGrip{position:absolute;top:13px;left:calc(50% - 10px);width:20px;height:20px;border-radius:50%;background:linear-gradient(#ede6bf,#898e76);border:3px solid #536558;box-shadow:0 3px 8px #0009}#wheelCenter{position:absolute;inset:43px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #bdd3ad70;background:linear-gradient(#223c2b,#183023);color:#f9e2ab;font-size:14px;font-weight:900;pointer-events:none}
 #rotateInstructions{max-width:155px;font-size:12px;line-height:1.75;color:#d3dfd0}#rotateInstructions b{color:#ffdb87;font-size:14px}#roundBadge{font-size:11px;border:1px solid #c8d6ab54;background:#d7e69d16;border-radius:10px;padding:6px 9px;white-space:nowrap;color:#d1dcbd}
 #intro,#endOverlay{position:fixed;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;padding:calc(15px + env(safe-area-inset-top)) 16px calc(15px + env(safe-area-inset-bottom));background:#07180abf;backdrop-filter:blur(9px)}.modal{width:min(450px,100%);max-height:100%;overflow:auto;border-radius:24px;background:linear-gradient(155deg,#294131,#15291f 70%);border:1px solid #bccfa464;padding:23px 20px 19px;box-shadow:0 30px 75px #020902bb}.introMark{font-size:47px;line-height:1;margin:0 0 9px}.modal h1{font-size:26px;letter-spacing:1px;margin:0 0 7px}.modal h2{font-size:25px;margin:0 0 12px}.modal p{font-size:13px;color:#c5d2c0;line-height:1.72;margin:0 0 18px}.introSteps{display:grid;gap:8px;margin:15px 0 22px}.introStep{display:flex;align-items:center;gap:11px;background:#101f17ae;border:1px solid #c9d7a020;padding:10px 11px;border-radius:12px;font-size:13px}.introStep span{display:grid;place-items:center;background:#bad89436;border-radius:8px;width:28px;height:28px;font-weight:900;color:#efcf8b}.kicker{color:#e4c987;font-size:11px;letter-spacing:2px;font-weight:900;margin-bottom:8px}
@@ -37,63 +33,128 @@ button{font:inherit;font-weight:800;border:0;cursor:pointer;color:var(--ink);tou
 #endOverlay{display:none}#endOverlay.show{display:flex}#outcomeCoords{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.outcomeCell{background:#0c2219;border-radius:12px;padding:14px 10px;text-align:center}.outcomeCell small{display:block;color:#abc3a8;font-size:11px}.outcomeCell strong{display:block;font-size:24px;font-variant-numeric:tabular-nums;margin-top:3px}.note{font-size:11px;color:#9fb4a3;line-height:1.55}
 @media(max-height:740px){#root{padding-top:calc(5px + env(safe-area-inset-top));padding-bottom:calc(7px + env(safe-area-inset-bottom))}#stats .stat{padding:7px 10px}.statValue strong{font-size:24px}#controls{padding:11px}#guide{margin-bottom:2px}#stageName{font-size:18px}#stageDesc{margin-top:2px;font-size:11px}#wheelPad{width:129px;height:129px}#wheelCenter{inset:36px}#wheelLayout{margin-bottom:6px}}
 @media(min-width:750px){#root{padding-top:20px;padding-bottom:20px}#guide{margin-bottom:18px}}
+
+/* v0.2: permanent workbench controls; powder is now shown in the physical barrel */
+.actionThree{display:grid;grid-template-columns:1.17fr 1fr 1fr;gap:7px}
+.actionThree .btn{min-height:80px;padding:9px 4px;display:flex;flex-direction:column;gap:5px;font-size:12px;line-height:1.3}
+.actionThree .btn .ico{font-size:23px;line-height:1.1}
+.actionThree .btn small{font-size:10px;font-weight:600;line-height:1.1;opacity:.84}
+#pourBtn{height:80px;min-height:80px}
+#workTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+#workTitle .smallTitle{margin:0;font-size:14px}
+#pressBtn.live{background:#dcb46d;color:#15291a;box-shadow:0 0 0 2px #e8cf81a1,0 0 20px #efc97740}
+#shapeBtn{background:#314638}
+#scene{cursor:default}
+@media(max-width:360px){.actionThree{gap:5px}.actionThree .btn{font-size:11px;min-height:72px}#pourBtn{height:72px;min-height:72px}}
+@media(max-height:740px){.actionThree .btn{min-height:65px}#pourBtn{height:65px;min-height:65px}#workTitle{margin-bottom:7px}}
+@media(max-height:740px){body.workmode #guide{display:none}}
 </style>
 </head>
 <body>
 <canvas id="scene" aria-label="遊戲場景"></canvas><div id="screenTint"></div>
 <div id="root">
   <header id="head">
-    <div class="heading"><div class="logo">💣</div><div class="headingText"><div class="headingTitle">手榴彈製作訓練 <span style="color:#eaca8c;font-size:10px">PROTOTYPE 0.1</span></div><div class="headingSub" id="headerSub">軍械庫 · 綠桶實驗區</div></div><button id="restart" aria-label="重新開始">↻</button></div>
+    <div class="heading"><div class="logo">💣</div><div class="headingText"><div class="headingTitle">手榴彈製作訓練 <span style="color:#eaca8c;font-size:10px">PROTOTYPE 0.2</span></div><div class="headingSub" id="headerSub">軍械庫 · 綠桶實驗區</div></div><button id="restart" aria-label="重新開始">↻</button></div>
     <div id="steps"><div class="step active"></div><div class="step"></div><div class="step"></div><div class="step"></div></div>
-    <div id="stats"><div class="stat" id="gramStat"><label>目前火藥</label><div class="statValue"><strong id="gramText">0</strong><small>克</small></div></div><div class="stat" id="densityStat"><label>遊戲密度</label><div class="statValue"><strong id="densityText">0.00</strong><small>密度值</small></div></div></div>
+    <div id="stats"><div class="stat" id="gramStat"><label>目前火藥</label><div class="statValue"><strong id="gramText">0</strong><small>克</small></div></div><div class="stat" id="densityStat"><label>遊戲密度</label><div class="statValue"><strong id="densityText">0.60</strong><small>密度值</small></div></div></div>
   </header>
   <div id="toast"></div>
-  <div id="guide"><div id="stageRound">第 1 輪</div><div id="stageName">填充火藥</div><div id="stageDesc">按住倒入火藥，自己決定這輪的份量。</div></div>
+  <div id="guide"><div id="stageRound">已壓實 0 次</div><div id="stageName">自由裝填與壓實</div><div id="stageDesc">看桶內的火藥高度；想倒就倒、想壓就壓。</div></div>
   <div id="controls" class="hidden"></div>
 </div>
-<div id="intro"><div class="modal"><div class="kicker">國軍訓練中心 · 獨立試玩</div><div class="introMark">🛢️</div><h1>這桶東西，真的能丟嗎？</h1><p>從一只軍綠色大桶子開始，一輪一輪加入火藥、壓實。見好就收，或冒險再來一次？最後親手把大桶轉成手榴彈，再試試看能丟多準。</p><div class="introSteps"><div class="introStep"><span>1</span>按住倒入火藥 · 決定裝填量</div><div class="introStep"><span>2</span>壓實 QTE · 失誤會傷害隱藏外殼耐久</div><div class="introStep"><span>3</span>反覆累積或收手 · 旋轉轉輪定型</div><div class="introStep"><span>4</span>控制左右和遠近 · 完成投擲測試</div></div><button class="btn primary full" id="startBtn">開始訓練　→</button><div class="underText">這版只做到投擲落地，不含爆炸與破壞。</div></div></div>
+<div id="intro"><div class="modal"><div class="kicker">國軍訓練中心 · 獨立試玩</div><div class="introMark">🛢️</div><h1>這桶東西，真的能丟嗎？</h1><p>從一只軍綠色大桶子開始，自由加入火藥、反覆壓實。隨時可以收手，但千萬別倒到滿出來！最後親手把大桶轉成手榴彈，再試試看能丟多準。</p><div class="introSteps"><div class="introStep"><span>1</span>按住倒火藥，直接看桶內高度，滿出來會強制停機</div><div class="introStep"><span>2</span>隨時壓實 QTE，也可以連續倒入或連續壓實</div><div class="introStep"><span>3</span>主動進轉輪定型，或因溢出、破殼被迫進入</div><div class="introStep"><span>4</span>控制左右和遠近 · 完成投擲測試</div></div><button class="btn primary full" id="startBtn">開始訓練　→</button><div class="underText">這版只做到投擲落地，不含爆炸與破壞。</div></div></div>
 <div id="endOverlay"><div class="modal"><div class="kicker">投擲訓練 · 本回合完成</div><div style="font-size:43px;margin-bottom:6px">🎯</div><h2 id="endHeading">投擲完成！</h2><p id="endDesc">你丟出的成品已經落地，爆炸效果將在後續版本加入。</p><div id="outcomeCoords"><div class="outcomeCell"><small>投擲距離</small><strong id="distVal">0.0 m</strong></div><div class="outcomeCell"><small>偏離目標</small><strong id="missVal">0.0 m</strong></div></div><div class="outcomeCell" style="margin-bottom:16px"><small>本次火藥／密度</small><strong id="finalVal" style="font-size:20px">0 克 · 0.00</strong></div><button class="btn primary full" id="retryBtn">再製作一顆　↻</button><div class="underText">不顯示外殼耐久、定型品質或失敗原因。</div></div></div>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);const cv=$('scene'),ctx=cv.getContext('2d');let W=0,H=0,DPR=1;
 let S={},rafTime=0,lastT=0,pouring=false,shapeDragging=false,lastAngle=0,qtePos=0,aimPos=0,toastClock=0;
+const BARREL_SPACE=1000; /* abstract game-only visual capacity, not a physical formula */
+const powderLevel=()=>S.powder/(Math.max(.1,S.density)*BARREL_SPACE);
 const TAU=Math.PI*2, clamp=(v,l,h)=>Math.max(l,Math.min(h,v)),rnd=(a,b)=>a+Math.random()*(b-a),ease=t=>t*t*(3-2*t),fmt=n=>Math.floor(n).toLocaleString('en-US');
-function reset(){S={phase:'intro',powder:0,density:0.00,round:1,roundGrams:0,totalPressed:0,hp:100,broken:false,shape:0,shapeTarget:rnd(.91,1.08),power:0,qteCenter:.5,qteSpeed:1.8,qteClock:0,compressT:0,compressMode:'',aimX:0,aimZ:0,aimClock:0,throwT:0,shotX:0,shotZ:0,particles:[],shake:0,shotRot:0};pouring=false;shapeDragging=false;lastT=0;renderHUD();$('intro').style.display='flex';$('endOverlay').classList.remove('show');$('controls').classList.add('hidden');$('guide').classList.add('hidden');}
-function phase(p){S.phase=p;if(['shape','aimX','aimZ','flight'].includes(p)){$('toast').classList.remove('show');toastClock=0}renderHUD();}
+function reset(){S={phase:'intro',powder:0,density:0.60,round:1,totalPressed:0,lastPourPress:0,hp:100,broken:false,spillTime:0,shape:0,shapeTarget:rnd(.91,1.08),power:0,qteCenter:.5,qteSpeed:1.8,qteClock:0,compressT:0,compressMode:'',aimX:0,aimZ:0,aimClock:0,throwT:0,shotX:0,shotZ:0,particles:[],shake:0,shotRot:0};pouring=false;shapeDragging=false;lastT=0;renderHUD();$('intro').style.display='flex';$('endOverlay').classList.remove('show');$('controls').classList.add('hidden');$('guide').classList.add('hidden');}
+function phase(p){S.phase=p;renderHUD();}
 function toast(text,ms=1300){const el=$('toast');el.textContent=text;el.classList.add('show');toastClock=performance.now()+ms;}
-function stepIndex(){return ['fill','press','decide'].includes(S.phase)?0:S.phase==='shape'?1:['aimX','aimZ'].includes(S.phase)?2:3;}
-function renderHUD(){const ph=S.phase;$('stats').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='flight');$('steps').classList.toggle('hidden',ph==='intro'||ph==='end');$('guide').classList.toggle('hidden',ph==='intro'||ph==='end');$('controls').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='flight');$('gramText').textContent=fmt(S.powder);$('densityText').textContent=S.density.toFixed(2);const sti=stepIndex();document.querySelectorAll('.step').forEach((el,i)=>{el.classList.toggle('active',i===sti);el.classList.toggle('done',i<sti)});$('headerSub').textContent=['aimX','aimZ','flight'].includes(ph)?'投擲訓練場 · 目標校準':'軍械庫 · 綠桶實驗區';$('stageRound').textContent=['fill','press','decide'].includes(ph)?`第 ${S.round} 輪`:['aimX','aimZ'].includes(ph)?'投擲模擬訓練':ph==='flight'?'投擲中……':'最後定型';
-const titles={fill:'填充火藥',press:'壓實 QTE',decide:S.broken?'外殼損壞！':'繼續挑戰？',shape:'把大桶轉成手榴彈',aimX:'左右方向',aimZ:'投擲遠近',flight:'投擲中……'};const desc={fill:'按住倒入火藥，自己決定這輪的份量。',press:'指針進入亮色區域時按下「壓實」。',decide:S.broken?'外殼已經損壞，必須停止裝填。':'保住目前成果，還是再裝填一輪？',shape:'沿著轉輪順時針旋轉，覺得外型像手榴彈時就停手。',aimX:'抓準指針，決定落點偏左或偏右。',aimZ:'再次抓準指針，決定落點遠近。',flight:'正在飛向訓練目標……'};
-$('stageName').textContent=titles[ph]||'';$('stageDesc').textContent=desc[ph]||'';
-const ctl=$('controls');ctl.replaceChildren();if(ph==='fill'){
- ctl.innerHTML=`<div class="smallTitle">倒入火藥　<span class="dim" id="roundMass">本輪 0 克</span></div><div class="fillMeter"><div class="fillValue" id="fillValue"></div></div><div class="split"><button id="pourBtn" class="btn"><span>⬇　按住倒入</span><small>鬆手就停止</small></button><button id="compressBtn" class="btn primary" disabled>開始壓實　→</button></div><div class="underText">每輪最多倒入 480 克（純遊戲設定）</div>`;
- const btn=$('pourBtn');btn.addEventListener('pointerdown',e=>{e.preventDefault();btn.setPointerCapture(e.pointerId);pouring=true;btn.classList.add('isHeld')});const stop=()=>{pouring=false;btn.classList.remove('isHeld')};btn.addEventListener('pointerup',stop);btn.addEventListener('pointercancel',stop);btn.addEventListener('lostpointercapture',stop);$('compressBtn').addEventListener('click',startPress);
-}else if(ph==='press'){
- ctl.innerHTML=`<div id="pressureBanner"><span>壓縮機運作中</span><span>抓準時機！</span></div><div id="qteTrack"><div id="qteAim"></div><div id="qteNeedle"></div></div><div id="qteHint">亮區中央最精準 · 完美壓實不傷外殼</div><button class="btn primary full" id="pressButton">⬇　壓實！</button>`;
- $('qteAim').style.left=(S.qteCenter*100-7.5)+'%';$('pressButton').addEventListener('click',finishPress);
-}else if(ph==='decide'){
- const bad=S.broken;ctl.innerHTML=`<div id="decisionHead"><div><div class="smallTitle" style="font-size:16px;margin:0">${bad?'外殼破裂，必須停機！':'還要再裝一輪嗎？'}</div><div class="dim" style="margin-top:4px">目前 ${fmt(S.powder)} 克　·　遊戲密度 ${S.density.toFixed(2)}</div></div><div id="conditionIcon">${bad?'💥':'🛢️'}</div></div>${bad?'<button id="nextShape" class="btn primary full">前往轉輪定型　→</button>':'<div class="split"><button id="nextShape" class="btn ghost">見好就收</button><button id="addMore" class="btn primary">＋ 再加一輪！</button></div>'}`;
- $('nextShape').addEventListener('click',startShape);if(!bad)$('addMore').addEventListener('click',()=>{S.round++;S.roundGrams=0;phase('fill')});
-}else if(ph==='shape'){
- ctl.innerHTML=`<div id="wheelLayout"><div id="wheelPad"><div id="wheelFace"></div><div id="wheelRot"><div id="wheelGrip"></div></div><div id="wheelCenter">↻ 旋轉</div></div><div id="rotateInstructions"><b>將桶子慢慢定型</b><br>順時針轉動轉輪。<br>覺得外觀適合了，就按完成。<br><span class="dim">超過頭不能轉回去。</span></div></div><button id="shapeDone" class="btn primary full">完成定型 · 前往投擲　→</button>`;
- const wheel=$('wheelPad');wheel.addEventListener('pointerdown',e=>{e.preventDefault();wheel.setPointerCapture(e.pointerId);shapeDragging=true;lastAngle=pointerAngle(e,wheel)});wheel.addEventListener('pointermove',e=>{if(!shapeDragging||S.phase!=='shape')return;e.preventDefault();const a=pointerAngle(e,wheel);let d=a-lastAngle;if(d>Math.PI)d-=TAU;if(d<-Math.PI)d+=TAU;lastAngle=a;if(d>0&&d<1.3){S.shape=clamp(S.shape+d/TAU*.38,0,1.65);S.shake=Math.min(.4,S.shake+.012);updateWheel();}});const stop=()=>{shapeDragging=false};wheel.addEventListener('pointerup',stop);wheel.addEventListener('pointercancel',stop);wheel.addEventListener('lostpointercapture',stop);$('shapeDone').addEventListener('click',startAim);updateWheel();
-}else if(ph==='aimX'||ph==='aimZ'){
- const ax=ph==='aimX';ctl.innerHTML=`<div class="smallTitle">${ax?'第 1 步：左右方向':'第 2 步：投擲遠近'}</div><div id="aimTrack"><div id="aimPerfect"></div><div id="aimPointer"></div></div><button id="lockAim" class="btn primary full">${ax?'鎖定左右方向　→':'投擲！　↗'}</button><div class="underText">金色指針會快速來回移動，靠近中央越準</div>`;
- $('lockAim').addEventListener('click',()=>{if(S.phase==='aimX'){S.aimX=aimPos;S.aimClock=0;phase('aimZ')}else{S.aimZ=aimPos;startFlight()}});
-}}
+function stepIndex(){return ['fill','press'].includes(S.phase)?0:S.phase==='shape'?1:['aimX','aimZ'].includes(S.phase)?2:3;}
+function renderHUD(){
+ const ph=S.phase,work=ph==='fill'||ph==='press';
+ document.body.classList.toggle('workmode',work);
+ $('stats').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='flight');
+ $('steps').classList.toggle('hidden',ph==='intro'||ph==='end');
+ $('guide').classList.toggle('hidden',ph==='intro'||ph==='end');
+ $('controls').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='flight');
+ $('gramText').textContent=fmt(S.powder);$('densityText').textContent=S.density.toFixed(2);
+ const sti=stepIndex();document.querySelectorAll('.step').forEach((el,i)=>{el.classList.toggle('active',i===sti);el.classList.toggle('done',i<sti)});
+ $('headerSub').textContent=['aimX','aimZ','flight'].includes(ph)?'投擲訓練場 · 目標校準':'軍械庫 · 綠桶實驗區';
+ $('stageRound').textContent=work?`已壓實 ${S.totalPressed} 次`:['aimX','aimZ'].includes(ph)?'投擲模擬訓練':ph==='flight'?'投擲中……':'最後定型';
+ const titles={fill:'自由裝填與壓實',press:'抓準時機壓實！',shape:'把大桶轉成手榴彈',aimX:'左右方向',aimZ:'投擲遠近',flight:'投擲中……'};
+ const desc={fill:'看桶內粉末高度，自行決定何時倒、何時壓。',press:'指針就在桶子上！按下方按鈕或直接點桶子壓實。',shape:'沿著轉輪順時針旋轉，覺得外型像手榴彈時就停手。',aimX:'抓準指針，決定落點偏左或偏右。',aimZ:'再次抓準指針，決定落點遠近。',flight:'正在飛向訓練目標……'};
+ $('stageName').textContent=titles[ph]||'';$('stageDesc').textContent=desc[ph]||'';
+ const ctl=$('controls');ctl.replaceChildren();
+ if(work){
+   ctl.innerHTML=`<div id="workTitle"><div class="smallTitle">${ph==='press'?'壓實時機 · 注意桶上的指針':'自由操作 · 觀察火藥高度'}</div><span class="dim" id="workHint">${ph==='press'?'點桶上的指針也能壓實':'不要讓火藥滿出桶口'}</span></div>
+   <div class="actionThree">
+    <button id="pourBtn" class="btn" ${ph==='press'?'disabled':''}><span class="ico">⬇</span><span>按住倒火藥</span><small>放開就停</small></button>
+    <button id="pressBtn" class="btn ${ph==='press'?'live':'primary'}" ${S.powder<15?'disabled':''}><span class="ico">${ph==='press'?'🎯':'⚙'}</span><span>${ph==='press'?'立即壓實！':'啟動壓實'}</span><small>${ph==='press'?'抓準 QTE':'可連續壓實'}</small></button>
+    <button id="shapeBtn" class="btn ghost" ${ph==='press'||S.powder<15?'disabled':''}><span class="ico">↻</span><span>轉輪定型</span><small>隨時收手</small></button>
+   </div><div class="underText">${ph==='press'?'指針跑到亮區時按「立即壓實」；失誤可能弄壞外殼。':'上方直接看得到桶內火藥；壓實後粉末會下降，騰出空間。'}</div>`;
+   const btn=$('pourBtn');
+   if(ph==='fill'){
+     btn.addEventListener('pointerdown',e=>{e.preventDefault();if(S.phase!=='fill')return;btn.setPointerCapture(e.pointerId);pouring=true;btn.classList.add('isHeld')});
+     const stop=()=>{pouring=false;btn.classList.remove('isHeld')};
+     btn.addEventListener('pointerup',stop);btn.addEventListener('pointercancel',stop);btn.addEventListener('lostpointercapture',stop);
+   }
+   $('pressBtn').addEventListener('click',()=>{if(S.phase==='press')finishPress();else startPress()});
+   $('shapeBtn').addEventListener('click',()=>{if(S.phase==='fill'&&S.powder>=15)startShape()});
+ }else if(ph==='shape'){
+   ctl.innerHTML=`<div id="wheelLayout"><div id="wheelPad"><div id="wheelFace"></div><div id="wheelRot"><div id="wheelGrip"></div></div><div id="wheelCenter">↻ 旋轉</div></div><div id="rotateInstructions"><b>將桶子慢慢定型</b><br>順時針轉動轉輪。<br>覺得外觀適合了，就按完成。<br><span class="dim">超過頭不能轉回去。</span></div></div><button id="shapeDone" class="btn primary full">完成定型 · 前往投擲　→</button>`;
+   const wheel=$('wheelPad');wheel.addEventListener('pointerdown',e=>{e.preventDefault();wheel.setPointerCapture(e.pointerId);shapeDragging=true;lastAngle=pointerAngle(e,wheel)});
+   wheel.addEventListener('pointermove',e=>{if(!shapeDragging||S.phase!=='shape')return;e.preventDefault();const a=pointerAngle(e,wheel);let d=a-lastAngle;if(d>Math.PI)d-=TAU;if(d<-Math.PI)d+=TAU;lastAngle=a;if(d>0&&d<1.3){S.shape=clamp(S.shape+d/TAU*.38,0,1.65);S.shake=Math.min(.4,S.shake+.012);updateWheel();}});
+   const stop=()=>{shapeDragging=false};wheel.addEventListener('pointerup',stop);wheel.addEventListener('pointercancel',stop);wheel.addEventListener('lostpointercapture',stop);
+   $('shapeDone').addEventListener('click',startAim);updateWheel();
+ }else if(ph==='aimX'||ph==='aimZ'){
+   const ax=ph==='aimX';ctl.innerHTML=`<div class="smallTitle">${ax?'第 1 步：左右方向':'第 2 步：投擲遠近'}</div><div id="aimTrack"><div id="aimPerfect"></div><div id="aimPointer"></div></div><button id="lockAim" class="btn primary full">${ax?'鎖定左右方向　→':'投擲！　↗'}</button><div class="underText">金色指針會快速來回移動，靠近中央越準</div>`;
+   $('lockAim').addEventListener('click',()=>{if(S.phase==='aimX'){S.aimX=aimPos;S.aimClock=0;phase('aimZ')}else{S.aimZ=aimPos;startFlight()}});
+ }
+}
 function pointerAngle(e,el){const r=el.getBoundingClientRect();return Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2));}
 function updateWheel(){const el=$('wheelRot');if(el)el.style.transform=`rotate(${S.shape/.38*360}deg)`;}
-function updateStats(){if(S.phase==='intro')return;const g=$('gramText'),d=$('densityText');if(g)g.textContent=fmt(S.powder);if(d)d.textContent=S.density.toFixed(2);if(S.phase==='fill'){$('roundMass').textContent=`本輪 ${fmt(S.roundGrams)} 克`;$('fillValue').style.width=(S.roundGrams/480*100).toFixed(2)+'%';$('compressBtn').disabled=S.roundGrams<45;}}
-function startPress(){if(S.roundGrams<45)return;pouring=false;S.qteClock=0;S.qteCenter=rnd(.32,.68);S.qteSpeed=1.4+Math.min(2.8,S.round*.19);phase('press');}
-function finishPress(){if(S.phase!=='press')return;const deviation=Math.abs(qtePos-S.qteCenter);const score=clamp(1-deviation/.38,0,1);let label,loss,gain;if(deviation<=.024){label='PERFECT！';loss=0;gain=.40}else if(deviation<=.072){label='GREAT！';loss=4;gain=.29}else if(deviation<=.14){label='GOOD！';loss=10;gain=.20}else if(deviation<=.24){label='BAD…';loss=23;gain=.10}else{label='MISS！';loss=42;gain=.035}
- S.totalPressed++;S.hp=clamp(S.hp-loss,0,100);S.broken=S.hp<=0;S.density=clamp(S.density+gain*(1+Math.log1p(S.round)*.16),.3,9.99);S.power=latentPower(1);S.shake=.85;S.compressT=1;S.compressMode=label;S.particles=[];toast(label+(S.broken?'　外殼破裂！':''),S.broken?1500:1100);phase('decide');}
+function updateStats(){if(S.phase==='intro')return;
+ const g=$('gramText'),d=$('densityText');if(g)g.textContent=fmt(S.powder);if(d)d.textContent=S.density.toFixed(2);
+ const b=$('pressBtn'),shape=$('shapeBtn');if(S.phase==='fill'&&b)b.disabled=S.powder<15;
+ if(S.phase==='fill'&&shape)shape.disabled=S.powder<15;
+}
+function startPress(){if(S.phase!=='fill'||S.powder<15)return;pouring=false;
+ S.qteClock=0;S.qteCenter=rnd(.30,.70);S.qteSpeed=1.4+Math.min(2.8,(S.totalPressed+1)*.19);phase('press');}
+function finishPress(){if(S.phase!=='press')return;
+ const deviation=Math.abs(qtePos-S.qteCenter);let label,loss,gain;
+ if(deviation<=.024){label='PERFECT！';loss=0;gain=.40}
+ else if(deviation<=.072){label='GREAT！';loss=4;gain=.29}
+ else if(deviation<=.14){label='GOOD！';loss=10;gain=.20}
+ else if(deviation<=.24){label='BAD…';loss=23;gain=.10}
+ else{label='MISS！';loss=42;gain=.035}
+ // Diminishing returns on repeatedly pressing an unchanged load, but extra presses are always possible.
+ const repeat=Math.max(0,S.totalPressed-S.lastPourPress);
+ gain*=Math.max(.42,1-repeat*.10);
+ S.totalPressed++;S.round=S.totalPressed+1;S.hp=clamp(S.hp-loss,0,100);S.broken=S.hp<=0;
+ S.density=clamp(S.density+gain*(1+Math.log1p(S.round)*.13),.3,9.99);
+ S.shake=.85;S.compressT=1;S.compressMode=label;S.particles=[];
+ if(S.broken){S.spillTime=0;startShape();toast(`${label}　外殼損壞！強制進入定型！`,2200)}
+ else{phase('fill');toast(`${label}　桶內火藥下降，可以繼續裝填／壓實`,1250)}
+}
+function triggerOverflow(){if(S.phase!=='fill')return;
+ pouring=false;S.spillTime=1.55;S.shake=1.2;startShape();
+ toast('⚠ 火藥滿出來造成危險！強制進入定型！',3100);
+}
 function startShape(){S.shape=0;S.shapeTarget=rnd(.88,1.07)+Math.min(.13,S.round*.009);phase('shape')}
-function latentPower(shaping){return S.powder*Math.pow(1.32,S.totalPressed)*S.density*(S.broken?.55:1)*shaping;}
-function startAim(){// Pure game score, hidden and reserved for future explosion gameplay.
- const closeness=Math.abs(S.shape-S.shapeTarget);S.shapeQuality=Math.max(.08,1/(1+Math.pow(closeness/.23,2)));S.power=latentPower(S.shapeQuality);S.aimClock=0;phase('aimX');}
+function startAim(){// Play-only quality score. Hidden from the player.
+ const closeness=Math.abs(S.shape-S.shapeTarget);S.shapeQuality=Math.max(.08,1/(1+Math.pow(closeness/.23,2)));S.aimClock=0;phase('aimX');}
 function startFlight(){S.phase='flight';S.throwT=0;S.shotX=(S.aimX-.5)*18;S.shotZ=5+(1-S.aimZ)*24;S.shotRot=rnd(-3,3);S.shake=.25;renderHUD();}
 function endFlight(){phase('end');const lateral=S.shotX;const forward=S.shotZ;const dist=Math.hypot(lateral,forward);const off=Math.hypot(lateral,forward-17);$('distVal').textContent=dist.toFixed(1)+' m';$('missVal').textContent=off.toFixed(1)+' m';$('finalVal').textContent=`${fmt(S.powder)} 克 · ${S.density.toFixed(2)}`;$('endHeading').textContent=off<2.2?'正中目標！':off<5?'很接近了！':'手榴彈已落地！';$('endDesc').textContent='本次投擲測試完成。爆炸、建築破壞和地標圖鑑將在下一階段製作。';$('endOverlay').classList.add('show');}
-function boot(){reset();$('startBtn').addEventListener('click',()=>{$('intro').style.display='none';S.phase='fill';S.round=1;S.roundGrams=0;phase('fill')});$('retryBtn').addEventListener('click',()=>{reset();$('intro').style.display='none';S.phase='fill';phase('fill')});$('restart').addEventListener('click',()=>{if(confirm('要重新開始這次訓練嗎？'))reset()});window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden)pouring=false});resize();requestAnimationFrame(loop)}
+function boot(){reset();$('startBtn').addEventListener('click',()=>{$('intro').style.display='none';S.phase='fill';S.round=1;phase('fill')});$('retryBtn').addEventListener('click',()=>{reset();$('intro').style.display='none';S.phase='fill';phase('fill')});$('restart').addEventListener('click',()=>{if(confirm('要重新開始這次訓練嗎？'))reset()});cv.addEventListener('pointerdown',e=>{
+ if(S.phase!=='press')return;
+ const bw=Math.min(W*.55,222),bx=W*.5-bw*.5,by=H*.5-73;
+ if(e.clientX>=bx-9&&e.clientX<=bx+bw+9&&e.clientY>=by-40&&e.clientY<=by+55){e.preventDefault();finishPress()}
+});window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden)pouring=false});resize();requestAnimationFrame(loop)}
 function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=Math.max(1,window.innerWidth);H=Math.max(1,window.innerHeight);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0)}
 function rr(x,y,w,h,r,fill,stroke,lw=1){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
 function line(x1,y1,x2,y2,color,width=2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
@@ -116,10 +177,10 @@ function drawWorkshop(t){const cy=H*.50;let bg=ctx.createLinearGradient(0,0,0,H)
  for(let x=px-spread+28;x<px+spread-18;x+=43){ellipse(x,cy-181,3,3,'#26382f','#a4b7a085',1)}
  const pressY=cy-157+(S.phase==='press'||S.compressT>0?Math.sin(t*7)*3+S.compressT*8:0);
  rr(px-41,pressY,82,20,5,colorGrad(0,pressY,0,pressY+21,'#a2aaa0','#3c5441'),'#d8dfc34d',2);rr(px-19,pressY-13,38,17,4,'#63756b','#cedbbe58',2);
- if(S.phase==='fill'){
+ if(S.phase==='fill'||S.phase==='press'||S.spillTime>0){
  // hopper and falling powder
  rr(px-41,cy-232,82,30,4,'#495c51','#d5dcc058',2);ctx.beginPath();ctx.moveTo(px-35,cy-204);ctx.lineTo(px+35,cy-204);ctx.lineTo(px+12,cy-177);ctx.lineTo(px-12,cy-177);ctx.closePath();ctx.fillStyle='#b3ab6c';ctx.fill();rr(px-10,cy-181,20,16,3,'#a8aa7c');
- if(pouring){for(let i=0;i<21;i++){const y=(t*240+i*29)%62;const x=px+Math.sin(i*81)*8;ellipse(x,cy-161+y,1.5+i%3,2.5,'#e3d091c5')}}
+ if(pouring||S.spillTime>0){for(let i=0;i<34;i++){const y=(t*260+i*19)%90;const x=px+Math.sin(i*81)*10;ellipse(x,cy-165+y,1.2+i%3,2.2,'#e3d091dc')}}
  }
  // side light panel
  let x=px-spread+29;if(W>350){rr(x,cy-144,63,33,5,'#0b2a1e','#aec79354',1);ctx.font='bold 9px system-ui';ctx.textAlign='center';ctx.fillStyle='#b4deae';ctx.fillText('MFG-01',x+31,cy-131);ctx.fillStyle=S.broken?'#e6a173':'#85d3a5';ctx.fillText(S.broken?'FAULT':'READY',x+31,cy-118)}
@@ -127,6 +188,27 @@ function drawWorkshop(t){const cy=H*.50;let bg=ctx.createLinearGradient(0,0,0,H)
  ellipse(px,cy+107,114,17,'#06180cb0');
  const shape=['shape','aimX','aimZ','flight','end'].includes(S.phase)?S.shape:0;
  drawCan(px,cy+32,shape,t,1);
+ // Powder spill clearly pours over the two sides of the barrel when the player overfills it.
+ if(S.spillTime>0){
+   const a=clamp(S.spillTime/.8,0,1);ctx.save();ctx.globalAlpha=a;
+   for(let side of [-1,1])for(let i=0;i<28;i++){
+     const flow=(t*135+i*16)%140;
+     const x=px+side*(74+Math.abs(Math.sin(i*7.17))*24)+side*flow*.28;
+     const y=cy-112+flow;
+     ellipse(x,y,(i%3)+1.6,(i%2)+2.5,i%3===0?'#f8dea0':'#d5b873');
+   }ctx.restore();
+ }
+ if(S.phase==='press'){
+   const bw=Math.min(W*.55,222),bx=px-bw/2,by=cy-73;
+   rr(bx-9,by-40,bw+18,95,12,'#0c201ae6','#f2d28b9b',2);
+   ctx.textAlign='center';ctx.font='900 13px system-ui';ctx.fillStyle='#ffe4a5';ctx.fillText('抓準時機！點這裡壓實',px,by-17);
+   rr(bx,by-6,bw,32,8,'#1e3929','#d2dcb288',1);
+   rr(bx+bw*(S.qteCenter-.075),by-5,bw*.15,30,2,'#e4e9a45f','#e8eebe',1);
+   rr(bx+bw*(S.qteCenter-.018),by-5,bw*.036,30,2,'#dae8a2aa');
+   rr(bx+bw*qtePos-2.5,by-9,5,38,3,'#fff6d6');
+   ctx.font='bold 11px system-ui';ctx.fillStyle='#f8e9c2';ctx.fillText('PERFECT 區域',px,by+43);
+ }
+
  // foreground edge
  rr(0,py+22,W,Math.max(0,H-py-20),0,colorGrad(0,py,0,H,'#172b21','#0c1b15'));
  line(0,py+22,W,py+22,'#acc7a043',3);
@@ -141,13 +223,28 @@ function drawCan(px,base,t,tm,sc=1){ctx.save();ctx.translate(px+Math.sin(tm*23)*
  if(p>.59){ctx.globalAlpha=clamp((p-.59)*4,0,1);ctx.strokeStyle='#bac7aa';ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(15,y+3);ctx.lineTo(38,y-15);ctx.lineTo(51,y+19);ctx.stroke();ctx.globalAlpha=1}
  // main body shape, top becomes rounded shoulder toward grenade
  ctx.beginPath();ctx.moveTo(-radiusTop,y+11);ctx.bezierCurveTo(-rad-bulge,y+height*.12,-rad-bulge,y+height*.76,-rad*.66,bottom-7);ctx.quadraticCurveTo(0,bottom+7,rad*.66,bottom-7);ctx.bezierCurveTo(rad+bulge,y+height*.76,rad+bulge,y+height*.12,radiusTop,y+11);ctx.quadraticCurveTo(0,y-13,-radiusTop,y+11);ctx.closePath();ctx.fillStyle=bodyGradient;ctx.fill();ctx.strokeStyle='#11271f';ctx.lineWidth=4;ctx.stroke();
- ctx.save();ctx.clip();const rows=p>.42?5:3;const cols=p>.56?5:3;
+ ctx.save();ctx.clip();
+ // Visible fictional powder with granules, using a game-only barrel-fill ratio.
+ if((S.phase==='fill'||S.phase==='press'||(S.phase==='shape'&&S.spillTime>0))&&S.powder>0){
+   const fill=clamp(powderLevel(),0,1.03);
+   const innerBottom=bottom-7,innerTop=y+24,fillY=innerBottom-(innerBottom-innerTop)*fill;
+   const powderG=ctx.createLinearGradient(0,fillY,0,innerBottom);
+   powderG.addColorStop(0,'#d9be74');powderG.addColorStop(.43,'#bda368');powderG.addColorStop(1,'#766b42');
+   ctx.fillStyle=powderG;ctx.beginPath();ctx.moveTo(-rad-18,innerBottom+20);ctx.lineTo(-rad-18,fillY+5);
+   ctx.quadraticCurveTo(-rad*.48,fillY-4,0,fillY+5);ctx.quadraticCurveTo(rad*.5,fillY+13,rad+18,fillY+5);
+   ctx.lineTo(rad+18,innerBottom+20);ctx.closePath();ctx.fill();
+   ctx.strokeStyle='#f4d991aa';ctx.lineWidth=2;
+   ctx.beginPath();ctx.moveTo(-rad-6,fillY+5);ctx.quadraticCurveTo(0,fillY+2,rad+6,fillY+5);ctx.stroke();
+   ctx.fillStyle='#f5d9957a';
+   for(let i=0;i<83;i++){
+     const gx=-rad+(Math.sin(i*12.183+4)*.5+.5)*rad*2;
+     const gy=fillY+11+((i*29)%138)/138*Math.max(0,innerBottom-fillY-19);
+     if(gy<innerBottom-2){ctx.beginPath();ctx.arc(gx,gy,i%3===0?1.7:.9,0,TAU);ctx.fill()}
+   }
+ }
+ const rows=p>.42?5:3;const cols=p>.56?5:3;
  for(let i=1;i<rows;i++){const q=i/rows,yy=y+18+(bottom-y-34)*q;ctx.beginPath();ctx.moveTo(-rad-24,yy);ctx.quadraticCurveTo(0,yy+7*p,rad+24,yy);ctx.strokeStyle=`rgba(21,45,30,${.39+.14*p})`;ctx.lineWidth=3.3;ctx.stroke();ctx.beginPath();ctx.moveTo(-rad,yy-3);ctx.lineTo(rad,yy-3);ctx.strokeStyle='#a8b99420';ctx.lineWidth=1;ctx.stroke()}
  if(p>.40){ctx.globalAlpha=clamp((p-.4)*2.7,0,1);for(let i=1;i<cols;i++){const xx=-rad+2*rad*i/cols;ctx.beginPath();ctx.moveTo(xx*.81,y+12);ctx.bezierCurveTo(xx*1.09,y+height*.29,xx*1.12,y+height*.7,xx*.74,bottom);ctx.strokeStyle='#263c2d';ctx.lineWidth=3.8;ctx.stroke()}ctx.globalAlpha=1}
- // powder fill line visible through stylized inspection window, not blueprint
- if(S.phase==='fill'||S.phase==='press'||S.phase==='decide'){
- rr(-34,y+height*.24,68,9,3,'#1b3326d9','#bed59d42');rr(-30,y+height*.26,60*clamp(S.roundGrams/480,0,1),5,2,'#efc77a');
- }
  ctx.restore();
  // top ellipse lip, becomes grenade shoulder
  ellipse(0,y+9,radiusTop,10-5*p,'#6f8964','#c2d3b06b',2.2);
@@ -183,11 +280,17 @@ function sceneField(t){const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorSto
 function drawDummy(x,y,c,i){ctx.save();ctx.translate(x,y);ctx.fillStyle='#102d22a8';ellipse(4,10,14,7);rr(-7,-1,14,17,3,c,'#173d29',1);ellipse(0,-6,8,7,c,'#193929',1);line(-6,11,-10,20,'#1c3325',3);line(6,11,10,20,'#1c3325',3);ctx.restore()}
 function render(t){ctx.clearRect(0,0,W,H);if(['aimX','aimZ','flight','end'].includes(S.phase))sceneField(t);else drawWorkshop(t);}
 function loop(ms){const t=ms/1000,dt=Math.min(.055,lastT?t-lastT:0);lastT=t;rafTime=t;
- if(pouring&&S.phase==='fill'){let add=Math.min(480-S.roundGrams,dt*(158+Math.min(120,S.round*9)));if(add>0){if(S.powder===0)S.density=.6;S.roundGrams+=add;S.powder+=add;S.density=clamp(S.density-dt*.038,.4,9.99)}else pouring=false;updateStats()}
- if(S.phase==='press'){S.qteClock+=dt;const v=Math.asin(Math.sin(S.qteClock*S.qteSpeed*2.3))/Math.PI+.5;qtePos=clamp(v,0,1);const el=$('qteNeedle');if(el)el.style.left=(qtePos*100)+'%'}
+ if(pouring&&S.phase==='fill'){
+   // This is an abstract visual fill system for the game, not real powder compaction data.
+   const add=dt*(180+Math.min(110,S.totalPressed*9));
+   S.powder+=add;S.lastPourPress=S.totalPressed;
+   updateStats();
+   if(powderLevel()>=1){triggerOverflow()}
+ }
+ if(S.phase==='press'){S.qteClock+=dt;const v=Math.asin(Math.sin(S.qteClock*S.qteSpeed*2.3))/Math.PI+.5;qtePos=clamp(v,0,1)}
  if(S.phase==='aimX'||S.phase==='aimZ'){S.aimClock+=dt;aimPos=(Math.sin(S.aimClock*(S.phase==='aimX'?5.3:6.6)-1.25)+1)/2;const el=$('aimPointer');if(el)el.style.left=(aimPos*100)+'%'}
  if(S.phase==='flight'){S.throwT+=dt;if(S.throwT>1.6)endFlight()}
- if(S.compressT>0)S.compressT=Math.max(0,S.compressT-dt*1.7);if(S.shake>0)S.shake=Math.max(0,S.shake-dt*.94);
+ if(S.compressT>0)S.compressT=Math.max(0,S.compressT-dt*1.7);if(S.shake>0)S.shake=Math.max(0,S.shake-dt*.94);if(S.spillTime>0)S.spillTime=Math.max(0,S.spillTime-dt);
  if(toastClock&&ms>toastClock){$('toast').classList.remove('show');toastClock=0}
  render(t);requestAnimationFrame(loop)}
 boot();
