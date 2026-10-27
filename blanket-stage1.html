@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
 <meta name="theme-color" content="#203229" />
-<title>豆腐干棉被｜第一、二階段：水火刷洗＋記憶開折 v0.7</title>
+<title>豆腐干棉被｜第一、二階段：水火刷洗＋記憶開折 v0.8</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f6f6e8;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -35,7 +35,11 @@ body{display:flex;justify-content:center;align-items:center}
 #folds{transition:opacity .24s ease}
 #wetShine,#wetBlotches,#charBlotches,#ashes,#flameFx,#waterFx,#smokeFx,#steamFx,#puddle,#drips,#puffLines{transition:opacity .18s linear}
 #waterFx,#flameFx,#steamFx,#smokeFx,#puddle,#ashes,#drips,#charBlotches,#wetBlotches{pointer-events:none}
-#dirtLayer .trash,#dirtLayer .stain{transition:opacity .16s linear}
+#dirtLayer .trash,#dirtLayer .stain{transition:opacity .15s linear}
+#dirtLayer .trash{pointer-events:none;will-change:transform}
+#moldLayer{pointer-events:none;transition:opacity .25s ease}
+#moldLayer .mushroom{transition:transform .24s ease}
+#scene,#scrubArea{touch-action:none}
 #scrubArea{pointer-events:all;cursor:grab}
 #scrubArea.scrubbing{cursor:grabbing}
 #scrubFx circle{transition:opacity .22s linear}
@@ -97,25 +101,25 @@ body{display:flex;justify-content:center;align-items:center}
 /* Standalone second stage: memorise an outline for one second, then draw it from memory. */
 .next-stage{width:100%;margin-top:10px;padding:9px 13px;background:linear-gradient(135deg,#83a45d,#537e55);border:1px solid #cfefaa80;border-radius:12px;color:#fcffeb;font:inherit;font-size:14px;font-weight:900;min-height:40px;cursor:pointer;touch-action:manipulation}
 .next-stage:active{filter:brightness(1.2)}
-#memoryOverlay{position:absolute;inset:0;width:100%;height:100%;max-width:580px;margin:auto;touch-action:none;z-index:4;pointer-events:auto;overscroll-behavior:none}
+#memoryOverlay{position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;margin:0;touch-action:none;z-index:20;pointer-events:auto;overscroll-behavior:none;background:#14251f}
 #drawingSurface{pointer-events:all;cursor:crosshair}
 #memoryTarget,#memoryGhost,#memoryInk,#memorySplash{pointer-events:none}
-.stage2-info{position:absolute;z-index:9;left:14px;right:14px;top:calc(130px + env(safe-area-inset-top));text-align:center;padding:9px 12px;border-radius:16px;background:#14231ddf;border:1px solid #b5c7ab75;box-shadow:0 8px 20px #07140b70}
+.stage2-info{position:fixed;z-index:23;left:12px;right:12px;top:calc(6px + env(safe-area-inset-top));text-align:center;padding:8px 11px;border-radius:14px;background:#14231de0;border:1px solid #b5c7ab75;box-shadow:0 8px 20px #07140b45;pointer-events:none}
 .memory-round{font-weight:900;font-size:14px;color:#f4ecd0;letter-spacing:1px}
 .memory-instruction{margin-top:5px;font-size:15px;font-weight:800;color:#e3f7e1}
 .scores-mini{font-size:12px;color:#b6d3be;margin-top:5px}
-.stage2-result{position:absolute;z-index:10;top:calc(65% - 85px);left:50%;transform:translateX(-50%);width:min(84%,320px);background:#0c1b17eb;border:1px solid #c4d9bda0;border-radius:18px;box-shadow:0 9px 34px #020905a8;text-align:center;padding:16px 13px;pointer-events:none}
+.stage2-result{position:fixed;z-index:24;top:calc(48% - 65px);left:50%;transform:translateX(-50%);width:min(84%,320px);background:#0c1b17f1;border:1px solid #c4d9bda0;border-radius:18px;box-shadow:0 9px 34px #020905a8;text-align:center;padding:16px 13px;pointer-events:none}
 .result-title{font-size:32px;line-height:1.15;color:#fff0b5;font-weight:1000}
 .result-subtitle{margin-top:6px;font-size:13px;color:#d2e6d7}
-.stage2-controls{position:absolute;z-index:9;bottom:0;left:0;right:0;padding:13px 14px calc(15px + env(safe-area-inset-bottom));background:linear-gradient(180deg,transparent,#101a16ed 17%,#0a1310 70%)}
+.stage2-controls{position:fixed;z-index:24;bottom:0;left:0;right:0;padding:8px 14px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(180deg,transparent,#101a16e8 15%,#0a1310 70%)}
 .stage2-tip{font-size:12px;color:#d6e9d4;text-align:center;margin-bottom:9px}
 .stage2-buttons{display:grid;grid-template-columns:1fr 2fr;gap:10px}
 .stage2-buttons button{min-height:66px;border-radius:15px;font:inherit;font-weight:900;font-size:20px;touch-action:manipulation}
 .redraw-btn{background:#405a4d;color:#f2f6e7;border:1px solid #9daf9f74}
 .fold-btn{background:linear-gradient(145deg,#e8b969,#bb732e);color:#22190c;border:1px solid #ffe2a4}
 .fold-btn:disabled{filter:grayscale(.7);opacity:.53}
-@media(max-height:730px){.stage2-info{top:calc(100px + env(safe-area-inset-top));padding:6px 9px}.memory-instruction{font-size:13px}.stage2-buttons button{min-height:56px}.stage2-controls{padding-top:6px}.stage2-result{top:58%}}
-@media(max-width:410px){.stage2-info{left:10px;right:10px;top:calc(128px + env(safe-area-inset-top));padding:7px 9px}.stage2-result{width:82%}}
+@media(max-height:730px){.stage2-info{top:calc(4px + env(safe-area-inset-top));padding:6px 9px}.memory-instruction{font-size:13px}.stage2-buttons button{min-height:56px}.stage2-controls{padding-top:6px}.stage2-result{top:45%}}
+@media(max-width:410px){.stage2-info{left:10px;right:10px;top:calc(6px + env(safe-area-inset-top));padding:7px 9px}.stage2-result{width:82%}}
 </style>
 </head>
 <body>
@@ -205,19 +209,9 @@ body{display:flex;justify-content:center;align-items:center}
            <ellipse id="stain3" class="stain" cx="439" cy="334" rx="34" ry="16" transform="rotate(-11 439 334)"/>
            <ellipse id="stain4" class="stain" cx="250" cy="415" rx="30" ry="14" transform="rotate(21 250 415)"/>
          </g>
-         <g id="trashPieces">
-           <g id="trash1" class="trash" transform="translate(150 276) rotate(-18)"><rect x="-14" y="-9" width="28" height="18" rx="3" fill="#e7e1da" stroke="#9b8e84" stroke-width="2"/><path d="M-10 -3 Q0 7 10 -2" fill="none" stroke="#b1a39a" stroke-width="2"/></g>
-           <g id="trash2" class="trash" transform="translate(222 326) rotate(17)"><path d="M-12 0 L0 -12 L14 0 L3 13 Z" fill="#d7cb72" stroke="#8e8450" stroke-width="2"/><path d="M-8 1 L2 -9" stroke="#7c7542" stroke-width="1.5"/></g>
-           <g id="trash3" class="trash" transform="translate(287 293) rotate(11)"><rect x="-12" y="-6" width="24" height="12" rx="3" fill="#c76a6f" stroke="#87484a" stroke-width="2"/><path d="M-7 -6 L-10 -11 M7 6 L10 11" stroke="#f0c9cc" stroke-width="2" stroke-linecap="round"/></g>
-           <g id="trash4" class="trash" transform="translate(354 341) rotate(-22)"><circle cx="0" cy="0" r="10" fill="#90af72" stroke="#4b6945" stroke-width="2"/><path d="M-6 3 Q0 -6 6 2" fill="none" stroke="#4b6945" stroke-width="2"/></g>
-           <g id="trash5" class="trash" transform="translate(440 293) rotate(9)"><path d="M-16 0 Q0 -11 16 0 Q0 11 -16 0Z" fill="#e6ecef" stroke="#9ca5a8" stroke-width="2"/><path d="M-8 0 H8" stroke="#b9c0c4" stroke-width="2"/></g>
-           <g id="trash6" class="trash" transform="translate(490 350) rotate(23)"><rect x="-11" y="-11" width="22" height="22" rx="4" fill="#91bdd2" stroke="#537889" stroke-width="2"/><circle cx="0" cy="0" r="4" fill="#dfeff7"/></g>
-           <g id="trash7" class="trash" transform="translate(402 399) rotate(-17)"><path d="M-13 -5 L13 -5 L9 8 L-9 8 Z" fill="#e7c55f" stroke="#9c8240" stroke-width="2"/><path d="M-6 -8 H6" stroke="#e7c55f" stroke-width="4" stroke-linecap="round"/></g>
-           <g id="trash8" class="trash" transform="translate(198 393) rotate(31)"><ellipse cx="0" cy="0" rx="11" ry="7" fill="#7eb26c" stroke="#46724a" stroke-width="2"/><path d="M-6 0 Q0 -7 6 0" fill="none" stroke="#46724a" stroke-width="1.5"/></g>
-           <g id="trash9" class="trash" transform="translate(302 437) rotate(-9)"><path d="M-13 -8 H13 V8 H-13 Z" fill="#ddd1c5" stroke="#9f9387" stroke-width="2"/><path d="M-9 -4 Q0 4 8 -3" fill="none" stroke="#b7a89d" stroke-width="2"/></g>
-           <g id="trash10" class="trash" transform="translate(468 410) rotate(11)"><path d="M-10 -10 L10 10 M10 -10 L-10 10" stroke="#c9b566" stroke-width="4" stroke-linecap="round"/></g>
-         </g>
+         <g id="trashPieces"></g>
        </g>
+       <g id="moldLayer" opacity="0"><g id="moldSpots"></g><g id="moldMushrooms"></g></g>
        <g id="charBlotches"><ellipse cx="317" cy="316" rx="81" ry="67" fill="url(#burnGradient)"/><ellipse cx="439" cy="371" rx="90" ry="63" fill="url(#burnGradient)"/><ellipse cx="185" cy="376" rx="63" ry="52" fill="url(#burnGradient)"/></g>
        <g id="dryDust"><path d="M133 270 Q229 244 346 262" stroke="#e7d3a4" stroke-opacity=".7" stroke-width="4" fill="none"/><path d="M184 352Q283 330 391 350" stroke="#e3d9b7" stroke-opacity=".5" stroke-width="3" fill="none"/></g>
      </g>
@@ -312,14 +306,7 @@ body{display:flex;justify-content:center;align-items:center}
    <g id="steamFx" stroke="#b5d8d9" stroke-opacity=".6" stroke-width="5" fill="none" stroke-linecap="round"><path d="M265 262Q241 236 273 219Q303 196 282 170"/><path d="M350 244Q332 213 362 190"/></g>
    <g id="smokeFx" stroke="#b8bbba" stroke-opacity=".65" stroke-width="10" fill="none" stroke-linecap="round"><path d="M285 261Q261 241 279 211Q304 186 291 166"/><path d="M347 255Q328 213 354 193Q381 166 368 139"/><path d="M425 280Q408 257 435 228Q447 214 438 186"/></g>
   </svg>
-  <svg id="memoryOverlay" viewBox="0 0 640 560" aria-label="依照記憶用手指描出剛才的白色封閉線條" hidden>
-    <rect id="drawingSurface" x="70" y="200" width="505" height="255" rx="20" fill="#0a1718" fill-opacity=".28" />
-    <path id="memoryTarget" fill="none" stroke="#fff9e7" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0" filter="url(#traceGlow)" />
-    <path id="memoryGhost" fill="none" stroke="#fff3b0" stroke-width="5" stroke-opacity=".92" stroke-dasharray="10 8" stroke-linecap="round" stroke-linejoin="round" hidden />
-    <path id="memoryInk" fill="none" stroke="#7cf3ea" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
-    <text id="memorySplash" x="320" y="186" font-size="23" font-weight="900" text-anchor="middle" fill="#fff8dc" paint-order="stroke" stroke="#19302a" stroke-width="6"></text>
-    <defs><filter id="traceGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-  </svg>
+
  </div>
  <div class="stage2-info" id="stage2Info" hidden>
    <div class="memory-round" id="roundLabel">第 1 / 3 題</div>
@@ -337,9 +324,17 @@ body{display:flex;justify-content:center;align-items:center}
      <button class="fold-btn" id="foldBtn" type="button" disabled>開折</button>
    </div>
  </div>
- <div class="state" id="stage1State" aria-live="polite"><div class="state-name"><span id="stateName">蓬鬆乾爽</span><span class="state-tag" id="stateTag">軍綠棉被</span></div><div class="state-desc" id="stateDesc">一開始棉被會很髒很亂。先灑水弄濕，再直接在棉被上來回猛刷，把整堆垃圾和髒污刷掉。</div><button id="nextStageBtn" class="next-stage" type="button">下一階段：記憶折線 <span aria-hidden="true">→</span></button></div>
+ <div class="state" id="stage1State" aria-live="polite"><div class="state-name"><span id="stateName">蓬鬆乾爽</span><span class="state-tag" id="stateTag">軍綠棉被</span></div><div class="state-desc" id="stateDesc">先灑水，再用手指把每個垃圾往床邊掃出去。濕太久還會發霉長香菇！</div><button id="nextStageBtn" class="next-stage" type="button">下一階段：記憶折線 <span aria-hidden="true">→</span></button></div>
  <div class="controls" id="stage1Controls"><button id="waterBtn" class="tool water" type="button"><span>💧</span><div>灑水<small>長按持續加水</small></div></button><button id="fireBtn" class="tool fire" type="button"><span>🔥</span><div>打火機<small>長按烘乾 / 燒焦</small></div></button></div>
 </div>
+  <svg id="memoryOverlay" viewBox="0 0 390 844" preserveAspectRatio="none" aria-label="全螢幕記憶折線畫布" hidden>
+    <rect id="drawingSurface" x="0" y="0" width="390" height="844" fill="transparent" />
+    <path id="memoryTarget" fill="none" stroke="#fffaf0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0" filter="url(#traceGlow)" />
+    <path id="memoryGhost" fill="none" stroke="#fff3b0" stroke-width="4" stroke-opacity=".92" stroke-dasharray="10 8" stroke-linecap="round" stroke-linejoin="round" hidden />
+    <path id="memoryInk" fill="none" stroke="#7cf3ea" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+    <text id="memorySplash" x="195" y="142" font-size="16" font-weight="900" text-anchor="middle" fill="#fff8dc" paint-order="stroke" stroke="#19302a" stroke-width="6"></text>
+    <defs><filter id="traceGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  </svg>
 <script>
 (()=>{'use strict';
   const $=id=>document.getElementById(id);
@@ -357,54 +352,121 @@ body{display:flex;justify-content:center;align-items:center}
   let moisture=32,burn=0,dirt=82,ash=false,action=null,last=performance.now(),lastRender=0;
   let stage=1;
   let scrubbing=false,lastScrubPoint=null,scrubAccum=0;
-  const dirtPieces=Array.from(document.querySelectorAll('#trashPieces .trash'));
+  const trashRoot=$('trashPieces');
+  let trashObjects=[],trashInitial=1,dirtyStart=100,grimeProgress=0,brushSeconds=0;
   const dirtStains=Array.from(document.querySelectorAll('#dirtSmudges .stain'));
   const TRASH_NS='http://www.w3.org/2000/svg';
   function makeSvg(tag, attrs){ const el=document.createElementNS(TRASH_NS,tag); for(const [k,v] of Object.entries(attrs)) el.setAttribute(k,v); return el; }
-  function addExtraTrash(){
-    const trashRoot=$('trashPieces');
-    const presets=[
-      {t:'paper',x:172,y:248,r:-26,s:1.0},{t:'leaf',x:218,y:280,r:18,s:.9},{t:'cup',x:258,y:258,r:14,s:1.05},{t:'bag',x:322,y:246,r:-8,s:1.0},
-      {t:'wrapper',x:392,y:260,r:21,s:1.05},{t:'paper',x:450,y:253,r:-18,s:.92},{t:'leaf',x:494,y:286,r:33,s:1.12},{t:'cup',x:131,y:333,r:-14,s:1.0},
-      {t:'bag',x:201,y:346,r:25,s:1.05},{t:'wrapper',x:270,y:326,r:-21,s:.98},{t:'paper',x:338,y:351,r:17,s:.9},{t:'cup',x:405,y:347,r:-27,s:1.08},
-      {t:'leaf',x:476,y:337,r:11,s:1.0},{t:'bag',x:160,y:394,r:23,s:1.05},{t:'wrapper',x:229,y:405,r:-14,s:1.0},{t:'paper',x:360,y:403,r:7,s:.95},
-      {t:'cup',x:426,y:393,r:-24,s:1.03},{t:'leaf',x:505,y:404,r:29,s:.88}
-    ];
-    for(const [idx,p] of presets.entries()){
-      const g=makeSvg('g',{class:'trash extra-trash',id:`extraTrash${idx+1}`,transform:`translate(${p.x} ${p.y}) rotate(${p.r}) scale(${p.s})`});
-      if(p.t==='paper'){
-        g.appendChild(makeSvg('rect',{x:-13,y:-9,width:26,height:18,rx:3,fill:'#ece2d6',stroke:'#aa9889','stroke-width':2}));
-        g.appendChild(makeSvg('path',{d:'M-9 -2 Q0 7 9 -1',fill:'none',stroke:'#c3b2a2','stroke-width':2}));
-      } else if(p.t==='leaf'){
-        g.appendChild(makeSvg('ellipse',{cx:0,cy:0,rx:11,ry:7,fill:'#7eb26c',stroke:'#46724a','stroke-width':2}));
-        g.appendChild(makeSvg('path',{d:'M-6 0 Q0 -7 6 0',fill:'none',stroke:'#46724a','stroke-width':1.5}));
-      } else if(p.t==='cup'){
-        g.appendChild(makeSvg('rect',{x:-11,y:-11,width:22,height:22,rx:4,fill:'#91bdd2',stroke:'#537889','stroke-width':2}));
-        g.appendChild(makeSvg('circle',{cx:0,cy:0,r:4,fill:'#dfeff7'}));
-      } else if(p.t==='bag'){
-        g.appendChild(makeSvg('path',{d:'M-14 -9 H14 V9 H-14 Z',fill:'#d86a75',stroke:'#87484a','stroke-width':2}));
-        g.appendChild(makeSvg('path',{d:'M-8 -9 L-11 -14 M8 9 L11 14',stroke:'#f0c9cc','stroke-width':2,'stroke-linecap':'round'}));
-      } else if(p.t==='wrapper'){
-        g.appendChild(makeSvg('path',{d:'M-16 0 Q0 -11 16 0 Q0 11 -16 0Z',fill:'#efe6a2',stroke:'#a79346','stroke-width':2}));
-        g.appendChild(makeSvg('path',{d:'M-8 0 H8',stroke:'#c2b35e','stroke-width':2}));
-      }
-      trashRoot.appendChild(g);
-      dirtPieces.push(g);
+  // Each speck is its own SVG object, with coordinates and a real swept-away lifecycle.
+  // No global fade-out based on the dirt meter. A piece disappears only after it
+  // is physically brushed off the blanket's edge.
+  function randomShape(type,g){
+    function child(tag,props){const el=makeSvg(tag,props);g.appendChild(el);return el;}
+    const samples={
+      paper:()=>{child('path',{d:'M-16 -10 L11 -12 L15 8 L-12 11 Z',fill:'#f3eee2',stroke:'#ada392','stroke-width':2});child('path',{d:'M-10 -3L5 -5M-9 3L10 2',fill:'none',stroke:'#b8b3a9','stroke-width':1.3});},
+      wrapper:()=>{child('path',{d:'M-17 -8 L-11 -13 L11 -8 L17 0 L10 11 L-15 7 Z',fill:['#ffd35d','#fa888c','#9ce2fc','#f8eeee'][Math.floor(Math.random()*4)],stroke:'#796e6b','stroke-width':1.8});child('path',{d:'M-11 -4 L10 4M-7 5L11 -2',fill:'none',stroke:'#ffffff9c','stroke-width':1.3});},
+      leaf:()=>{child('path',{d:'M-14 6 Q-9 -12 12 -9 Q12 5 -5 11Z',fill:['#c1aa59','#94aa54','#916a42'][Math.floor(Math.random()*3)],stroke:'#534f31','stroke-width':1.8});child('path',{d:'M-15 8 L11 -8',stroke:'#51492e','stroke-width':1.7});},
+      tissue:()=>{child('path',{d:'M-15 -9 Q0 -16 14 -7 Q8 4 14 11 Q-2 6 -13 12Z',fill:'#f5f4ea',stroke:'#c4c4b2','stroke-width':1.5});child('path',{d:'M-8 -7Q0 1 7 -4',stroke:'#b9bdb0',fill:'none','stroke-width':1.4});},
+      bottle:()=>{child('rect',{x:-6,y:-17,width:12,height:29,rx:3,fill:'#7dcde0',stroke:'#3d7a8e','stroke-width':2});child('rect',{x:-4,y:-22,width:8,height:7,rx:1.5,fill:'#2f87a6'});child('rect',{x:-6,y:-2,width:12,height:9,fill:'#e8f6f3'});},
+      cup:()=>{child('path',{d:'M-12 -11 L12 -11 L8 13 L-8 13Z',fill:'#e3bc76',stroke:'#a27b53','stroke-width':2});child('ellipse',{cx:0,cy:-11,rx:12,ry:4.5,fill:'#5d4e41',stroke:'#f4ddc4','stroke-width':2});child('path',{d:'M7 -12L16 -23',stroke:'#d9d9cc','stroke-width':2});},
+      carton:()=>{child('path',{d:'M-13 -11 L11 -11 L16 10 L-11 12Z',fill:'#cb8763',stroke:'#754b37','stroke-width':2});child('path',{d:'M-12 -11L3 0L15 -10M3 0V11',stroke:'#fff0ce','stroke-width':1.8,fill:'none'});},
+      sock:()=>{child('path',{d:'M-8 -19 L7 -19 L7 -3 Q7 6 16 7 L15 15 Q-2 18 -8 5Z',fill:'#ddd8c4',stroke:'#766f63','stroke-width':2});child('path',{d:'M-7 -15H7',stroke:'#99a78c','stroke-width':3});},
+      noodle:()=>{child('path',{d:'M-15 2 Q-10 -12 1 -3 Q10 9 15 -6 M-13 -7Q-5 11 7 9 Q17 8 12 3',fill:'none',stroke:'#dfc37a','stroke-width':3.5,'stroke-linecap':'round'});},
+      mud:()=>{child('path',{d:'M-14 -4 Q-11 -14 1 -11 Q15 -8 15 2 Q14 15 0 11 Q-13 13 -14 -4Z',fill:'#6b4d35',stroke:'#4e382a','stroke-width':1.8});child('circle',{cx:-5,cy:-3,r:2.2,fill:'#987451'});}
+    }; samples[type]();
+  }
+  function blanketBoundary(y){
+    const t=clamp((y-240)/190,0,1);
+    return {left:120-36*t,right:488+51*t};
+  }
+  function onBlanket(x,y,pad=0){
+    if(y<222-pad||y>436+pad)return false;
+    const b=blanketBoundary(y);
+    return x>=b.left-pad&&x<=b.right+pad;
+  }
+  function rerollDirt(){
+    dirt=Math.round(85+Math.random()*15);dirtyStart=dirt;
+    grimeProgress=0;brushSeconds=0;trashObjects=[];trashRoot.replaceChildren();
+    const types=['paper','wrapper','leaf','tissue','bottle','cup','carton','sock','noodle','mud'];
+    const count=Math.round(185+Math.random()*35); trashInitial=count;
+    for(let i=0;i<count;i++){
+      const y=235+Math.random()*188,b=blanketBoundary(y);
+      const x=b.left+11+Math.random()*(b.right-b.left-22);
+      const deg=Math.random()*360,scale=.56+Math.random()*.69;
+      const group=makeSvg('g',{class:'trash',transform:`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${deg.toFixed(1)}) scale(${scale.toFixed(2)})`});
+      randomShape(types[Math.floor(Math.random()*types.length)],group);
+      trashRoot.appendChild(group);
+      trashObjects.push({x,y,deg,scale,el:group,removed:false});
     }
   }
-  addExtraTrash();
-  const dry=hex('#aaa979'),fresh=hex('#7f995f'),wet=hex('#3e775e'),soggy=hex('#315f59');
+  function syncDirty(){
+    const left=trashObjects.reduce((n,p)=>n+(!p.removed?1:0),0);
+    const target=dirtyStart*(.78*left/trashInitial + .22*(1-grimeProgress));
+    // No instant vanishing; a very fast player still needs sustained brushing.
+    dirt=Math.max(0, Math.min(100, Math.max(target, dirtyStart-11*brushSeconds)));
+    if(left===0&&grimeProgress>=1&&brushSeconds>=dirtyStart/11)dirt=0;
+  }
+  function distToSegment(px,py,ax,ay,bx,by){
+    const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy||1;
+    const t=clamp(((px-ax)*dx+(py-ay)*dy)/l,0,1);
+    return Math.hypot(px-(ax+dx*t),py-(ay+dy*t));
+  }
+  function sweepTrash(a,b){
+    const dx=b.x-a.x,dy=b.y-a.y,travel=Math.hypot(dx,dy);
+    if(travel<1||moisture<38)return;
+    const strength=Math.min(travel,76);
+    for(const obj of trashObjects){
+      if(obj.removed)continue;
+      const distance=distToSegment(obj.x,obj.y,a.x,a.y,b.x,b.y);
+      if(distance>35)continue;
+      const proximity=1-distance/35;
+      const factor=(.55+proximity*.95)*(strength/travel);
+      // Every object moves separately in the direction of the finger stroke.
+      obj.x+=dx*factor;obj.y+=dy*factor;
+      obj.deg+=dx*.09+dy*.04;
+      if(!onBlanket(obj.x,obj.y,-3)){
+        obj.removed=true;obj.el.style.opacity='0';obj.el.setAttribute('transform',`translate(${obj.x.toFixed(1)} ${obj.y.toFixed(1)}) rotate(${obj.deg.toFixed(1)}) scale(${obj.scale})`);
+      }else{
+        obj.el.setAttribute('transform',`translate(${obj.x.toFixed(1)} ${obj.y.toFixed(1)}) rotate(${obj.deg.toFixed(1)}) scale(${obj.scale})`);
+      }
+    }
+    grimeProgress=clamp(grimeProgress+Math.min(travel,70)/15500,0,1);
+    // Brush travel is capped so moving one finger across the entire screen
+    // in one event cannot wash the whole blanket instantly.
+    brushSeconds+=Math.min(travel,70)/460;
+    syncDirty();
+  }
+  function makeMold(){
+    const spots=$('moldSpots'),shrooms=$('moldMushrooms');
+    const locations=[[150,288],[255,271],[360,296],[450,322],[218,373],[329,395],[473,390],[119,361],[397,247],[303,326],[516,371],[192,424]];
+    locations.forEach(([x,y],i)=>{
+      const patch=makeSvg('ellipse',{cx:x,cy:y,rx:24+(i%3)*10,ry:11+(i%4)*5,fill:i%2?'#315a3c':'#537c49','fill-opacity':'.7'});
+      spots.appendChild(patch);
+      if(i<10){
+        const g=makeSvg('g',{class:'mushroom',transform:`translate(${x} ${y}) scale(0.001)`});
+        g.appendChild(makeSvg('path',{d:'M-4 1Q-6 -6 -2 -20 L5 -20 Q8 -6 5 2Z',fill:'#e1dcc4',stroke:'#8c947a','stroke-width':1.2}));
+        g.appendChild(makeSvg('path',{d:'M-19 -17 Q-14 -36 0 -34 Q13 -34 19 -17 Q0 -10 -19 -17Z',fill:['#d69a61','#f1dbb6','#a7b984'][i%3],stroke:'#596247','stroke-width':1.7}));
+        g.appendChild(makeSvg('circle',{cx:-5,cy:-24,r:2.5,fill:'#f5e8d9'}));
+        g.appendChild(makeSvg('circle',{cx:5,cy:-26,r:2.1,fill:'#eeeadd'}));
+        shrooms.appendChild(g);
+      }
+    });
+  }
+  makeMold();
+  let moldAge=0;
+  const dry=hex('#7d9d66'),fresh=hex('#83a66e'),wet=hex('#3e775e'),soggy=hex('#315f59');
   const burnt=hex('#aa723d'),char=hex('#353532');
   function state(){
     if(ash)return ['灰燼','被子消失','你把整張棉被燒成灰了！這個狀態無法再用水恢復，只能重新開始。'];
     if(burn>=67)return ['焦黑冒煙','燒焦','大塊布料已經焦黑冒煙，快燒成灰了。'];
     if(burn>=24)return ['焦黃捲曲','危險','邊角乾裂發黃，表面出現明顯焦斑。再烤會變成焦炭。'];
-    if(moisture<8)return ['乾到發脆','極乾','顏色變淡發黃，棉被又硬又挺，碰到火很容易焦。'];
+    if(moisture===0&&burn===0&&dirt===0)return ['完美軍綠','乾淨','完全乾燥、沒有燒焦、沒有垃圾，漂亮的軍綠色棉被。'];
+    if(moisture<8)return ['乾到發脆','極乾','水分完全烘乾，棉被變得比較挺。繼續用火才會燒焦。'];
     if(moisture<23)return ['偏乾硬挺','乾','水分不足，表面泛黃、皺摺變得硬邦邦。'];
     if(moisture<44)return ['蓬鬆乾爽','正常','這才是正常的軍綠色棉被：有厚度、有皺摺，還算柔軟。'];
     if(moisture<65)return ['微濕滲水','微濕','棉被顏色變深，出現一塊塊不規則水痕。'];
-    if(moisture<85)return ['濕透滴水','全濕','棉被吸飽水，明顯變重下垂，側邊開始滴水。'];
-    return ['泡水軟爛','最濕','整張棉被浸滿水，濕得發亮，軟趴趴地攤在床上。'];
+    if(moisture<85)return ['濕透發霉','全濕','棉被吸飽水，開始長出綠色霉斑；濕得越久，小香菇會慢慢冒出來。'];
+    return ['泡水長香菇','最濕','整張棉被濕爛到開始長菇！霉斑、香菇越來越多，快變成軍中菇菇農場。'];
   }
   function update(){
     const m=moisture/100,b=burn/100, [name,tag,desc]=state();
@@ -421,6 +483,7 @@ body{display:flex;justify-content:center;align-items:center}
     let color=blend(dry,fresh,clamp(moisture/32,0,1));
     if(moisture>32)color=blend(fresh,wet,clamp((moisture-32)/45,0,1));
     if(moisture>77)color=blend(wet,soggy,clamp((moisture-77)/23,0,1));
+    if(moisture===0&&burn===0&&dirt===0)color=hex('#80a568');
     color=blend(color,burnt,clamp(burn/48,0,1));
     color=blend(color,char,clamp((burn-38)/52,0,1));
     // Four different light/dark tones keep the quilt volumetric in every state.
@@ -439,7 +502,7 @@ body{display:flex;justify-content:center;align-items:center}
     blanket.setAttribute('transform',`translate(${305*(1-scaleX)} ${330*(1-scaleY)+sag*12}) scale(${scaleX} ${scaleY})`);
     $('folds').setAttribute('opacity',String(.78+stiffness*.16-sag*.23));
     $('puffLines').setAttribute('opacity',String(.92-sag*.50));
-    $('dryDust').style.opacity=String(clamp((20-moisture)/16,0,1)*(1-clamp(burn/20,0,1)));
+    $('dryDust').style.opacity=String((moisture===0&&burn===0&&dirt===0)?0:clamp((20-moisture)/16,0,1)*(1-clamp(burn/20,0,1)));
     wetBlotches.style.opacity=String(clamp((moisture-37)/35,0,.72));
     wetShine.style.opacity=String(clamp((moisture-57)/43,0,.85));
     puddle.style.opacity=String(clamp((moisture-66)/34,0,1));
@@ -457,14 +520,16 @@ body{display:flex;justify-content:center;align-items:center}
     flameFx.style.opacity=String(action==='fire'&&!ash?clamp((72-moisture)/50,.18,.82):0);
     $('lighterFx').style.opacity=String(action==='fire'&&!ash?1:0);
     // Keep even burnt quilt visually textured, never pure black.
-    dirtPieces.forEach((el,i)=>{
-      const threshold=4 + i*4.2;
-      const vis=clamp((dirt-threshold)/18,0,1);
+    dirtStains.forEach((el,i)=>{
+      const vis=clamp((dirt-(i*3))/55,0,.95);
       el.style.opacity=String(vis);
     });
-    dirtStains.forEach((el,i)=>{
-      const vis=clamp((dirt-(i*6))/42,0,.95);
-      el.style.opacity=String(vis);
+    const mold=clamp((moisture-69)/24,0,1)*clamp((moldAge+.45)/3.2,0,1)*(ash?0:1);
+    $('moldLayer').style.opacity=String(mold);
+    Array.from($('moldMushrooms').children).forEach((g,i)=>{
+      const grow=clamp((mold*(1.75+i*.06)-.18-i*.035),0,1);
+      const loc=[[150,288],[255,271],[360,296],[450,322],[218,373],[329,395],[473,390],[119,361],[397,247],[303,326]][i];
+      g.setAttribute('transform',`translate(${loc[0]} ${loc[1]}) scale(${Math.max(.001,grow).toFixed(3)})`);
     });
     scrubArea.classList.toggle('scrubbing', scrubbing);
     firBtn.disabled=watBtn.disabled=ash;
@@ -493,17 +558,14 @@ body{display:flex;justify-content:center;align-items:center}
     if(stage!==1 || !scrubbing || ash) return;
     const pt=svgPoint(e);
     if(lastScrubPoint){
-      const dx=pt.x-lastScrubPoint.x, dy=pt.y-lastScrubPoint.y;
-      const dist=Math.hypot(dx,dy);
-      scrubAccum += dist;
-      if(moisture>=38 && dirt>0 && dist>0){
-        dirt = clamp(dirt - dist*0.0082, 0, 100);
-        addScrubFx(pt.x, pt.y);
+      const dist=Math.hypot(pt.x-lastScrubPoint.x,pt.y-lastScrubPoint.y);
+      if(moisture>=38 && dirt>0 && dist>1){
+        sweepTrash(lastScrubPoint,pt);
+        if(Math.random()<.7)addScrubFx(pt.x,pt.y);
       }
     }
     lastScrubPoint=pt;
-    update();
-    e.preventDefault();
+    update();e.preventDefault();
   }
   scrubArea.addEventListener('pointerdown',e=>{
     if(stage!==1 || ash) return;
@@ -548,25 +610,39 @@ body{display:flex;justify-content:center;align-items:center}
       // Moisture stops active combustion, but char marks do not vanish magically.
       if(burn>0)burn=clamp(burn-dt*2,0,100);
     }else if(which==='fire'){
+      const wasZero=moisture===0;
       moisture=clamp(moisture-dt*29);
-      if(moisture<20) burn=clamp(burn+dt*(moisture<6?29:13));
+      if(wasZero)burn=clamp(burn+dt*29);
     }
     if(burn>=99.7){burn=100;ash=true;setAction(null);}
   }
   bind(watBtn,'water');bind(firBtn,'fire');
   window.addEventListener('blur',()=>setAction(null));
-  function rerollDirt(){ dirt=Math.round(72 + Math.random()*28); }
-  $('reset').addEventListener('click',()=>{leaveStage2();moisture=32;burn=0;ash=false;rerollDirt();scrubbing=false;lastScrubPoint=null;setAction(null);update();});
-  function frame(now){const dt=Math.min((now-last)/1000,.05);last=now;if(action)step(action,dt);if(now-lastRender>60){update();lastRender=now;} requestAnimationFrame(frame);}
+  $('reset').addEventListener('click',()=>{leaveStage2();moisture=32;burn=0;ash=false;moldAge=0;rerollDirt();scrubbing=false;lastScrubPoint=null;setAction(null);update();});
+  function frame(now){const dt=Math.min((now-last)/1000,.05);last=now;if(action)step(action,dt);if(moisture>=70&&!ash)moldAge=Math.min(30,moldAge+dt);else moldAge=Math.max(0,moldAge-dt*1.8);if(now-lastRender>60){update();lastRender=now;} requestAnimationFrame(frame);}
   // Stage 2: one-second memory challenge; three independently generated outlines.
   const overlay=$('memoryOverlay'),memoryTarget=$('memoryTarget'),memoryGhost=$('memoryGhost'),memoryInk=$('memoryInk'),memorySplash=$('memorySplash');
   const roundLabel=$('roundLabel'),memoryInstruction=$('memoryInstruction'),scoresMini=$('scoresMini');
   const stage2Tip=$('stage2Tip'),stage2Result=$('stage2Result'),stage2ResultTitle=$('stage2ResultTitle'),stage2ResultSubtitle=$('stage2ResultSubtitle');
   const redrawBtn=$('redrawBtn'),foldBtn=$('foldBtn');
   let round=0,mode='idle',roundScores=[],targetPoints=[],drawPoints=[],lastDrawPointer=null,previewTimer=null,feedbackTimer=null;
-  const C={x:320,y:329}, TAU=Math.PI*2;
-  // SVG nodes do not reliably implement HTMLElement.hidden on mobile Safari.
-  const svgShow=(el,visible)=>{if(visible)el.removeAttribute('hidden');else el.setAttribute('hidden','');};
+  const TAU=Math.PI*2;
+  let canvasW=390,canvasH=844;
+  function fitMemoryCanvas(){
+    canvasW=Math.max(280,window.innerWidth); canvasH=Math.max(480,window.innerHeight);
+    overlay.setAttribute('viewBox',`0 0 ${canvasW} ${canvasH}`);
+    $('drawingSurface').setAttribute('width',String(canvasW));
+    $('drawingSurface').setAttribute('height',String(canvasH));
+    memorySplash.setAttribute('x',String(canvasW/2));
+    memorySplash.setAttribute('y',String(Math.round(canvasH*.14)));
+    const unit=Math.max(3,Math.min(canvasW,canvasH)/90);
+    memoryTarget.setAttribute('stroke-width',String(unit));
+    memoryGhost.setAttribute('stroke-width',String(unit*.75));
+    memoryInk.setAttribute('stroke-width',String(unit));
+    // Do not generate new target when resizing in the middle of a round.
+  }
+  window.addEventListener('resize',()=>{if(stage===2)fitMemoryCanvas();});
+  const svgHide=(el,hide)=>el.toggleAttribute('hidden',Boolean(hide));
   function clearStageTimers(){if(previewTimer!==null)clearTimeout(previewTimer);if(feedbackTimer!==null)clearTimeout(feedbackTimer);previewTimer=feedbackTimer=null;}
   function buildOutline(n){
     // Round difficulty grows: larger number of bends in the enclosed white outline.
@@ -580,7 +656,10 @@ body{display:flex;justify-content:center;align-items:center}
     return template.map(v=>{
       const a=v.a*TAU+turn;
       const ratio=v.r*(.89+Math.random()*.21);
-      return {x:C.x+Math.cos(a)*135*ratio,y:C.y+Math.sin(a)*71*ratio};
+      // Full display area: roughly 75% screen width, 60-70% screen height,
+      // comparable to a full-screen phone drawing app.
+      return {x:canvasW*.5+Math.cos(a)*canvasW*.36*ratio,
+              y:canvasH*.50+Math.sin(a)*canvasH*.34*ratio};
     });
   }
   function polyPath(points,close){
@@ -595,7 +674,7 @@ body{display:flex;justify-content:center;align-items:center}
   function showScoreSummary(){
     const avg=Math.round(roundScores.reduce((a,b)=>a+b,0)/3);
     mode='done';lastDrawPointer=null;
-    svgShow(memoryTarget,false);svgShow(memoryGhost,false);svgShow(memoryInk,false);
+    svgHide(memoryTarget,true);svgHide(memoryGhost,true);svgHide(memoryInk,true);
     memorySplash.textContent='挑戰完成！';
     roundLabel.textContent='三次開折結束';
     memoryInstruction.textContent='三次的貼合分數已經結算';
@@ -615,7 +694,7 @@ body{display:flex;justify-content:center;align-items:center}
     mode='preview';drawPoints=[];lastDrawPointer=null;
     targetPoints=buildOutline(round);
     memoryTarget.setAttribute('d',polyPath(targetPoints,true));
-    svgShow(memoryTarget,true);svgShow(memoryGhost,false);svgShow(memoryInk,true);memoryInk.setAttribute('d','');
+    svgHide(memoryTarget,false);svgHide(memoryGhost,true);svgHide(memoryInk,false);memoryInk.setAttribute('d','');
     stage2Result.hidden=true;
     memorySplash.textContent='記住這條白線！';
     roundLabel.textContent=`第 ${round+1} / 3 題`;
@@ -626,24 +705,24 @@ body{display:flex;justify-content:center;align-items:center}
     previewTimer=setTimeout(()=>{
       if(stage!==2 || mode!=='preview')return;
       previewTimer=null;mode='draw';
-      svgShow(memoryTarget,false);memorySplash.textContent='輪到你了！';
+      svgHide(memoryTarget,true);memorySplash.textContent='輪到你了！';
       memoryInstruction.textContent='憑記憶畫出剛才的封閉線條';
-      stage2Tip.textContent='直接在棉被上畫線，畫好按「開折」';
+      stage2Tip.textContent='直接在滿版畫布上畫線，畫好按「開折」';
       redrawBtn.disabled=false;
     },1000);
   }
   function startStage2(){
-    stage=2;setAction(null);scrubbing=false;
+    stage=2;setAction(null);scrubbing=false;fitMemoryCanvas();
     round=0;roundScores=[];drawPoints=[];clearStageTimers();
     $('stage1Meters').hidden=true;$('stage1State').hidden=true;$('stage1Controls').hidden=true;
     $('stageSubtitle').textContent='第二階段｜白線記憶開折（共 3 次）';
-    svgShow(overlay,true);$('stage2Info').hidden=false;$('stage2Controls').hidden=false;
+    svgHide(overlay,false);$('stage2Info').hidden=false;$('stage2Controls').hidden=false;
     redrawBtn.textContent='重畫';
     startRound();
   }
   function leaveStage2(){
     clearStageTimers();stage=1;mode='idle';lastDrawPointer=null;
-    svgShow(overlay,false);$('stage2Info').hidden=true;$('stage2Controls').hidden=true;stage2Result.hidden=true;
+    svgHide(overlay,true);$('stage2Info').hidden=true;$('stage2Controls').hidden=true;stage2Result.hidden=true;
     $('stage1Meters').hidden=false;$('stage1State').hidden=false;$('stage1Controls').hidden=false;
     $('stageSubtitle').textContent='第一階段｜棉被乾濕度、焦化與刷洗';
   }
@@ -680,8 +759,9 @@ body{display:flex;justify-content:center;align-items:center}
     if(!T.length||!U.length)return 0;
     const tDist=T.map(p=>nearestDistance(p,U)),uDist=U.map(p=>nearestDistance(p,T));
     const mean=(tDist.reduce((a,b)=>a+b,0)/T.length + uDist.reduce((a,b)=>a+b,0)/U.length)/2;
-    const coverage=tDist.filter(d=>d<25).length/T.length;
-    const detail=clamp(1-mean/70,0,1);
+    const tol=Math.max(20,Math.min(canvasW,canvasH)*.063);
+    const coverage=tDist.filter(d=>d<tol).length/T.length;
+    const detail=clamp(1-mean/(tol*2.8),0,1);
     const tLen=length(targetPoints,true),uLen=length(drawPoints,false);
     const lenQuality=Math.exp(-1.55*Math.abs(Math.log(Math.max(1,uLen)/tLen)));
     const closure=clamp(1-Math.hypot(drawPoints[0].x-drawPoints.at(-1).x,drawPoints[0].y-drawPoints.at(-1).y)/100,0,1);
@@ -720,7 +800,7 @@ body{display:flex;justify-content:center;align-items:center}
     if(mode==='done'){round=0;roundScores=[];redrawBtn.textContent='重畫';startRound();return;}
     if(mode!=='draw'||foldBtn.disabled)return;
     const score=similarity();roundScores.push(score);mode='feedback';lastDrawPointer=null;
-    svgShow(memoryTarget,false);memoryGhost.setAttribute('d',polyPath(targetPoints,true));svgShow(memoryGhost,true);
+    svgHide(memoryTarget,true);memoryGhost.setAttribute('d',polyPath(targetPoints,true));svgHide(memoryGhost,false);
     stage2ResultTitle.textContent=`${score} 分`;
     stage2ResultSubtitle.textContent=round===2?'三次開折完成！':'白色虛線是正確形狀；青色是你畫的';
     stage2Result.hidden=false;
@@ -731,7 +811,7 @@ body{display:flex;justify-content:center;align-items:center}
     foldBtn.disabled=true;redrawBtn.disabled=true;
     feedbackTimer=setTimeout(()=>{feedbackTimer=null;round++;startRound();},1900);
   });
-  window.__blanketStageDebug=()=>({stage,round,mode,roundScores:[...roundScores],previewVisible:!memoryTarget.hasAttribute('hidden'),drawPoints:drawPoints.length,moisture,burn,dirt,ash,action,scrubbing,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
+  window.__blanketStageDebug=()=>({stage,round,mode,roundScores:[...roundScores],previewVisible:!memoryTarget.hasAttribute('hidden'),drawPoints:drawPoints.length,moisture,burn,dirt,trashRemaining:trashObjects.filter(o=>!o.removed).length,trashInitial,moldAge,ash,action,scrubbing,canvasW,canvasH,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
   rerollDirt();
   update();requestAnimationFrame(frame);
 })();
