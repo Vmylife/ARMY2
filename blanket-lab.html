@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#19251d">
-<title>豆腐干棉被｜自由軟布試玩 v0.2</title>
+<title>豆腐干棉被｜自由厚棉被試玩 v0.3</title>
 <style>
   :root{color-scheme:dark;font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -27,7 +27,7 @@
 </head>
 <body>
 <canvas id="scene" aria-label="可自由抓取任一角或布面並任意摺疊、拖下平台的軟棉被"></canvas>
-<div class="top"><div class="heading"><h1>豆腐干棉被</h1><small>一角一角慢慢拉，想怎麼折都可以</small></div><button id="reset" type="button">重新攤開</button></div>
+<div class="top"><div class="heading"><h1>豆腐干棉被</h1><small>稍微厚一點的軟被子，想怎麼折都可以</small></div><button id="reset" type="button">重新攤開</button></div>
 <div class="status" id="status" role="status" aria-live="polite"></div>
 <div class="bottom"><div class="tips"><span>抓角落拉起</span><span>長按被面抓布</span><span>輕滑推整</span><span>拖下床會掉落</span></div></div>
 <script>
@@ -37,6 +37,8 @@ const status=document.getElementById('status');
 // Standalone Verlet fabric: every corner is a DIFFERENT free-moving particle.
 // No fold axis, mirrored corner, auto snapping, tabletop clamp, or canned poses.
 const NX=25,NZ=19,BW=2.18,BD=1.62;
+// Light quilt fill, not a thick mattress: about 6.5cm edge, physical folded-layer spacing.
+const QUILT_THICKNESS=.065;
 const TABLE={xmin:-1.245,xmax:1.245,zmin:-.96,zmax:.96};
 const FLOOR=-.94,TOP=.054,H=1/60;
 const particles=[],springs=[],quads=[],edge=[];
@@ -56,8 +58,10 @@ function reset(){
  const phase=Math.random()*Math.PI*2;
  for(let j=0;j<NZ;j++)for(let i=0;i<NX;i++){
   const u=i/(NX-1),v=j/(NZ-1);
-  const ripple=.014*Math.sin(i*.76+j*.27+phase)+.011*Math.cos(i*.33-j*.74);
-  const x=(u-.5)*BW+.012*Math.sin(v*11+phase),z=(v-.5)*BD+.014*Math.sin(u*9+phase),y=TOP+.034+ripple;
+  const ripple=.018*Math.sin(i*.53+j*.29+phase)+.012*Math.cos(i*.30-j*.46);
+  // A few gently stuffed quilt sections, without a flat rigid sheet surface.
+  const puff=.012*Math.sin(u*Math.PI*5)**2*Math.sin(v*Math.PI*4)**2;
+  const x=(u-.5)*BW+.012*Math.sin(v*11+phase),z=(v-.5)*BD+.014*Math.sin(u*9+phase),y=TOP+.038+ripple+puff;
   particles.push({id:at(i,j),i,j,x,y,z,px:x,py:y,pz:z,shade:Math.sin(i*1.51+j*.83)});
  }
  for(let j=0;j<NZ;j++)for(let i=0;i<NX;i++){
@@ -128,18 +132,20 @@ function capTarget(g){
  // Finger motion shifts the grabbed point freely in XY on the table and above it.
  // Dragging toward the top of the screen lifts the fold; gravity remains active everywhere else.
  const deltaX=(g.cur.x-g.start.x)/scale,deltaY=(g.cur.y-g.start.y)/scale;
- const freeX=g.origin.x+deltaX-deltaY*.18;
- const freeZ=g.origin.z+deltaY/.82;
+ // Finger displacement acts on ONLY the held particle. Keep height under
+ // control; the previous unrestricted 2.3m lift turned cloth into a tall flag.
+ const freeX=g.origin.x+deltaX-deltaY*.20;
+ const freeZ=g.origin.z+deltaY/.76;
  const amount=Math.hypot(deltaX,deltaY);
- const lift=.13+Math.min(.86,amount*.43)+Math.max(0,-deltaY)*.12;
- g.goal={x:clamp(freeX,-3.5,3.5),y:clamp(g.origin.y+lift,-.5,2.3),z:clamp(freeZ,-2.8,2.8)};
+ const lift=.035+Math.min(.64,amount*.43)+Math.max(0,-deltaY)*.06;
+ g.goal={x:clamp(freeX,-3.0,3.0),y:clamp(g.origin.y+lift,-.4,.84),z:clamp(freeZ,-2.55,2.55)};
 }
 function movePin(g){
  if(!g||g.mode!=='hold')return;
  capTarget(g);
  const p=particles[g.id];
  // Slight grip inertia is crucial: a real corner drags the surrounding material behind it.
- const rate=.36;
+ const rate=.26;
  p.x+=(g.goal.x-p.x)*rate;p.y+=(g.goal.y-p.y)*rate;p.z+=(g.goal.z-p.z)*rate;
  p.px=p.x;p.py=p.y;p.pz=p.z;
 }
@@ -147,7 +153,10 @@ function constraints(){
  for(const s of springs){const a=particles[s.a],b=particles[s.b],dx=b.x-a.x,dy=b.y-a.y,dz=b.z-a.z;
   const len=Math.hypot(dx,dy,dz)||.000001;
   // Soft compression, strong tensile limit. The blanket can bunch and collapse.
-  let stretch=len-s.rest;if(stretch<0)stretch*=.04;
+  let stretch=len-s.rest;
+  // Real filled cloth cannot collapse to zero area like a string. Maintain
+  // moderate compression resistance but allow folds to stack in 3-D.
+  if(stretch<0)stretch*=.23;
   const amt=(stretch/len)*s.stiff*.50;
   const gx=dx*amt,gy=dy*amt,gz=dz*amt;
   const af=drag&&drag.mode==='hold'&&drag.id===a.id?0:1,bf=drag&&drag.mode==='hold'&&drag.id===b.id?0:1;
@@ -180,23 +189,31 @@ function selfCollision(){
    const a=hash.get(xx+','+zz);if(!a)continue;
    for(const q of a){if(q.id<=p.id||Math.abs(p.i-q.i)<3&&Math.abs(p.j-q.j)<3)continue;
     const dx=q.x-p.x,dz=q.z-p.z,planar=Math.hypot(dx,dz);
-    if(planar>.075||Math.abs(p.y-q.y)>.10)continue;
-    let delta=.09-Math.abs(p.y-q.y);if(delta<=0)continue;
+    if(planar>.070||Math.abs(p.y-q.y)>QUILT_THICKNESS*1.3)continue;
+    const delta=QUILT_THICKNESS*1.08-Math.abs(p.y-q.y);
+    if(delta<=0)continue;
     const sign=p.y<=q.y?-1:1;
     const pinP=drag&&drag.mode==='hold'&&drag.id===p.id,pinQ=drag&&drag.mode==='hold'&&drag.id===q.id;
-    if(!pinP)p.y+=sign*delta*.28;
-    if(!pinQ)q.y-=sign*delta*.28;
+    // Previous-frame positions must move too, or repeated layer separation
+    // becomes perpetual upward acceleration (the spiky umbrella bug).
+    const shift=delta*.27;
+    if(!pinP){p.y+=sign*shift;p.py+=sign*shift;}
+    if(!pinQ){q.y-=sign*shift;q.py-=sign*shift;}
    }
   }
  }
 }
 function tick(dt){
- const damp=Math.pow(.975,dt*60);
+ const damp=Math.pow(.936,dt*60);
  for(const p of particles){
   if(drag&&drag.mode==='hold'&&drag.id===p.id)continue;
-  let vx=(p.x-p.px)*damp,vy=(p.y-p.py)*damp,vz=(p.z-p.pz)*damp;
+  // Collision and rapid drags must not inject unlimited velocity into Verlet.
+  // Without a speed limit the whole quilt degenerates into a vertical spike.
+  const vx=clamp((p.x-p.px)*damp,-.042,.042),
+        vy=clamp((p.y-p.py)*damp,-.072,.055),
+        vz=clamp((p.z-p.pz)*damp,-.042,.042);
   p.px=p.x;p.py=p.y;p.pz=p.z;
-  p.x+=vx;p.y+=vy-6.6*dt*dt;p.z+=vz;
+  p.x+=vx;p.y+=vy-7.3*dt*dt;p.z+=vz;
  }
  // Quick stroking nudges nearby cloth; long press physically pins only ONE point.
  if(drag&&drag.mode==='brush'&&drag.moved){
@@ -216,7 +233,7 @@ function tick(dt){
 function clothSides(front){
  // A soft quilt has a visible stuffed edge rather than the zero-thickness edge of a sheet.
  // Off-platform edges hang with the particles; they are NEVER snapped to the mattress.
- const thickness=.043;
+ const thickness=QUILT_THICKNESS;
  for(let k=0;k<edge.length;k++){
   const a=particles[edge[k]],b=particles[edge[(k+1)%edge.length]];
   const isFront=(a.z+b.z)*.5>-.03;
@@ -236,16 +253,28 @@ function drawCloth(){
   const a=f.quad.map(i=>particles[i]),pp=a.map(q=>P(q.x,q.z,q.y));
   const gradient=(a[1].y+a[2].y-a[0].y-a[3].y)*.55;
   const slope=(a[2].y+a[3].y-a[0].y-a[1].y)*.54;
-  const light=clamp(47+gradient*210-slope*120+Math.sin(f.n*.3)*1.1,32,65);
+  const light=clamp(48+gradient*135-slope*85+Math.sin(f.n*.27)*.55,40,59);
   polygon(pp,`hsl(${99+f.n%4} 25% ${light}%)`);
   if(f.n%8===0){ctx.save();ctx.beginPath();ctx.moveTo((pp[0].x+pp[3].x)*.5,(pp[0].y+pp[3].y)*.5);
    ctx.lineTo((pp[1].x+pp[2].x)*.5,(pp[1].y+pp[2].y)*.5);ctx.strokeStyle='#e0e4c318';ctx.lineWidth=.65;ctx.stroke();ctx.restore();}
  }
  clothSides(true);
- ctx.save();outline(edge.map(i=>{const q=particles[i];return P(q.x,q.z,q.y)}));ctx.closePath();ctx.strokeStyle='#2c422f';ctx.lineWidth=2.2;ctx.lineJoin='round';ctx.stroke();
- ctx.setLineDash([4,4]);ctx.strokeStyle='#cbdbb47d';ctx.lineWidth=1;ctx.stroke();ctx.restore();
- ctx.save();ctx.strokeStyle='#142e1e24';ctx.lineWidth=.7;
- for(let j=4;j<NZ;j+=5){const a=[];for(let i=0;i<NX;i++)a.push(P(particles[at(i,j)].x,particles[at(i,j)].z,particles[at(i,j)].y));outline(a);ctx.stroke();}ctx.restore();
+ // Draw independent hem segments instead of a single self-crossing outline:
+ // a fully crumpled quilt used to produce ugly black rings and zigzag artifacts.
+ ctx.save();ctx.lineJoin='round';ctx.lineCap='round';ctx.strokeStyle='#375039b0';ctx.lineWidth=1.35;
+ for(let k=0;k<edge.length;k++){
+  const a=particles[edge[k]],b=particles[edge[(k+1)%edge.length]];
+  const q=P(a.x,a.z,a.y),r=P(b.x,b.z,b.y);
+  ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(r.x,r.y);ctx.stroke();
+ }
+ ctx.strokeStyle='#cad8aa55';ctx.lineWidth=.65;
+ for(let k=0;k<edge.length;k+=2){
+  const a=particles[edge[k]],b=particles[edge[(k+1)%edge.length]],q=P(a.x,a.z,a.y),r=P(b.x,b.z,b.y);
+  ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(r.x,r.y);ctx.stroke();
+ }
+ ctx.restore();
+ ctx.save();ctx.strokeStyle='#d7ebbf12';ctx.lineWidth=.7;
+ for(let j=5;j<NZ;j+=6){const a=[];for(let i=0;i<NX;i++)a.push(P(particles[at(i,j)].x,particles[at(i,j)].z,particles[at(i,j)].y));outline(a);ctx.stroke();}ctx.restore();
 }
 function drawGrab(){
  if(!drag){if(!showHelp)return;for(const id of [at(0,0),at(NX-1,0),at(NX-1,NZ-1),at(0,NZ-1)]){
@@ -257,7 +286,8 @@ function drawGrab(){
  ctx.beginPath();ctx.arc(drag.cur.x,drag.cur.y,13,0,Math.PI*2);ctx.strokeStyle='#f8ebae90';ctx.lineWidth=1.5;ctx.stroke();
 }
 function frame(time){
- let elapsed=clamp((time-last)/1000,0,.055);last=time;lag+=elapsed;clock+=elapsed;
+ let elapsed=clamp((time-last)/1000,0,.055);last=time;
+ lag=Math.min(lag+elapsed,H*3);clock+=elapsed;
  let count=0;while(lag>=H&&count++<3){tick(H);lag-=H;}
  ctx.clearRect(0,0,width,height);drawRoom();drawCloth();drawGrab();
  if(statusUntil&&time>statusUntil){statusUntil=0;status.classList.remove('show');}
@@ -300,7 +330,8 @@ window.__blanketDebug=()=>({
   corners:[at(0,0),at(NX-1,0),at(NX-1,NZ-1),at(0,NZ-1)].map(id=>{const p=particles[id];return {world:{x:p.x,y:p.y,z:p.z},screen:P(p.x,p.z,p.y)};}),
   offBed:particles.filter(p=>p.x<TABLE.xmin||p.x>TABLE.xmax||p.z<TABLE.zmin||p.z>TABLE.zmax).length,
   fallen:particles.filter(p=>p.y<-.5).length,
-  center:particles[at(12,9)]
+  center:particles[at(12,9)],
+  bounds:particles.reduce((a,p)=>({minX:Math.min(a.minX,p.x),maxX:Math.max(a.maxX,p.x),minY:Math.min(a.minY,p.y),maxY:Math.max(a.maxY,p.y),minZ:Math.min(a.minZ,p.z),maxZ:Math.max(a.maxZ,p.z)}),{minX:99,maxX:-99,minY:99,maxY:-99,minZ:99,maxZ:-99})
 });
 reset();resize();requestAnimationFrame(frame);
 })();
