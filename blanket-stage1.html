@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
 <meta name="theme-color" content="#203229" />
-<title>豆腐干棉被｜第一階段：水火與清潔 v0.5</title>
+<title>豆腐干棉被｜第一階段：水火與髒污 v0.6</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f6f6e8;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -26,7 +26,7 @@ body{display:flex;justify-content:center;align-items:center}
 .progress{height:100%;width:32%;border-radius:100px;transition:width .10s linear}
 #waterProgress{background:linear-gradient(90deg,#adc68e,#659978,#4b83ae)}
 #burnProgress{width:0;background:linear-gradient(90deg,#d1b05f,#e67c37,#7d3e25,#202020)}
-#cleanProgress{width:55%;background:linear-gradient(90deg,#745134,#b58f53,#7aa86e,#4cb17c)}
+#dirtyProgress{width:82%;background:linear-gradient(90deg,#6f5a32,#a26b2d,#c16a36,#d84837)}
 .artframe{position:absolute;left:0;right:0;top:23%;height:52%;max-height:560px;min-height:300px;display:flex;justify-content:center;align-items:center;pointer-events:auto}
 #scene{width:100%;height:100%;max-width:580px;overflow:visible;filter:drop-shadow(0 10px 9px #07140b26)}
 .blanket{transform-origin:306px 331px;transition:transform .22s ease,opacity .24s ease;}
@@ -104,7 +104,7 @@ body{display:flex;justify-content:center;align-items:center}
   <div class="meters">
    <div class="meter"><div class="meter-label">💧 含水量 <strong id="waterValue">32%</strong></div><div class="track"><div class="progress" id="waterProgress"></div></div></div>
    <div class="meter"><div class="meter-label">🔥 焦化度 <strong id="burnValue">0%</strong></div><div class="track"><div class="progress" id="burnProgress"></div></div></div>
-   <div class="meter clean"><div class="meter-label">🧽 清潔度 <strong id="cleanValue">55%</strong></div><div class="track"><div class="progress" id="cleanProgress"></div></div></div>
+   <div class="meter clean"><div class="meter-label">🗑️ 髒亂度 <strong id="dirtyValue">82%</strong></div><div class="track"><div class="progress" id="dirtyProgress"></div></div></div>
   </div>
  </div>
  <div class="artframe">
@@ -289,14 +289,14 @@ body{display:flex;justify-content:center;align-items:center}
    <g id="smokeFx" stroke="#b8bbba" stroke-opacity=".65" stroke-width="10" fill="none" stroke-linecap="round"><path d="M285 261Q261 241 279 211Q304 186 291 166"/><path d="M347 255Q328 213 354 193Q381 166 368 139"/><path d="M425 280Q408 257 435 228Q447 214 438 186"/></g>
   </svg>
  </div>
- <div class="state" aria-live="polite"><div class="state-name"><span id="stateName">蓬鬆乾爽</span><span class="state-tag" id="stateTag">軍綠棉被</span></div><div class="state-desc" id="stateDesc">一開始棉被會隨機髒。先灑水弄濕，再直接在棉被上來回刷洗，把垃圾刷掉。</div></div>
+ <div class="state" aria-live="polite"><div class="state-name"><span id="stateName">蓬鬆乾爽</span><span class="state-tag" id="stateTag">軍綠棉被</span></div><div class="state-desc" id="stateDesc">一開始棉被會很髒很亂。先灑水弄濕，再直接在棉被上來回猛刷，把整堆垃圾和髒污刷掉。</div></div>
  <div class="controls"><button id="waterBtn" class="tool water" type="button"><span>💧</span><div>灑水<small>長按持續加水</small></div></button><button id="fireBtn" class="tool fire" type="button"><span>🔥</span><div>打火機<small>長按烘乾 / 燒焦</small></div></button></div>
 </div>
 <script>
 (()=>{'use strict';
   const $=id=>document.getElementById(id);
   const watBtn=$('waterBtn'),firBtn=$('fireBtn');
-  const waterLabel=$('waterValue'),burnLabel=$('burnValue'),cleanLabel=$('cleanValue'),waterBar=$('waterProgress'),burnBar=$('burnProgress'),cleanBar=$('cleanProgress');
+  const waterLabel=$('waterValue'),burnLabel=$('burnValue'),dirtyLabel=$('dirtyValue'),waterBar=$('waterProgress'),burnBar=$('burnProgress'),dirtyBar=$('dirtyProgress');
   const blanket=$('blanketGroup'),scene=$('scene'),scrubArea=$('scrubArea'),scrubFx=$('scrubFx'),waterFx=$('waterFx'),flameFx=$('flameFx'),steamFx=$('steamFx'),smokeFx=$('smokeFx'),wetBlotches=$('wetBlotches'),wetShine=$('wetShine'),charBlotches=$('charBlotches'),puddle=$('puddle'),drips=$('drips'),ashes=$('ashes');
   const stops=[$('fStop1'),$('fStop2'),$('fStop3'),$('fStop4')], edgeStops=[$('edgeStop1'),$('edgeStop2')];
   const clamp=(x,min=0,max=100)=>Math.min(max,Math.max(min,x));
@@ -306,10 +306,44 @@ body{display:flex;justify-content:center;align-items:center}
   const lerp=(a,b,t)=>a+(b-a)*t;
   const blend=(a,b,t)=>a.map((n,i)=>Math.round(lerp(n,b[i],clamp(t,0,1))));
   const rgb=a=>`rgb(${a[0]},${a[1]},${a[2]})`;
-  let moisture=32,burn=0,dirt=45,ash=false,action=null,last=performance.now(),lastRender=0;
+  let moisture=32,burn=0,dirt=82,ash=false,action=null,last=performance.now(),lastRender=0;
   let scrubbing=false,lastScrubPoint=null,scrubAccum=0;
   const dirtPieces=Array.from(document.querySelectorAll('#trashPieces .trash'));
   const dirtStains=Array.from(document.querySelectorAll('#dirtSmudges .stain'));
+  const TRASH_NS='http://www.w3.org/2000/svg';
+  function makeSvg(tag, attrs){ const el=document.createElementNS(TRASH_NS,tag); for(const [k,v] of Object.entries(attrs)) el.setAttribute(k,v); return el; }
+  function addExtraTrash(){
+    const trashRoot=$('trashPieces');
+    const presets=[
+      {t:'paper',x:172,y:248,r:-26,s:1.0},{t:'leaf',x:218,y:280,r:18,s:.9},{t:'cup',x:258,y:258,r:14,s:1.05},{t:'bag',x:322,y:246,r:-8,s:1.0},
+      {t:'wrapper',x:392,y:260,r:21,s:1.05},{t:'paper',x:450,y:253,r:-18,s:.92},{t:'leaf',x:494,y:286,r:33,s:1.12},{t:'cup',x:131,y:333,r:-14,s:1.0},
+      {t:'bag',x:201,y:346,r:25,s:1.05},{t:'wrapper',x:270,y:326,r:-21,s:.98},{t:'paper',x:338,y:351,r:17,s:.9},{t:'cup',x:405,y:347,r:-27,s:1.08},
+      {t:'leaf',x:476,y:337,r:11,s:1.0},{t:'bag',x:160,y:394,r:23,s:1.05},{t:'wrapper',x:229,y:405,r:-14,s:1.0},{t:'paper',x:360,y:403,r:7,s:.95},
+      {t:'cup',x:426,y:393,r:-24,s:1.03},{t:'leaf',x:505,y:404,r:29,s:.88}
+    ];
+    for(const [idx,p] of presets.entries()){
+      const g=makeSvg('g',{class:'trash extra-trash',id:`extraTrash${idx+1}`,transform:`translate(${p.x} ${p.y}) rotate(${p.r}) scale(${p.s})`});
+      if(p.t==='paper'){
+        g.appendChild(makeSvg('rect',{x:-13,y:-9,width:26,height:18,rx:3,fill:'#ece2d6',stroke:'#aa9889','stroke-width':2}));
+        g.appendChild(makeSvg('path',{d:'M-9 -2 Q0 7 9 -1',fill:'none',stroke:'#c3b2a2','stroke-width':2}));
+      } else if(p.t==='leaf'){
+        g.appendChild(makeSvg('ellipse',{cx:0,cy:0,rx:11,ry:7,fill:'#7eb26c',stroke:'#46724a','stroke-width':2}));
+        g.appendChild(makeSvg('path',{d:'M-6 0 Q0 -7 6 0',fill:'none',stroke:'#46724a','stroke-width':1.5}));
+      } else if(p.t==='cup'){
+        g.appendChild(makeSvg('rect',{x:-11,y:-11,width:22,height:22,rx:4,fill:'#91bdd2',stroke:'#537889','stroke-width':2}));
+        g.appendChild(makeSvg('circle',{cx:0,cy:0,r:4,fill:'#dfeff7'}));
+      } else if(p.t==='bag'){
+        g.appendChild(makeSvg('path',{d:'M-14 -9 H14 V9 H-14 Z',fill:'#d86a75',stroke:'#87484a','stroke-width':2}));
+        g.appendChild(makeSvg('path',{d:'M-8 -9 L-11 -14 M8 9 L11 14',stroke:'#f0c9cc','stroke-width':2,'stroke-linecap':'round'}));
+      } else if(p.t==='wrapper'){
+        g.appendChild(makeSvg('path',{d:'M-16 0 Q0 -11 16 0 Q0 11 -16 0Z',fill:'#efe6a2',stroke:'#a79346','stroke-width':2}));
+        g.appendChild(makeSvg('path',{d:'M-8 0 H8',stroke:'#c2b35e','stroke-width':2}));
+      }
+      trashRoot.appendChild(g);
+      dirtPieces.push(g);
+    }
+  }
+  addExtraTrash();
   const dry=hex('#aaa979'),fresh=hex('#7f995f'),wet=hex('#3e775e'),soggy=hex('#315f59');
   const burnt=hex('#aa723d'),char=hex('#353532');
   function state(){
@@ -326,16 +360,15 @@ body{display:flex;justify-content:center;align-items:center}
   function update(){
     const m=moisture/100,b=burn/100, [name,tag,desc]=state();
     $('stateName').textContent=name; $('stateTag').textContent=tag;
-    const clean=100-dirt;
     let fullDesc=desc;
-    if(!ash && dirt>8){
-      fullDesc += moisture>=38 ? ' 現在可以直接用手在棉被上來回刷洗。' : ' 先灑水把棉被弄濕，才能開始刷洗。';
+    if(!ash && dirt>6){
+      fullDesc += moisture>=38 ? ' 現在可以直接用手在棉被上來回猛刷，刷越久，髒亂度才會慢慢下降。' : ' 先灑水把棉被弄濕，才能開始刷洗。';
     } else if(!ash){
-      fullDesc += ' 棉被已經很乾淨了。';
+      fullDesc += ' 棉被已經刷得很乾淨了。';
     }
     $('stateDesc').textContent=fullDesc;
-    waterLabel.textContent=`${Math.round(moisture)}%`;burnLabel.textContent=`${Math.round(burn)}%`;cleanLabel.textContent=`${Math.round(clean)}%`;
-    waterBar.style.width=`${moisture}%`;burnBar.style.width=`${burn}%`;cleanBar.style.width=`${clean}%`;
+    waterLabel.textContent=`${Math.round(moisture)}%`;burnLabel.textContent=`${Math.round(burn)}%`;dirtyLabel.textContent=`${Math.round(dirt)}%`;
+    waterBar.style.width=`${moisture}%`;burnBar.style.width=`${burn}%`;dirtyBar.style.width=`${dirt}%`;
     let color=blend(dry,fresh,clamp(moisture/32,0,1));
     if(moisture>32)color=blend(fresh,wet,clamp((moisture-32)/45,0,1));
     if(moisture>77)color=blend(wet,soggy,clamp((moisture-77)/23,0,1));
@@ -376,12 +409,12 @@ body{display:flex;justify-content:center;align-items:center}
     $('lighterFx').style.opacity=String(action==='fire'&&!ash?1:0);
     // Keep even burnt quilt visually textured, never pure black.
     dirtPieces.forEach((el,i)=>{
-      const threshold=12 + i*7;
-      const vis=clamp((dirt-threshold)/22,0,1);
+      const threshold=4 + i*4.2;
+      const vis=clamp((dirt-threshold)/18,0,1);
       el.style.opacity=String(vis);
     });
     dirtStains.forEach((el,i)=>{
-      const vis=clamp((dirt-(i*10))/55,0,.95);
+      const vis=clamp((dirt-(i*6))/42,0,.95);
       el.style.opacity=String(vis);
     });
     scrubArea.classList.toggle('scrubbing', scrubbing);
@@ -415,7 +448,7 @@ body{display:flex;justify-content:center;align-items:center}
       const dist=Math.hypot(dx,dy);
       scrubAccum += dist;
       if(moisture>=38 && dirt>0 && dist>0){
-        dirt = clamp(dirt - dist*0.045, 0, 100);
+        dirt = clamp(dirt - dist*0.0082, 0, 100);
         addScrubFx(pt.x, pt.y);
       }
     }
@@ -473,10 +506,10 @@ body{display:flex;justify-content:center;align-items:center}
   }
   bind(watBtn,'water');bind(firBtn,'fire');
   window.addEventListener('blur',()=>setAction(null));
-  function rerollDirt(){ dirt=Math.round(28 + Math.random()*58); }
+  function rerollDirt(){ dirt=Math.round(72 + Math.random()*28); }
   $('reset').addEventListener('click',()=>{moisture=32;burn=0;ash=false;rerollDirt(); scrubbing=false; lastScrubPoint=null; setAction(null); update();});
   function frame(now){const dt=Math.min((now-last)/1000,.05);last=now;if(action)step(action,dt);if(now-lastRender>60){update();lastRender=now;} requestAnimationFrame(frame);}
-  window.__blanketStageDebug=()=>({moisture,burn,dirt,clean:100-dirt,ash,action,scrubbing,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
+  window.__blanketStageDebug=()=>({moisture,burn,dirt,ash,action,scrubbing,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
   rerollDirt();
   update();requestAnimationFrame(frame);
 })();
