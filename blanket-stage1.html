@@ -256,6 +256,21 @@ button{touch-action:manipulation;}
 .collection-close{width:100%;min-height:46px;margin-top:14px;color:#233a21;border:1px solid #e8f2cc;background:#b5d695;border-radius:12px;font-weight:1000;font-size:16px;touch-action:manipulation}
 @media(max-height:740px){.result-art{height:137px;margin:6px 0 0}.result-reveal .product-desc{margin-top:7px}.result-reveal .summary-detail{max-height:58px}}
 @media(prefers-reduced-motion:reduce){.result-art .art-subject{animation:none}}
+
+#stage1Meters{display:none !important}
+.collection-note{margin-bottom:10px}
+.collection-preview{display:grid;grid-template-columns:1.15fr .95fr;gap:12px;background:rgba(13,28,23,.66);border:1px solid rgba(224,239,201,.12);border-radius:16px;padding:12px;margin-bottom:12px}
+.collection-preview-art{min-height:178px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,rgba(57,83,63,.85),rgba(15,32,25,.9));border:1px solid rgba(223,239,192,.14)}
+.collection-preview-meta{display:flex;flex-direction:column;gap:8px;min-width:0}
+.collection-preview-title{font-size:22px;font-weight:1000;line-height:1.15}
+.collection-preview-rarity{display:inline-flex;align-self:flex-start;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:12px;font-weight:900;letter-spacing:1px}
+.collection-preview-desc{font-size:14px;line-height:1.55;color:#e4ecd2}
+.collection-preview-tip{font-size:12px;color:#b8c9a9}
+.collection-tile{cursor:pointer;transition:transform .14s ease,outline-color .14s ease,background .14s ease}
+.collection-tile.selected{outline:2px solid #d9ee9f;background:rgba(201,222,149,.13);transform:translateY(-1px)}
+.collection-grid{max-height:48vh;overflow:auto}
+@media(max-width:560px){.collection-preview{grid-template-columns:1fr}.collection-preview-art{min-height:160px}.collection-grid{max-height:42vh}}
+
 </style>
 </head>
 <body>
@@ -523,15 +538,24 @@ button{touch-action:manipulation;}
      <div class="summary-stat"><span>最後整理</span><strong id="summaryTidy">0 分</strong></div>
    </div>
    <div class="summary-detail" id="summaryDetail"></div>
-   <button id="collectionBtn" class="collection-link" type="button">📖 棉被圖鑑（0 / 20）</button>
+   <button id="collectionBtn" class="collection-link" type="button">📖 棉被圖鑑（100 / 100）</button>
    <button id="stage3RestartBtn" class="again-btn" type="button">再折一次！</button>
  </div>
 
  <div id="collectionBackdrop" class="collection-backdrop" hidden></div>
  <div id="collectionPanel" class="collection-panel" hidden role="dialog" aria-modal="true" aria-label="棉被圖鑑">
    <button id="collectionCloseTop" class="collection-close-top" type="button" aria-label="關閉圖鑑">✕</button>
-   <h2>📖 棉被圖鑑 <span id="collectionCount">0 / 20</span></h2>
-   <div class="collection-note">共 20 種成品，低分一樣可能出稀有造型。已解鎖的作品會留在這個瀏覽器裡。</div>
+   <h2>📖 棉被圖鑑 <span id="collectionCount">0 / 100</span></h2>
+   <div class="collection-note">目前先全解鎖，方便直接看全部成品。點任一張卡片可看大圖與描述。</div>
+   <div class="collection-preview" id="collectionPreview">
+     <div class="collection-preview-art" id="collectionPreviewArt"></div>
+     <div class="collection-preview-meta">
+       <div class="collection-preview-title" id="collectionPreviewName">班長認證豆腐乾</div>
+       <div class="collection-preview-rarity" id="collectionPreviewRarity">普通</div>
+       <div class="collection-preview-desc" id="collectionPreviewDesc">點下方任一成品，可以在這裡看大圖與說明。</div>
+       <div class="collection-preview-tip" id="collectionPreviewTip">圖鑑已全開放瀏覽。</div>
+     </div>
+   </div>
    <div id="collectionGrid" class="collection-grid"></div>
    <button id="collectionClose" class="collection-close" type="button">返回結算</button>
  </div>
@@ -942,61 +966,159 @@ button{touch-action:manipulation;}
   }
   // v1.4: 20 collectible blankets. Rarity and quality score are independent.
   // Outcomes are chosen from weighted, condition-matched candidates, not by score alone.
+
+  // v2.0: 100 collectible blankets. First-stage meters are hidden, gallery is fully unlocked for browsing.
   const outcomeBook=[
-    {id:'tofu',name:'班長認證豆腐乾',rarity:'普通',icon:'🧱',desc:'四邊方正，終於看得出你有折過。班長皺眉半天，只能叫你再折一次。'},
-    {id:'diamond',name:'鑽石棉被',rarity:'傳說',icon:'💎',desc:'稜角精準到折出鑽石切面。長官懷疑你把棉被送去切割工廠。'},
-    {id:'tank',name:'CM-11 勇虎坦克棉被',rarity:'史詩',icon:'🪖',desc:'砲塔、砲管、履帶一應俱全。班長：叫你摺豆腐乾，誰准你在寢室組裝戰車？'},
-    {id:'fighter',name:'F-16 戰機棉被',rarity:'史詩',icon:'✈️',desc:'被角折成機翼，整張床已經變成軍用機場。這架飛機只能用手洗。'},
-    {id:'carrier',name:'航空母艦棉被',rarity:'傳說',icon:'🚢',desc:'潮濕被子變成航艦甲板，迷你戰機準備起飛。寢室現在歸海軍管。'},
-    {id:'seal',name:'塌陷海豹棉被',rarity:'普通',icon:'🦭',desc:'軟趴趴趴在床上，拍一下還會彈。連海豹都比你會整理內務。'},
-    {id:'turtle',name:'烏龜棉被',rarity:'稀有',icon:'🐢',desc:'整齊的龜殼，四條腿慢慢爬。值星官等牠歸隊等到天黑。'},
-    {id:'elephant',name:'戰術大象棉被',rarity:'稀有',icon:'🐘',desc:'一角折成長鼻子，裝滿水還會自己噴。國軍後勤新增戰象編制。'},
-    {id:'swan',name:'飯店天鵝棉被',rarity:'稀有',icon:'🦢',desc:'新訓寢室瞬間升級蜜月套房。班長問你是不是走錯宿舍。'},
-    {id:'stinky',name:'臭豆腐棉被',rarity:'稀有',icon:'🥢',desc:'濕、髒、又有點怪味，折完直接升級夜市名產。班長：整個寢室都聞到了！'},
-    {id:'bun',name:'巨型饅頭棉被',rarity:'普通',icon:'🥟',desc:'根本折不起來，反而膨脹成大饅頭。這東西要送去伙房，不是內務櫃。'},
-    {id:'chicken',name:'雞排棉被',rarity:'稀有',icon:'🍗',desc:'烤得金黃又被槌得扁扁一大片。值星官忍不住問你要不要加辣。'},
-    {id:'garbage',name:'垃圾山棉被',rarity:'普通',icon:'🗑️',desc:'紙袋、寶特瓶、襪子全都夾進折層。你折出了營區的第二座掩埋場。'},
-    {id:'roach',name:'蟑螂豪宅棉被',rarity:'稀有',icon:'🪳',desc:'垃圾多到連蟑螂都搬家入住。入住率百分之百，整潔度負百分之百。'},
-    {id:'mushroom',name:'香菇農場棉被',rarity:'稀有',icon:'🍄',desc:'每一層都在長菇，摺棉被變成採菇菇。班長叫大家先別動，晚餐有著落了。'},
-    {id:'kraken',name:'深海巨獸棉被',rarity:'史詩',icon:'🐙',desc:'濕透的被角長成觸手，彷彿深海章魚被抓進寢室。床鋪已列為海洋保護區。'},
-    {id:'coal',name:'黑炭棉被',rarity:'普通',icon:'🪨',desc:'整團黑到像煤礦，輕輕一拍還會掉灰。消防班已經在門口排隊。'},
-    {id:'phoenix',name:'鳳凰棉被',rarity:'傳說',icon:'🔥',desc:'焦黑布層突然展開火翼、浴火重生。班長：內務評分沒叫你召喚神獸！'},
-    {id:'cthulhu',name:'克蘇魯棉被',rarity:'傳說',icon:'👁️',desc:'髒污和水氣喚醒不可名狀的觸手，還主動向班長申請休假。'},
-    {id:'soldier',name:'睡死的同梯棉被',rarity:'史詩',icon:'😴',desc:'摺到一半才發現裡面藏了同梯。班長：棉被裡怎麼有人？！全班集合！'}
+    {id:"tofu", name:"班長認證豆腐乾", rarity:"普通", icon:"🧱", desc:"四邊方正，終於看得出你有折過。班長皺眉半天，只能叫你再折一次。", pool:"pristine", bias:1.45},
+    {id:"diamond", name:"鑽石棉被", rarity:"傳說", icon:"💎", desc:"稜角精準到折出鑽石切面。長官懷疑你把棉被送去切割工廠。", pool:"elite_pristine", bias:1.2},
+    {id:"tank", name:"CM-11 勇虎坦克棉被", rarity:"史詩", icon:"🪖", desc:"砲塔、砲管、履帶一應俱全。班長：叫你摺豆腐乾，誰准你在寢室組裝戰車？", pool:"military", bias:1.18},
+    {id:"fighter", name:"F-16 戰機棉被", rarity:"史詩", icon:"✈️", desc:"被角折成機翼，整張床已經變成軍用機場。這架飛機只能用手洗。", pool:"military", bias:1.05},
+    {id:"carrier", name:"航空母艦棉被", rarity:"傳說", icon:"🚢", desc:"潮濕被子變成航艦甲板，迷你戰機準備起飛。寢室現在歸海軍管。", pool:"naval", bias:1.15},
+    {id:"seal", name:"塌陷海豹棉被", rarity:"普通", icon:"🦭", desc:"軟趴趴趴在床上，拍一下還會彈。連海豹都比你會整理內務。", pool:"cute_fail", bias:1.2},
+    {id:"turtle", name:"烏龜棉被", rarity:"稀有", icon:"🐢", desc:"整齊的龜殼，四條腿慢慢爬。值星官等牠歸隊等到天黑。", pool:"animal", bias:1.0},
+    {id:"elephant", name:"戰術大象棉被", rarity:"稀有", icon:"🐘", desc:"一角折成長鼻子，裝滿水還會自己噴。國軍後勤新增戰象編制。", pool:"wet", bias:0.95},
+    {id:"swan", name:"飯店天鵝棉被", rarity:"稀有", icon:"🦢", desc:"新訓寢室瞬間升級蜜月套房。班長問你是不是走錯宿舍。", pool:"pristine", bias:0.92},
+    {id:"stinky", name:"臭豆腐棉被", rarity:"稀有", icon:"🥢", desc:"濕、髒、又有點怪味，折完直接升級夜市名產。班長：整個寢室都聞到了！", pool:"dirty", bias:1.0},
+    {id:"bun", name:"巨型饅頭棉被", rarity:"普通", icon:"🥟", desc:"根本折不起來，反而膨脹成大饅頭。這東西要送去伙房，不是內務櫃。", pool:"food_soft", bias:1.05},
+    {id:"chicken", name:"雞排棉被", rarity:"稀有", icon:"🍗", desc:"烤得金黃又被槌得扁扁一大片。值星官忍不住問你要不要加辣。", pool:"food_baked", bias:1.0},
+    {id:"garbage", name:"垃圾山棉被", rarity:"普通", icon:"🗑️", desc:"紙袋、寶特瓶、襪子全都夾進折層。你折出了營區的第二座掩埋場。", pool:"dirty", bias:1.25},
+    {id:"roach", name:"蟑螂豪宅棉被", rarity:"稀有", icon:"🪳", desc:"垃圾多到連蟑螂都搬家入住。入住率百分之百，整潔度負百分之百。", pool:"dirty_bug", bias:1.1},
+    {id:"mushroom", name:"香菇農場棉被", rarity:"稀有", icon:"🍄", desc:"每一層都在長菇，摺棉被變成採菇菇。班長叫大家先別動，晚餐有著落了。", pool:"mold", bias:1.15},
+    {id:"kraken", name:"深海巨獸棉被", rarity:"史詩", icon:"🐙", desc:"濕透的被角長成觸手，彷彿深海章魚被抓進寢室。床鋪已列為海洋保護區。", pool:"mold", bias:0.9},
+    {id:"coal", name:"黑炭棉被", rarity:"普通", icon:"🪨", desc:"整團黑到像煤礦，輕輕一拍還會掉灰。消防班已經在門口排隊。", pool:"burn", bias:1.35},
+    {id:"phoenix", name:"鳳凰棉被", rarity:"傳說", icon:"🔥", desc:"焦黑布層突然展開火翼、浴火重生。班長：內務評分沒叫你召喚神獸！", pool:"inferno", bias:1.1},
+    {id:"cthulhu", name:"克蘇魯棉被", rarity:"傳說", icon:"👁️", desc:"髒污和水氣喚醒不可名狀的觸手，還主動向班長申請休假。", pool:"cosmic", bias:1.0},
+    {id:"soldier", name:"睡死的同梯棉被", rarity:"史詩", icon:"😴", desc:"摺到一半才發現裡面藏了同梯。班長：棉被裡怎麼有人？！全班集合！", pool:"dirty", bias:0.85},
+    {id:"fortress", name:"堡壘棉被", rarity:"稀有", icon:"🏰", desc:"折角像城牆一樣層層疊起，整張床瞬間升級防禦工事。", pool:"military", bias:0.95},
+    {id:"artillery", name:"自走砲棉被", rarity:"史詩", icon:"💥", desc:"長長一管從棉被中伸出，班長懷疑你是不是偷帶火砲進寢室。", pool:"military", bias:0.92},
+    {id:"missile", name:"飛彈發射車棉被", rarity:"史詩", icon:"🚀", desc:"折層像發射架一樣抬起，隨時準備對空喊發射。", pool:"military", bias:0.92},
+    {id:"helicopter", name:"直升機棉被", rarity:"稀有", icon:"🚁", desc:"上層亂翹剛好變成旋翼，還差點把蚊帳吹飛。", pool:"military", bias:0.88},
+    {id:"drone", name:"無人機棉被", rarity:"稀有", icon:"🛸", desc:"小巧又俐落，像一架自己巡邏床鋪的迷你無人機。", pool:"military", bias:0.82},
+    {id:"submarine", name:"潛艇棉被", rarity:"史詩", icon:"🫧", desc:"濕棉被壓成流線艇身，看起來隨時會潛進床墊裡。", pool:"naval", bias:0.95},
+    {id:"apc", name:"裝甲運兵車棉被", rarity:"稀有", icon:"🚛", desc:"方方正正，摺完像一台能載全班出操的裝甲車。", pool:"military", bias:0.9},
+    {id:"radar", name:"雷達站棉被", rarity:"稀有", icon:"📡", desc:"稜角和折層像旋轉天線，隔壁連的長官都收得到。", pool:"object_clean", bias:0.9},
+    {id:"mechfort", name:"機動堡壘棉被", rarity:"傳說", icon:"🤖", desc:"不像坦克也不像建築，總之它看起來已經能自己站哨了。", pool:"cosmic", bias:0.8},
+    {id:"sandbag", name:"沙包陣地棉被", rarity:"普通", icon:"🪵", desc:"摺得不高不低，意外變成一圈簡易沙包掩體。", pool:"military", bias:0.82},
+    {id:"rabbit", name:"兔子棉被", rarity:"普通", icon:"🐰", desc:"耳朵高高豎起，看起來比你還緊張。", pool:"animal", bias:0.88},
+    {id:"cat", name:"貓咪棉被", rarity:"稀有", icon:"🐱", desc:"整團蜷成一坨還翹出耳朵，超像一隻懶洋洋的貓。", pool:"animal", bias:0.92},
+    {id:"dog", name:"柴犬棉被", rarity:"稀有", icon:"🐶", desc:"折角圓滾滾，眼神彷彿在問你有沒有肉乾。", pool:"animal", bias:0.9},
+    {id:"pig", name:"小豬棉被", rarity:"普通", icon:"🐷", desc:"中間胖胖兩邊短短，整體散發出一股幸福的肉感。", pool:"animal", bias:0.85},
+    {id:"penguin", name:"企鵝棉被", rarity:"稀有", icon:"🐧", desc:"站得直直的，像隨時要參加南極升旗。", pool:"animal", bias:0.82},
+    {id:"whale", name:"鯨魚棉被", rarity:"史詩", icon:"🐋", desc:"大片濕被面捲成弧線，像一頭擱淺在床上的鯨魚。", pool:"wet", bias:0.95},
+    {id:"frog", name:"青蛙棉被", rarity:"普通", icon:"🐸", desc:"攤平又鼓鼓的，感覺下一秒就會呱一聲跳走。", pool:"wet", bias:0.82},
+    {id:"snake", name:"蛇蛇棉被", rarity:"稀有", icon:"🐍", desc:"被角細長亂扭，活像一條賴在床上的蛇。", pool:"weird", bias:0.8},
+    {id:"capybara", name:"水豚棉被", rarity:"稀有", icon:"🦫", desc:"整體鬆鬆軟軟，散發出一種超佛系的躺平氣質。", pool:"animal", bias:0.86},
+    {id:"dragon", name:"青龍棉被", rarity:"傳說", icon:"🐉", desc:"折痕一層一層拉成鱗片，床鋪直接飛升成神獸棲地。", pool:"elite_pristine", bias:0.82},
+    {id:"dinosaur", name:"恐龍棉被", rarity:"史詩", icon:"🦖", desc:"前面短短後面一大截，像是從白堊紀逃來的棉被。", pool:"animal", bias:0.8},
+    {id:"jellyfish", name:"水母棉被", rarity:"稀有", icon:"🪼", desc:"濕濕軟軟又一條條垂下，根本是漂浮中的床上水母。", pool:"wet", bias:0.9},
+    {id:"owl", name:"貓頭鷹棉被", rarity:"稀有", icon:"🦉", desc:"兩個角翹得對稱，整體像一隻半夜盯人的貓頭鷹。", pool:"animal", bias:0.84},
+    {id:"squid", name:"烏賊棉被", rarity:"史詩", icon:"🦑", desc:"邊邊亂甩像觸手，但又比克蘇魯稍微講道理一點。", pool:"mold", bias:0.78},
+    {id:"pizza", name:"披薩棉被", rarity:"普通", icon:"🍕", desc:"圓圓扁扁還帶點配料感，怎麼看都像超大披薩。", pool:"food_soft", bias:0.82},
+    {id:"omelette", name:"蛋餅棉被", rarity:"普通", icon:"🍳", desc:"薄薄一層捲過去，活脫脫一份早餐店蛋餅。", pool:"food_soft", bias:0.86},
+    {id:"sushi", name:"壽司棉被", rarity:"稀有", icon:"🍣", desc:"被面包住內容物，折層切面還真有點像壽司。", pool:"pristine", bias:0.8},
+    {id:"toast", name:"吐司棉被", rarity:"普通", icon:"🍞", desc:"方方的、軟軟的、看起來很想抹果醬。", pool:"food_soft", bias:0.75},
+    {id:"pancake", name:"蔥油餅棉被", rarity:"普通", icon:"🥞", desc:"壓扁又帶點焦香，彷彿能聽見煎台滋滋叫。", pool:"food_baked", bias:0.8},
+    {id:"springroll", name:"春捲棉被", rarity:"稀有", icon:"🌯", desc:"一路捲到底，完全是內務版春捲。", pool:"food_soft", bias:0.84},
+    {id:"burger", name:"漢堡棉被", rarity:"稀有", icon:"🍔", desc:"上下兩層夾住亂七八糟的東西，意外很有漢堡感。", pool:"dirty", bias:0.74},
+    {id:"ramen", name:"拉麵棉被", rarity:"史詩", icon:"🍜", desc:"邊角散開像麵條，班長一看就餓了。", pool:"wet", bias:0.76},
+    {id:"dumpling", name:"水餃棉被", rarity:"普通", icon:"🥟", desc:"一邊鼓鼓一邊收邊，像一顆超大北方水餃。", pool:"food_soft", bias:0.82},
+    {id:"mochi", name:"麻糬棉被", rarity:"普通", icon:"🍡", desc:"黏黏軟軟又有延展性，整體完全不像軍用品。", pool:"wet", bias:0.7},
+    {id:"seaweed", name:"海苔飯捲棉被", rarity:"稀有", icon:"🍙", desc:"軍綠表面一包起來，真的很像加大版飯捲。", pool:"pristine", bias:0.76},
+    {id:"taro", name:"芋頭酥棉被", rarity:"稀有", icon:"🥮", desc:"外酥內軟的幻覺超強，折痕還帶出一點糕點層次。", pool:"food_baked", bias:0.84},
+    {id:"sweetpotato", name:"烤地瓜棉被", rarity:"稀有", icon:"🍠", desc:"烤得剛剛好，外皮皺皺像真的地瓜。", pool:"food_baked", bias:0.88},
+    {id:"bbq", name:"炭烤肉排棉被", rarity:"史詩", icon:"🥩", desc:"火候足、壓得夠，用力聞還真的像在烤肉。", pool:"food_baked", bias:0.92},
+    {id:"algae", name:"綠藻棉被", rarity:"普通", icon:"🪴", desc:"濕太久開始發青發黏，整張床像長出一層綠藻。", pool:"wet", bias:0.78},
+    {id:"slime", name:"史萊姆棉被", rarity:"稀有", icon:"🟢", desc:"滑滑黏黏、沒有形狀，彷彿碰一下就會啵地散開。", pool:"wet", bias:0.88},
+    {id:"sponge", name:"海綿棉被", rarity:"普通", icon:"🧽", desc:"含水量超高，擠一下感覺還能再流半桶出來。", pool:"wet", bias:0.84},
+    {id:"swamp", name:"沼澤棉被", rarity:"稀有", icon:"🟫", desc:"又濕又髒還帶點暗色塊，看起來像一片小沼澤。", pool:"dirty", bias:0.92},
+    {id:"lotus", name:"蓮葉棉被", rarity:"稀有", icon:"🪷", desc:"濕被子邊邊撐起弧度，還莫名有種池塘美感。", pool:"wet", bias:0.84},
+    {id:"puffer", name:"河豚棉被", rarity:"稀有", icon:"🐡", desc:"鼓得圓滾滾又帶點刺刺感，像受驚的河豚。", pool:"wet", bias:0.82},
+    {id:"coral", name:"珊瑚棉被", rarity:"史詩", icon:"🪸", desc:"濕到長出奇怪分枝，彷彿床上正在養珊瑚。", pool:"mold", bias:0.82},
+    {id:"driftwood", name:"漂流木棉被", rarity:"普通", icon:"🪵", desc:"水氣退去後皺成硬硬一條，像剛被海浪沖上岸。", pool:"wet", bias:0.74},
+    {id:"compost", name:"堆肥棉被", rarity:"普通", icon:"🌱", desc:"垃圾和濕氣一起發酵，這已經不是內務，是農業。", pool:"dirty", bias:1.0},
+    {id:"sock", name:"臭襪棉被", rarity:"普通", icon:"🧦", desc:"被子被你整理成一大坨襪子味。遠遠看就知道有人偷懶。", pool:"dirty", bias:0.82},
+    {id:"canpile", name:"寶特瓶山棉被", rarity:"稀有", icon:"🧴", desc:"看起來像把整袋資源回收一起折進去了。", pool:"dirty", bias:0.9},
+    {id:"landfill", name:"掩埋場棉被", rarity:"史詩", icon:"⛰️", desc:"成堆垃圾被壓成地景，營區第二座垃圾山正式完工。", pool:"dirty", bias:1.08},
+    {id:"petri", name:"培養皿棉被", rarity:"史詩", icon:"🧫", desc:"濕、髒、熱度剛好，這張棉被已具備研究價值。", pool:"mold", bias:0.96},
+    {id:"antnest", name:"螞蟻窩棉被", rarity:"稀有", icon:"🐜", desc:"縫隙層層疊疊，像一個超大型螞蟻迷宮。", pool:"dirty_bug", bias:0.88},
+    {id:"moldking", name:"菇王棉被", rarity:"傳說", icon:"👑", desc:"不只是長香菇，簡直是整套菇菇王國在床上登基。", pool:"mold", bias:1.05},
+    {id:"ashpile", name:"灰燼棉被", rarity:"普通", icon:"🌫️", desc:"一拍就掉灰，整體已經進入能裝香灰的階段。", pool:"burn", bias:0.9},
+    {id:"lava", name:"熔岩棉被", rarity:"史詩", icon:"🌋", desc:"焦黑和橘紅裂紋交錯，像一塊會流動的熔岩。", pool:"inferno", bias:0.96},
+    {id:"meteor", name:"隕石棉被", rarity:"史詩", icon:"☄️", desc:"整塊硬梆梆還帶焦斑，像剛從外太空砸下來。", pool:"burn", bias:0.88},
+    {id:"burnttoast", name:"焦糖吐司棉被", rarity:"普通", icon:"🍞", desc:"看起來其實有點好吃，但評分一定不會太高。", pool:"food_baked", bias:0.76},
+    {id:"firecracker", name:"爆竹棉被", rarity:"稀有", icon:"🧨", desc:"一折下去火花四散，像年節限定的危險棉被。", pool:"inferno", bias:0.84},
+    {id:"kiln", name:"窯烤棉被", rarity:"稀有", icon:"🏺", desc:"烤得有點過頭，卻意外帶出一種陶窯的藝術感。", pool:"burn", bias:0.8},
+    {id:"charcoalking", name:"炭王棉被", rarity:"傳說", icon:"♨️", desc:"不是煤塊，是煤塊之王。床鋪已進入高溫鍛造模式。", pool:"inferno", bias:0.92},
+    {id:"portal", name:"傳送門棉被", rarity:"傳說", icon:"🌀", desc:"折層對得太離譜，床中央像開了一個異次元入口。", pool:"cosmic", bias:0.86},
+    {id:"ufo", name:"飛碟棉被", rarity:"史詩", icon:"👽", desc:"圓盤感十足，還有一種半夜會自己升空的氣質。", pool:"cosmic", bias:0.8},
+    {id:"monolith", name:"方尖碑棉被", rarity:"史詩", icon:"🗿", desc:"折得太工整，安靜得像神祕文明留下來的遺物。", pool:"elite_pristine", bias:0.72},
+    {id:"crystal", name:"水晶簇棉被", rarity:"史詩", icon:"🔮", desc:"多折角一起發亮，像一大叢從床上長出的晶體。", pool:"elite_pristine", bias:0.84},
+    {id:"papercrane", name:"千紙鶴棉被", rarity:"稀有", icon:"🕊️", desc:"折線乾淨俐落，整體輕盈得像一隻紙鶴。", pool:"pristine", bias:0.8},
+    {id:"cash", name:"鈔票棉被", rarity:"稀有", icon:"💵", desc:"一層一層排得太整齊，竟然有種大把現金的既視感。", pool:"object_clean", bias:0.8},
+    {id:"laptop", name:"筆電棉被", rarity:"稀有", icon:"💻", desc:"方型外觀加上一道折痕，像打開就能寫報告的軍用筆電。", pool:"object_clean", bias:0.88},
+    {id:"fridge", name:"冰箱棉被", rarity:"稀有", icon:"🧊", desc:"折得方正又厚，像寢室突然多出一台雙門小冰箱。", pool:"object_clean", bias:0.82},
+    {id:"washingmachine", name:"洗衣機棉被", rarity:"史詩", icon:"🫧", desc:"髒棉被竟然折成洗衣機，這已經是一種反諷藝術。", pool:"object_dirty", bias:0.94},
+    {id:"robot", name:"巨型機器人棉被", rarity:"傳說", icon:"🤖", desc:"稜角、關節、肩甲全到位。再給它兩節電池就能出操。", pool:"cosmic", bias:0.9},
+    {id:"throne", name:"王座棉被", rarity:"史詩", icon:"👑", desc:"折層撐出椅背和扶手，一坐上去就像變連長。", pool:"elite_pristine", bias:0.72},
+    {id:"crown", name:"皇冠棉被", rarity:"史詩", icon:"👑", desc:"被角尖尖對稱排開，看起來像內務界的加冕儀式。", pool:"elite_pristine", bias:0.8},
+    {id:"shrine", name:"神轎棉被", rarity:"傳說", icon:"⛩️", desc:"這不是棉被，是會讓大家一起喊起駕的神轎。", pool:"weird", bias:0.74},
+    {id:"trafficcone", name:"三角錐棉被", rarity:"普通", icon:"🚧", desc:"亂折一通卻意外很有警示效果，床鋪瞬間變施工區。", pool:"tidy_fail", bias:0.88},
+    {id:"barricade", name:"路障棉被", rarity:"普通", icon:"🛑", desc:"一塊一塊卡在那裡，彷彿專門拿來擋班長。", pool:"object_dirty", bias:0.8},
+    {id:"dice", name:"骰子棉被", rarity:"稀有", icon:"🎲", desc:"方方正正還帶點點點，像用棉被做成的大骰子。", pool:"pristine", bias:0.74},
+    {id:"maze", name:"迷宮棉被", rarity:"史詩", icon:"🧩", desc:"折痕太多又太亂，最後竟形成一張軍營迷宮。", pool:"weird", bias:0.84},
+    {id:"coffin", name:"棺材棉被", rarity:"史詩", icon:"⚰️", desc:"折得又直又硬，透著一種不祥但工整的氣氛。", pool:"burn", bias:0.72},
+    {id:"cloud", name:"雲朵棉被", rarity:"普通", icon:"☁️", desc:"太鬆太軟太飄，最後像一朵還沒睡醒的雲。", pool:"cute_fail", bias:0.88},
+    {id:"blackhole", name:"黑洞棉被", rarity:"傳說", icon:"🕳️", desc:"所有折線、髒污、熱量都收束成一個洞，連評分都被吸進去了。", pool:"cosmic", bias:1.08}
   ];
   const outcomeById=Object.fromEntries(outcomeBook.map(o=>[o.id,o]));
   const outcomeRarityColor={'普通':'#b8c4b8','稀有':'#92d3f1','史詩':'#e1aeff','傳說':'#ffdc86'};
+  const poolWeight={
+    tidy_fail: c => Math.max(0, 1.3 + Math.max(0,60-c.F)*0.025 + Math.max(0,58-c.P)*0.025 + c.D*0.003 + c.W*0.003),
+    cute_fail: c => Math.max(0, .9 + Math.max(0,72-c.F)*0.018 + Math.max(0,72-c.P)*0.015 + Math.max(0,38-c.B)*0.004),
+    pristine: c => (c.B<25&&c.D<32&&c.W<55&&c.F>60&&c.P>58) ? 1 + (c.F-60)*0.028 + (c.P-58)*0.028 + Math.max(0,25-c.D)*0.01 : 0,
+    elite_pristine: c => (c.B<18&&c.D<18&&c.W<32&&c.F>82&&c.P>82) ? 1 + (c.F-82)*0.05 + (c.P-82)*0.05 : 0,
+    military: c => (c.F>52&&c.P>52&&c.B<82) ? 1 + (c.F-52)*0.022 + (c.P-52)*0.024 + Math.max(0,28-c.D)*0.008 : 0,
+    naval: c => (c.W>46&&c.F>58&&c.P>56&&c.B<65) ? 1 + (c.W-46)*0.03 + (c.F-58)*0.012 : 0,
+    animal: c => (c.F>38&&c.P>38&&c.B<70) ? 1 + Math.max(0,100-Math.abs(c.F-68)-Math.abs(c.P-63))*0.010 : 0,
+    wet: c => (c.W>48&&c.B<70) ? 1 + (c.W-48)*0.028 + Math.max(0,35-c.D)*0.003 : 0,
+    mold: c => (c.W>58&&c.M>.18&&c.B<65) ? 1 + (c.W-58)*0.026 + c.M*0.75 + c.D*0.003 : 0,
+    dirty: c => (c.D>42) ? 1 + (c.D-42)*0.04 + Math.max(0,c.W-25)*0.01 : 0,
+    dirty_bug: c => (c.D>62&&c.B<72) ? 1 + (c.D-62)*0.055 + Math.max(0,c.W-12)*0.008 : 0,
+    food_soft: c => (c.B<28) ? .8 + c.W*0.012 + Math.max(0,55-c.F)*0.006 : 0,
+    food_baked: c => (c.B>12&&c.B<72) ? .9 + (c.B-12)*0.022 + Math.max(0,c.P-32)*0.01 : 0,
+    burn: c => (c.B>42) ? 1 + (c.B-42)*0.045 + Math.max(0,c.P-45)*0.008 : 0,
+    inferno: c => (c.B>68) ? 1 + (c.B-68)*0.055 + Math.max(0,c.P-60)*0.012 + Math.max(0,c.F-60)*0.008 : 0,
+    weird: c => .45 + c.total*0.0024 + Math.max(0,52-c.F)*0.006,
+    cosmic: c => ((c.F>74&&c.P>74) || (c.W>80&&c.D>58) || c.B>80) ? .7 + c.total*0.0034 + c.M*0.25 : 0,
+    object_clean: c => (c.D<38&&c.B<42&&c.F>50) ? .9 + (c.F-50)*0.018 + Math.max(0,c.P-45)*0.016 : 0,
+    object_dirty: c => (c.D>30&&c.F>42) ? .8 + c.D*0.014 + Math.max(0,c.P-35)*0.012 : 0
+  };
   function decideOutcome(total,foldAvg,tidy){
-    const W=moisture,B=burn,D=dirt,F=foldAvg,P=tidy;
-    const scores={
-      tofu: (B>=55||W>=80||D>=60?.32:2.6)+(D<32&&B<25&&W<55?4.2:0)+(F>65&&P>65&&D<30&&B<30&&W<55?4.3:0),
-      diamond: (W<28&&B<12&&D<18&&F>=94&&P>=93)?2.0:0,
-      tank: (P>=75&&F>=52&&B<90)?(1.3+(P-75)*.055+(F-52)*.022):0,
-      fighter: (W<40&&B<40&&F>=78&&P>=68)?(1.3+(F-78)*.08):0,
-      carrier: (W>=77&&F>=78&&P>=75&&B<55)?(1.3+(W-77)*.06):0,
-      seal: (F<=60||P<=34)?(4+(60-F)*.035+(34-P)*.025):.55,
-      turtle: (F>=30&&F<=83&&B<70)?(1.4+(70-Math.abs(F-56))*.020):0,
-      elephant: (W>=52&&F<=76&&B<70)?(1.6+(W-52)*.023):0,
-      swan: (W<78&&B<35&&F>=68&&P>=44)?(1.6+(F-68)*.03):0,
-      stinky: (W>=48&&D>=55&&B<65)?(2.3+(D-55)*.045):0,
-      bun: (W>=55&&F<62&&P<63)?(3.5+(W-55)*.035):0,
-      chicken: (B>=18&&B<72&&P>=40&&B<100)?(2.0+(B-18)*.035):0,
-      garbage: (D>=50)?(4+(D-50)*.075):0,
-      roach: (D>=76&&W>=24&&B<70)?(1.7+(D-76)*.08):0,
-      mushroom: (W>=72&&moldAge>.4&&B<70)?(3+(W-72)*.065+moldAge*.2):0,
-      kraken: (W>=86&&F<=66&&P>=70&&B<50)?(1.4+(W-86)*.11):0,
-      coal: (B>=50)?(5+(B-50)*.11):0,
-      phoenix: (B>=78&&B<100&&F>=78&&P>=88)?(1.2+(B-78)*.055):0,
-      cthulhu: (W>=82&&D>=77&&F<=48&&B<70)?(1.25+(D-77)*.07):0,
-      soldier: (D>=62&&F<=43&&P<=46)?(1.3+(D-62)*.035):0
-    };
-    // Rarity isn't the same thing as score: failure results can also be legendary.
-    const rarityFactor={'普通':1,'稀有':.72,'史詩':.39,'傳說':.23};
-    const entries=outcomeBook.map(o=>({item:o,w:(scores[o.id]||0)*rarityFactor[o.rarity]})).filter(e=>e.w>0);
-    let sum=entries.reduce((acc,e)=>acc+e.w,0);
+    const c={W:moisture,B:burn,D:dirt,F:foldAvg,P:tidy,M:moldAge,total};
+    const rarityFactor={'普通':1,'稀有':.88,'史詩':.68,'傳說':.52};
+    const entries=[];
+    for(const item of outcomeBook){
+      const fn=poolWeight[item.pool];
+      let w=fn?fn(c):0;
+      if(item.id==='diamond' && !(c.W<18&&c.B<10&&c.D<10&&c.F>90&&c.P>90)) w*=.35;
+      if(item.id==='tofu' && c.B>55) w*=.45;
+      if(item.id==='stinky' && c.D<52) w*=.3;
+      if(item.id==='phoenix' && c.B<78) w*=.18;
+      if(item.id==='blackhole' && c.total<255) w*=.22;
+      if(item.id==='carrier' && c.W<70) w*=.4;
+      if(item.id==='soldier' && c.D<55) w*=.36;
+      if(item.id==='moldking' && (c.W<76||c.M<.52)) w*=.25;
+      if(item.id==='bbq' && (c.B<28||c.B>74)) w*=.45;
+      if(item.id==='washingmachine' && c.D<55) w*=.25;
+      w*=item.bias||1;
+      w*=rarityFactor[item.rarity]||1;
+      if(w>0.02) entries.push({item,w});
+    }
+    let sum=entries.reduce((a,b)=>a+b.w,0);
+    if(!sum) return outcomeById.tofu;
     let pick=Math.random()*sum;
-    for(const e of entries){pick-=e.w;if(pick<=0)return e.item;}
-    return entries.length?entries[entries.length-1].item:outcomeById.tofu;
+    for(const e of entries){ pick-=e.w; if(pick<=0) return e.item; }
+    return entries[entries.length-1].item;
   }
 
   // All result artwork is native SVG, offline and in the SAME HTML. No remote image assets.
@@ -1038,12 +1160,13 @@ button{touch-action:manipulation;}
     soldier:()=>`${commonCube(158,47,102,131,'#7b9a70')}${ellipse(111,105,24,25,'#e4bf9d',`stroke="#815f4a" stroke-width="3"`)}${rect(132,87,116,40,14,'#6e8c64',`stroke="#3c5641" stroke-width="4"`)}${rect(241,100,47,15,6,'#4e6951')}${rect(244,121,47,16,6,'#4e6951')}${rect(90,77,34,14,8,'#536b4c')}${line('M105 110 q9 6 17 0','#785645',2)}<text x="252" y="69" font-size="22" font-weight="900" fill="#f9eab3">Zzz</text>`
   };
   function resultArt(product){
-    const b=artTemplates[product.id]||artTemplates.tofu;
+    const fallback=()=>`${commonCube(156,66,102,98,'#6f915d')}${rect(118,112,122,38,12,'#89a976',`opacity=".48"`)}<text x="180" y="116" text-anchor="middle" font-size="54">${product.icon||'🧱'}</text><text x="180" y="165" text-anchor="middle" font-size="18" font-weight="900" fill="#f4f6de">${product.name.replace(/棉被$/,'')}</text>`;
+    const b=artTemplates[product.id]||fallback;
     // Preserve state in illustrated materials without hiding each subject's outline.
     const wetTint=moisture>=60?`<rect x="62" y="60" width="240" height="118" rx="22" fill="#346b86" opacity="${Math.min(.19,(moisture-55)*.004).toFixed(2)}"/>`:'';
     const scorchTint=burn>=22?`<g fill="#382c29" opacity="${Math.min(.65,burn/150).toFixed(2)}">${ellipse(132,139,26,13,'#4c3427')}${ellipse(244,142,30,10,'#382f29')}</g>`:'';
     const trashMarks=dirt>=50?Array.from({length:Math.min(9,Math.round(dirt/12))},(_,i)=>{const x=119+(i*47)%133,y=115+(i*23)%41;return rect(x,y,8,7,1,i%2?'#e7c37b':'#a6dce5',`transform="rotate(${i*31} ${x} ${y})"`);}).join(''):'';
-    const special=['diamond','phoenix','coal','cthulhu','kraken','carrier','garbage','roach','soldier'].includes(product.id);
+    const special=['diamond','phoenix','coal','cthulhu','kraken','carrier','garbage','roach','soldier','blackhole','portal','robot','mechfort','moldking'].includes(product.id);
     const details=special?'':wetTint+scorchTint+trashMarks;
     return `<svg viewBox="0 0 360 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${product.name}">
     <defs><linearGradient id="artBg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#304c3f"/><stop offset="1" stop-color="#142e25"/></linearGradient></defs>
@@ -1055,36 +1178,55 @@ button{touch-action:manipulation;}
   }
 
   // Safe local progress; Safari private browsing may disable storage.
-  const collectionKey='army2_blanket_outcomes_v1';
-  let collected=new Set();
-  try{const arr=JSON.parse(localStorage.getItem(collectionKey)||'[]');if(Array.isArray(arr))collected=new Set(arr.filter(id=>outcomeById[id]));}catch(_){ }
+  // Safe local progress; current preview build force-unlocks all outcomes for browsing.
+  const collectionKey='army2_blanket_outcomes_v2';
+  let collected=new Set(outcomeBook.map(o=>o.id));
+  try{localStorage.setItem(collectionKey,JSON.stringify([...collected]));}catch(_){ }
   let lastOutcome=null;
+  let collectionSelectedId=outcomeBook[0].id;
+  function refreshCollectionButton(){ $('collectionBtn').textContent=`📖 棉被圖鑑（${collected.size} / ${outcomeBook.length}）`; }
   function unlockOutcome(product){
     collected.add(product.id);
     try{localStorage.setItem(collectionKey,JSON.stringify([...collected]));}catch(_){ }
-    $('collectionBtn').textContent=`📖 棉被圖鑑（${collected.size} / 20）`;
+    refreshCollectionButton();
   }
-  function openCollection(){
+  function showCollectionPreview(item){
+    collectionSelectedId=item.id;
+    $('collectionPreviewName').textContent=item.name;
+    $('collectionPreviewRarity').textContent=item.rarity+' · '+(item.icon||'');
+    $('collectionPreviewRarity').style.color=outcomeRarityColor[item.rarity]||'';
+    $('collectionPreviewRarity').style.setProperty('--rarity-color',outcomeRarityColor[item.rarity]||'#fff');
+    $('collectionPreviewDesc').textContent=item.desc;
+    $('collectionPreviewTip').textContent=`圖鑑編號 ${String(outcomeBook.findIndex(o=>o.id===item.id)+1).padStart(3,'0')} / ${outcomeBook.length}`;
+    $('collectionPreviewArt').innerHTML=resultArt(item);
+    [...$('collectionGrid').children].forEach(el=>el.classList.toggle('selected', el.dataset.id===item.id));
+  }
+  function openCollection(initialId){
     const panel=$('collectionPanel'),grid=$('collectionGrid');
     grid.replaceChildren();
     $('collectionCount').textContent=`${collected.size} / ${outcomeBook.length}`;
     for(const item of outcomeBook){
       const seen=collected.has(item.id),tile=document.createElement('div');
       tile.className='collection-tile'+(seen?'':' locked');
+      tile.dataset.id=item.id;
       const symbol=document.createElement('div');symbol.className='symbol';symbol.textContent=seen?item.icon:'🔒';
       const content=document.createElement('div');
       const name=document.createElement('div');name.className='tile-name';name.textContent=seen?item.name:'尚未解鎖';
       const grade=document.createElement('div');grade.className='tile-grade';grade.style.color=seen?outcomeRarityColor[item.rarity]:'';grade.textContent=seen?item.rarity:'？？？';
       content.append(name,grade);tile.append(symbol,content);grid.appendChild(tile);
+      if(seen) tile.addEventListener('click',()=>showCollectionPreview(item));
     }
+    const target=outcomeById[initialId]||outcomeById[collectionSelectedId]||outcomeBook[0];
+    showCollectionPreview(target);
     $('collectionBackdrop').hidden=false;panel.hidden=false;
   }
   function closeCollection(){ $('collectionBackdrop').hidden=true;$('collectionPanel').hidden=true; }
-  $('collectionBtn').addEventListener('click',openCollection);
+  $('collectionBtn').addEventListener('click',()=>openCollection(lastOutcome?lastOutcome.id:null));
   $('collectionClose').addEventListener('click',closeCollection);
   $('collectionCloseTop').addEventListener('click',closeCollection);
   $('collectionBackdrop').addEventListener('click',closeCollection);
   function productFor(total,foldAvg,tidy){ return decideOutcome(total,foldAvg,tidy); }
+  refreshCollectionButton();
 
   function tidyValueAt(now){
     const phase=((now-tidyStartedAt)%TIDY_CYCLE_MS+TIDY_CYCLE_MS)%TIDY_CYCLE_MS/TIDY_CYCLE_MS;
