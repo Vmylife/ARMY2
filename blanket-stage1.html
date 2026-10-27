@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
 <meta name="theme-color" content="#203229" />
-<title>豆腐干棉被｜第一階段：水與火 v0.4</title>
+<title>豆腐干棉被｜第一階段：水火與清潔 v0.5</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f6f6e8;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -19,19 +19,25 @@ body{display:flex;justify-content:center;align-items:center}
 .reset{border:1px solid #acc0a680;color:#f8f8e8;border-radius:11px;background:#3c5142d9;font-weight:800;font-size:12px;min-height:40px;min-width:82px;padding:8px 10px;touch-action:manipulation}
 .meters{margin-top:15px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .meter{background:#17251cbb;border:1px solid #9daa8a56;border-radius:13px;padding:9px 10px;box-shadow:0 7px 12px #07100a35}
+.meter.clean{grid-column:1 / -1}
 .meter-label{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#e9eedb;margin-bottom:6px}
 .meter-label strong{font-variant-numeric:tabular-nums;color:white}
 .track{background:#101a14;border-radius:100px;height:9px;overflow:hidden}
 .progress{height:100%;width:32%;border-radius:100px;transition:width .10s linear}
 #waterProgress{background:linear-gradient(90deg,#adc68e,#659978,#4b83ae)}
 #burnProgress{width:0;background:linear-gradient(90deg,#d1b05f,#e67c37,#7d3e25,#202020)}
-.artframe{position:absolute;left:0;right:0;top:23%;height:52%;max-height:560px;min-height:300px;display:flex;justify-content:center;align-items:center;pointer-events:none}
+#cleanProgress{width:55%;background:linear-gradient(90deg,#745134,#b58f53,#7aa86e,#4cb17c)}
+.artframe{position:absolute;left:0;right:0;top:23%;height:52%;max-height:560px;min-height:300px;display:flex;justify-content:center;align-items:center;pointer-events:auto}
 #scene{width:100%;height:100%;max-width:580px;overflow:visible;filter:drop-shadow(0 10px 9px #07140b26)}
 .blanket{transform-origin:306px 331px;transition:transform .22s ease,opacity .24s ease;}
 #baseFabric,#frontFabric,#hemStroke,#rimLine,#seamTop,#creaseA,#creaseB,#creaseC{transition:fill .18s ease,stroke .18s ease}
 #folds{transition:opacity .24s ease}
 #wetShine,#wetBlotches,#charBlotches,#ashes,#flameFx,#waterFx,#smokeFx,#steamFx,#puddle,#drips,#puffLines{transition:opacity .18s linear}
 #waterFx,#flameFx,#steamFx,#smokeFx,#puddle,#ashes,#drips,#charBlotches,#wetBlotches{pointer-events:none}
+#dirtLayer .trash,#dirtLayer .stain{transition:opacity .16s linear}
+#scrubArea{pointer-events:all;cursor:grab}
+#scrubArea.scrubbing{cursor:grabbing}
+#scrubFx circle{transition:opacity .22s linear}
 #waterFx{opacity:0}
 #flameFx{opacity:0}
 #steamFx{opacity:0}
@@ -98,6 +104,7 @@ body{display:flex;justify-content:center;align-items:center}
   <div class="meters">
    <div class="meter"><div class="meter-label">💧 含水量 <strong id="waterValue">32%</strong></div><div class="track"><div class="progress" id="waterProgress"></div></div></div>
    <div class="meter"><div class="meter-label">🔥 焦化度 <strong id="burnValue">0%</strong></div><div class="track"><div class="progress" id="burnProgress"></div></div></div>
+   <div class="meter clean"><div class="meter-label">🧽 清潔度 <strong id="cleanValue">55%</strong></div><div class="track"><div class="progress" id="cleanProgress"></div></div></div>
   </div>
  </div>
  <div class="artframe">
@@ -167,12 +174,34 @@ body{display:flex;justify-content:center;align-items:center}
        </g>
        <g id="wetBlotches" fill="url(#darkWet)"><ellipse cx="205" cy="289" rx="92" ry="48"/><ellipse cx="405" cy="361" rx="115" ry="60"/><ellipse cx="294" cy="390" rx="90" ry="47"/></g>
        <g id="wetShine" fill="none" stroke="#d0f7e9" stroke-linecap="round"><path d="M173 250 Q276 231 369 249" opacity=".32" stroke-width="5"/><path d="M212 325 Q341 314 476 321" opacity=".27" stroke-width="4"/><path d="M142 414 Q303 391 437 410" opacity=".32" stroke-width="4"/></g>
+       <g id="dirtLayer">
+         <g id="dirtSmudges" fill="#54462d" fill-opacity=".34">
+           <ellipse id="stain1" class="stain" cx="180" cy="305" rx="38" ry="18" transform="rotate(-16 180 305)"/>
+           <ellipse id="stain2" class="stain" cx="315" cy="363" rx="42" ry="20" transform="rotate(8 315 363)"/>
+           <ellipse id="stain3" class="stain" cx="439" cy="334" rx="34" ry="16" transform="rotate(-11 439 334)"/>
+           <ellipse id="stain4" class="stain" cx="250" cy="415" rx="30" ry="14" transform="rotate(21 250 415)"/>
+         </g>
+         <g id="trashPieces">
+           <g id="trash1" class="trash" transform="translate(150 276) rotate(-18)"><rect x="-14" y="-9" width="28" height="18" rx="3" fill="#e7e1da" stroke="#9b8e84" stroke-width="2"/><path d="M-10 -3 Q0 7 10 -2" fill="none" stroke="#b1a39a" stroke-width="2"/></g>
+           <g id="trash2" class="trash" transform="translate(222 326) rotate(17)"><path d="M-12 0 L0 -12 L14 0 L3 13 Z" fill="#d7cb72" stroke="#8e8450" stroke-width="2"/><path d="M-8 1 L2 -9" stroke="#7c7542" stroke-width="1.5"/></g>
+           <g id="trash3" class="trash" transform="translate(287 293) rotate(11)"><rect x="-12" y="-6" width="24" height="12" rx="3" fill="#c76a6f" stroke="#87484a" stroke-width="2"/><path d="M-7 -6 L-10 -11 M7 6 L10 11" stroke="#f0c9cc" stroke-width="2" stroke-linecap="round"/></g>
+           <g id="trash4" class="trash" transform="translate(354 341) rotate(-22)"><circle cx="0" cy="0" r="10" fill="#90af72" stroke="#4b6945" stroke-width="2"/><path d="M-6 3 Q0 -6 6 2" fill="none" stroke="#4b6945" stroke-width="2"/></g>
+           <g id="trash5" class="trash" transform="translate(440 293) rotate(9)"><path d="M-16 0 Q0 -11 16 0 Q0 11 -16 0Z" fill="#e6ecef" stroke="#9ca5a8" stroke-width="2"/><path d="M-8 0 H8" stroke="#b9c0c4" stroke-width="2"/></g>
+           <g id="trash6" class="trash" transform="translate(490 350) rotate(23)"><rect x="-11" y="-11" width="22" height="22" rx="4" fill="#91bdd2" stroke="#537889" stroke-width="2"/><circle cx="0" cy="0" r="4" fill="#dfeff7"/></g>
+           <g id="trash7" class="trash" transform="translate(402 399) rotate(-17)"><path d="M-13 -5 L13 -5 L9 8 L-9 8 Z" fill="#e7c55f" stroke="#9c8240" stroke-width="2"/><path d="M-6 -8 H6" stroke="#e7c55f" stroke-width="4" stroke-linecap="round"/></g>
+           <g id="trash8" class="trash" transform="translate(198 393) rotate(31)"><ellipse cx="0" cy="0" rx="11" ry="7" fill="#7eb26c" stroke="#46724a" stroke-width="2"/><path d="M-6 0 Q0 -7 6 0" fill="none" stroke="#46724a" stroke-width="1.5"/></g>
+           <g id="trash9" class="trash" transform="translate(302 437) rotate(-9)"><path d="M-13 -8 H13 V8 H-13 Z" fill="#ddd1c5" stroke="#9f9387" stroke-width="2"/><path d="M-9 -4 Q0 4 8 -3" fill="none" stroke="#b7a89d" stroke-width="2"/></g>
+           <g id="trash10" class="trash" transform="translate(468 410) rotate(11)"><path d="M-10 -10 L10 10 M10 -10 L-10 10" stroke="#c9b566" stroke-width="4" stroke-linecap="round"/></g>
+         </g>
+       </g>
        <g id="charBlotches"><ellipse cx="317" cy="316" rx="81" ry="67" fill="url(#burnGradient)"/><ellipse cx="439" cy="371" rx="90" ry="63" fill="url(#burnGradient)"/><ellipse cx="185" cy="376" rx="63" ry="52" fill="url(#burnGradient)"/></g>
        <g id="dryDust"><path d="M133 270 Q229 244 346 262" stroke="#e7d3a4" stroke-opacity=".7" stroke-width="4" fill="none"/><path d="M184 352Q283 330 391 350" stroke="#e3d9b7" stroke-opacity=".5" stroke-width="3" fill="none"/></g>
      </g>
      <path id="hemStroke" d="M139 222 C175 210 206 219 237 218 L462 223 Q485 230 494 257 L544 389 Q553 410 527 416 L104 440 Q82 443 81 418 Q88 378 105 315 L119 254 Q124 234 139 222 Z" fill="none" stroke="#bbc996" stroke-width="3" stroke-dasharray="8 5" opacity=".65" />
      <path id="rimLine" d="M94 434 Q223 454 345 439 L527 426" stroke="#b6d399" stroke-opacity=".68" stroke-width="3" fill="none" stroke-linecap="round" />
    </g>
+   <path id="scrubArea" d="M139 222 C175 210 206 219 237 218 L462 223 Q485 230 494 257 L544 389 Q553 410 527 416 L104 440 Q82 443 81 418 Q88 378 105 315 L119 254 Q124 234 139 222 Z" fill="#ffffff" opacity="0.001"/>
+   <g id="scrubFx"></g>
    <g id="drips" fill="#80c9e5"><path d="M123 442q-9 9-4 23q7 9 14 0q0-11-10-23Z"/><path d="M439 424q-9 10-4 24q7 7 14 0q-1-12-10-24Z"/><path d="M537 417q-8 8-5 24q8 9 15-1q-2-15-10-23Z"/></g>
    <g id="ashes">
      <ellipse cx="325" cy="411" rx="186" ry="39" fill="url(#ashGradient)"/>
@@ -260,15 +289,15 @@ body{display:flex;justify-content:center;align-items:center}
    <g id="smokeFx" stroke="#b8bbba" stroke-opacity=".65" stroke-width="10" fill="none" stroke-linecap="round"><path d="M285 261Q261 241 279 211Q304 186 291 166"/><path d="M347 255Q328 213 354 193Q381 166 368 139"/><path d="M425 280Q408 257 435 228Q447 214 438 186"/></g>
   </svg>
  </div>
- <div class="state" aria-live="polite"><div class="state-name"><span id="stateName">蓬鬆乾爽</span><span class="state-tag" id="stateTag">軍綠棉被</span></div><div class="state-desc" id="stateDesc">一張有厚度的軍綠色棉被。按住灑水讓它變濕，按住打火機讓它烘乾。</div></div>
+ <div class="state" aria-live="polite"><div class="state-name"><span id="stateName">蓬鬆乾爽</span><span class="state-tag" id="stateTag">軍綠棉被</span></div><div class="state-desc" id="stateDesc">一開始棉被會隨機髒。先灑水弄濕，再直接在棉被上來回刷洗，把垃圾刷掉。</div></div>
  <div class="controls"><button id="waterBtn" class="tool water" type="button"><span>💧</span><div>灑水<small>長按持續加水</small></div></button><button id="fireBtn" class="tool fire" type="button"><span>🔥</span><div>打火機<small>長按烘乾 / 燒焦</small></div></button></div>
 </div>
 <script>
 (()=>{'use strict';
   const $=id=>document.getElementById(id);
   const watBtn=$('waterBtn'),firBtn=$('fireBtn');
-  const waterLabel=$('waterValue'),burnLabel=$('burnValue'),waterBar=$('waterProgress'),burnBar=$('burnProgress');
-  const blanket=$('blanketGroup'),waterFx=$('waterFx'),flameFx=$('flameFx'),steamFx=$('steamFx'),smokeFx=$('smokeFx'),wetBlotches=$('wetBlotches'),wetShine=$('wetShine'),charBlotches=$('charBlotches'),puddle=$('puddle'),drips=$('drips'),ashes=$('ashes');
+  const waterLabel=$('waterValue'),burnLabel=$('burnValue'),cleanLabel=$('cleanValue'),waterBar=$('waterProgress'),burnBar=$('burnProgress'),cleanBar=$('cleanProgress');
+  const blanket=$('blanketGroup'),scene=$('scene'),scrubArea=$('scrubArea'),scrubFx=$('scrubFx'),waterFx=$('waterFx'),flameFx=$('flameFx'),steamFx=$('steamFx'),smokeFx=$('smokeFx'),wetBlotches=$('wetBlotches'),wetShine=$('wetShine'),charBlotches=$('charBlotches'),puddle=$('puddle'),drips=$('drips'),ashes=$('ashes');
   const stops=[$('fStop1'),$('fStop2'),$('fStop3'),$('fStop4')], edgeStops=[$('edgeStop1'),$('edgeStop2')];
   const clamp=(x,min=0,max=100)=>Math.min(max,Math.max(min,x));
   // Work exclusively with RGB arrays. Previous version accidentally passed 'rgb(...)'
@@ -277,7 +306,10 @@ body{display:flex;justify-content:center;align-items:center}
   const lerp=(a,b,t)=>a+(b-a)*t;
   const blend=(a,b,t)=>a.map((n,i)=>Math.round(lerp(n,b[i],clamp(t,0,1))));
   const rgb=a=>`rgb(${a[0]},${a[1]},${a[2]})`;
-  let moisture=32,burn=0,ash=false,action=null,last=performance.now(),lastRender=0;
+  let moisture=32,burn=0,dirt=45,ash=false,action=null,last=performance.now(),lastRender=0;
+  let scrubbing=false,lastScrubPoint=null,scrubAccum=0;
+  const dirtPieces=Array.from(document.querySelectorAll('#trashPieces .trash'));
+  const dirtStains=Array.from(document.querySelectorAll('#dirtSmudges .stain'));
   const dry=hex('#aaa979'),fresh=hex('#7f995f'),wet=hex('#3e775e'),soggy=hex('#315f59');
   const burnt=hex('#aa723d'),char=hex('#353532');
   function state(){
@@ -293,9 +325,17 @@ body{display:flex;justify-content:center;align-items:center}
   }
   function update(){
     const m=moisture/100,b=burn/100, [name,tag,desc]=state();
-    $('stateName').textContent=name; $('stateTag').textContent=tag; $('stateDesc').textContent=desc;
-    waterLabel.textContent=`${Math.round(moisture)}%`;burnLabel.textContent=`${Math.round(burn)}%`;
-    waterBar.style.width=`${moisture}%`;burnBar.style.width=`${burn}%`;
+    $('stateName').textContent=name; $('stateTag').textContent=tag;
+    const clean=100-dirt;
+    let fullDesc=desc;
+    if(!ash && dirt>8){
+      fullDesc += moisture>=38 ? ' 現在可以直接用手在棉被上來回刷洗。' : ' 先灑水把棉被弄濕，才能開始刷洗。';
+    } else if(!ash){
+      fullDesc += ' 棉被已經很乾淨了。';
+    }
+    $('stateDesc').textContent=fullDesc;
+    waterLabel.textContent=`${Math.round(moisture)}%`;burnLabel.textContent=`${Math.round(burn)}%`;cleanLabel.textContent=`${Math.round(clean)}%`;
+    waterBar.style.width=`${moisture}%`;burnBar.style.width=`${burn}%`;cleanBar.style.width=`${clean}%`;
     let color=blend(dry,fresh,clamp(moisture/32,0,1));
     if(moisture>32)color=blend(fresh,wet,clamp((moisture-32)/45,0,1));
     if(moisture>77)color=blend(wet,soggy,clamp((moisture-77)/23,0,1));
@@ -335,7 +375,65 @@ body{display:flex;justify-content:center;align-items:center}
     flameFx.style.opacity=String(action==='fire'&&!ash?clamp((72-moisture)/50,.18,.82):0);
     $('lighterFx').style.opacity=String(action==='fire'&&!ash?1:0);
     // Keep even burnt quilt visually textured, never pure black.
+    dirtPieces.forEach((el,i)=>{
+      const threshold=12 + i*7;
+      const vis=clamp((dirt-threshold)/22,0,1);
+      el.style.opacity=String(vis);
+    });
+    dirtStains.forEach((el,i)=>{
+      const vis=clamp((dirt-(i*10))/55,0,.95);
+      el.style.opacity=String(vis);
+    });
+    scrubArea.classList.toggle('scrubbing', scrubbing);
     firBtn.disabled=watBtn.disabled=ash;
+  }
+  function svgPoint(e){
+    const pt=scene.createSVGPoint();
+    pt.x=e.clientX; pt.y=e.clientY;
+    return pt.matrixTransform(scene.getScreenCTM().inverse());
+  }
+  function addScrubFx(x,y){
+    const ns='http://www.w3.org/2000/svg';
+    for(let i=0;i<3;i++){
+      const c=document.createElementNS(ns,'circle');
+      c.setAttribute('cx', x + (Math.random()*18-9));
+      c.setAttribute('cy', y + (Math.random()*12-6));
+      c.setAttribute('r', 4 + Math.random()*5);
+      c.setAttribute('fill', 'rgba(255,255,255,.45)');
+      c.setAttribute('stroke', 'rgba(220,250,255,.6)');
+      c.setAttribute('stroke-width', '1.2');
+      scrubFx.appendChild(c);
+      setTimeout(()=>{c.style.opacity='0'; c.setAttribute('transform','translate(0 -8)');},20);
+      setTimeout(()=>c.remove(),280);
+    }
+  }
+  function scrubMove(e){
+    if(!scrubbing || ash) return;
+    const pt=svgPoint(e);
+    if(lastScrubPoint){
+      const dx=pt.x-lastScrubPoint.x, dy=pt.y-lastScrubPoint.y;
+      const dist=Math.hypot(dx,dy);
+      scrubAccum += dist;
+      if(moisture>=38 && dirt>0 && dist>0){
+        dirt = clamp(dirt - dist*0.045, 0, 100);
+        addScrubFx(pt.x, pt.y);
+      }
+    }
+    lastScrubPoint=pt;
+    update();
+    e.preventDefault();
+  }
+  scrubArea.addEventListener('pointerdown',e=>{
+    if(ash) return;
+    if(action) setAction(null);
+    scrubbing=true; lastScrubPoint=svgPoint(e);
+    try{scrubArea.setPointerCapture(e.pointerId);}catch(_){ }
+    e.preventDefault();
+    update();
+  });
+  scrubArea.addEventListener('pointermove',scrubMove);
+  for(const evt of ['pointerup','pointercancel','lostpointercapture']){
+    scrubArea.addEventListener(evt,()=>{scrubbing=false; lastScrubPoint=null; update();});
   }
   function setAction(which){
     if(ash && which)return;
@@ -375,9 +473,11 @@ body{display:flex;justify-content:center;align-items:center}
   }
   bind(watBtn,'water');bind(firBtn,'fire');
   window.addEventListener('blur',()=>setAction(null));
-  $('reset').addEventListener('click',()=>{moisture=32;burn=0;ash=false;setAction(null);update();});
+  function rerollDirt(){ dirt=Math.round(28 + Math.random()*58); }
+  $('reset').addEventListener('click',()=>{moisture=32;burn=0;ash=false;rerollDirt(); scrubbing=false; lastScrubPoint=null; setAction(null); update();});
   function frame(now){const dt=Math.min((now-last)/1000,.05);last=now;if(action)step(action,dt);if(now-lastRender>60){update();lastRender=now;} requestAnimationFrame(frame);}
-  window.__blanketStageDebug=()=>({moisture,burn,ash,action,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
+  window.__blanketStageDebug=()=>({moisture,burn,dirt,clean:100-dirt,ash,action,scrubbing,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
+  rerollDirt();
   update();requestAnimationFrame(frame);
 })();
 </script>
