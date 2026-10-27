@@ -183,8 +183,8 @@ button{touch-action:manipulation;}
 #impactLayer{position:fixed;inset:0;z-index:29;pointer-events:none;overflow:hidden;}
 #impactSvg{position:absolute;inset:0;width:100vw;height:100dvh;}
 .slam-hand{opacity:0;transform:translateY(-430px) rotate(-13deg);transform-origin:195px 435px;}
-#impactLayer.punching .slam-hand{animation:powerSlam .95s cubic-bezier(.25,.04,.25,1) forwards}
-@keyframes powerSlam{0%{transform:translateY(-430px) rotate(-13deg);opacity:.98}36%{transform:translateY(-200px) rotate(-8deg);opacity:1}55%{transform:translateY(0) rotate(0);opacity:1}64%{transform:translateY(12px) rotate(1deg);opacity:1}74%{transform:translateY(-8px) rotate(0);opacity:1}100%{transform:translateY(-200px) rotate(-3deg);opacity:0}}
+#impactLayer.punching .slam-hand{animation:powerSlam .72s cubic-bezier(.3,.04,.25,1) forwards}
+@keyframes powerSlam{0%{transform:translateY(-430px) rotate(-13deg);opacity:.98}47%{transform:translateY(-230px) rotate(-6deg);opacity:1}74%{transform:translateY(0) rotate(0);opacity:1}82%{transform:translateY(14px) rotate(0);opacity:1}100%{transform:translateY(-80px) rotate(-3deg);opacity:0}}
 .impact-explosion{opacity:0;transform-box:fill-box;transform-origin:center;}
 #impactLayer.exploding .impact-explosion{animation:impactBurst .72s cubic-bezier(.04,.81,.2,1) forwards}
 @keyframes impactBurst{0%{opacity:1;transform:scale(.12)}28%{opacity:1;transform:scale(1.1)}100%{opacity:0;transform:scale(2.25)}}
@@ -196,9 +196,18 @@ button{touch-action:manipulation;}
 @keyframes whiteOut{0%{opacity:0}6%{opacity:.92}23%{opacity:.54}100%{opacity:0}}
 #memoryBgStage.quake{animation:quakeBed .43s cubic-bezier(.2,.8,.3,1)}
 @keyframes quakeBed{0%{filter:none}15%{filter:drop-shadow(4px 3px 2px #060e0a77);translate:6px 0}30%{translate:-7px 4px}47%{translate:5px -3px}68%{translate:-3px 2px}100%{translate:0 0;filter:none}}
-#foldImpactFx{opacity:0;transform-box:fill-box;transform-origin:center;pointer-events:none}
-#foldImpactFx.active{animation:foldBoom .47s ease-out forwards}
-@keyframes foldBoom{0%{opacity:1;scale:.25}30%{opacity:1;scale:1}100%{opacity:0;scale:1.9}}
+/* The fold contact effect stays ON the blanket. Only its inner rings scale,
+   never the translated SVG group: animating the group's transform made it fly. */
+#foldImpactFx{opacity:0;pointer-events:none}
+#foldImpactFx.active{animation:foldFxVisibility .42s ease-out forwards}
+#foldImpactFx .fold-fx-glow,#foldImpactFx .fold-fx-ring,#foldImpactFx .fold-fx-rays{transform-box:fill-box;transform-origin:center}
+#foldImpactFx.active .fold-fx-glow{animation:foldFxGlow .42s ease-out both}
+#foldImpactFx.active .fold-fx-ring{animation:foldFxRing .42s ease-out both}
+#foldImpactFx.active .fold-fx-rays{animation:foldFxRays .42s ease-out both}
+@keyframes foldFxVisibility{0%{opacity:1}52%{opacity:.94}100%{opacity:0}}
+@keyframes foldFxGlow{0%{transform:scale(.35);opacity:.95}32%{transform:scale(.9);opacity:.8}100%{transform:scale(1.10);opacity:0}}
+@keyframes foldFxRing{0%{transform:scale(.25);opacity:1}48%{transform:scale(.85);opacity:.85}100%{transform:scale(1.25);opacity:0}}
+@keyframes foldFxRays{0%{transform:scale(.35);opacity:1}44%{transform:scale(.95);opacity:.95}100%{transform:scale(1.15);opacity:0}}
 .result-backdrop{position:fixed;inset:0;background:linear-gradient(180deg,rgba(5,16,10,.05),rgba(5,16,10,.36) 44%,rgba(2,10,6,.72));z-index:27;pointer-events:none;opacity:0;}
 .result-backdrop.visible{animation:backdropIn .38s ease forwards}
 @keyframes backdropIn{from{opacity:0}to{opacity:1}}
@@ -457,8 +466,7 @@ button{touch-action:manipulation;}
     <path d="M153 443 Q162 464 183 469" fill="none" stroke="#ffe4c5" stroke-opacity=".85" stroke-width="6" stroke-linecap="round"/>
     <path d="M144 428 Q125 427 128 449 Q131 469 151 465" fill="url(#impactSkin)" stroke="#8d5540" stroke-width="5"/>
    </g>
-   <g id="impactExplosion" transform="translate(195 468)">
-    <g class="impact-explosion">
+   <g id="impactExplosion" class="impact-explosion" transform="translate(195 468)">
      <circle r="126" fill="url(#impactGlow)"/>
      <circle r="42" fill="none" stroke="#fff9cf" stroke-width="9"/>
      <circle r="78" fill="none" stroke="#ffe6a4" stroke-opacity=".8" stroke-width="5"/>
@@ -468,7 +476,6 @@ button{touch-action:manipulation;}
      </g>
      <g fill="#ffffff"><circle cx="95" cy="-104" r="8"/><circle cx="-99" cy="103" r="6"/><circle cx="-127" cy="-30" r="6"/><circle cx="104" cy="92" r="7"/></g>
     </g>
-   </g>
     <text x="195" y="567" id="impactWord" text-anchor="middle" font-size="55" font-weight="1000" fill="#fffbea" stroke="#314a2f" stroke-width="9" paint-order="stroke">砰！！</text>
   </svg>
  </div>
@@ -532,17 +539,19 @@ button{touch-action:manipulation;}
         <g id="finalTofu" opacity="0"></g>
         <use id="stageAshes" href="#ashes"/>
       </g>
+      <!-- Stationary light burst right where folded quilt lands on mattress. -->
+      <g id="foldImpactFx" transform="translate(300 350)" pointer-events="none">
+        <ellipse class="fold-fx-glow" rx="80" ry="52" fill="url(#memHitGlow)"/>
+        <ellipse class="fold-fx-ring" rx="52" ry="30" fill="none" stroke="#fff8cd" stroke-opacity=".94" stroke-width="7"/>
+        <g class="fold-fx-rays" stroke="#fffce7" stroke-width="6" stroke-linecap="round">
+          <path d="M-12 -38L-21 -67 M17 -35L35 -62 M47 -9L80 -18 M40 18L71 37 M-46 5L-78 8 M-34 26L-62 48"/>
+        </g>
+      </g>
     </g>
     <rect id="drawingSurface" x="0" y="0" width="390" height="844" fill="transparent" />
     <path id="memoryTarget" fill="none" stroke="#fffaf0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0" filter="url(#traceGlow)" />
     <path id="memoryGhost" fill="none" stroke="#fff3b0" stroke-width="4" stroke-opacity=".92" stroke-dasharray="10 8" stroke-linecap="round" stroke-linejoin="round" hidden />
     <path id="memoryInk" fill="none" stroke="#7cf3ea" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
-    <g id="foldImpactFx" class="fold-hit-fx" transform="translate(195 468)" pointer-events="none">
-      <circle r="88" fill="url(#memHitGlow)"/>
-      <circle r="35" fill="none" stroke="#fff6c8" stroke-width="7"/>
-      <g stroke="#fffce0" stroke-width="6" stroke-linecap="round"><path d="M0 -62V-100 M47 -35L85 -62 M50 33L91 57 M0 59V96 M-51 33L-92 63 M-48 -35L-90 -63"/></g>
-      <text x="0" y="-80" text-anchor="middle" font-size="26" font-weight="1000" fill="#fff8d5" stroke="#2e503d" stroke-width="5" paint-order="stroke">啪！</text>
-    </g>
     <text id="memorySplash" x="195" y="142" font-size="16" font-weight="900" text-anchor="middle" fill="#fff8dc" paint-order="stroke" stroke="#19302a" stroke-width="6"></text>
   </svg>
 <script>
@@ -879,9 +888,11 @@ button{touch-action:manipulation;}
   }
   function restartAnimation(el,name){el.classList.remove(name);void el.getBoundingClientRect();el.classList.add(name);}
   function bedQuake(){const bed=$('memoryBgStage');restartAnimation(bed,'quake');setTimeout(()=>bed.classList.remove('quake'),460);}
-  function foldPunch(){
-    const w=window.innerWidth,h=window.innerHeight;
-    foldImpactFx.setAttribute('transform',`translate(${(w-390)/2+195} ${(h-844)/2+468})`);
+  function foldPunch(level){
+    // Coordinates are relative to #memoryBgStage, the same coordinate system
+    // as the real fold mesh. Effect is anchored to the fabric's landing point.
+    const contact=[null,{x:302,y:342},{x:302,y:337},{x:305,y:365}][level] || {x:302,y:342};
+    foldImpactFx.setAttribute('transform',`translate(${contact.x} ${contact.y})`);
     restartAnimation(foldImpactFx,'active');bedQuake();impactSound('fold');vibrate([18,35,40]);
   }
   function cancelTidyEffects(){
@@ -1417,9 +1428,10 @@ button{touch-action:manipulation;}
     const thisRound=round;
     const visualScore=roundScores.reduce((a,b)=>a+b,0)/roundScores.length;
     if(round===2)buildTofuResult(visualScore);
-    setTimeout(()=>{if(stage===2 && mode==='folding')foldPunch();},630);
     animateFold(round+1,visualScore,()=>{
       if(stage!==2)return;
+      // The quilt has landed; burst from the surface, never fly across it.
+      foldPunch(thisRound+1);
       memoryGhost.setAttribute('d',polyPath(targetPoints,true));svgHide(memoryGhost,false);
       svgHide(memoryInk,false);
       stage2ResultTitle.textContent=`${score} 分`;
