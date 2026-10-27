@@ -53,8 +53,8 @@ function inst(list,part){const a=new Float32Array(list.length*12);for(let i=0;i<
  if(part===2)color=v.rgb||[.36,.49,.32];
  else if(part>=3&&part<=4)color=v.enemy?[.73,.22,.19]:[.18,.65,.40];
  else if(v.kind===2)color=[.89,.72,.34];
- else if(v.kind===1)color=v.seed<.26?[.58,.62,.62]:v.seed<.5?[.73,.65,.50]:v.seed<.76?[.45,.59,.63]:[.74,.72,.61];
- else color=v.seed<.5?[.40,.53,.41]:[.57,.62,.46];
+ else if(v.kind===1)color=v.seed<.26?[.73,.76,.72]:v.seed<.5?[.84,.77,.67]:v.seed<.76?[.64,.75,.78]:[.82,.80,.72];
+ else color=v.seed<.5?[.69,.77,.66]:[.78,.80,.70];
  a.set([v.x||0,v.y||0,v.z||0,h,v.w||.7,v.d||.7,v.seed||.31,v.kind||0,color[0],color[1],color[2],v.landmark?1:0],o);
  }return a;}
 // Triangle cube geometry; face normals included per vertex. y=0..1.
@@ -89,9 +89,9 @@ void main(){
 }`;
 const FS=`precision mediump float;
 varying vec3 vCol;varying vec3 vN;varying vec3 vLocal;varying float vKind,vHit,vPart;
-void main(){float lit=.66+.28*max(0.,dot(normalize(vN),normalize(vec3(.42,1.,.63))))+.09*max(0.,dot(normalize(vN),normalize(vec3(-1.,.2,-.1))));
+void main(){float lit=.79+.19*max(0.,dot(normalize(vN),normalize(vec3(.42,1.,.63))))+.04*max(0.,dot(normalize(vN),normalize(vec3(-1.,.2,-.1))));
 vec3 col=vCol*lit;
-if(vPart>.5&&vPart<1.5)col*=.73;
+if(vPart>.5&&vPart<1.5)col*=.82;
 if(vPart<.5&&vKind>.5&&vKind<1.5){
  // procedural window panels on vertical city faces: no texture downloads.
  if(abs(vN.y)<.5){vec2 p=abs(vN.x)>.5?vec2(vLocal.z,vLocal.y):vec2(vLocal.x,vLocal.y);
@@ -123,9 +123,29 @@ class WebWorld{
  this.ringBuf=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,this.ringBuf);g.bufferData(g.ARRAY_BUFFER,new Float32Array(this.ringVerts),g.STATIC_DRAW);
  this.sphere=g.createBuffer();this.sphereVertices=sphereMesh();g.bindBuffer(g.ARRAY_BUFFER,this.sphere);g.bufferData(g.ARRAY_BUFFER,this.sphereVertices,g.STATIC_DRAW);
  this.bld=inst(buildings,0);this.nearBld=inst(buildings.filter(b=>Math.hypot(b.x,b.z-18)<620),0);this.troop=inst(soldiers,3);
- const roads=[];for(let x=-1450;x<=1450;x+=124){roads.push({x,y:-.08,z:0,h:.12,w:6,d:2920,rgb:[.27,.31,.30],kind:0})}for(let z=-1450;z<=1450;z+=124)roads.push({x:0,y:-.075,z,h:.12,w:2920,d:6,rgb:[.27,.31,.30],kind:0});
- this.roads=inst(roads,2);this.ground=inst([{x:0,y:-.28,z:0,w:3300,d:3300,h:.15,rgb:[.30,.43,.28]}],2);
- for(const k of ['bld','nearBld','troop','roads','ground']){const buf=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,buf);g.bufferData(g.ARRAY_BUFFER,this[k],g.STATIC_DRAW);this[k+'Buf']=buf;}
+ // The test ground must read as the same warm pastel stylized Army camp,
+ // not a dark green rectangle with asphalt city lines.
+ const roads=[];for(let x=-1450;x<=1450;x+=124){roads.push({x,y:-.10,z:0,h:.14,w:6.4,d:2920,rgb:[.70,.73,.70],kind:0})}for(let z=-1450;z<=1450;z+=124)roads.push({x:0,y:-.095,z,h:.14,w:2920,d:6.4,rgb:[.70,.73,.70],kind:0});
+ const grass=[.674,.764,.615],stone=[.863,.833,.740],curb=[.79,.78,.71],walk=[.835,.818,.751];
+ const camp=[{x:0,y:-.088,z:52,h:.13,w:192,d:232,rgb:grass}];
+ const rect=(x,z,w,d,color=stone,y=.018,h=.045)=>camp.push({x,y,z,w,d,h,rgb:color});
+ // Original camp's pale paths, neat lawn sections, and raised stone curbs.
+ rect(0,49,16,207,stone);rect(0,7,184,10,stone);rect(0,62,184,10,stone);rect(0,113,184,10,stone);
+ rect(-36,59,4,148,walk);rect(36,59,4,148,walk);
+ for(const z of [7,62,113]){rect(0,z-5.1,184,.36,curb,.064,.058);rect(0,z+5.1,184,.36,curb,.064,.058)}
+ for(const x of [-8.1,8.1]){rect(x,49,.30,207,curb,.065,.05)}
+ // Sandy inner courtyard, paved assembly square, and planted borders.
+ rect(0,37,31,28,[.79,.77,.69],.051,.045);
+ rect(0,-16,39,19,[.75,.78,.71],.052,.055);
+ for(const x of [-82,82]){rect(x,54,3,205,[.72,.79,.65],.025,.045)}
+ // Little tufts of grass arranged away from walkways and building footprints.
+ let rseed=410283;const rr=()=>{rseed=(1664525*rseed+1013904223)>>>0;return rseed/4294967296};
+ const originalSpots=[[0,50],[-22,52],[22,52],[0,78],[-42,77],[42,77],[-22,98],[22,98],[0,106],[-45,24],[44,24],[-23,26],[23,26],[-48,117],[47,117],[0,128],[-65,48],[64,55],[-65,104],[65,104]];
+ for(let k=0;k<330;k++){const x=(rr()-.5)*182,z=-44+rr()*190;if(Math.abs(x)<9||[7,62,113].some(a=>Math.abs(z-a)<6)||originalSpots.some(([bx,bz])=>Math.abs(x-bx)<10&&Math.abs(z-bz)<8))continue;
+  rect(x,z,.14+rr()*.16,.25+rr()*.36,[.43+rr()*.06,.58+rr()*.08,.38+rr()*.06],.059,.10+rr()*.13);
+ }
+ this.camp=inst(camp,2);this.roads=inst(roads,2);this.ground=inst([{x:0,y:-.28,z:0,w:3300,d:3300,h:.15,rgb:grass}],2);
+ for(const k of ['bld','nearBld','troop','roads','ground','camp']){const buf=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,buf);g.bufferData(g.ARRAY_BUFFER,this[k],g.STATIC_DRAW);this[k+'Buf']=buf;}
  this.debrisBuf=g.createBuffer();this.flightBuf=g.createBuffer();this.starProgram=compile(g,`precision mediump float;attribute vec3 aStar;uniform float uTwist;varying float vBr;void main(){float a=atan(aStar.y,aStar.x)+uTwist*(1.-length(aStar.xy));float r=length(aStar.xy);gl_Position=vec4(cos(a)*r,sin(a)*r*.63,0.,1.);gl_PointSize=1.5+aStar.z*3.2;vBr=aStar.z;}`,`precision mediump float;varying float vBr;void main(){float r=length(gl_PointCoord-.5);if(r>.49)discard;gl_FragColor=vec4(mix(vec3(.30,.42,.9),vec3(1.,.82,.58),vBr),(.35+vBr*.65)*(1.-r));}`);
  const stars=[];for(let i=0;i<2000;i++){const arm=i%4,rad=Math.pow(rand(),.72)*.96,ang=arm*Math.PI*.5+rad*10.2+(rand()-.5)*(.12+rad*.2);stars.push(Math.cos(ang)*rad+(rand()-.5)*.025,Math.sin(ang)*rad+(rand()-.5)*.045,.2+rand()*.8);}this.starCount=stars.length/3;this.stars=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,this.stars);g.bufferData(g.ARRAY_BUFFER,new Float32Array(stars),g.STATIC_DRAW);g.enable(g.DEPTH_TEST);g.depthFunc(g.LEQUAL);g.clearColor(.57,.68,.70,1);}
  resize(){this.width=c.clientWidth||window.innerWidth;this.height=c.clientHeight||window.innerHeight;const dpr=Math.min(1.45,window.devicePixelRatio||1);c.width=Math.floor(this.width*dpr);c.height=Math.floor(this.height*dpr);if(this.backup){this.backup.width=c.width;this.backup.height=c.height;}if(this.gl)this.gl.viewport(0,0,c.width,c.height);}
@@ -148,12 +168,13 @@ class WebWorld{
  debris(vp){if(this.radius<0)return;const candidates=[];let count=0;for(const b of buildings){const d=Math.hypot(b.x-this.impact[0],b.z-this.impact[1]);if(d>125||d>this.radius||count>120)continue;count++;const elapsed=Math.max(0,this.time-(d/Math.max(this.radius,1))*this.time);for(let i=0;i<2;i++){const age=Math.max(0,(this.radius-d)/(5+this.blastMax*.008));if(age>5.8)continue;const r=(b.seed+i*.37)*6.28;const ff=clamp(age,0,4);candidates.push({x:b.x+Math.cos(r)*ff*7,y:Math.max(0,.6+Math.sin(ff*1.8)*ff*1.8),z:b.z+Math.sin(r)*ff*7,w:1.1+i*.4,d:1,h:1,seed:b.seed,rgb:[.59,.55,.45]});}}
  if(candidates.length){const a=inst(candidates,5),g=this.gl;g.bindBuffer(g.ARRAY_BUFFER,this.debrisBuf);g.bufferData(g.ARRAY_BUFFER,a,g.DYNAMIC_DRAW);this.instanceDraw(this.debrisBuf,candidates.length,5,vp);}}
  drawRing(vp){if(this.radius<=1)return;const g=this.gl,p=this.ringP;g.useProgram(p);g.bindBuffer(g.ARRAY_BUFFER,this.ringBuf);const a=g.getAttribLocation(p,'aRing');g.enableVertexAttribArray(a);g.vertexAttribPointer(a,4,g.FLOAT,false,16,0);g.uniformMatrix4fv(g.getUniformLocation(p,'uVP'),false,vp);g.uniform2f(g.getUniformLocation(p,'uCenter'),this.impact[0],this.impact[1]);g.uniform1f(g.getUniformLocation(p,'uRadius'),this.radius);g.uniform1f(g.getUniformLocation(p,'uWidth'),Math.max(2,Math.min(65,this.radius*.04)));g.enable(g.BLEND);g.blendFunc(g.SRC_ALPHA,g.ONE);g.depthMask(false);g.drawArrays(g.TRIANGLES,0,this.ringVerts.length/4);g.depthMask(true);g.disable(g.BLEND);}
- drawLand(){const g=this.gl;g.clearColor(.49,.65,.69,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);let dist=72,tx=0,tz=48;
- if(this.radius>=0){dist=clamp(this.radius*.94+72,72,7600);tx=this.impact[0];tz=this.impact[1];}const eye=[tx+dist*.43,dist*.68,tz+dist*.93],tgt=[tx,0,tz];const vp=mul(pers(54,c.width/c.height,.5,19000),lookAt(eye,tgt));
- this.instanceDraw(this.groundBuf,1,2,vp);this.instanceDraw(this.roadsBuf,this.roads.length/12,2,vp);
+ drawLand(){const g=this.gl;g.clearColor(.66,.80,.91,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);let dist=63,tx=0,tz=44;
+ if(this.radius>=0){dist=clamp(this.radius*.94+63,63,7600);tx=this.impact[0];tz=this.impact[1];}const eye=[tx+dist*.43,dist*.68,tz+dist*.93],tgt=[tx,0,tz];const vp=mul(pers(54,c.width/c.height,.5,19000),lookAt(eye,tgt));
+ this.instanceDraw(this.groundBuf,1,2,vp);this.instanceDraw(this.roadsBuf,this.roads.length/12,2,vp);if(dist<450)this.instanceDraw(this.campBuf,this.camp.length/12,2,vp);
  const lod=(this.radius<350)?'nearBld':'bld';this.instanceDraw(this[lod+'Buf'],this[lod].length/12,0,vp);this.instanceDraw(this[lod+'Buf'],this[lod].length/12,1,vp);
+ if(dist>440&&this.detailProxyBuf){this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,0,vp);this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,1,vp);}
  this.instanceDraw(this.troopBuf,this.troop.length/12,3,vp);this.instanceDraw(this.troopBuf,this.troop.length/12,4,vp);
- this.drawDetailed(vp,dist);this.drawFlight(vp);
+ this.drawCampProps(vp,dist);this.drawDetailed(vp,dist);this.drawFlight(vp);
  this.debris(vp);this.drawRing(vp);
  }
 
@@ -168,6 +189,10 @@ class WebWorld{
    [-65,48,'barracks'],[64,55,'barracks'],[-65,104,'office'],[65,104,'office']
   ];
   spots.forEach(([x,z,type],i)=>this.nearBuildings.push({x,z,type,idx:i,people:2+(i%7)*2,hit:false,fragments:[]}));
+  // At distance, the real GLBs are replaced by a small batch of matching
+  // footprints rather than disappearing when the detailed cull threshold hits.
+  this.detailProxy=inst(this.nearBuildings.map(b=>({x:b.x,z:b.z,h:b.type==='office'?9:4.4,w:b.type==='office'?9:12,d:b.type==='office'?9:6.5,kind:0,seed:(b.idx%9)/9})),0);
+  this.detailProxyBuf=this.gl.createBuffer();this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.detailProxyBuf);this.gl.bufferData(this.gl.ARRAY_BUFFER,this.detailProxy,this.gl.STATIC_DRAW);
   for(let i=0;i<42;i++){
     let enemy=i<29;const a=(i*2.39996)%6.283,r=enemy?(3.5+(i%8)*2.0):(26+(i%5)*5);
     const x=(enemy?0:-28)+Math.cos(a)*r,z=(enemy?50:9)+Math.sin(a)*r*.87;
@@ -197,8 +222,45 @@ class WebWorld{
     this.soldierGltf=cadet;this.soldierGeo=this.skinGeometry(cadet);this.soldierTexture=await this.glbTexture(cadet,cadet.json.meshes[0].primitives[0]);
     const template=new RigAnimator(cadet);this.actors.forEach((a,i)=>{let anim;if(i===0)anim=template;else{anim=Object.create(RigAnimator.prototype);Object.assign(anim,{gltf:cadet,j:template.j,nodes:template.nodes,inverse:template.inverse,joints:template.joints,parents:template.parents,meshIndex:template.meshIndex,clips:template.clips,clip:'Idle',clock:0,speed:1,bones:new Float32Array(template.bones.length),globals:new Map(),prevClip:null,transition:0,prevTime:0,completed:false,rifleAim:0,recoil:0,handNode:template.handNode,rightHandWorld:null,leftHandNode:template.leftHandNode,leftHandWorld:null});}a.anim=anim;anim.setClip(anim.hasClip('Idle_11')?'Idle_11':'Idle');});
     this.modelState='ready';
+    // Optional original GLB props. Scene remains playable while props download.
+    void this.initCampProps();
   }catch(e){this.modelState='partial';this.modelErrors.push(String(e));console.error('模型載入出錯',e);}
   this.buildEvents();
+ }
+ async initCampProps(){
+  const spots=this.nearBuildings||[];
+  const nearBuilding=(x,z)=>spots.some(b=>Math.abs(b.x-x)<11&&Math.abs(b.z-z)<10);
+  const trees=[];let n=0;
+  for(const x of [-87,-74,-58,-35,34,57,74,87])for(const z of [-34,-8,23,48,88,130,151]){
+    if(nearBuilding(x,z)||Math.abs(x)<12||([7,62,113].some(a=>Math.abs(z-a)<8)))continue;
+    if(n++%3===0)continue;trees.push({type:n%2?'treeA':'treeB',x:x+(n%3)-1,z:z+(n%5)-2,scale:4.5+(n%3)*.55,yaw:n*.63});
+  }
+  const entries=[...trees];
+  for(const z of [-3,32,84,139])for(const x of [-11.6,11.6])entries.push({type:'streetlamp',x,z,scale:4.0,yaw:0});
+  for(const [x,z,yaw] of [[-21,-7,0],[21,-7,3.14],[-13,140,1.57],[13,140,1.57],[-55,-28,.3],[52,146,.4]])entries.push({type:'bench',x,z,scale:2.65,yaw});
+  // Original low-polygon timber boundary, spaced just like the main camp fence.
+  for(let z=-42;z<=153;z+=8)for(const x of [-96,96])entries.push({type:'fence',x,z,scale:7.9,yaw:Math.PI/2});
+  for(let x=-88;x<=88;x+=8)for(const z of [-47,158])entries.push({type:'fence',x,z,scale:7.9,yaw:0});
+  this.campProps=entries;
+  this.propModels={};
+  const paths={treeA:'tree-a',treeB:'tree-b',streetlamp:'streetlamp',bench:'bench',fence:'fence'};
+  await Promise.all(Object.entries(paths).map(async([kind,path])=>{try{
+    const model=await loadGlb('./assets/props/'+path+'.glb');const p=model.json.meshes[0].primitives[0];
+    const acc=model.json.accessors[p.attributes.POSITION],lo=acc.min||[-.5,-.5,-.5],hi=acc.max||[.5,.5,.5];
+    const geo=this.staticGeometry(model,p),tex=await this.glbTexture(model,p);
+    this.propModels[kind]={geo,tex,center:[(lo[0]+hi[0])/2,lo[1],(lo[2]+hi[2])/2]};
+   }catch(e){console.warn('場景小物件載入略過:',kind,String(e));}
+  }));
+ }
+ drawCampProps(vp,dist){
+  if(this.modelState!=='ready'||dist>260||!this.campProps||!this.propModels)return;
+  this.setupDetailPrograms();if(!this.detailProg)return;
+  const maxDist=dist>140?140:260;const [ix,iz]=this.impact;
+  for(const p of this.campProps){const a=this.propModels[p.type];if(!a)continue;
+    if(dist>140&&Math.hypot(p.x-ix,p.z-iz)>maxDist)continue;
+    const model=mul(T(p.x,0,p.z),mul(RY(p.yaw||0),mul(SC(p.scale),T(-a.center[0],-a.center[1],-a.center[2]))));
+    this.drawStaticMesh(a.geo,a.tex,model,vp);
+  }
  }
  staticGeometry(gltf,p){const g=this.gl,vao=g.createVertexArray();g.bindVertexArray(vao);
   for(const [attr,loc,size] of [['POSITION',0,3],['NORMAL',1,3],['TEXCOORD_0',2,2]]){
@@ -218,7 +280,7 @@ class WebWorld{
  }
  async glbTexture(gltf,prim){const g=this.gl;const mat=gltf.json.materials[prim.material],texIdx=mat?.pbrMetallicRoughness?.baseColorTexture?.index;
    if(texIdx==null)return this.blankTexture();const imgIdx=gltf.json.textures[texIdx].source;
-   const bitmap=await createImageBitmap(gltf.imageFrom(imgIdx));const canvas=document.createElement('canvas');canvas.width=768;canvas.height=768;const ctx=canvas.getContext('2d');ctx.drawImage(bitmap,0,0,768,768);bitmap.close();
+   const bitmap=await createImageBitmap(gltf.imageFrom(imgIdx));const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=1024;const ctx=canvas.getContext('2d');ctx.drawImage(bitmap,0,0,1024,1024);bitmap.close();
    const tex=g.createTexture();g.bindTexture(g.TEXTURE_2D,tex);g.pixelStorei(g.UNPACK_FLIP_Y_WEBGL,false);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,g.RGBA,g.UNSIGNED_BYTE,canvas);
    g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);return tex;
  }
@@ -300,7 +362,7 @@ class WebWorld{
  // No textures / 3D library needed; designed for WebGL-disabled phones.
  const ctx=this.fallback;if(!ctx)return;
  const w=c.width,h=c.height;
- const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,this.mode!=='field'?'#080c1d':'#739f9d');sky.addColorStop(.50,this.mode!=='field'?'#11122b':'#b4c5a6');sky.addColorStop(1,this.mode!=='field'?'#070b1b':'#3c6644');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+ const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,this.mode!=='field'?'#080c1d':'#a9d0eb');sky.addColorStop(.50,this.mode!=='field'?'#11122b':'#d5e5c8');sky.addColorStop(1,this.mode!=='field'?'#070b1b':'#abc49e');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
  if(this.mode==='galaxy'){const cx=w/2,cy=h/2;ctx.fillStyle='#f6dfaf';for(let i=0;i<850;i++){const a=i*2.4,r=Math.pow((i*.6180339887)%1,.68)*Math.min(w,h)*.45,arm=i%4*Math.PI/2,an=arm+r/35+Math.sin(i*6.13)*.1;ctx.globalAlpha=.15+((i%11)/11)*.80;const xx=cx+Math.cos(an)*r,yy=cy+Math.sin(an)*r*.6;ctx.beginPath();ctx.arc(xx,yy,0.5+(i%3)*.45,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;return;}
  if(this.mode==='space'){
    // Deep-space scene: stars, Earth, cracking planet and other planets, all game-scale.
@@ -316,19 +378,23 @@ class WebWorld{
    for(const [name,threshold,px,py,r,color] of bodies){if(rad<threshold*.18)continue;const dead=rad>threshold;ctx.globalAlpha=dead?.55:1;ctx.fillStyle=color;ctx.beginPath();ctx.arc(w*(.5+px),h*(.5+py),r,0,Math.PI*2);ctx.fill();if(name==='土星'){ctx.save();ctx.translate(w*(.5+px),h*(.5+py));ctx.rotate(-.3);ctx.strokeStyle='#eed7a4';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(0,0,25,10,0,0,Math.PI*2);ctx.stroke();ctx.restore();}ctx.globalAlpha=1;}
    return;
  }
- const dist=this.radius<0?110:clamp(this.radius*.88+90,110,7600);
+ const dist=this.radius<0?100:clamp(this.radius*.88+90,100,7600);
  const tx=this.radius>=0?this.impact[0]:0,tz=this.radius>=0?this.impact[1]:18;
  const eye=[tx+dist*.43,dist*.66,tz+dist*.95],center=[tx,0,tz];const f=norm(center.map((v,i)=>v-eye[i])),rt=norm(cross(f,[0,1,0])),up=cross(rt,f);
  const focal=h/(2*Math.tan(54*Math.PI/360/2));
  const proj=(x,y,z)=>{const d=[x-eye[0],y-eye[1],z-eye[2]],deep=dot(d,f);if(deep<1)return null;return [w*.5+focal*dot(d,rt)/deep,h*.5-focal*dot(d,up)/deep,deep];};
  const polygon=(vs,color)=>{if(vs.some(v=>!v))return;ctx.beginPath();vs.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=color;ctx.fill();};
- const plane=[[-1900,-.25,-1900],[1900,-.25,-1900],[1900,-.25,1900],[-1900,-.25,1900]].map(a=>proj(...a));polygon(plane,'#678b60');
+ const plane=[[-1900,-.25,-1900],[1900,-.25,-1900],[1900,-.25,1900],[-1900,-.25,1900]].map(a=>proj(...a));polygon(plane,'#aabd9b');
  // Intersecting roads and the main 3D practice square.
  const road=(x1,z1,x2,z2,color)=>polygon([[x1,-.15,z1],[x2,-.15,z1],[x2,-.15,z2],[x1,-.15,z2]].map(p=>proj(...p)),color);
  const dd=clamp(dist*1.6,190,2300),stride=124;
- for(let x=-1400;x<1400;x+=stride){if(Math.abs(x-tx)>dd)continue;road(x-3,-1400,x+3,1400,'#53605a');}
- for(let z=-1400;z<1400;z+=stride){if(Math.abs(z-tz)>dd)continue;road(-1400,z-3,1400,z+3,'#53605a');}
- road(-18,-4,18,50,'#687568');
+ for(let x=-1400;x<1400;x+=stride){if(Math.abs(x-tx)>dd)continue;road(x-3,-1400,x+3,1400,'#b8beb1');}
+ for(let z=-1400;z<1400;z+=stride){if(Math.abs(z-tz)>dd)continue;road(-1400,z-3,1400,z+3,'#b8beb1');}
+ // Decorative camp fields and warm paved footpaths to match the original world.
+ road(-97,-48,97,161,'#afc49f');
+ road(-8,-43,8,151,'#d6ceba');
+ for(const zz of [7,62,113])road(-93,zz-5,93,zz+5,'#dfd5bf');
+ road(-18,-4,18,50,'#c3c5ad');
  for(let zz=2;zz<=48;zz+=7){let a=proj(-18,.01,zz),b=proj(18,.01,zz);if(a&&b){ctx.strokeStyle='#e0dbac69';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();}}
  // All architecture faces are projected with a perspective camera, sorted far-to-near.
  const shown=[];
@@ -341,12 +407,17 @@ class WebWorld{
  const ground=[[-sw,0,-sd],[sw,0,-sd],[sw,0,sd],[-sw,0,sd]];
  const top=[[-sw+lean,h0,-sd],[sw+lean,h0,-sd],[sw+lean,h0,sd],[-sw+lean,h0,sd]];
  const xyz=p=>proj(bx+p[0],p[1],bz+p[2]);const v0=ground.map(xyz),v1=top.map(xyz);
- const base=b.kind===2?['#c69d61','#e2c180','#d2b074']:b.kind===1?['#677f83','#94a2a0','#849898']:['#445e49','#819078','#667c67'];
+ const base=b.kind===2?['#cdb16f','#e8cd9a','#ddc58a']:b.kind===1?['#9cbbb5','#c4d1ce','#b6c5bf']:['#a3bda4','#c7d5be','#b3c6b1'];
  const colors=hit?['#565b4f','#9f896f','#6d7262']:base;
  polygon([v0[1],v0[2],v1[2],v1[1]],colors[0]);polygon([v0[2],v0[3],v1[3],v1[2]],colors[1]);polygon([v0[0],v0[1],v1[1],v1[0]],colors[0]);polygon([v0[3],v0[0],v1[0],v1[3]],colors[1]);polygon([v1[0],v1[1],v1[2],v1[3]],colors[2]);
- if(!hit&&b.h>6&&o.depth<230){const cx=proj(b.x,b.h*.53,b.z+b.d*.501),ww=proj(b.x+b.w*.25,b.h*.53,b.z+b.d*.501);if(cx&&ww&&Math.abs(ww[0]-cx[0])>2.5){ctx.fillStyle='#273e47';const sz=clamp(Math.abs(ww[0]-cx[0])*.65,1,8);for(let row=0;row<3;row++)for(let col=-1;col<=1;col++){let a=proj(b.x+col*b.w*.24,b.h*(.22+row*.22),b.z+b.d*.502);if(a)ctx.fillRect(a[0]-sz*.5,a[1]-sz*.43,sz,sz*.7);}}}
+ if(!hit&&b.h>6&&o.depth<230){const cx=proj(b.x,b.h*.53,b.z+b.d*.501),ww=proj(b.x+b.w*.25,b.h*.53,b.z+b.d*.501);if(cx&&ww&&Math.abs(ww[0]-cx[0])>2.5){ctx.fillStyle='#587b8b';const sz=clamp(Math.abs(ww[0]-cx[0])*.65,1,8);for(let row=0;row<3;row++)for(let col=-1;col<=1;col++){let a=proj(b.x+col*b.w*.24,b.h*(.22+row*.22),b.z+b.d*.502);if(a)ctx.fillRect(a[0]-sz*.5,a[1]-sz*.43,sz,sz*.7);}}}
  if(hit&&tt<.8&&o.depth<340){const p=proj(b.x,b.h*.30,b.z);if(p){ctx.fillStyle='#bd997b7c';ctx.beginPath();ctx.ellipse(p[0],p[1],clamp(15+tt*20,3,52),clamp(6+tt*12,3,30),0,0,Math.PI*2);ctx.fill();}}
  }
+ if(dist<240){for(const x of [-82,-74,-61,62,75,85])for(const z of [-30,0,28,81,135]){
+   const p=proj(x,0,z),p1=proj(x,3.6,z);if(!p||!p1||p[2]>250||p[2]<5)continue;
+   const rad=clamp(145/p[2],2,19);ctx.fillStyle='#987b59';ctx.fillRect(p[0]-rad*.17,p1[1]+rad*.55,rad*.35,p[1]-p1[1]-rad*.55);
+   for(let k=0;k<3;k++){ctx.fillStyle=['#86ac75','#7da16c','#91b57e'][k];ctx.beginPath();ctx.arc(p1[0]+(k-1)*rad*.64,p1[1]-(k%2)*rad*.23,rad*(.84-(k%2)*.09),0,Math.PI*2);ctx.fill();}
+  }}
  if(dist<230){for(const s of soldiers){const p=proj(s.x,1,s.z);if(!p||p[2]>260)continue;const killed=this.radius>=0&&Math.hypot(s.x-this.impact[0],s.z-this.impact[1])<this.radius;ctx.fillStyle=killed?'#564b39':s.enemy?'#ce5548':'#5cb283';const hh=clamp(400/p[2],3,21);ctx.beginPath();ctx.arc(p[0],p[1]-hh*.8,hh*.3,0,Math.PI*2);ctx.fill();ctx.fillRect(p[0]-hh*.29,p[1]-hh*.52,hh*.58,hh*.72);}}
  if(this.radius>=0){ctx.beginPath();let last=false;for(let i=0;i<=80;i++){const a=i/80*Math.PI*2;let p=proj(this.impact[0]+this.radius*Math.cos(a),.17,this.impact[1]+this.radius*Math.sin(a));if(p&&p[0]>-3e3&&p[0]<w+3e3&&p[1]>-3e3&&p[1]<h+3e3){if(!last)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1]);last=true}else last=false;}ctx.strokeStyle='#ffe1a2';ctx.lineWidth=3;ctx.shadowColor='#ffcb83';ctx.shadowBlur=14;ctx.stroke();ctx.shadowBlur=0;}
  }
