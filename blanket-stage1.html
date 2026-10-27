@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
 <meta name="theme-color" content="#203229" />
-<title>豆腐干棉被｜第一到三階段：水火刷洗＋實體對折＋最後整理 v1.2</title>
+<title>豆腐干棉被｜第一到三階段：水火刷洗＋實體對折＋最後整理 v1.3</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f6f6e8;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -171,6 +171,57 @@ button{touch-action:manipulation;}
 .summary-note{font-size:12px;color:#bdcdb7;margin:11px 0 2px}
 #stage3RestartBtn{width:100%}
 @media(max-height:740px){#stage3Panel{padding:12px;top:calc(7px + env(safe-area-inset-top));}.stage3-panel h2{font-size:21px}.summary-result-name{font-size:24px}.summary-total{font-size:37px}.summary-grid{gap:6px;margin:8px 0}.stage3-meter{height:33px}#tidyButton{min-height:58px}}
+
+/* v1.3 - impact feel, precision lock, result reveal */
+#stage3Panel{z-index:25}
+#stage3Play{transition:filter .25s ease}
+#stage3Play.locked #tidyMeter{border-color:#ffe093;box-shadow:0 0 18px #ffed9b78,inset 0 2px 9px #0009}
+#stage3Play.locked .stage3-fill{background:linear-gradient(90deg,#6a9b57,#c6e77d,#fff9b8)}
+#stage3Play.locked #tidyButton{filter:saturate(.6);background:linear-gradient(145deg,#567460,#334838);color:#f0efc7;box-shadow:none;transform:none}
+#tidyReadout.locked-score{color:#ffe69b;font-size:20px;text-shadow:0 0 12px #fed18e8a;animation:scoreThump .34s ease-out both}
+@keyframes scoreThump{0%{transform:scale(.78)}55%{transform:scale(1.15)}100%{transform:scale(1)}}
+#impactLayer{position:fixed;inset:0;z-index:29;pointer-events:none;overflow:hidden;}
+#impactSvg{position:absolute;inset:0;width:100vw;height:100dvh;}
+.slam-hand{opacity:0;transform:translateY(-430px) rotate(-13deg);transform-origin:195px 435px;}
+#impactLayer.punching .slam-hand{animation:powerSlam .95s cubic-bezier(.25,.04,.25,1) forwards}
+@keyframes powerSlam{0%{transform:translateY(-430px) rotate(-13deg);opacity:.98}36%{transform:translateY(-200px) rotate(-8deg);opacity:1}55%{transform:translateY(0) rotate(0);opacity:1}64%{transform:translateY(12px) rotate(1deg);opacity:1}74%{transform:translateY(-8px) rotate(0);opacity:1}100%{transform:translateY(-200px) rotate(-3deg);opacity:0}}
+.impact-explosion{opacity:0;transform-box:fill-box;transform-origin:center;}
+#impactLayer.exploding .impact-explosion{animation:impactBurst .72s cubic-bezier(.04,.81,.2,1) forwards}
+@keyframes impactBurst{0%{opacity:1;transform:scale(.12)}28%{opacity:1;transform:scale(1.1)}100%{opacity:0;transform:scale(2.25)}}
+#impactWord{opacity:0;transform-origin:195px 565px;}
+#impactLayer.exploding #impactWord{animation:impactComic .62s ease-out forwards}
+@keyframes impactComic{0%{opacity:0;transform:scale(.4) rotate(-12deg)}25%{opacity:1;transform:scale(1.18) rotate(4deg)}55%{opacity:1;transform:scale(.98)}100%{opacity:0;transform:translateY(-50px) scale(1.28)}}
+.impact-flash{position:absolute;inset:0;pointer-events:none;background:white;opacity:0}
+#impactLayer.exploding .impact-flash{animation:whiteOut .58s ease-out forwards}
+@keyframes whiteOut{0%{opacity:0}6%{opacity:.92}23%{opacity:.54}100%{opacity:0}}
+#memoryBgStage.quake{animation:quakeBed .43s cubic-bezier(.2,.8,.3,1)}
+@keyframes quakeBed{0%{filter:none}15%{filter:drop-shadow(4px 3px 2px #060e0a77);translate:6px 0}30%{translate:-7px 4px}47%{translate:5px -3px}68%{translate:-3px 2px}100%{translate:0 0;filter:none}}
+#foldImpactFx{opacity:0;transform-box:fill-box;transform-origin:center;pointer-events:none}
+#foldImpactFx.active{animation:foldBoom .47s ease-out forwards}
+@keyframes foldBoom{0%{opacity:1;scale:.25}30%{opacity:1;scale:1}100%{opacity:0;scale:1.9}}
+.result-backdrop{position:fixed;inset:0;background:linear-gradient(180deg,rgba(5,16,10,.05),rgba(5,16,10,.36) 44%,rgba(2,10,6,.72));z-index:27;pointer-events:none;opacity:0;}
+.result-backdrop.visible{animation:backdropIn .38s ease forwards}
+@keyframes backdropIn{from{opacity:0}to{opacity:1}}
+.result-reveal{position:fixed;z-index:32;left:50%;top:57%;width:min(91vw,430px);max-height:min(77dvh,700px);overflow-y:auto;overscroll-behavior:contain;transform:translate(-50%,-50%);border:2px solid #eedaa380;border-radius:23px;background:radial-gradient(circle at 50% 0,#3c573d,#14291f 72%);box-shadow:0 22px 70px #010905d9,0 0 36px #f1d97b36;padding:19px 16px 15px;color:#faf7e7;text-align:center}
+.result-reveal.show{animation:revealPop .65s cubic-bezier(.15,1.35,.2,1) backwards}
+@keyframes revealPop{0%{opacity:0;transform:translate(-50%,-42%) scale(.53) rotate(-6deg)}64%{opacity:1;transform:translate(-50%,-50%) scale(1.045) rotate(1deg)}100%{transform:translate(-50%,-50%) scale(1) rotate(0)}}
+.result-eyebrow{font-size:12px;letter-spacing:2.5px;color:#dfeabc;font-weight:900;margin-bottom:12px}
+.result-topline{display:flex;align-items:center;gap:9px;text-align:left}
+.result-icon{font-size:38px;line-height:1;background:#8a9f7230;border:1px solid #cbd6b664;border-radius:14px;padding:10px 6px;flex:0 0 55px;text-align:center}
+.result-title-zone{flex:1;min-width:0}
+.result-title-small{font-size:12px;color:#d0dccb;font-weight:800;margin-bottom:4px}
+.result-reveal .summary-result-name{font-size:clamp(21px,5.4vw,26px);margin:0;line-height:1.15;color:#fff4a7;letter-spacing:.3px;overflow-wrap:anywhere;text-shadow:0 2px 12px #f4ce7455}
+.result-score-zone{flex:0 0 75px;text-align:center;background:linear-gradient(180deg,#f4d984,#b7833d);border:1px solid #fff2c2;border-radius:13px;padding:9px 5px;color:#35200c;box-shadow:0 4px 0 #6b4d2380}
+.result-score-zone strong{display:block;font-size:35px;line-height:1;font-variant-numeric:tabular-nums}
+.result-score-zone small{font-size:12px;font-weight:1000}
+.product-desc{font-size:14px;line-height:1.65;color:#f5f0d2;background:#ffffff0c;border-left:3px solid #f4cf7e;padding:11px 12px;text-align:left;border-radius:9px;margin:16px 0 9px}
+.result-reveal .summary-grid{margin:10px 0;gap:8px}
+.result-reveal .summary-stat{padding:8px}
+.result-reveal .summary-detail{font-size:11px;line-height:1.5;color:#d1ddcb;max-height:80px;overflow-y:auto}
+.again-btn{width:100%;min-height:53px;margin-top:15px;padding:10px 12px;border-radius:14px;border:1px solid #e2ecc0;background:linear-gradient(145deg,#a1c97a,#5b8654);box-shadow:0 4px 0 #24482f;color:#faffed;font:inherit;font-size:18px;font-weight:1000;touch-action:manipulation}
+.again-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #24482f}
+@media(max-height:730px){.result-reveal{top:57%;max-height:73dvh;padding:13px 12px}.result-eyebrow{margin-bottom:6px}.result-score-zone strong{font-size:30px}.product-desc{padding:8px 9px;margin:10px 0 6px}.again-btn{margin-top:9px}}
+@media(prefers-reduced-motion:reduce){.result-reveal.show{animation-duration:.24s}#memoryBgStage.quake{animation-duration:.2s}}
 </style>
 </head>
 <body>
@@ -388,24 +439,65 @@ button{touch-action:manipulation;}
      <div class="stage3-meter-readout" id="tidyReadout">0 / 100</div>
      <button id="tidyButton" type="button">整理！</button>
    </div>
-   <div id="stage3Summary" hidden>
-     <h2>折棉被總結算</h2>
-     <div class="summary-result-name" id="productName">軍用豆腐乾（暫定）</div>
-     <div class="summary-total" id="summaryTotal">0 分</div>
-     <div class="summary-grid">
-       <div class="summary-stat"><span>三次開折平均</span><strong id="summaryFolds">0 分</strong></div>
-       <div class="summary-stat"><span>最後整理</span><strong id="summaryTidy">0 分</strong></div>
-     </div>
-     <div class="summary-detail" id="summaryDetail"></div>
-     <div class="summary-note">成品名稱先用豆腐乾佔位，荒謬造型下次再加入。</div>
-     <div class="stage3-actions"><button id="stage3RestartBtn" type="button">再折一次</button></div>
-   </div>
  </div>
+ <div id="impactLayer" hidden aria-hidden="true">
+  <div class="impact-flash" id="impactFlash"></div>
+  <svg id="impactSvg" viewBox="0 0 390 844" preserveAspectRatio="none">
+   <defs>
+    <radialGradient id="impactGlow"><stop stop-color="#ffffff" stop-opacity=".96"/><stop offset=".36" stop-color="#ffedab" stop-opacity=".78"/><stop offset="1" stop-color="#fffbd8" stop-opacity="0"/></radialGradient>
+    <linearGradient id="impactSleeve" x1="0" x2="1" y1="0" y2=".4"><stop stop-color="#344d34"/><stop offset=".5" stop-color="#627c4d"/><stop offset="1" stop-color="#273f31"/></linearGradient>
+    <linearGradient id="impactSkin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffdbb8"/><stop offset=".7" stop-color="#dca47d"/><stop offset="1" stop-color="#b77755"/></linearGradient>
+   </defs>
+   <g id="slamHand" class="slam-hand">
+    <path d="M153 90 Q147 146 160 213 L169 337 L153 390 L218 399 L226 328 L219 192 Q223 143 215 90Z" fill="url(#impactSleeve)" stroke="#1b362c" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M157 326 Q193 343 223 325 L221 364 L153 361Z" fill="#2d4534" stroke="#19312a" stroke-width="5"/>
+    <path d="M156 359 Q187 370 222 353 L224 397 Q229 416 235 428 L231 465 Q219 485 192 487 L167 475 Q147 468 145 446 L143 419 Q145 397 156 359Z" fill="url(#impactSkin)" stroke="#8d5540" stroke-width="6"/>
+    <path d="M148 412 Q172 399 190 412 Q210 402 231 418" fill="none" stroke="#f6cfad" stroke-width="9" stroke-linecap="round"/>
+    <path d="M158 421 Q173 436 178 449 M186 418 Q197 434 201 449 M214 420 Q224 432 225 444" fill="none" stroke="#a9694d" stroke-opacity=".58" stroke-width="3" stroke-linecap="round"/>
+    <path d="M153 443 Q162 464 183 469" fill="none" stroke="#ffe4c5" stroke-opacity=".85" stroke-width="6" stroke-linecap="round"/>
+    <path d="M144 428 Q125 427 128 449 Q131 469 151 465" fill="url(#impactSkin)" stroke="#8d5540" stroke-width="5"/>
+   </g>
+   <g id="impactExplosion" transform="translate(195 468)">
+    <g class="impact-explosion">
+     <circle r="126" fill="url(#impactGlow)"/>
+     <circle r="42" fill="none" stroke="#fff9cf" stroke-width="9"/>
+     <circle r="78" fill="none" stroke="#ffe6a4" stroke-opacity=".8" stroke-width="5"/>
+     <g stroke="#fff9d2" stroke-width="10" stroke-linecap="round">
+      <path d="M0 -72 L0 -135"/><path d="M62 -36 L120 -71"/><path d="M63 40 L122 77"/>
+      <path d="M0 73 L0 143"/><path d="M-63 39 L-122 81"/><path d="M-64 -35 L-126 -70"/>
+     </g>
+     <g fill="#ffffff"><circle cx="95" cy="-104" r="8"/><circle cx="-99" cy="103" r="6"/><circle cx="-127" cy="-30" r="6"/><circle cx="104" cy="92" r="7"/></g>
+    </g>
+   </g>
+    <text x="195" y="567" id="impactWord" text-anchor="middle" font-size="55" font-weight="1000" fill="#fffbea" stroke="#314a2f" stroke-width="9" paint-order="stroke">砰！！</text>
+  </svg>
+ </div>
+ <div class="result-backdrop" id="resultBackdrop" hidden></div>
+ <div id="stage3Summary" class="result-reveal" hidden aria-live="polite">
+   <div class="result-eyebrow">報告長官！鑑定結果</div>
+   <div class="result-topline">
+      <div class="result-icon" id="productIcon">🧱</div>
+      <div class="result-title-zone">
+         <div class="result-title-small">這次你折出了</div>
+         <div class="summary-result-name" id="productName">豆腐乾棉被</div>
+      </div>
+      <div class="result-score-zone"><strong id="summaryTotal">0</strong><small>總分</small></div>
+   </div>
+   <p class="product-desc" id="productDescription">你的棉被究竟進化成了什麼？</p>
+   <div class="summary-grid">
+     <div class="summary-stat"><span>三次開折平均</span><strong id="summaryFolds">0 分</strong></div>
+     <div class="summary-stat"><span>最後整理</span><strong id="summaryTidy">0 分</strong></div>
+   </div>
+   <div class="summary-detail" id="summaryDetail"></div>
+   <button id="stage3RestartBtn" class="again-btn" type="button">再折一次！</button>
+ </div>
+
  <div class="state" id="stage1State" aria-live="polite"><div class="state-name"><span id="stateName">蓬鬆乾爽</span><span class="state-tag" id="stateTag">軍綠棉被</span></div><div class="state-desc" id="stateDesc">先灑水，再用手指把每個垃圾往床邊掃出去。濕太久還會發霉長香菇！</div><button id="nextStageBtn" class="next-stage" type="button">下一階段：記憶折線 <span aria-hidden="true">→</span></button></div>
  <div class="controls" id="stage1Controls"><button id="waterBtn" class="tool water" type="button"><span>💧</span><div>灑水<small>長按持續加水</small></div></button><button id="fireBtn" class="tool fire" type="button"><span>🔥</span><div>打火機<small>長按烘乾 / 燒焦</small></div></button></div>
 </div>
   <svg id="memoryOverlay" viewBox="0 0 390 844" preserveAspectRatio="none" aria-label="全螢幕記憶折線畫布" hidden>
     <defs>
+      <radialGradient id="memHitGlow"><stop stop-color="#ffffff" stop-opacity=".9"/><stop offset="1" stop-color="#ffdf83" stop-opacity="0"/></radialGradient>
       <linearGradient id="memBgGrad" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#18372e"/><stop offset=".52" stop-color="#11271f"/><stop offset="1" stop-color="#0a1914"/></linearGradient>
       <linearGradient id="memBlanketGrad" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#97ad76"/><stop offset=".4" stop-color="#7c955d"/><stop offset="1" stop-color="#506f44"/></linearGradient>
       <linearGradient id="memEdgeGrad" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d3dfb8" stop-opacity=".65"/><stop offset="1" stop-color="#385d3c" stop-opacity=".35"/></linearGradient>
@@ -445,6 +537,12 @@ button{touch-action:manipulation;}
     <path id="memoryTarget" fill="none" stroke="#fffaf0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0" filter="url(#traceGlow)" />
     <path id="memoryGhost" fill="none" stroke="#fff3b0" stroke-width="4" stroke-opacity=".92" stroke-dasharray="10 8" stroke-linecap="round" stroke-linejoin="round" hidden />
     <path id="memoryInk" fill="none" stroke="#7cf3ea" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+    <g id="foldImpactFx" class="fold-hit-fx" transform="translate(195 468)" pointer-events="none">
+      <circle r="88" fill="url(#memHitGlow)"/>
+      <circle r="35" fill="none" stroke="#fff6c8" stroke-width="7"/>
+      <g stroke="#fffce0" stroke-width="6" stroke-linecap="round"><path d="M0 -62V-100 M47 -35L85 -62 M50 33L91 57 M0 59V96 M-51 33L-92 63 M-48 -35L-90 -63"/></g>
+      <text x="0" y="-80" text-anchor="middle" font-size="26" font-weight="1000" fill="#fff8d5" stroke="#2e503d" stroke-width="5" paint-order="stroke">啪！</text>
+    </g>
     <text id="memorySplash" x="195" y="142" font-size="16" font-weight="900" text-anchor="middle" fill="#fff8dc" paint-order="stroke" stroke="#19302a" stroke-width="6"></text>
   </svg>
 <script>
@@ -741,7 +839,73 @@ button{touch-action:manipulation;}
   const stage3Play=$('stage3Play'),stage3Summary=$('stage3Summary'),tidyButton=$('tidyButton');
   const tidyMeter=$('tidyMeter'),tidyFill=$('tidyFill'),tidyNeedle=$('tidyNeedle'),tidyReadout=$('tidyReadout');
   let tidyRunning=false,tidyStartedAt=0,tidyFrame=0,tidyScore=null,tidyLockedValue=null;
-  const TIDY_CYCLE_MS=1450; // 從 0 → 100 → 0 共 1.45 秒，每秒近 1.4 個單程
+  let revealTimer=null,hitTimer=null,clearImpactTimer=null;
+  const impactLayer=$('impactLayer'),impactSvg=$('impactSvg'),foldImpactFx=$('foldImpactFx'),resultBackdrop=$('resultBackdrop');
+  const TIDY_CYCLE_MS=420; // v1.3: 0→100→0 in 0.42s; >3x faster than 1.45s
+  let soundContext=null;
+  function getSoundContext(){
+    try{
+      const Ctx=window.AudioContext||window.webkitAudioContext;
+      if(!Ctx)return null;
+      if(!soundContext)soundContext=new Ctx();
+      if(soundContext.state==='suspended')soundContext.resume().catch(()=>{});
+      return soundContext;
+    }catch(_){return null;}
+  }
+  function vibrate(pattern){
+    try{if(navigator.vibrate)navigator.vibrate(pattern);}catch(_){/* iOS Safari may not implement Vibration API */}
+  }
+  function impactSound(kind='boom'){
+    const ctx=getSoundContext();if(!ctx)return;
+    try{
+      const now=ctx.currentTime;
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      const isFold=kind==='fold',isWhoosh=kind==='whoosh';
+      o.type=isWhoosh?'sawtooth':'sine';
+      o.frequency.setValueAtTime(isWhoosh?650:(isFold?155:110),now);
+      o.frequency.exponentialRampToValueAtTime(isWhoosh?185:(isFold?62:39),now+(isWhoosh?.14:.25));
+      g.gain.setValueAtTime(.001,now);g.gain.exponentialRampToValueAtTime(isWhoosh?.06:(isFold?.14:.20),now+.009);
+      g.gain.exponentialRampToValueAtTime(.001,now+(isWhoosh?.18:.3));
+      o.connect(g).connect(ctx.destination);o.start(now);o.stop(now+(isWhoosh?.2:.32));
+      if(!isWhoosh){
+        const len=Math.floor(ctx.sampleRate*.16),buffer=ctx.createBuffer(1,len,ctx.sampleRate),data=buffer.getChannelData(0);
+        for(let i=0;i<len;i++)data[i]=(Math.random()*2-1)*(1-i/len);
+        const n=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),noiseGain=ctx.createGain();
+        n.buffer=buffer;filter.type='lowpass';filter.frequency.value=isFold?1150:800;
+        noiseGain.gain.setValueAtTime(isFold?.11:.17,now);noiseGain.gain.exponentialRampToValueAtTime(.001,now+.16);
+        n.connect(filter).connect(noiseGain).connect(ctx.destination);n.start(now);n.stop(now+.17);
+      }
+    }catch(_){/* sound unavailable must not interrupt game */}
+  }
+  function restartAnimation(el,name){el.classList.remove(name);void el.getBoundingClientRect();el.classList.add(name);}
+  function bedQuake(){const bed=$('memoryBgStage');restartAnimation(bed,'quake');setTimeout(()=>bed.classList.remove('quake'),460);}
+  function foldPunch(){
+    const w=window.innerWidth,h=window.innerHeight;
+    foldImpactFx.setAttribute('transform',`translate(${(w-390)/2+195} ${(h-844)/2+468})`);
+    restartAnimation(foldImpactFx,'active');bedQuake();impactSound('fold');vibrate([18,35,40]);
+  }
+  function cancelTidyEffects(){
+    if(hitTimer!==null)clearTimeout(hitTimer);
+    if(revealTimer!==null)clearTimeout(revealTimer);
+    if(clearImpactTimer!==null)clearTimeout(clearImpactTimer);
+    hitTimer=revealTimer=clearImpactTimer=null;
+    impactLayer.classList.remove('punching','exploding');impactLayer.hidden=true;
+    resultBackdrop.hidden=true;resultBackdrop.classList.remove('visible');
+    stage3Summary.hidden=true;stage3Summary.classList.remove('show');
+  }
+  function productFor(total,foldAvg,tidy){
+    // Initially a small set; each result is driven by the player's actual input state.
+    if(ash||burn>=92)return {name:'灰燼棉被',icon:'🌫️',desc:'長官把被子掀開，只剩下一堆灰。這是內務整理，還是火化現場？'};
+    if(burn>=54)return {name:'焦炭棉被',icon:'🔥',desc:'八層焦香，外酥內軟。全連只有你的棉被需要消防隊。'};
+    if(moisture>=78&&moldAge>.7)return {name:'香菇農場棉被',icon:'🍄',desc:'每一折都有菌菇驚喜。班長說先別動，這可能是連上的下一頓加菜。'};
+    if(dirt>=67)return {name:'垃圾山棉被',icon:'🗑️',desc:'從表面掃到夾層，總有驚喜垃圾。你把寢室內務變成資源回收場。'};
+    if(tidy>=86&&foldAvg>=75)return {name:'坦克棉被',icon:'🪖',desc:'最後那一下把棉被敲到裝甲級硬度。班長：叫你折豆腐，誰叫你組裝戰車？！'};
+    if(total>=82)return {name:'特級豆腐乾棉被',icon:'🏅',desc:'邊角方正、硬到像磚。班長檢查半天，只能說再折一次給大家看。'};
+    if(total>=60)return {name:'標準豆腐乾棉被',icon:'🧱',desc:'終於折出一塊像樣的豆腐乾。雖然不完美，至少不是不明生物。'};
+    if(tidy<22)return {name:'塌陷海豹棉被',icon:'🦭',desc:'最後一下根本沒用力。棉被直接癱在床上，像一隻不想起床的海豹。'};
+    return {name:'戰損飯糰棉被',icon:'🍙',desc:'你努力想把它折成方形，但它堅持要變飯糰。班長看了開始懷疑人生。'};
+  }
+
   function tidyValueAt(now){
     const phase=((now-tidyStartedAt)%TIDY_CYCLE_MS+TIDY_CYCLE_MS)%TIDY_CYCLE_MS/TIDY_CYCLE_MS;
     return 100*(1-Math.abs(2*phase-1));
@@ -760,32 +924,57 @@ button{touch-action:manipulation;}
     tidyFrame=requestAnimationFrame(tickTidy);
   }
   function startTidy(){
-    stopTidy();tidyScore=null;tidyLockedValue=null;
-    stage3Play.hidden=false;stage3Summary.hidden=true;stage3Panel.classList.remove('summary-mode');
-    tidyButton.disabled=false;
+    cancelTidyEffects();stopTidy();tidyScore=null;tidyLockedValue=null;
+    stage3Play.hidden=false;stage3Panel.classList.remove('summary-mode');stage3Play.classList.remove('locked');
+    tidyButton.disabled=false;tidyButton.textContent='整理！';tidyReadout.classList.remove('locked-score');
     tidyStartedAt=performance.now();tidyRunning=true;renderTidy(0);
     tidyFrame=requestAnimationFrame(tickTidy);
   }
-  function finishTidy(){
-    if(stage!==3||mode!=='tidy'||!tidyRunning)return;
-    // 當下讀取時間，而不是使用上一張影格，避免手機掉幀造成評分不準。
-    const current=tidyValueAt(performance.now());
-    tidyLockedValue=current;tidyScore=Math.round(current);
-    stopTidy();renderTidy(current);tidyButton.disabled=true;
-    mode='summary';
+  function revealTidy(){
+    if(stage!==3||mode!=='impact')return;
     const foldAvg=Math.round(roundScores.reduce((a,b)=>a+b,0)/Math.max(1,roundScores.length));
     const total=Math.round(foldAvg*.65+tidyScore*.35);
-    $('productName').textContent='軍用豆腐乾（暫定）';
-    $('summaryTotal').textContent=total+' 分';
+    const product=productFor(total,foldAvg,tidyScore);
+    $('productName').textContent=product.name;
+    $('productIcon').textContent=product.icon;
+    $('productDescription').textContent=product.desc;
+    $('summaryTotal').textContent=String(total);
     $('summaryFolds').textContent=foldAvg+' 分';
     $('summaryTidy').textContent=tidyScore+' 分';
     $('summaryDetail').textContent=
-      `開折成績：${roundScores.map((v,i)=>`第${i+1}折 ${v} 分`).join('／')}。`+
-      ` 最後整理停在 ${Math.round(current)} / 100，越靠近 MAX 分數越高。`+
-      ` 第一階段狀態：濕度 ${Math.round(moisture)}%、焦化 ${Math.round(burn)}%、髒亂 ${Math.round(dirt)}%。`+
-      ` 總分暫以三次開折平均占 65%、最後整理占 35% 計算。`;
-    stage3Play.hidden=true;stage3Summary.hidden=false;stage3Panel.classList.add('summary-mode');
-    memorySplash.textContent='';
+      `三次開折：${roundScores.map((v,i)=>`第${i+1}折 ${v}分`).join('／')}。`+
+      `最後整理命中 ${Math.round(tidyLockedValue)} / 100。`+
+      `棉被狀態：含水量 ${Math.round(moisture)}%、焦化 ${Math.round(burn)}%、髒亂 ${Math.round(dirt)}%。`;
+    resultBackdrop.hidden=false;resultBackdrop.classList.add('visible');
+    stage3Summary.hidden=false;restartAnimation(stage3Summary,'show');
+    mode='summary';vibrate([22,50,42]);impactSound('fold');
+  }
+  function finishTidy(){
+    if(stage!==3||mode!=='tidy'||!tidyRunning)return;
+    // Pointer-down, not delayed click, is the time to lock a super fast bar.
+    const current=tidyValueAt(performance.now());
+    tidyLockedValue=current;tidyScore=Math.round(current);
+    stopTidy();renderTidy(current);
+    tidyReadout.textContent=`命中 ${tidyScore} 分 / MAX 100`;
+    tidyReadout.classList.add('locked-score');stage3Play.classList.add('locked');
+    tidyButton.disabled=true;tidyButton.textContent=`已鎖定 ${tidyScore} 分！`;
+    mode='impact';vibrate(12);impactSound('whoosh');
+    impactSvg.setAttribute('viewBox',`0 0 ${window.innerWidth} ${window.innerHeight}`);
+    $('slamHand').setAttribute('transform',`translate(${(window.innerWidth-390)/2} ${(window.innerHeight-844)/2})`);
+    $('impactExplosion').setAttribute('transform',`translate(${window.innerWidth/2} ${window.innerHeight/2+46})`);
+    $('impactWord').setAttribute('x',String(window.innerWidth/2));
+    $('impactWord').setAttribute('y',String(window.innerHeight/2+140));
+    impactLayer.hidden=false;impactLayer.classList.remove('exploding');restartAnimation(impactLayer,'punching');
+    hitTimer=setTimeout(()=>{
+      hitTimer=null;if(stage!==3||mode!=='impact')return;
+      impactLayer.classList.add('exploding');bedQuake();
+      impactSound('boom');vibrate([55,28,85,20,45]);
+    },515);
+    // Meter remains locked and fully visible while the impact plays.
+    revealTimer=setTimeout(()=>{revealTimer=null;revealTidy();},1460);
+    clearImpactTimer=setTimeout(()=>{
+      clearImpactTimer=null;impactLayer.classList.remove('punching','exploding');impactLayer.hidden=true;
+    },1610);
   }
 
   let round=0,mode='idle',roundScores=[],targetPoints=[],drawPoints=[],lastDrawPointer=null,previewTimer=null,feedbackTimer=null,foldStep=0;
@@ -1132,8 +1321,8 @@ button{touch-action:manipulation;}
     startRound();
   }
   function leaveStage2(){
-    stopTidy();tidyScore=null;tidyLockedValue=null;stage3Panel.classList.remove('summary-mode');
-    stage3Play.hidden=false;stage3Summary.hidden=true;
+    stopTidy();cancelTidyEffects();tidyScore=null;tidyLockedValue=null;stage3Panel.classList.remove('summary-mode');
+    stage3Play.hidden=false;
     clearStageTimers();stage=1;mode='idle';lastDrawPointer=null;foldStep=0;renderFoldState();
     svgHide(overlay,true);$('stage2Info').hidden=true;$('stage2Controls').hidden=true;stage2Result.hidden=true;stage3Panel.hidden=true;
     redrawBtn.hidden=false; foldBtn.hidden=false; finalTidyBtn.hidden=true;
@@ -1185,6 +1374,7 @@ button{touch-action:manipulation;}
   $('nextStageBtn').addEventListener('click',startStage2);
   finalTidyBtn.addEventListener('click',enterStage3);
   stage3RestartBtn.addEventListener('click',()=>{leaveStage2();moisture=32;burn=0;ash=false;moldAge=0;rerollDirt();scrubbing=false;lastScrubPoint=null;setAction(null);update();});
+  tidyButton.addEventListener('pointerdown',e=>{if(e.button!==undefined && e.button!==0)return;finishTidy();});
   tidyButton.addEventListener('click',finishTidy);
   overlay.addEventListener('pointerdown',e=>{
     if(stage!==2||mode!=='draw'||e.button>0)return;
@@ -1217,6 +1407,7 @@ button{touch-action:manipulation;}
     if(stage!==2)return;
     if(mode!=='draw'||foldBtn.disabled)return;
     const score=similarity();roundScores.push(score);lastDrawPointer=null;
+    getSoundContext();impactSound('whoosh');vibrate(12);
     svgHide(memoryTarget,true);svgHide(memoryGhost,true);svgHide(memoryInk,true);
     stage2Result.hidden=true;
     memorySplash.textContent=round===2?'最後壓實！':'正在翻折棉被…';
@@ -1226,6 +1417,7 @@ button{touch-action:manipulation;}
     const thisRound=round;
     const visualScore=roundScores.reduce((a,b)=>a+b,0)/roundScores.length;
     if(round===2)buildTofuResult(visualScore);
+    setTimeout(()=>{if(stage===2 && mode==='folding')foldPunch();},630);
     animateFold(round+1,visualScore,()=>{
       if(stage!==2)return;
       memoryGhost.setAttribute('d',polyPath(targetPoints,true));svgHide(memoryGhost,false);
@@ -1240,7 +1432,7 @@ button{touch-action:manipulation;}
       feedbackTimer=setTimeout(()=>{feedbackTimer=null;if(stage!==2)return;if(thisRound===2){showFinishStage2();}else{round++;startRound();}},1120);
     });
   });
-  window.__blanketStageDebug=()=>({stage,round,mode,foldStep,foldForm:foldActive.getAttribute('href'),foldScores:[...foldScores],roundScores:[...roundScores],tidyRunning,tidyScore,tidyLockedValue,tidyCurrent:tidyRunning?tidyValueAt(performance.now()):tidyLockedValue,previewVisible:!memoryTarget.hasAttribute('hidden'),drawPoints:drawPoints.length,moisture,burn,dirt,trashRemaining:trashObjects.filter(o=>!o.removed).length,trashInitial,moldAge,ash,action,scrubbing,canvasW,canvasH,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
+  window.__blanketStageDebug=()=>({stage,round,mode,foldStep,foldForm:foldActive.getAttribute('href'),foldScores:[...foldScores],roundScores:[...roundScores],tidyRunning,tidyScore,tidyLockedValue,impactVisible:!impactLayer.hidden,revealVisible:!stage3Summary.hidden,tidyCurrent:tidyRunning?tidyValueAt(performance.now()):tidyLockedValue,previewVisible:!memoryTarget.hasAttribute('hidden'),drawPoints:drawPoints.length,moisture,burn,dirt,trashRemaining:trashObjects.filter(o=>!o.removed).length,trashInitial,moldAge,ash,action,scrubbing,canvasW,canvasH,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
   // Native text selection and Safari's callout obscured the game after long presses.
   document.addEventListener('selectstart',e=>e.preventDefault());
   document.addEventListener('dragstart',e=>e.preventDefault());
