@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
 <meta name="theme-color" content="#203229" />
-<title>豆腐干棉被｜第一到三階段：水火刷洗＋記憶開折 v0.9.1</title>
+<title>豆腐干棉被｜第一到三階段：水火刷洗＋記憶開折 v1.0</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f6f6e8;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -119,12 +119,12 @@ body{display:flex;justify-content:center;align-items:center}
 .fold-btn{background:linear-gradient(145deg,#e8b969,#bb732e);color:#22190c;border:1px solid #ffe2a4}
 .fold-btn:disabled{filter:grayscale(.7);opacity:.53}
 
-#memoryBgBlanket{transition:transform .55s cubic-bezier(.22,.75,.2,1),opacity .35s ease;transform-origin:50% 58%}
-#memoryOverlay.folded-1 #memoryBgBlanket{transform:translate(0px,22px) scale(.78,1)}
-#memoryOverlay.folded-2 #memoryBgBlanket{transform:translate(0px,48px) scale(.58,.96)}
-#memoryOverlay.folded-3 #memoryBgBlanket{transform:translate(0px,76px) scale(.38,.90)}
-#memoryOverlay.folded-1 #foldHint{opacity:.35}#memoryOverlay.folded-2 #foldHint{opacity:.55}#memoryOverlay.folded-3 #foldHint{opacity:.78}
-#foldHint{opacity:0;transition:opacity .4s ease}
+#memoryBgStage{pointer-events:none}
+#memoryBgBlanketWrap{transition:transform .62s cubic-bezier(.22,.8,.2,1),filter .42s ease,opacity .28s ease;transform-box:fill-box;transform-origin:50% 52%;}
+#memoryOverlay.folded-1 #memoryBgBlanketWrap{transform:translate(28px,14px) scale(.72,1) rotate(-1deg)}
+#memoryOverlay.folded-2 #memoryBgBlanketWrap{transform:translate(44px,52px) scale(.53,.88) rotate(-1.6deg)}
+#memoryOverlay.folded-3 #memoryBgBlanketWrap{transform:translate(58px,92px) scale(.39,.74) rotate(-2deg)}
+#memoryOverlay.folded-1 #memoryBgBlanketWrap use,#memoryOverlay.folded-2 #memoryBgBlanketWrap use,#memoryOverlay.folded-3 #memoryBgBlanketWrap use{filter:drop-shadow(0 9px 10px rgba(0,0,0,.18))}
 .stage2-extra{margin-top:10px}
 .final-btn{width:100%;min-height:56px;border-radius:16px;border:1px solid #d9e1af8c;background:linear-gradient(145deg,#8fb267,#5f834e);color:#f7fde8;font:inherit;font-weight:1000;font-size:19px;touch-action:manipulation}
 .final-btn[hidden],#memoryOverlay[hidden],#stage2Controls[hidden],#stage2Info[hidden],#stage2Result[hidden],#stage3Panel[hidden]{display:none!important;pointer-events:none!important}
@@ -192,15 +192,15 @@ button{touch-action:manipulation;}
     <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3"/></filter>
    </defs>
    <!-- Barracks light and platform -->
-   <ellipse cx="308" cy="449" rx="266" ry="50" fill="#020b05" opacity=".35" filter="url(#shadow)" />
-   <path d="M89 201 L501 209 L595 434 L62 467 Z" fill="#596a61" opacity=".7"/>
-   <path d="M112 204 Q118 192 139 194 L496 203 Q502 204 507 215 L592 419 Q601 430 583 440 L76 470 Q58 470 64 451 Z" fill="url(#mattressTop)" stroke="#e3ebd7" stroke-width="4"/>
-   <path d="M64 451 Q59 477 80 487 L577 459 Q595 454 592 419 L583 440 L76 470 Z" fill="url(#mattressFront)" />
-   <path d="M76 470 L583 440" fill="none" stroke="#cbd4bd" stroke-width="3" opacity=".9" />
-   <path d="M112 204 L64 451 L64 481" fill="none" stroke="#edf0de" stroke-width="4" opacity=".5" />
+   <ellipse id="bedShadow" cx="308" cy="449" rx="266" ry="50" fill="#020b05" opacity=".35" filter="url(#shadow)" />
+   <path id="bedPlatformShadow" d="M89 201 L501 209 L595 434 L62 467 Z" fill="#596a61" opacity=".7"/>
+   <path id="mattressTopShape" d="M112 204 Q118 192 139 194 L496 203 Q502 204 507 215 L592 419 Q601 430 583 440 L76 470 Q58 470 64 451 Z" fill="url(#mattressTop)" stroke="#e3ebd7" stroke-width="4"/>
+   <path id="mattressFrontShape" d="M64 451 Q59 477 80 487 L577 459 Q595 454 592 419 L583 440 L76 470 Z" fill="url(#mattressFront)" />
+   <path id="mattressSeam" d="M76 470 L583 440" fill="none" stroke="#cbd4bd" stroke-width="3" opacity=".9" />
+   <path id="mattressSideLine" d="M112 204 L64 451 L64 481" fill="none" stroke="#edf0de" stroke-width="4" opacity=".5" />
    <!-- Pillow hints this is an actual bed -->
-   <path d="M151 206 Q162 184 189 185 L430 188 Q454 189 463 211 L453 246 L155 239 Q138 227 151 206 Z" fill="#dfe3d6" stroke="#a2afa2" stroke-width="3" />
-   <path d="M161 216 Q249 205 443 218" fill="none" stroke="#fcfff4" stroke-width="3" opacity=".65" />
+   <path id="pillowBody" d="M151 206 Q162 184 189 185 L430 188 Q454 189 463 211 L453 246 L155 239 Q138 227 151 206 Z" fill="#dfe3d6" stroke="#a2afa2" stroke-width="3" />
+   <path id="pillowTopLine" d="M161 216 Q249 205 443 218" fill="none" stroke="#fcfff4" stroke-width="3" opacity=".65" />
    <g id="puddle"><ellipse cx="378" cy="459" rx="126" ry="25" fill="url(#puddleGradient)"/><path d="M292 458Q360 448 455 461" stroke="#b1dfed" stroke-width="2" fill="none" opacity=".6" /></g>
    <!-- quilt: top face plus puffy sides and overhang -->
    <g class="blanket" id="blanketGroup">
@@ -370,19 +370,20 @@ button{touch-action:manipulation;}
       <filter id="memShadow" x="-30%" y="-30%" width="160%" height="170%"><feGaussianBlur stdDeviation="18"/></filter>
     </defs>
     <rect x="0" y="0" width="390" height="844" fill="url(#memBgGrad)"/>
-    <g id="memoryBgBlanket">
-      <ellipse cx="195" cy="540" rx="146" ry="50" fill="#020b05" opacity=".30" filter="url(#memShadow)"/>
-      <rect x="44" y="170" width="302" height="495" rx="28" fill="#d6ddc8" stroke="#edf2df" stroke-width="4"/>
-      <g id="foldHint">
-        <line x1="195" y1="188" x2="195" y2="646" stroke="#f0f5df" stroke-width="5" stroke-dasharray="10 10" opacity=".55"/>
+    <g id="memoryBgStage" transform="translate(10 244) scale(.58)">
+      <use href="#bedShadow"/>
+      <use href="#bedPlatformShadow"/>
+      <use href="#mattressTopShape"/>
+      <use href="#mattressFrontShape"/>
+      <use href="#mattressSeam"/>
+      <use href="#mattressSideLine"/>
+      <use href="#pillowBody"/>
+      <use href="#pillowTopLine"/>
+      <g id="memoryBgBlanketWrap">
+        <use href="#puddle"/>
+        <use href="#blanketGroup"/>
+        <use href="#ashes"/>
       </g>
-      <rect x="64" y="191" width="262" height="447" rx="26" fill="url(#memBlanketGrad)" stroke="#425e38" stroke-width="4"/>
-      <rect x="78" y="205" width="234" height="419" rx="22" fill="url(#memEdgeGrad)" opacity=".35"/>
-      <path d="M86 290 Q194 260 307 294" stroke="#d8e8bc" stroke-opacity=".28" stroke-width="7" fill="none" stroke-linecap="round"/>
-      <path d="M82 396 Q191 372 309 402" stroke="#d8e8bc" stroke-opacity=".22" stroke-width="7" fill="none" stroke-linecap="round"/>
-      <path d="M84 516 Q189 492 307 524" stroke="#d8e8bc" stroke-opacity=".18" stroke-width="7" fill="none" stroke-linecap="round"/>
-      <path d="M78 215 H312 M78 250 H312 M78 285 H312 M78 320 H312 M78 355 H312 M78 390 H312 M78 425 H312 M78 460 H312 M78 495 H312 M78 530 H312 M78 565 H312 M78 600 H312" stroke="#faf7dc" stroke-opacity=".06" stroke-width="1"/>
-      <path d="M110 190 Q160 168 214 183 T326 188" stroke="#edf4df" stroke-opacity=".66" stroke-width="4" fill="none" stroke-linecap="round"/>
     </g>
     <rect id="drawingSurface" x="0" y="0" width="390" height="844" fill="transparent" />
     <path id="memoryTarget" fill="none" stroke="#fffaf0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0" filter="url(#traceGlow)" />
@@ -674,7 +675,7 @@ button{touch-action:manipulation;}
   bind(watBtn,'water');bind(firBtn,'fire');
   window.addEventListener('blur',()=>setAction(null));
   $('reset').addEventListener('click',()=>{leaveStage2();moisture=32;burn=0;ash=false;moldAge=0;rerollDirt();scrubbing=false;lastScrubPoint=null;setAction(null);update();});
-  function frame(now){const dt=Math.min((now-last)/1000,.05);last=now;if(action)step(action,dt);if(moisture>=70&&!ash)moldAge=Math.min(30,moldAge+dt);else moldAge=Math.max(0,moldAge-dt*1.8);if(now-lastRender>60){update();lastRender=now;} requestAnimationFrame(frame);}
+  function frame(now){const dt=Math.min((now-last)/1000,.05);last=now;if(stage===1){if(action)step(action,dt);if(moisture>=70&&!ash)moldAge=Math.min(30,moldAge+dt);else moldAge=Math.max(0,moldAge-dt*1.8);if(now-lastRender>60){update();lastRender=now;}} requestAnimationFrame(frame);}
   // Stage 2: one-second memory challenge; three independently generated outlines.
   const overlay=$('memoryOverlay'),memoryTarget=$('memoryTarget'),memoryGhost=$('memoryGhost'),memoryInk=$('memoryInk'),memorySplash=$('memorySplash');
   const roundLabel=$('roundLabel'),memoryInstruction=$('memoryInstruction'),scoresMini=$('scoresMini');
@@ -788,7 +789,7 @@ button{touch-action:manipulation;}
     stage=2;setAction(null);scrubbing=false;fitMemoryCanvas();
     round=0;roundScores=[];drawPoints=[];foldStep=0;clearStageTimers();
     $('stage1Meters').hidden=true;$('stage1State').hidden=true;$('stage1Controls').hidden=true;
-    $('stageSubtitle').textContent='第二階段｜白線記憶開折（共 3 次）';
+    $('stageSubtitle').textContent='第二階段｜記憶折線＋對折動畫（共 3 次）';
     svgHide(overlay,false);$('stage2Info').hidden=false;$('stage2Controls').hidden=false;
     stage3Panel.hidden=true; redrawBtn.hidden=false; foldBtn.hidden=false; finalTidyBtn.hidden=true;
     redrawBtn.textContent='重畫'; renderFoldState();
@@ -884,7 +885,7 @@ button{touch-action:manipulation;}
     memorySplash.textContent='';
     memoryInstruction.textContent=round===2?'棉被已經完成第三次對折':'這回合的貼合度';
     scoresMini.textContent=roundScores.map((v,i)=>`第${i+1}次 ${v}分`).join('　');
-    stage2Tip.textContent=round===2?'三次對折都完成了':'按下開折後，棉被已經對折一次';
+    stage2Tip.textContent=round===2?'三次對折都完成了':'按下開折後，棉被會真的再折一次';
     foldBtn.disabled=true;redrawBtn.disabled=true;
     foldStep=Math.min(3,foldStep+1);renderFoldState();
     feedbackTimer=setTimeout(()=>{feedbackTimer=null; if(round===2){showFinishStage2();} else {round++; startRound();}},1750);
