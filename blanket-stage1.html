@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#1a251f">
+<title>報告長官！這不是豆腐乾｜第一階段：乾濕度試玩</title>
+<style>
+  :root{color-scheme:dark;font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#162119;overscroll-behavior:none}
+  body{display:flex;align-items:center;justify-content:center}
+  .app{position:relative;width:min(100vw,520px);height:min(100vh,920px);overflow:hidden;background:radial-gradient(circle at 50% -10%,#3b5348 0,#24362d 38%,#15211b 78%,#101913 100%)}
+  .hud{position:absolute;left:0;right:0;top:0;padding:calc(14px + env(safe-area-inset-top)) 16px 10px;z-index:5;pointer-events:none}
+  .title{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .title h1{margin:0;color:#f2f1df;font-size:clamp(20px,4.6vw,28px);line-height:1.05;font-weight:900;letter-spacing:1px;text-shadow:0 2px 10px #0a120dcc}
+  .title small{display:block;margin-top:4px;color:#d0d9c3;font-size:12px;letter-spacing:.4px}
+  .reset{pointer-events:auto;border:1px solid #aab9a66e;background:#324236d6;color:#f4f6eb;border-radius:12px;padding:10px 13px;font-weight:800;font-size:13px;min-height:42px}
+  .reset:active{transform:scale(.96)}
+  .meters{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;pointer-events:none}
+  .meter{background:#131d17ca;border:1px solid #96a69073;border-radius:14px;padding:8px 10px;box-shadow:0 8px 18px #08110b55}
+  .meter .label{display:flex;justify-content:space-between;color:#e9efd8;font-size:12px;margin-bottom:6px}
+  .bar{height:11px;border-radius:999px;background:#0c130f;overflow:hidden;box-shadow:inset 0 1px 4px #0009}
+  .fill{height:100%;width:50%;border-radius:999px;transition:width .18s linear, background .18s linear}
+  .fill.moisture{background:linear-gradient(90deg,#b48d46 0%,#d8caa2 12%,#97a86a 28%,#537a56 46%,#2a5864 68%,#29518a 84%,#2b4d7a 100%)}
+  .fill.scorch{background:linear-gradient(90deg,#45524b 0%,#66624f 15%,#8b6b36 33%,#9e5a23 52%,#5b2a16 74%,#252525 100%)}
+  .scene{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-top:42px}
+  .scene::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#ffffff06 0 25%,transparent 25% 100%),repeating-linear-gradient(90deg,transparent 0 76px,#ffffff05 76px 77px);opacity:.18;pointer-events:none}
+  .bed-shadow{position:absolute;left:50%;top:53%;width:min(86vw,380px);height:min(28vw,118px);transform:translate(-50%,32%) skewX(-12deg);border-radius:50%;background:#0008;filter:blur(18px);opacity:.45}
+  .bed{position:absolute;left:50%;top:53%;width:min(86vw,380px);height:min(47vw,205px);transform:translate(-50%,-50%)}
+  .mattress-top{position:absolute;inset:0;clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);background:linear-gradient(180deg,#b9c1af 0,#aab19d 100%);border-radius:10px;box-shadow:0 2px 0 #dce2d1 inset,0 -3px 0 #949e86 inset}
+  .mattress-front{position:absolute;left:0;right:10%;bottom:-22px;height:24px;background:linear-gradient(180deg,#667164 0,#4e584d 100%);transform:skewX(-36deg);transform-origin:left top;border-radius:0 0 9px 7px}
+  .mattress-side{position:absolute;top:0;right:-1px;width:11%;height:100%;background:linear-gradient(180deg,#6d776a 0,#4a5448 100%);clip-path:polygon(0 0,100% 0,100% 100%,0 100%,14% 50%)}
+  .blanket-wrap{position:absolute;left:10%;top:5%;width:80%;height:82%;pointer-events:none;overflow:visible}
+  .blanket{position:absolute;inset:0;transform-origin:center center;border-radius:20px 24px 20px 18px;transition:transform .22s ease, filter .22s ease, opacity .22s ease, border-radius .22s ease, box-shadow .22s ease, background .22s ease;box-shadow:0 16px 24px #0b110d45, inset 0 2px 0 #ffffff1f, inset 0 -5px 16px #00000022;background:var(--blanket-bg,#73895f);filter:var(--blanket-filter,none);opacity:var(--blanket-opacity,1)}
+  .blanket::before,.blanket::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;transition:opacity .22s ease, transform .22s ease, background .22s ease, box-shadow .22s ease}
+  .blanket::before{background:radial-gradient(90% 55% at 20% 20%,rgba(255,255,255,.16),transparent 38%),radial-gradient(55% 45% at 70% 65%,rgba(0,0,0,.12),transparent 58%),radial-gradient(45% 22% at 35% 60%,var(--wet-patch1,transparent),transparent 65%),radial-gradient(40% 18% at 68% 38%,var(--wet-patch2,transparent),transparent 68%),radial-gradient(28% 16% at 55% 75%,var(--wet-patch3,transparent),transparent 70%),repeating-linear-gradient(180deg,transparent 0 16px,rgba(255,255,255,.035) 16px 18px,transparent 18px 30px);opacity:.96;transform:translateY(var(--wrinkleY,0px)) skewX(var(--skewX,0deg))}
+  .blanket::after{background:radial-gradient(18% 18% at 24% 22%,var(--scorch1,transparent),transparent 72%),radial-gradient(22% 19% at 70% 42%,var(--scorch2,transparent),transparent 74%),radial-gradient(16% 13% at 56% 72%,var(--scorch3,transparent),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.04),transparent 34%,rgba(0,0,0,.12) 100%);opacity:var(--overlayOpacity,.9)}
+  .fold{position:absolute;left:8%;right:6%;height:18%;border-radius:50%;background:rgba(255,255,255,.09);filter:blur(2px);opacity:var(--foldOpacity,.24);transition:all .22s ease}
+  .fold.f1{top:18%;transform:rotate(-3deg) translateY(var(--f1y,0px)) scaleX(1.04)}
+  .fold.f2{top:46%;left:14%;right:12%;transform:rotate(2.8deg) translateY(var(--f2y,0px)) scaleX(.92)}
+  .fold.f3{top:67%;left:22%;right:10%;transform:rotate(-1deg) translateY(var(--f3y,0px)) scaleX(.88);opacity:var(--foldOpacity2,.18)}
+  .edge-roll{position:absolute;left:3%;right:4%;bottom:-3.5%;height:11%;border-radius:999px;background:var(--edge-bg,#6d8159);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 4px #0003;transition:all .22s ease;transform:translateY(var(--edge-drop,0px)) scaleX(var(--edgeScale,1))}
+  .corner{position:absolute;width:22%;height:20%;bottom:-1%;right:-1.5%;border-radius:0 0 45% 40%;background:var(--corner-bg,#768c61);filter:brightness(.93);transition:all .22s ease;transform:translate(var(--cornerX,0px),var(--cornerY,0px)) rotate(var(--cornerRot,-7deg)) skewX(-9deg)}
+  .puddle{position:absolute;left:50%;bottom:-15px;width:min(54vw,210px);height:28px;transform:translateX(-50%) scale(var(--puddleScale,0));transform-origin:center center;border-radius:50%;opacity:var(--puddleOpacity,0);background:radial-gradient(ellipse at center,rgba(53,117,168,.55) 0,rgba(39,92,136,.30) 42%,transparent 70%);filter:blur(3px);transition:all .22s ease}
+  .ash-pile{position:absolute;left:50%;top:50%;width:40%;height:19%;transform:translate(-50%,55%) scale(var(--ashScale,0));border-radius:50%;background:radial-gradient(ellipse at center,#767676 0,#4a4a4a 36%,#1f1f1f 68%,transparent 72%);opacity:var(--ashOpacity,0);filter:blur(1px);transition:all .22s ease}
+  .droplets,.smokes,.sparks{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .drop,.smoke,.spark{position:absolute}
+  .drop{width:8px;height:13px;border-radius:50% 50% 55% 55%;background:linear-gradient(180deg,#cce5ff,#4583c7);opacity:0;animation:fall 1s linear infinite;filter:drop-shadow(0 1px 2px #2d4f74)}
+  .smoke{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(170,170,170,.58),rgba(80,80,80,.16) 55%,transparent 72%);opacity:0;animation:smoke 1.6s ease-out infinite}
+  .spark{width:6px;height:6px;border-radius:50%;background:#ffb44c;box-shadow:0 0 10px #ff9f2f;opacity:0;animation:spark .8s linear infinite}
+  @keyframes fall{0%{transform:translateY(-14px) scale(.9);opacity:0}15%{opacity:.95}100%{transform:translateY(120px) scale(1.1);opacity:0}}
+  @keyframes smoke{0%{transform:translate(0,0) scale(.7);opacity:0}14%{opacity:.78}100%{transform:translate(12px,-72px) scale(1.75);opacity:0}}
+  @keyframes spark{0%{transform:translate(0,0) scale(.3);opacity:0}18%{opacity:.95}100%{transform:translate(12px,-26px) scale(1.1);opacity:0}}
+  .state-panel{position:absolute;left:14px;right:14px;bottom:108px;display:grid;gap:8px;z-index:5;pointer-events:none}
+  .state-card{background:#101713dd;border:1px solid #9caf9b78;border-radius:16px;padding:12px 14px;color:#ecf0df;box-shadow:0 8px 20px #09100b70}
+  .state-name{font-size:17px;font-weight:900;letter-spacing:.5px}
+  .state-desc{margin-top:6px;color:#d4dbc7;font-size:12px;line-height:1.45}
+  .controls{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 14px calc(18px + env(safe-area-inset-bottom));z-index:6;background:linear-gradient(180deg,transparent 0,#0d1511ba 18%,#0d1511e8 42%,#0b120f 100%)}
+  .tool{border:1px solid #a1b19d73;border-radius:18px;color:#f5f8ed;background:#253129;min-height:68px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;font-weight:900;font-size:18px;touch-action:none;user-select:none;-webkit-user-select:none}
+  .tool small{font-size:11px;font-weight:700;color:#d0d7c3;opacity:.92}
+  .tool.water{background:linear-gradient(180deg,#2a4f62,#183243)}
+  .tool.fire{background:linear-gradient(180deg,#664120,#3b2416)}
+  .tool.active{transform:translateY(1px) scale(.988);box-shadow:inset 0 0 0 2px #ffffff22,0 0 0 2px #ffffff12}
+  .chips{margin-top:9px;display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:11px;padding:5px 8px;border-radius:999px;background:#ffffff10;color:#e7edd9;border:1px solid #ffffff14}
+  @media (max-width:430px){.state-panel{bottom:114px}.state-name{font-size:15px}.controls{gap:8px;padding-left:10px;padding-right:10px}.tool{min-height:64px;font-size:17px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hud">
+    <div class="title">
+      <div><h1>第一階段：控制乾濕度</h1><small>先不折棉被，只看「灑水 / 打火機」會怎麼改變棉被</small></div>
+      <button class="reset" id="reset" type="button">重新開始</button>
+    </div>
+    <div class="meters">
+      <div class="meter"><div class="label"><span>乾濕度</span><strong id="moistureText">28</strong></div><div class="bar"><div class="fill moisture" id="moistureFill"></div></div></div>
+      <div class="meter"><div class="label"><span>燒焦度</span><strong id="scorchText">0</strong></div><div class="bar"><div class="fill scorch" id="scorchFill"></div></div></div>
+    </div>
+  </div>
+  <div class="scene">
+    <div class="bed-shadow"></div>
+    <div class="bed">
+      <div class="mattress-top"></div><div class="mattress-front"></div><div class="mattress-side"></div>
+      <div class="blanket-wrap" id="wrap">
+        <div class="blanket" id="blanket"><div class="fold f1"></div><div class="fold f2"></div><div class="fold f3"></div><div class="edge-roll"></div><div class="corner"></div></div>
+        <div class="puddle" id="puddle"></div><div class="ash-pile" id="ash"></div><div class="droplets" id="droplets"></div><div class="smokes" id="smokes"></div><div class="sparks" id="sparks"></div>
+      </div>
+    </div>
+  </div>
+  <div class="state-panel"><div class="state-card"><div class="state-name" id="stateName">正常乾爽</div><div class="state-desc" id="stateDesc">棉被是正常的軍中綠，蓬鬆但還算平整。可以繼續加水讓它變濕，也可以用打火機把它慢慢烤乾。</div><div class="chips" id="chips"></div></div></div>
+  <div class="controls"><button class="tool water" id="waterBtn" type="button">💧 灑水<small>按住持續加水</small></button><button class="tool fire" id="fireBtn" type="button">🔥 打火機<small>按住持續烘乾 / 烤焦</small></button></div>
+</div>
+<script>
+(()=>{'use strict';
+const blanket=document.getElementById('blanket'),ash=document.getElementById('ash'),puddle=document.getElementById('puddle'),droplets=document.getElementById('droplets'),smokes=document.getElementById('smokes'),sparks=document.getElementById('sparks');
+const moistureFill=document.getElementById('moistureFill'),scorchFill=document.getElementById('scorchFill'),moistureText=document.getElementById('moistureText'),scorchText=document.getElementById('scorchText');
+const stateName=document.getElementById('stateName'),stateDesc=document.getElementById('stateDesc'),chips=document.getElementById('chips');
+const waterBtn=document.getElementById('waterBtn'),fireBtn=document.getElementById('fireBtn'),resetBtn=document.getElementById('reset');
+let moisture=28, scorch=0, action=null, alive=true;
+const defs={ash:['燒成灰','你真的把棉被燒沒了。床上只剩下灰燼和一點焦味，這一局基本上結束。',['不可逆','灰燼','結束狀態']],char:['焦黑冒煙','棉被已經整片焦黑，邊角脆化，還在慢慢冒煙。再烤一下就會直接變成灰。',['嚴重燒焦','冒煙','危險']],scorched:['乾焦發黃','水分快被烤光了，表面開始發黃、捲角，摸起來又乾又硬。',['過乾','捲角','開始焦化']],dry:['正常乾爽','棉被是正常的軍中綠，蓬鬆但還算平整。可以繼續加水讓它變濕，也可以用打火機把它慢慢烤乾。',['基準狀態','可往兩邊調整']],damp:['微濕','表面顏色變深了一點，局部已經有水痕，但整體還撐得住。',['輕微潮濕','有水痕']],wet:['潮濕下垂','棉被吸水後變重，整體開始往下塌，表面帶明顯濕斑。',['變重','開始塌陷']],soaked:['濕透滴水','整條棉被都吃滿了水，邊角不斷滴水，床下已經有水漬。',['滴水','非常濕']],soggy:['泡水爛軟','已經不是棉被，是一團泡水海帶。整張軟爛、貼在床上，快要滑下去了。',['最濕','軟爛','重得要命']]};
+const clamp=(v,min,max)=>Math.min(max,Math.max(min,v)); const lerp=(a,b,t)=>a+(b-a)*t;
+function mix(c1,c2,t){const a=parseInt(c1.slice(1),16),b=parseInt(c2.slice(1),16),ar=(a>>16)&255,ag=(a>>8)&255,ab=a&255,br=(b>>16)&255,bg=(b>>8)&255,bb=b&255;return `rgb(${Math.round(lerp(ar,br,t))},${Math.round(lerp(ag,bg,t))},${Math.round(lerp(ab,bb,t))})`;}
+function stateKey(){if(scorch>=96)return 'ash'; if(scorch>=72)return 'char'; if(scorch>=38)return 'scorched'; if(moisture<20)return 'dry'; if(moisture<42)return 'damp'; if(moisture<65)return 'wet'; if(moisture<86)return 'soaked'; return 'soggy';}
+function renderChips(list){chips.innerHTML=''; list.forEach(txt=>{const s=document.createElement('span'); s.className='chip'; s.textContent=txt; chips.appendChild(s);});}
+function spawn(container,type,count){const frag=document.createDocumentFragment(); const isDrop=type==='drop',isSmoke=type==='smoke',isSpark=type==='spark'; for(let i=0;i<count;i++){const el=document.createElement('span'); el.className=type; el.style.left=(16+Math.random()*68)+'%'; el.style.top=(isDrop?(-10-Math.random()*18):(58+Math.random()*18))+'%'; el.style.animationDelay=(-(Math.random()*1.2)).toFixed(2)+'s'; el.style.animationDuration=(isDrop?(0.7+Math.random()*0.55):(isSmoke?(1.2+Math.random()*0.9):(0.55+Math.random()*0.35))).toFixed(2)+'s'; if(isSpark)el.style.left=(35+Math.random()*30)+'%'; frag.appendChild(el);} container.innerHTML=''; container.appendChild(frag);}
+function update(){const wet=clamp(moisture/100,0,1), burn=clamp(scorch/100,0,1), key=stateKey(), [name,desc,chipList]=defs[key]; stateName.textContent=name; stateDesc.textContent=desc; renderChips(chipList); moistureText.textContent=Math.round(moisture); scorchText.textContent=Math.round(scorch); moistureFill.style.width=moisture+'%'; scorchFill.style.width=scorch+'%';
+ let base=mix('#8d7b49','#6d845b',clamp((moisture-5)/30,0,1)); base=mix(base,'#51715b',clamp((moisture-30)/35,0,1)); base=mix(base,'#365e57',clamp((moisture-60)/28,0,1)); base=mix(base,'#2a4b53',clamp((moisture-82)/18,0,1)); if(scorch>0)base=mix(base,'#8b6429',clamp(scorch/45,0,1)); if(scorch>45)base=mix(base,'#35261c',clamp((scorch-45)/28,0,1)); if(scorch>75)base=mix(base,'#2b2b2b',clamp((scorch-75)/22,0,1)); if(scorch>=96)base=mix('#4c4c4c','#767676',clamp((scorch-96)/4,0,1));
+ blanket.style.setProperty('--blanket-bg',base); blanket.style.setProperty('--blanket-filter',`saturate(${lerp(.96,.82,wet)-burn*.05}) brightness(${1-wet*.05-burn*.17}) contrast(${1+wet*.04+burn*.08})`);
+ blanket.style.transform=`translateY(${lerp(-2,22,wet)+(key==='soggy'?12:0)-burn*4}px) scale(${lerp(1.02,1.06,wet)+(key==='soggy'?0.06:0)-burn*0.02},${lerp(1.04,.90,wet)-(key==='char'?0.05:0)-(key==='ash'?0.12:0)}) rotate(${lerp(-1.2,1.8,wet)+(burn>30?1.5:0)}deg)`;
+ blanket.style.borderRadius=`${20+wet*8}px ${24+wet*14}px ${18+wet*6}px ${18+wet*12}px`;
+ blanket.style.setProperty('--wrinkleY',`${lerp(-1,6,wet)}px`); blanket.style.setProperty('--skewX',`${lerp(-1.5,2,wet)-burn*0.02}deg`); blanket.style.setProperty('--foldOpacity',String(lerp(.18,.28,wet)+(burn>20?.04:0))); blanket.style.setProperty('--foldOpacity2',String(lerp(.13,.22,wet)+(burn>20?.02:0))); blanket.style.setProperty('--f1y',`${lerp(-1,7,wet)}px`); blanket.style.setProperty('--f2y',`${lerp(0,10,wet)}px`); blanket.style.setProperty('--f3y',`${lerp(1,13,wet)}px`); blanket.style.setProperty('--edge-drop',`${lerp(0,8,wet)+(key==='soggy'?4:0)}px`); blanket.style.setProperty('--edgeScale',`${lerp(1.02,1.09,wet)}`); blanket.style.setProperty('--cornerX',`${lerp(0,-4,wet)-burn*0.08}px`); blanket.style.setProperty('--cornerY',`${lerp(0,18,wet)+(burn>35?-6:0)}px`); blanket.style.setProperty('--cornerRot',`${lerp(-8,-15,wet)+(burn>25?-12:0)}deg`);
+ blanket.style.setProperty('--wet-patch1', wet>.18?`rgba(39,70,79,${0.12+wet*.20})`:'transparent'); blanket.style.setProperty('--wet-patch2', wet>.34?`rgba(27,53,65,${0.10+wet*.20})`:'transparent'); blanket.style.setProperty('--wet-patch3', wet>.54?`rgba(20,46,57,${0.09+wet*.18})`:'transparent'); blanket.style.setProperty('--scorch1', scorch>10?`rgba(150,104,28,${0.15+burn*.16})`:'transparent'); blanket.style.setProperty('--scorch2', scorch>32?`rgba(69,31,16,${0.16+burn*.24})`:'transparent'); blanket.style.setProperty('--scorch3', scorch>68?`rgba(24,24,24,${0.18+burn*.33})`:'transparent'); blanket.style.setProperty('--overlayOpacity',String(clamp(.78+wet*.12+burn*.12,.8,1))); blanket.style.setProperty('--edge-bg',mix('#72885b','#334844',wet)); blanket.style.setProperty('--corner-bg',mix('#7c9166','#35504b',wet)); blanket.style.setProperty('--blanket-opacity', key==='ash'?'.12':'1');
+ puddle.style.setProperty('--puddleScale', String(key==='wet'?0.62:key==='soaked'?0.92:key==='soggy'?1.12:0)); puddle.style.setProperty('--puddleOpacity', String(key==='wet'?0.40:key==='soaked'?0.64:key==='soggy'?0.78:0));
+ ash.style.setProperty('--ashScale', key==='ash'?'1.08':key==='char'?'.18':'0'); ash.style.setProperty('--ashOpacity', key==='ash'?'.98':key==='char'?'.18':'0');
+ if(['damp','wet','soaked','soggy'].includes(key)){spawn(droplets,'drop', key==='damp'?2:key==='wet'?4:key==='soaked'?7:10); droplets.style.opacity = key==='damp'?.35:key==='wet'?.55:.9;} else {droplets.innerHTML=''; droplets.style.opacity=0;}
+ if(key==='char' || key==='ash'){spawn(smokes,'smoke', key==='char'?6:10); smokes.style.opacity = key==='char'?.9:1;} else {smokes.innerHTML=''; smokes.style.opacity=0;}
+ if(action==='fire' && alive && key!=='ash'){spawn(sparks,'spark', scorch>40?5:2); sparks.style.opacity = scorch>40?1:.45;} else {sparks.innerHTML=''; sparks.style.opacity=0;}
+}
+function step(kind,dt){ if(kind==='water'){ if(!alive)return; moisture=clamp(moisture+dt*26,0,100); scorch=clamp(scorch-dt*18,0,100); if(scorch>=96 && moisture>28)moisture=clamp(moisture,0,38);} else if(kind==='fire'){ if(!alive)return; if(moisture>0)moisture=clamp(moisture-dt*22,0,100); if(moisture<18)scorch=clamp(scorch+dt*22,0,100); else if(moisture<36)scorch=clamp(scorch+dt*9,0,100); else scorch=clamp(scorch+dt*2.5,0,100); if(scorch>=96){alive=false; moisture=0;}} update();}
+function setAction(kind,on){action = on ? kind : (action===kind?null:action); waterBtn.classList.toggle('active', action==='water'); fireBtn.classList.toggle('active', action==='fire');}
+function bindHold(btn,kind){const start=e=>{e.preventDefault(); setAction(kind,true);}; const end=e=>{e.preventDefault(); setAction(kind,false);}; btn.addEventListener('pointerdown',start); btn.addEventListener('pointerup',end); btn.addEventListener('pointercancel',end); btn.addEventListener('pointerleave',end);}
+bindHold(waterBtn,'water'); bindHold(fireBtn,'fire'); window.addEventListener('pointerup',()=>{setAction('water',false); setAction('fire',false);});
+resetBtn.addEventListener('click',()=>{moisture=28; scorch=0; alive=true; action=null; setAction('water',false); setAction('fire',false); update();});
+let last=performance.now(); function loop(now){const dt=Math.min((now-last)/1000,.05); last=now; if(action)step(action,dt); requestAnimationFrame(loop);} update(); requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
