@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
 <meta name="theme-color" content="#203229" />
-<title>豆腐干棉被｜第一到三階段：水火刷洗＋記憶開折 v0.9</title>
+<title>豆腐干棉被｜第一到三階段：水火刷洗＋記憶開折 v0.9.1</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f6f6e8;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -20,7 +20,7 @@ body{display:flex;justify-content:center;align-items:center}
 .meters{margin-top:15px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .meter{background:#17251cbb;border:1px solid #9daa8a56;border-radius:13px;padding:9px 10px;box-shadow:0 7px 12px #07100a35}
 .meter.clean{grid-column:1 / -1}
-[hidden]{display:none!important}
+[hidden],#memoryOverlay[hidden],#stage2Controls[hidden],#stage2Info[hidden],#stage2Result[hidden],#stage3Panel[hidden]{display:none!important;pointer-events:none!important}
 .meter-label{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#e9eedb;margin-bottom:6px}
 .meter-label strong{font-variant-numeric:tabular-nums;color:white}
 .track{background:#101a14;border-radius:100px;height:9px;overflow:hidden}
@@ -127,7 +127,7 @@ body{display:flex;justify-content:center;align-items:center}
 #foldHint{opacity:0;transition:opacity .4s ease}
 .stage2-extra{margin-top:10px}
 .final-btn{width:100%;min-height:56px;border-radius:16px;border:1px solid #d9e1af8c;background:linear-gradient(145deg,#8fb267,#5f834e);color:#f7fde8;font:inherit;font-weight:1000;font-size:19px;touch-action:manipulation}
-.final-btn[hidden]{display:none!important}
+.final-btn[hidden],#memoryOverlay[hidden],#stage2Controls[hidden],#stage2Info[hidden],#stage2Result[hidden],#stage3Panel[hidden]{display:none!important;pointer-events:none!important}
 .stage3-panel{position:fixed;z-index:25;left:14px;right:14px;top:calc(76px + env(safe-area-inset-top));padding:18px 16px;border-radius:20px;background:#102019eb;border:1px solid #c1d2b380;box-shadow:0 16px 42px #04110ab8;color:#eef7e8;text-align:center}
 .stage3-panel h2{margin:0 0 8px;font-size:24px;line-height:1.2}
 .stage3-panel p{margin:8px 0 0;font-size:14px;line-height:1.7;color:#d5e5d1}
@@ -135,6 +135,17 @@ body{display:flex;justify-content:center;align-items:center}
 .stage3-actions button{min-height:54px;border-radius:15px;font:inherit;font-weight:900;font-size:17px;background:linear-gradient(145deg,#d8bb72,#b88734);color:#22190c;border:1px solid #ffe3af}
 @media(max-height:730px){.stage2-info{top:calc(4px + env(safe-area-inset-top));padding:6px 9px}.memory-instruction{font-size:13px}.stage2-buttons button{min-height:56px}.stage2-controls{padding-top:6px}.stage2-result{top:45%}}
 @media(max-width:410px){.stage2-info{left:10px;right:10px;top:calc(6px + env(safe-area-inset-top));padding:7px 9px}.stage2-result{width:82%}}
+/* iOS Safari: game UI must not become selectable text / blue native handles. */
+html,body,.app,.app *,svg,svg *,#memoryOverlay,#memoryOverlay *{
+  -webkit-user-select:none !important;
+  user-select:none !important;
+  -webkit-touch-callout:none !important;
+  -webkit-tap-highlight-color:transparent !important;
+  -webkit-user-drag:none;
+}
+img,svg{ -webkit-user-drag:none; }
+#scrubArea,#memoryOverlay,#drawingSurface{touch-action:none !important;}
+button{touch-action:manipulation;}
 </style>
 </head>
 <body>
@@ -669,7 +680,8 @@ body{display:flex;justify-content:center;align-items:center}
   const roundLabel=$('roundLabel'),memoryInstruction=$('memoryInstruction'),scoresMini=$('scoresMini');
   const stage2Tip=$('stage2Tip'),stage2Result=$('stage2Result'),stage2ResultTitle=$('stage2ResultTitle'),stage2ResultSubtitle=$('stage2ResultSubtitle');
   const redrawBtn=$('redrawBtn'),foldBtn=$('foldBtn');
-  let round=0,mode='idle',roundScores=[],targetPoints=[],drawPoints=[],lastDrawPointer=null,previewTimer=null,feedbackTimer=null;
+  const finalTidyBtn=$('finalTidyBtn'),stage3Panel=$('stage3Panel'),stage3RestartBtn=$('stage3RestartBtn');
+  let round=0,mode='idle',roundScores=[],targetPoints=[],drawPoints=[],lastDrawPointer=null,previewTimer=null,feedbackTimer=null,foldStep=0;
   const TAU=Math.PI*2;
   let canvasW=390,canvasH=844;
   function fitMemoryCanvas(){
@@ -830,6 +842,7 @@ body{display:flex;justify-content:center;align-items:center}
     const closure=clamp(1-Math.hypot(drawPoints[0].x-drawPoints.at(-1).x,drawPoints[0].y-drawPoints.at(-1).y)/100,0,1);
     return Math.round(clamp((.62*detail+.23*coverage+.10*lenQuality+.05*closure)*100,0,100));
   }
+  // Players may proceed at any time, regardless of water, burn, dirt or ash.
   $('nextStageBtn').addEventListener('click',startStage2);
   finalTidyBtn.addEventListener('click',enterStage3);
   stage3RestartBtn.addEventListener('click',leaveStage2);
@@ -877,6 +890,16 @@ body{display:flex;justify-content:center;align-items:center}
     feedbackTimer=setTimeout(()=>{feedbackTimer=null; if(round===2){showFinishStage2();} else {round++; startRound();}},1750);
   });
   window.__blanketStageDebug=()=>({stage,round,mode,foldStep,roundScores:[...roundScores],previewVisible:!memoryTarget.hasAttribute('hidden'),drawPoints:drawPoints.length,moisture,burn,dirt,trashRemaining:trashObjects.filter(o=>!o.removed).length,trashInitial,moldAge,ash,action,scrubbing,canvasW,canvasH,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
+  // Native text selection and Safari's callout obscured the game after long presses.
+  document.addEventListener('selectstart',e=>e.preventDefault());
+  document.addEventListener('dragstart',e=>e.preventDefault());
+  document.addEventListener('contextmenu',e=>e.preventDefault());
+  // Safari may default to scrolling/selection on SVG surface even with touch-action.
+  for(const surface of [scrubArea,overlay]){
+    surface.addEventListener('touchstart',e=>{
+      if(e.cancelable)e.preventDefault();
+    },{passive:false});
+  }
   rerollDirt();
   update();requestAnimationFrame(frame);
 })();
