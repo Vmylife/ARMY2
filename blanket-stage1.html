@@ -1,129 +1,298 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
-<meta name="theme-color" content="#1a251f">
-<title>報告長官！這不是豆腐乾｜第一階段：乾濕度試玩</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
+<meta name="theme-color" content="#203229" />
+<title>豆腐干棉被｜第一階段：水與火 v0.2</title>
 <style>
-  :root{color-scheme:dark;font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif}
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#162119;overscroll-behavior:none}
-  body{display:flex;align-items:center;justify-content:center}
-  .app{position:relative;width:min(100vw,520px);height:min(100vh,920px);overflow:hidden;background:radial-gradient(circle at 50% -10%,#3b5348 0,#24362d 38%,#15211b 78%,#101913 100%)}
-  .hud{position:absolute;left:0;right:0;top:0;padding:calc(14px + env(safe-area-inset-top)) 16px 10px;z-index:5;pointer-events:none}
-  .title{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-  .title h1{margin:0;color:#f2f1df;font-size:clamp(20px,4.6vw,28px);line-height:1.05;font-weight:900;letter-spacing:1px;text-shadow:0 2px 10px #0a120dcc}
-  .title small{display:block;margin-top:4px;color:#d0d9c3;font-size:12px;letter-spacing:.4px}
-  .reset{pointer-events:auto;border:1px solid #aab9a66e;background:#324236d6;color:#f4f6eb;border-radius:12px;padding:10px 13px;font-weight:800;font-size:13px;min-height:42px}
-  .reset:active{transform:scale(.96)}
-  .meters{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;pointer-events:none}
-  .meter{background:#131d17ca;border:1px solid #96a69073;border-radius:14px;padding:8px 10px;box-shadow:0 8px 18px #08110b55}
-  .meter .label{display:flex;justify-content:space-between;color:#e9efd8;font-size:12px;margin-bottom:6px}
-  .bar{height:11px;border-radius:999px;background:#0c130f;overflow:hidden;box-shadow:inset 0 1px 4px #0009}
-  .fill{height:100%;width:50%;border-radius:999px;transition:width .18s linear, background .18s linear}
-  .fill.moisture{background:linear-gradient(90deg,#b48d46 0%,#d8caa2 12%,#97a86a 28%,#537a56 46%,#2a5864 68%,#29518a 84%,#2b4d7a 100%)}
-  .fill.scorch{background:linear-gradient(90deg,#45524b 0%,#66624f 15%,#8b6b36 33%,#9e5a23 52%,#5b2a16 74%,#252525 100%)}
-  .scene{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-top:42px}
-  .scene::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#ffffff06 0 25%,transparent 25% 100%),repeating-linear-gradient(90deg,transparent 0 76px,#ffffff05 76px 77px);opacity:.18;pointer-events:none}
-  .bed-shadow{position:absolute;left:50%;top:53%;width:min(86vw,380px);height:min(28vw,118px);transform:translate(-50%,32%) skewX(-12deg);border-radius:50%;background:#0008;filter:blur(18px);opacity:.45}
-  .bed{position:absolute;left:50%;top:53%;width:min(86vw,380px);height:min(47vw,205px);transform:translate(-50%,-50%)}
-  .mattress-top{position:absolute;inset:0;clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);background:linear-gradient(180deg,#b9c1af 0,#aab19d 100%);border-radius:10px;box-shadow:0 2px 0 #dce2d1 inset,0 -3px 0 #949e86 inset}
-  .mattress-front{position:absolute;left:0;right:10%;bottom:-22px;height:24px;background:linear-gradient(180deg,#667164 0,#4e584d 100%);transform:skewX(-36deg);transform-origin:left top;border-radius:0 0 9px 7px}
-  .mattress-side{position:absolute;top:0;right:-1px;width:11%;height:100%;background:linear-gradient(180deg,#6d776a 0,#4a5448 100%);clip-path:polygon(0 0,100% 0,100% 100%,0 100%,14% 50%)}
-  .blanket-wrap{position:absolute;left:10%;top:5%;width:80%;height:82%;pointer-events:none;overflow:visible}
-  .blanket{position:absolute;inset:0;transform-origin:center center;border-radius:20px 24px 20px 18px;transition:transform .22s ease, filter .22s ease, opacity .22s ease, border-radius .22s ease, box-shadow .22s ease, background .22s ease;box-shadow:0 16px 24px #0b110d45, inset 0 2px 0 #ffffff1f, inset 0 -5px 16px #00000022;background:var(--blanket-bg,#73895f);filter:var(--blanket-filter,none);opacity:var(--blanket-opacity,1)}
-  .blanket::before,.blanket::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;transition:opacity .22s ease, transform .22s ease, background .22s ease, box-shadow .22s ease}
-  .blanket::before{background:radial-gradient(90% 55% at 20% 20%,rgba(255,255,255,.16),transparent 38%),radial-gradient(55% 45% at 70% 65%,rgba(0,0,0,.12),transparent 58%),radial-gradient(45% 22% at 35% 60%,var(--wet-patch1,transparent),transparent 65%),radial-gradient(40% 18% at 68% 38%,var(--wet-patch2,transparent),transparent 68%),radial-gradient(28% 16% at 55% 75%,var(--wet-patch3,transparent),transparent 70%),repeating-linear-gradient(180deg,transparent 0 16px,rgba(255,255,255,.035) 16px 18px,transparent 18px 30px);opacity:.96;transform:translateY(var(--wrinkleY,0px)) skewX(var(--skewX,0deg))}
-  .blanket::after{background:radial-gradient(18% 18% at 24% 22%,var(--scorch1,transparent),transparent 72%),radial-gradient(22% 19% at 70% 42%,var(--scorch2,transparent),transparent 74%),radial-gradient(16% 13% at 56% 72%,var(--scorch3,transparent),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.04),transparent 34%,rgba(0,0,0,.12) 100%);opacity:var(--overlayOpacity,.9)}
-  .fold{position:absolute;left:8%;right:6%;height:18%;border-radius:50%;background:rgba(255,255,255,.09);filter:blur(2px);opacity:var(--foldOpacity,.24);transition:all .22s ease}
-  .fold.f1{top:18%;transform:rotate(-3deg) translateY(var(--f1y,0px)) scaleX(1.04)}
-  .fold.f2{top:46%;left:14%;right:12%;transform:rotate(2.8deg) translateY(var(--f2y,0px)) scaleX(.92)}
-  .fold.f3{top:67%;left:22%;right:10%;transform:rotate(-1deg) translateY(var(--f3y,0px)) scaleX(.88);opacity:var(--foldOpacity2,.18)}
-  .edge-roll{position:absolute;left:3%;right:4%;bottom:-3.5%;height:11%;border-radius:999px;background:var(--edge-bg,#6d8159);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 4px #0003;transition:all .22s ease;transform:translateY(var(--edge-drop,0px)) scaleX(var(--edgeScale,1))}
-  .corner{position:absolute;width:22%;height:20%;bottom:-1%;right:-1.5%;border-radius:0 0 45% 40%;background:var(--corner-bg,#768c61);filter:brightness(.93);transition:all .22s ease;transform:translate(var(--cornerX,0px),var(--cornerY,0px)) rotate(var(--cornerRot,-7deg)) skewX(-9deg)}
-  .puddle{position:absolute;left:50%;bottom:-15px;width:min(54vw,210px);height:28px;transform:translateX(-50%) scale(var(--puddleScale,0));transform-origin:center center;border-radius:50%;opacity:var(--puddleOpacity,0);background:radial-gradient(ellipse at center,rgba(53,117,168,.55) 0,rgba(39,92,136,.30) 42%,transparent 70%);filter:blur(3px);transition:all .22s ease}
-  .ash-pile{position:absolute;left:50%;top:50%;width:40%;height:19%;transform:translate(-50%,55%) scale(var(--ashScale,0));border-radius:50%;background:radial-gradient(ellipse at center,#767676 0,#4a4a4a 36%,#1f1f1f 68%,transparent 72%);opacity:var(--ashOpacity,0);filter:blur(1px);transition:all .22s ease}
-  .droplets,.smokes,.sparks{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-  .drop,.smoke,.spark{position:absolute}
-  .drop{width:8px;height:13px;border-radius:50% 50% 55% 55%;background:linear-gradient(180deg,#cce5ff,#4583c7);opacity:0;animation:fall 1s linear infinite;filter:drop-shadow(0 1px 2px #2d4f74)}
-  .smoke{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(170,170,170,.58),rgba(80,80,80,.16) 55%,transparent 72%);opacity:0;animation:smoke 1.6s ease-out infinite}
-  .spark{width:6px;height:6px;border-radius:50%;background:#ffb44c;box-shadow:0 0 10px #ff9f2f;opacity:0;animation:spark .8s linear infinite}
-  @keyframes fall{0%{transform:translateY(-14px) scale(.9);opacity:0}15%{opacity:.95}100%{transform:translateY(120px) scale(1.1);opacity:0}}
-  @keyframes smoke{0%{transform:translate(0,0) scale(.7);opacity:0}14%{opacity:.78}100%{transform:translate(12px,-72px) scale(1.75);opacity:0}}
-  @keyframes spark{0%{transform:translate(0,0) scale(.3);opacity:0}18%{opacity:.95}100%{transform:translate(12px,-26px) scale(1.1);opacity:0}}
-  .state-panel{position:absolute;left:14px;right:14px;bottom:108px;display:grid;gap:8px;z-index:5;pointer-events:none}
-  .state-card{background:#101713dd;border:1px solid #9caf9b78;border-radius:16px;padding:12px 14px;color:#ecf0df;box-shadow:0 8px 20px #09100b70}
-  .state-name{font-size:17px;font-weight:900;letter-spacing:.5px}
-  .state-desc{margin-top:6px;color:#d4dbc7;font-size:12px;line-height:1.45}
-  .controls{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 14px calc(18px + env(safe-area-inset-bottom));z-index:6;background:linear-gradient(180deg,transparent 0,#0d1511ba 18%,#0d1511e8 42%,#0b120f 100%)}
-  .tool{border:1px solid #a1b19d73;border-radius:18px;color:#f5f8ed;background:#253129;min-height:68px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;font-weight:900;font-size:18px;touch-action:none;user-select:none;-webkit-user-select:none}
-  .tool small{font-size:11px;font-weight:700;color:#d0d7c3;opacity:.92}
-  .tool.water{background:linear-gradient(180deg,#2a4f62,#183243)}
-  .tool.fire{background:linear-gradient(180deg,#664120,#3b2416)}
-  .tool.active{transform:translateY(1px) scale(.988);box-shadow:inset 0 0 0 2px #ffffff22,0 0 0 2px #ffffff12}
-  .chips{margin-top:9px;display:flex;flex-wrap:wrap;gap:6px}
-  .chip{font-size:11px;padding:5px 8px;border-radius:999px;background:#ffffff10;color:#e7edd9;border:1px solid #ffffff14}
-  @media (max-width:430px){.state-panel{bottom:114px}.state-name{font-size:15px}.controls{gap:8px;padding-left:10px;padding-right:10px}.tool{min-height:64px;font-size:17px}}
+:root{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;color:#f6f6e8;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;width:100%;margin:0;overflow:hidden;overscroll-behavior:none;background:#17271f}
+body{display:flex;justify-content:center;align-items:center}
+.app{width:min(100%,560px);height:100%;max-height:1080px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 36%,#354e3f 0%,#263a2e 43%,#14251d 88%)}
+.app::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(102deg,transparent 0,transparent 93px,#c3d2b809 94px,#c3d2b809 96px,transparent 97px,transparent 188px);mask-image:linear-gradient(to bottom,#0005,transparent 87%)}
+.header{position:absolute;z-index:6;top:0;left:0;right:0;padding:calc(16px + env(safe-area-inset-top)) 17px 0}
+.toprow{display:flex;gap:12px;align-items:start;justify-content:space-between}
+.toprow h1{font-size:clamp(20px,4.2vw,25px);letter-spacing:1px;margin:0 0 5px;font-weight:900;line-height:1.2}
+.subtitle{font-size:12px;color:#c9d4be;line-height:1.5}
+.reset{border:1px solid #acc0a680;color:#f8f8e8;border-radius:11px;background:#3c5142d9;font-weight:800;font-size:12px;min-height:40px;min-width:82px;padding:8px 10px;touch-action:manipulation}
+.meters{margin-top:15px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.meter{background:#17251cbb;border:1px solid #9daa8a56;border-radius:13px;padding:9px 10px;box-shadow:0 7px 12px #07100a35}
+.meter-label{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#e9eedb;margin-bottom:6px}
+.meter-label strong{font-variant-numeric:tabular-nums;color:white}
+.track{background:#101a14;border-radius:100px;height:9px;overflow:hidden}
+.progress{height:100%;width:32%;border-radius:100px;transition:width .10s linear}
+#waterProgress{background:linear-gradient(90deg,#adc68e,#659978,#4b83ae)}
+#burnProgress{width:0;background:linear-gradient(90deg,#d1b05f,#e67c37,#7d3e25,#202020)}
+.artframe{position:absolute;left:0;right:0;top:23%;height:52%;max-height:560px;min-height:300px;display:flex;justify-content:center;align-items:center;pointer-events:none}
+#scene{width:100%;height:100%;max-width:580px;overflow:visible;filter:drop-shadow(0 10px 9px #07140b26)}
+.blanket{transform-origin:306px 331px;transition:transform .22s ease,opacity .24s ease;}
+#baseFabric,#frontFabric,#hemStroke,#rimLine,#seamTop,#creaseA,#creaseB,#creaseC{transition:fill .18s ease,stroke .18s ease}
+#folds{transition:opacity .24s ease}
+#wetShine,#wetBlotches,#charBlotches,#ashes,#flameFx,#waterFx,#smokeFx,#steamFx,#puddle,#drips,#puffLines{transition:opacity .18s linear}
+#waterFx,#flameFx,#steamFx,#smokeFx,#puddle,#ashes,#drips,#charBlotches,#wetBlotches{pointer-events:none}
+#waterFx{opacity:0}
+#flameFx{opacity:0}
+#steamFx{opacity:0}
+#smokeFx{opacity:0}
+#ashes{opacity:0}
+#drips{opacity:0}
+#puddle{opacity:0}
+#charBlotches{opacity:0}
+#wetBlotches{opacity:0}
+#wetShine{opacity:0}
+#dryDust{opacity:0;transition:opacity .2s}
+#smokeFx path{animation:floatUp 2.1s infinite ease-out;transform-origin:center}
+#smokeFx path:nth-child(2){animation-delay:.4s}
+#smokeFx path:nth-child(3){animation-delay:1s}
+#steamFx path{animation:floatUp 1.5s infinite ease-out}
+#waterFx ellipse,#waterFx path{animation:fallDrop .72s infinite linear}
+#waterFx ellipse:nth-child(2){animation-delay:-.27s}
+#waterFx ellipse:nth-child(3){animation-delay:-.51s}
+#flameFx path{animation:flicker .22s infinite alternate ease-in-out;transform-origin:344px 313px}
+#flameFx path:nth-child(2){animation-delay:-.11s;transform-origin:386px 290px}
+#drips path{animation:fallDrop 1.15s infinite linear}
+#drips path:nth-child(2){animation-delay:-.56s}
+#drips path:nth-child(3){animation-delay:-.27s}
+@keyframes floatUp{0%{transform:translateY(8px) scale(.8);opacity:.2}33%{opacity:.8}100%{transform:translateY(-44px) scale(1.3);opacity:0}}
+@keyframes flicker{0%{transform:scaleY(.83) skewX(-4deg)}100%{transform:scaleY(1.15) skewX(4deg)}}
+@keyframes fallDrop{0%{transform:translateY(-12px);opacity:0}25%{opacity:1}100%{transform:translateY(47px);opacity:0}}
+.state{position:absolute;z-index:5;left:15px;right:15px;bottom:calc(105px + env(safe-area-inset-bottom));padding:13px 15px;border-radius:17px;background:#101b14e6;border:1px solid #9aaa8b6a;box-shadow:0 9px 22px #030a055c}
+.state-name{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:18px;font-weight:900;margin-bottom:5px}
+.state-tag{font-size:11px;font-weight:700;background:#9ba77f23;border:1px solid #baca9880;color:#dce9bc;padding:5px 9px;white-space:nowrap;border-radius:99px}
+.state-desc{font-size:12px;line-height:1.5;color:#cfd9c6}
+.controls{position:absolute;z-index:7;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:11px 15px calc(15px + env(safe-area-inset-bottom));background:linear-gradient(to bottom,transparent,#0c1710ba 12%,#0a150dee 55%)}
+.tool{border:1px solid #aec4b26e;border-radius:17px;min-height:78px;display:flex;align-items:center;justify-content:center;gap:9px;font:inherit;font-size:17px;font-weight:900;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
+.tool span{font-size:25px}
+.tool small{font-weight:500;font-size:11px;display:block;line-height:1.6;color:#e5ecda}
+.tool.water{background:linear-gradient(160deg,#2e728f,#235069)}
+.tool.fire{background:linear-gradient(160deg,#91532b,#68331d)}
+.tool.active{filter:brightness(1.28);transform:scale(.978);border-color:#fff9}
+.tool:disabled{opacity:.55;filter:grayscale(.8);cursor:default}
+@media(max-height:720px){.artframe{top:20%;height:54%}.state{padding:9px 12px;bottom:calc(95px + env(safe-area-inset-bottom))}.state-name{font-size:16px}.tool{min-height:67px}.controls{padding-top:7px}}
+@media(max-width:390px){.header{padding-left:12px;padding-right:12px}.toprow h1{font-size:20px}.subtitle{font-size:11px}.state{left:11px;right:11px}.controls{gap:8px;padding-left:11px;padding-right:11px}}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="hud">
-    <div class="title">
-      <div><h1>第一階段：控制乾濕度</h1><small>先不折棉被，只看「灑水 / 打火機」會怎麼改變棉被</small></div>
-      <button class="reset" id="reset" type="button">重新開始</button>
-    </div>
-    <div class="meters">
-      <div class="meter"><div class="label"><span>乾濕度</span><strong id="moistureText">28</strong></div><div class="bar"><div class="fill moisture" id="moistureFill"></div></div></div>
-      <div class="meter"><div class="label"><span>燒焦度</span><strong id="scorchText">0</strong></div><div class="bar"><div class="fill scorch" id="scorchFill"></div></div></div>
-    </div>
+ <div class="header">
+  <div class="toprow">
+   <div><h1>報告長官！這不是豆腐乾</h1><div class="subtitle">第一階段｜棉被乾濕度試驗（獨立版本）</div></div>
+   <button class="reset" id="reset" type="button">重新開始</button>
   </div>
-  <div class="scene">
-    <div class="bed-shadow"></div>
-    <div class="bed">
-      <div class="mattress-top"></div><div class="mattress-front"></div><div class="mattress-side"></div>
-      <div class="blanket-wrap" id="wrap">
-        <div class="blanket" id="blanket"><div class="fold f1"></div><div class="fold f2"></div><div class="fold f3"></div><div class="edge-roll"></div><div class="corner"></div></div>
-        <div class="puddle" id="puddle"></div><div class="ash-pile" id="ash"></div><div class="droplets" id="droplets"></div><div class="smokes" id="smokes"></div><div class="sparks" id="sparks"></div>
-      </div>
-    </div>
+  <div class="meters">
+   <div class="meter"><div class="meter-label">💧 含水量 <strong id="waterValue">32%</strong></div><div class="track"><div class="progress" id="waterProgress"></div></div></div>
+   <div class="meter"><div class="meter-label">🔥 焦化度 <strong id="burnValue">0%</strong></div><div class="track"><div class="progress" id="burnProgress"></div></div></div>
   </div>
-  <div class="state-panel"><div class="state-card"><div class="state-name" id="stateName">正常乾爽</div><div class="state-desc" id="stateDesc">棉被是正常的軍中綠，蓬鬆但還算平整。可以繼續加水讓它變濕，也可以用打火機把它慢慢烤乾。</div><div class="chips" id="chips"></div></div></div>
-  <div class="controls"><button class="tool water" id="waterBtn" type="button">💧 灑水<small>按住持續加水</small></button><button class="tool fire" id="fireBtn" type="button">🔥 打火機<small>按住持續烘乾 / 烤焦</small></button></div>
+ </div>
+ <div class="artframe">
+  <svg id="scene" viewBox="0 0 640 560" role="img" aria-label="一張有厚度、有縫線和皺摺的軍綠色棉被，受水和火影響會改變外形和表面">
+   <defs>
+    <linearGradient id="roomFloor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6a7f68" stop-opacity=".35"/><stop offset="1" stop-color="#253a30" stop-opacity=".03"/></linearGradient>
+    <linearGradient id="mattressTop" x1="0" x2=".5" y1="0" y2="1"><stop stop-color="#d7ddc9"/><stop offset="1" stop-color="#99a99a"/></linearGradient>
+    <linearGradient id="mattressFront" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#6f8073"/><stop offset="1" stop-color="#344a3b"/></linearGradient>
+    <linearGradient id="fabricGradient" x1="0" x2=".9" y1="0" y2="1">
+     <stop id="fStop1" stop-color="#a2b583"/><stop id="fStop2" offset=".34" stop-color="#81975e"/><stop id="fStop3" offset=".69" stop-color="#77935e"/><stop id="fStop4" offset="1" stop-color="#506f44"/>
+    </linearGradient>
+    <linearGradient id="edgeGrad" x1="0" y1="0" x2=".6" y2="1"><stop id="edgeStop1" stop-color="#628350"/><stop id="edgeStop2" offset="1" stop-color="#344e37"/></linearGradient>
+    <linearGradient id="hem" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#c8d4a0" stop-opacity=".66"/><stop offset="1" stop-color="#385d3c" stop-opacity=".35"/></linearGradient>
+    <radialGradient id="puffGlow" cx="40%" cy="38%" r="66%"><stop stop-color="#f4ffd4" stop-opacity=".21"/><stop offset=".5" stop-color="#ffffff" stop-opacity=".03"/><stop offset="1" stop-color="#000000" stop-opacity=".20"/></radialGradient>
+    <radialGradient id="darkWet"><stop stop-color="#244a58" stop-opacity=".55"/><stop offset="1" stop-color="#244a58" stop-opacity="0"/></radialGradient>
+    <radialGradient id="puddleGradient"><stop stop-color="#8bb9cc" stop-opacity=".62"/><stop offset=".67" stop-color="#4a829a" stop-opacity=".30"/><stop offset="1" stop-color="#31536d" stop-opacity="0"/></radialGradient>
+    <radialGradient id="burnGradient"><stop stop-color="#121311" stop-opacity=".94"/><stop offset=".52" stop-color="#302720" stop-opacity=".9"/><stop offset=".75" stop-color="#a46126" stop-opacity=".59"/><stop offset="1" stop-color="#cb7729" stop-opacity="0"/></radialGradient>
+    <radialGradient id="ashGradient"><stop stop-color="#7d7c70"/><stop offset=".58" stop-color="#5d5f58"/><stop offset=".9" stop-color="#2b302d"/><stop offset="1" stop-color="#212b25" stop-opacity="0"/></radialGradient>
+    <radialGradient id="ashBright"><stop stop-color="#acaaa1" stop-opacity=".7"/><stop offset="1" stop-color="#acaaa1" stop-opacity="0"/></radialGradient>
+    <linearGradient id="flameColor" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#ff5221"/><stop offset=".45" stop-color="#ff9a25"/><stop offset="1" stop-color="#ffe889"/></linearGradient>
+    <clipPath id="fabricClip"><path id="fabricClipPath" d="M139 222 C175 210 206 219 237 218 L462 223 Q485 230 494 257 L544 389 Q553 410 527 416 L104 440 Q82 443 81 418 Q88 378 105 315 L119 254 Q124 234 139 222 Z"/></clipPath>
+    <pattern id="quiltWeave" width="9" height="9" patternUnits="userSpaceOnUse"><path d="M0 0H9M0 0V9" stroke="#faf7dc" stroke-opacity=".10" stroke-width=".55"/><path d="M0 5H9" stroke="#142317" stroke-opacity=".07" stroke-width=".5"/></pattern>
+    <filter id="shadow" x="-30%" y="-45%" width="160%" height="200%"><feGaussianBlur stdDeviation="12"/></filter>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3"/></filter>
+   </defs>
+   <!-- Barracks light and platform -->
+   <ellipse cx="308" cy="449" rx="266" ry="50" fill="#020b05" opacity=".35" filter="url(#shadow)" />
+   <path d="M89 201 L501 209 L595 434 L62 467 Z" fill="#596a61" opacity=".7"/>
+   <path d="M112 204 Q118 192 139 194 L496 203 Q502 204 507 215 L592 419 Q601 430 583 440 L76 470 Q58 470 64 451 Z" fill="url(#mattressTop)" stroke="#e3ebd7" stroke-width="4"/>
+   <path d="M64 451 Q59 477 80 487 L577 459 Q595 454 592 419 L583 440 L76 470 Z" fill="url(#mattressFront)" />
+   <path d="M76 470 L583 440" fill="none" stroke="#cbd4bd" stroke-width="3" opacity=".9" />
+   <path d="M112 204 L64 451 L64 481" fill="none" stroke="#edf0de" stroke-width="4" opacity=".5" />
+   <!-- Pillow hints this is an actual bed -->
+   <path d="M151 206 Q162 184 189 185 L430 188 Q454 189 463 211 L453 246 L155 239 Q138 227 151 206 Z" fill="#dfe3d6" stroke="#a2afa2" stroke-width="3" />
+   <path d="M161 216 Q249 205 443 218" fill="none" stroke="#fcfff4" stroke-width="3" opacity=".65" />
+   <g id="puddle"><ellipse cx="378" cy="459" rx="126" ry="25" fill="url(#puddleGradient)"/><path d="M292 458Q360 448 455 461" stroke="#b1dfed" stroke-width="2" fill="none" opacity=".6" /></g>
+   <!-- quilt: top face plus puffy sides and overhang -->
+   <g class="blanket" id="blanketGroup">
+     <path d="M81 404 Q71 436 93 451 Q126 462 173 452 L498 440 Q541 440 549 414 L544 389 L96 417 Z" fill="url(#edgeGrad)" id="frontFabric" stroke="#375139" stroke-width="3"/>
+     <path id="baseFabric" d="M139 222 C175 210 206 219 237 218 L462 223 Q485 230 494 257 L544 389 Q553 410 527 416 L104 440 Q82 443 81 418 Q88 378 105 315 L119 254 Q124 234 139 222 Z" fill="url(#fabricGradient)" stroke="#43633f" stroke-width="4"/>
+     <g clip-path="url(#fabricClip)">
+       <rect x="68" y="210" width="505" height="241" fill="url(#puffGlow)"/>
+       <rect x="68" y="210" width="505" height="241" fill="url(#quiltWeave)"/>
+       <g id="puffLines" opacity=".8">
+        <path d="M97 280 Q194 254 292 268 Q404 273 511 259" stroke="#f4ffca" stroke-opacity=".16" stroke-width="22" fill="none" filter="url(#soft)"/>
+        <path d="M90 338 Q221 313 327 329 Q448 349 533 322" stroke="#1a3728" stroke-opacity=".16" stroke-width="16" fill="none" filter="url(#soft)"/>
+        <path d="M84 397 Q212 377 316 389 Q414 401 547 381" stroke="#ecf8c1" stroke-opacity=".13" stroke-width="16" fill="none" filter="url(#soft)"/>
+       </g>
+       <g id="folds" fill="none" stroke-linecap="round">
+         <path id="creaseA" d="M109 280 C186 274 264 281 352 271 S459 258 509 271" stroke="#29482e" stroke-opacity=".39" stroke-width="3.2"/>
+         <path d="M110 286 C186 280 267 288 352 278 S459 264 508 278" stroke="#ecf8c1" stroke-opacity=".22" stroke-width="3" />
+         <path id="creaseB" d="M95 345 C180 338 280 357 363 345 Q448 337 532 343" stroke="#29482e" stroke-opacity=".43" stroke-width="3.4"/>
+         <path d="M97 351 C181 343 278 362 364 352 Q448 344 530 350" stroke="#efffd2" stroke-opacity=".24" stroke-width="2.6"/>
+         <path id="creaseC" d="M100 403 Q215 390 312 409 Q415 416 534 397" stroke="#213822" stroke-opacity=".29" stroke-width="3"/>
+       </g>
+       <!-- stitched cotton diamond pattern -->
+       <g id="stitching" fill="none" stroke="#e5edb8" stroke-opacity=".27" stroke-width="1.1" stroke-dasharray="3 8">
+         <path d="M47 260 L580 365 M43 304 L567 407 M59 348 L539 447 M81 399 L500 470 M105 206 L537 296 M135 177 L559 265"/>
+         <path d="M122 446 L362 181 M191 458 L431 184 M269 459 L499 207 M353 449 L559 272 M70 382 L262 181"/>
+       </g>
+       <g id="wetBlotches" fill="url(#darkWet)"><ellipse cx="205" cy="289" rx="92" ry="48"/><ellipse cx="405" cy="361" rx="115" ry="60"/><ellipse cx="294" cy="390" rx="90" ry="47"/></g>
+       <g id="wetShine" fill="none" stroke="#d0f7e9" stroke-linecap="round"><path d="M173 250 Q276 231 369 249" opacity=".32" stroke-width="5"/><path d="M212 325 Q341 314 476 321" opacity=".27" stroke-width="4"/><path d="M142 414 Q303 391 437 410" opacity=".32" stroke-width="4"/></g>
+       <g id="charBlotches"><ellipse cx="317" cy="316" rx="81" ry="67" fill="url(#burnGradient)"/><ellipse cx="439" cy="371" rx="90" ry="63" fill="url(#burnGradient)"/><ellipse cx="185" cy="376" rx="63" ry="52" fill="url(#burnGradient)"/></g>
+       <g id="dryDust"><path d="M133 270 Q229 244 346 262" stroke="#e7d3a4" stroke-opacity=".7" stroke-width="4" fill="none"/><path d="M184 352Q283 330 391 350" stroke="#e3d9b7" stroke-opacity=".5" stroke-width="3" fill="none"/></g>
+     </g>
+     <path id="hemStroke" d="M139 222 C175 210 206 219 237 218 L462 223 Q485 230 494 257 L544 389 Q553 410 527 416 L104 440 Q82 443 81 418 Q88 378 105 315 L119 254 Q124 234 139 222 Z" fill="none" stroke="#bbc996" stroke-width="3" stroke-dasharray="8 5" opacity=".65" />
+     <path id="rimLine" d="M94 434 Q223 454 345 439 L527 426" stroke="#b6d399" stroke-opacity=".68" stroke-width="3" fill="none" stroke-linecap="round" />
+   </g>
+   <g id="drips" fill="#80c9e5"><path d="M123 442q-9 9-4 23q7 9 14 0q0-11-10-23Z"/><path d="M439 424q-9 10-4 24q7 7 14 0q-1-12-10-24Z"/><path d="M537 417q-8 8-5 24q8 9 15-1q-2-15-10-23Z"/></g>
+   <g id="ashes">
+     <ellipse cx="325" cy="411" rx="186" ry="39" fill="url(#ashGradient)"/>
+     <path d="M147 401 Q174 375 210 395 Q241 374 285 402 Q313 377 353 394 Q389 375 430 401 Q465 389 489 411 Q470 434 429 427 Q378 442 349 430 Q287 442 250 423 Q198 435 147 401 Z" fill="#777a73" opacity=".9"/>
+     <ellipse cx="322" cy="405" rx="104" ry="23" fill="url(#ashBright)"/>
+     <path d="M206 410L244 415M351 404L407 421M282 427L321 419M433 406L448 408" stroke="#cac8b5" stroke-opacity=".7" stroke-width="2"/>
+   </g>
+   <!-- Tool effects are ABOVE quilt -->
+   <g id="waterFx">
+     <path d="M310 115 Q301 166 313 212" fill="none" stroke="#91d8ff" stroke-opacity=".7" stroke-width="6" stroke-dasharray="10 11"/>
+     <ellipse cx="276" cy="196" rx="6" ry="13" fill="#d5f4ff"/>
+     <ellipse cx="340" cy="171" rx="6" ry="12" fill="#b4e9ff"/>
+     <ellipse cx="309" cy="190" rx="5" ry="11" fill="#83c9fa"/>
+     <path d="M274 240Q312 218 353 239 M280 247Q313 232 345 246" fill="none" stroke="#b2e9ff" stroke-opacity=".8" stroke-width="3"/>
+   </g>
+   <g id="flameFx" fill="url(#flameColor)">
+     <path d="M347 350Q298 321 337 282Q340 308 361 270Q399 316 378 350Z"/>
+     <path d="M398 358Q369 334 386 303Q396 322 414 295Q445 343 421 358Z"/>
+     <path d="M353 348Q342 331 357 310Q359 332 371 326Q373 347 365 349Z" fill="#fff1b2"/>
+   </g>
+   <g id="steamFx" stroke="#b5d8d9" stroke-opacity=".6" stroke-width="5" fill="none" stroke-linecap="round"><path d="M265 262Q241 236 273 219Q303 196 282 170"/><path d="M350 244Q332 213 362 190"/></g>
+   <g id="smokeFx" stroke="#b8bbba" stroke-opacity=".65" stroke-width="10" fill="none" stroke-linecap="round"><path d="M285 261Q261 241 279 211Q304 186 291 166"/><path d="M347 255Q328 213 354 193Q381 166 368 139"/><path d="M425 280Q408 257 435 228Q447 214 438 186"/></g>
+  </svg>
+ </div>
+ <div class="state" aria-live="polite"><div class="state-name"><span id="stateName">蓬鬆乾爽</span><span class="state-tag" id="stateTag">軍綠棉被</span></div><div class="state-desc" id="stateDesc">一張有厚度的軍綠色棉被。按住灑水讓它變濕，按住打火機讓它烘乾。</div></div>
+ <div class="controls"><button id="waterBtn" class="tool water" type="button"><span>💧</span><div>灑水<small>長按持續加水</small></div></button><button id="fireBtn" class="tool fire" type="button"><span>🔥</span><div>打火機<small>長按烘乾 / 燒焦</small></div></button></div>
 </div>
 <script>
 (()=>{'use strict';
-const blanket=document.getElementById('blanket'),ash=document.getElementById('ash'),puddle=document.getElementById('puddle'),droplets=document.getElementById('droplets'),smokes=document.getElementById('smokes'),sparks=document.getElementById('sparks');
-const moistureFill=document.getElementById('moistureFill'),scorchFill=document.getElementById('scorchFill'),moistureText=document.getElementById('moistureText'),scorchText=document.getElementById('scorchText');
-const stateName=document.getElementById('stateName'),stateDesc=document.getElementById('stateDesc'),chips=document.getElementById('chips');
-const waterBtn=document.getElementById('waterBtn'),fireBtn=document.getElementById('fireBtn'),resetBtn=document.getElementById('reset');
-let moisture=28, scorch=0, action=null, alive=true;
-const defs={ash:['燒成灰','你真的把棉被燒沒了。床上只剩下灰燼和一點焦味，這一局基本上結束。',['不可逆','灰燼','結束狀態']],char:['焦黑冒煙','棉被已經整片焦黑，邊角脆化，還在慢慢冒煙。再烤一下就會直接變成灰。',['嚴重燒焦','冒煙','危險']],scorched:['乾焦發黃','水分快被烤光了，表面開始發黃、捲角，摸起來又乾又硬。',['過乾','捲角','開始焦化']],dry:['正常乾爽','棉被是正常的軍中綠，蓬鬆但還算平整。可以繼續加水讓它變濕，也可以用打火機把它慢慢烤乾。',['基準狀態','可往兩邊調整']],damp:['微濕','表面顏色變深了一點，局部已經有水痕，但整體還撐得住。',['輕微潮濕','有水痕']],wet:['潮濕下垂','棉被吸水後變重，整體開始往下塌，表面帶明顯濕斑。',['變重','開始塌陷']],soaked:['濕透滴水','整條棉被都吃滿了水，邊角不斷滴水，床下已經有水漬。',['滴水','非常濕']],soggy:['泡水爛軟','已經不是棉被，是一團泡水海帶。整張軟爛、貼在床上，快要滑下去了。',['最濕','軟爛','重得要命']]};
-const clamp=(v,min,max)=>Math.min(max,Math.max(min,v)); const lerp=(a,b,t)=>a+(b-a)*t;
-function mix(c1,c2,t){const a=parseInt(c1.slice(1),16),b=parseInt(c2.slice(1),16),ar=(a>>16)&255,ag=(a>>8)&255,ab=a&255,br=(b>>16)&255,bg=(b>>8)&255,bb=b&255;return `rgb(${Math.round(lerp(ar,br,t))},${Math.round(lerp(ag,bg,t))},${Math.round(lerp(ab,bb,t))})`;}
-function stateKey(){if(scorch>=96)return 'ash'; if(scorch>=72)return 'char'; if(scorch>=38)return 'scorched'; if(moisture<20)return 'dry'; if(moisture<42)return 'damp'; if(moisture<65)return 'wet'; if(moisture<86)return 'soaked'; return 'soggy';}
-function renderChips(list){chips.innerHTML=''; list.forEach(txt=>{const s=document.createElement('span'); s.className='chip'; s.textContent=txt; chips.appendChild(s);});}
-function spawn(container,type,count){const frag=document.createDocumentFragment(); const isDrop=type==='drop',isSmoke=type==='smoke',isSpark=type==='spark'; for(let i=0;i<count;i++){const el=document.createElement('span'); el.className=type; el.style.left=(16+Math.random()*68)+'%'; el.style.top=(isDrop?(-10-Math.random()*18):(58+Math.random()*18))+'%'; el.style.animationDelay=(-(Math.random()*1.2)).toFixed(2)+'s'; el.style.animationDuration=(isDrop?(0.7+Math.random()*0.55):(isSmoke?(1.2+Math.random()*0.9):(0.55+Math.random()*0.35))).toFixed(2)+'s'; if(isSpark)el.style.left=(35+Math.random()*30)+'%'; frag.appendChild(el);} container.innerHTML=''; container.appendChild(frag);}
-function update(){const wet=clamp(moisture/100,0,1), burn=clamp(scorch/100,0,1), key=stateKey(), [name,desc,chipList]=defs[key]; stateName.textContent=name; stateDesc.textContent=desc; renderChips(chipList); moistureText.textContent=Math.round(moisture); scorchText.textContent=Math.round(scorch); moistureFill.style.width=moisture+'%'; scorchFill.style.width=scorch+'%';
- let base=mix('#8d7b49','#6d845b',clamp((moisture-5)/30,0,1)); base=mix(base,'#51715b',clamp((moisture-30)/35,0,1)); base=mix(base,'#365e57',clamp((moisture-60)/28,0,1)); base=mix(base,'#2a4b53',clamp((moisture-82)/18,0,1)); if(scorch>0)base=mix(base,'#8b6429',clamp(scorch/45,0,1)); if(scorch>45)base=mix(base,'#35261c',clamp((scorch-45)/28,0,1)); if(scorch>75)base=mix(base,'#2b2b2b',clamp((scorch-75)/22,0,1)); if(scorch>=96)base=mix('#4c4c4c','#767676',clamp((scorch-96)/4,0,1));
- blanket.style.setProperty('--blanket-bg',base); blanket.style.setProperty('--blanket-filter',`saturate(${lerp(.96,.82,wet)-burn*.05}) brightness(${1-wet*.05-burn*.17}) contrast(${1+wet*.04+burn*.08})`);
- blanket.style.transform=`translateY(${lerp(-2,22,wet)+(key==='soggy'?12:0)-burn*4}px) scale(${lerp(1.02,1.06,wet)+(key==='soggy'?0.06:0)-burn*0.02},${lerp(1.04,.90,wet)-(key==='char'?0.05:0)-(key==='ash'?0.12:0)}) rotate(${lerp(-1.2,1.8,wet)+(burn>30?1.5:0)}deg)`;
- blanket.style.borderRadius=`${20+wet*8}px ${24+wet*14}px ${18+wet*6}px ${18+wet*12}px`;
- blanket.style.setProperty('--wrinkleY',`${lerp(-1,6,wet)}px`); blanket.style.setProperty('--skewX',`${lerp(-1.5,2,wet)-burn*0.02}deg`); blanket.style.setProperty('--foldOpacity',String(lerp(.18,.28,wet)+(burn>20?.04:0))); blanket.style.setProperty('--foldOpacity2',String(lerp(.13,.22,wet)+(burn>20?.02:0))); blanket.style.setProperty('--f1y',`${lerp(-1,7,wet)}px`); blanket.style.setProperty('--f2y',`${lerp(0,10,wet)}px`); blanket.style.setProperty('--f3y',`${lerp(1,13,wet)}px`); blanket.style.setProperty('--edge-drop',`${lerp(0,8,wet)+(key==='soggy'?4:0)}px`); blanket.style.setProperty('--edgeScale',`${lerp(1.02,1.09,wet)}`); blanket.style.setProperty('--cornerX',`${lerp(0,-4,wet)-burn*0.08}px`); blanket.style.setProperty('--cornerY',`${lerp(0,18,wet)+(burn>35?-6:0)}px`); blanket.style.setProperty('--cornerRot',`${lerp(-8,-15,wet)+(burn>25?-12:0)}deg`);
- blanket.style.setProperty('--wet-patch1', wet>.18?`rgba(39,70,79,${0.12+wet*.20})`:'transparent'); blanket.style.setProperty('--wet-patch2', wet>.34?`rgba(27,53,65,${0.10+wet*.20})`:'transparent'); blanket.style.setProperty('--wet-patch3', wet>.54?`rgba(20,46,57,${0.09+wet*.18})`:'transparent'); blanket.style.setProperty('--scorch1', scorch>10?`rgba(150,104,28,${0.15+burn*.16})`:'transparent'); blanket.style.setProperty('--scorch2', scorch>32?`rgba(69,31,16,${0.16+burn*.24})`:'transparent'); blanket.style.setProperty('--scorch3', scorch>68?`rgba(24,24,24,${0.18+burn*.33})`:'transparent'); blanket.style.setProperty('--overlayOpacity',String(clamp(.78+wet*.12+burn*.12,.8,1))); blanket.style.setProperty('--edge-bg',mix('#72885b','#334844',wet)); blanket.style.setProperty('--corner-bg',mix('#7c9166','#35504b',wet)); blanket.style.setProperty('--blanket-opacity', key==='ash'?'.12':'1');
- puddle.style.setProperty('--puddleScale', String(key==='wet'?0.62:key==='soaked'?0.92:key==='soggy'?1.12:0)); puddle.style.setProperty('--puddleOpacity', String(key==='wet'?0.40:key==='soaked'?0.64:key==='soggy'?0.78:0));
- ash.style.setProperty('--ashScale', key==='ash'?'1.08':key==='char'?'.18':'0'); ash.style.setProperty('--ashOpacity', key==='ash'?'.98':key==='char'?'.18':'0');
- if(['damp','wet','soaked','soggy'].includes(key)){spawn(droplets,'drop', key==='damp'?2:key==='wet'?4:key==='soaked'?7:10); droplets.style.opacity = key==='damp'?.35:key==='wet'?.55:.9;} else {droplets.innerHTML=''; droplets.style.opacity=0;}
- if(key==='char' || key==='ash'){spawn(smokes,'smoke', key==='char'?6:10); smokes.style.opacity = key==='char'?.9:1;} else {smokes.innerHTML=''; smokes.style.opacity=0;}
- if(action==='fire' && alive && key!=='ash'){spawn(sparks,'spark', scorch>40?5:2); sparks.style.opacity = scorch>40?1:.45;} else {sparks.innerHTML=''; sparks.style.opacity=0;}
-}
-function step(kind,dt){ if(kind==='water'){ if(!alive)return; moisture=clamp(moisture+dt*26,0,100); scorch=clamp(scorch-dt*18,0,100); if(scorch>=96 && moisture>28)moisture=clamp(moisture,0,38);} else if(kind==='fire'){ if(!alive)return; if(moisture>0)moisture=clamp(moisture-dt*22,0,100); if(moisture<18)scorch=clamp(scorch+dt*22,0,100); else if(moisture<36)scorch=clamp(scorch+dt*9,0,100); else scorch=clamp(scorch+dt*2.5,0,100); if(scorch>=96){alive=false; moisture=0;}} update();}
-function setAction(kind,on){action = on ? kind : (action===kind?null:action); waterBtn.classList.toggle('active', action==='water'); fireBtn.classList.toggle('active', action==='fire');}
-function bindHold(btn,kind){const start=e=>{e.preventDefault(); setAction(kind,true);}; const end=e=>{e.preventDefault(); setAction(kind,false);}; btn.addEventListener('pointerdown',start); btn.addEventListener('pointerup',end); btn.addEventListener('pointercancel',end); btn.addEventListener('pointerleave',end);}
-bindHold(waterBtn,'water'); bindHold(fireBtn,'fire'); window.addEventListener('pointerup',()=>{setAction('water',false); setAction('fire',false);});
-resetBtn.addEventListener('click',()=>{moisture=28; scorch=0; alive=true; action=null; setAction('water',false); setAction('fire',false); update();});
-let last=performance.now(); function loop(now){const dt=Math.min((now-last)/1000,.05); last=now; if(action)step(action,dt); requestAnimationFrame(loop);} update(); requestAnimationFrame(loop);
+  const $=id=>document.getElementById(id);
+  const watBtn=$('waterBtn'),firBtn=$('fireBtn');
+  const waterLabel=$('waterValue'),burnLabel=$('burnValue'),waterBar=$('waterProgress'),burnBar=$('burnProgress');
+  const blanket=$('blanketGroup'),waterFx=$('waterFx'),flameFx=$('flameFx'),steamFx=$('steamFx'),smokeFx=$('smokeFx'),wetBlotches=$('wetBlotches'),wetShine=$('wetShine'),charBlotches=$('charBlotches'),puddle=$('puddle'),drips=$('drips'),ashes=$('ashes');
+  const stops=[$('fStop1'),$('fStop2'),$('fStop3'),$('fStop4')], edgeStops=[$('edgeStop1'),$('edgeStop2')];
+  const clamp=(x,min=0,max=100)=>Math.min(max,Math.max(min,x));
+  // Work exclusively with RGB arrays. Previous version accidentally passed 'rgb(...)'
+  // strings into a parser for hexadecimal colors; that made the quilt black.
+  const hex=s=>[parseInt(s.slice(1,3),16),parseInt(s.slice(3,5),16),parseInt(s.slice(5,7),16)];
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  const blend=(a,b,t)=>a.map((n,i)=>Math.round(lerp(n,b[i],clamp(t,0,1))));
+  const rgb=a=>`rgb(${a[0]},${a[1]},${a[2]})`;
+  let moisture=32,burn=0,ash=false,action=null,last=performance.now(),lastRender=0;
+  const dry=hex('#aaa979'),fresh=hex('#7f995f'),wet=hex('#3e775e'),soggy=hex('#315f59');
+  const burnt=hex('#aa723d'),char=hex('#353532');
+  function state(){
+    if(ash)return ['灰燼','被子消失','你把整張棉被燒成灰了！這個狀態無法再用水恢復，只能重新開始。'];
+    if(burn>=67)return ['焦黑冒煙','燒焦','大塊布料已經焦黑冒煙，快燒成灰了。'];
+    if(burn>=24)return ['焦黃捲曲','危險','邊角乾裂發黃，表面出現明顯焦斑。再烤會變成焦炭。'];
+    if(moisture<8)return ['乾到發脆','極乾','顏色變淡發黃，棉被又硬又挺，碰到火很容易焦。'];
+    if(moisture<23)return ['偏乾硬挺','乾','水分不足，表面泛黃、皺摺變得硬邦邦。'];
+    if(moisture<44)return ['蓬鬆乾爽','正常','這才是正常的軍綠色棉被：有厚度、有皺摺，還算柔軟。'];
+    if(moisture<65)return ['微濕滲水','微濕','棉被顏色變深，出現一塊塊不規則水痕。'];
+    if(moisture<85)return ['濕透滴水','全濕','棉被吸飽水，明顯變重下垂，側邊開始滴水。'];
+    return ['泡水軟爛','最濕','整張棉被浸滿水，濕得發亮，軟趴趴地攤在床上。'];
+  }
+  function update(){
+    const m=moisture/100,b=burn/100, [name,tag,desc]=state();
+    $('stateName').textContent=name; $('stateTag').textContent=tag; $('stateDesc').textContent=desc;
+    waterLabel.textContent=`${Math.round(moisture)}%`;burnLabel.textContent=`${Math.round(burn)}%`;
+    waterBar.style.width=`${moisture}%`;burnBar.style.width=`${burn}%`;
+    let color=blend(dry,fresh,clamp(moisture/32,0,1));
+    if(moisture>32)color=blend(fresh,wet,clamp((moisture-32)/45,0,1));
+    if(moisture>77)color=blend(wet,soggy,clamp((moisture-77)/23,0,1));
+    color=blend(color,burnt,clamp(burn/48,0,1));
+    color=blend(color,char,clamp((burn-38)/52,0,1));
+    // Four different light/dark tones keep the quilt volumetric in every state.
+    stops[0].setAttribute('stop-color',rgb(blend(color,[245,245,193],.26)));
+    stops[1].setAttribute('stop-color',rgb(blend(color,[243,252,199],.08)));
+    stops[2].setAttribute('stop-color',rgb(color));
+    stops[3].setAttribute('stop-color',rgb(blend(color,[12,29,20],.28)));
+    edgeStops[0].setAttribute('stop-color',rgb(blend(color,[15,42,29],.23)));
+    edgeStops[1].setAttribute('stop-color',rgb(blend(color,[10,25,18],.55)));
+    $('baseFabric').setAttribute('stroke',rgb(blend(color,[17,40,24],.46)));
+    // Moist fabric loses puff volume and visibly sags over the front edge.
+    const sag=clamp((moisture-30)/70,0,1);
+    const stiffness=clamp((25-moisture)/25,0,1);
+    const scaleY=1 + sag*.065 - stiffness*.03;
+    const scaleX=1 + sag*.022 - stiffness*.008;
+    blanket.setAttribute('transform',`translate(${305*(1-scaleX)} ${330*(1-scaleY)+sag*12}) scale(${scaleX} ${scaleY})`);
+    $('folds').setAttribute('opacity',String(.78+stiffness*.16-sag*.23));
+    $('puffLines').setAttribute('opacity',String(.92-sag*.50));
+    $('dryDust').style.opacity=String(clamp((20-moisture)/16,0,1)*(1-clamp(burn/20,0,1)));
+    wetBlotches.style.opacity=String(clamp((moisture-37)/35,0,.72));
+    wetShine.style.opacity=String(clamp((moisture-57)/43,0,.85));
+    puddle.style.opacity=String(clamp((moisture-66)/34,0,1));
+    drips.style.opacity=String(clamp((moisture-68)/22,0,1));
+    charBlotches.style.opacity=String(clamp((burn-11)/62,0,1));
+    $('hemStroke').setAttribute('opacity',String(.66-clamp(burn/100,0,.5)));
+    $('stitching').setAttribute('opacity',String(1-clamp((burn-40)/58,0,.75)));
+    // Ash is drawn below the tool effects as a remaining identifiable fabric pile.
+    blanket.setAttribute('opacity',String(ash?0:Math.max(.01,1-clamp((burn-87)/13,0,1))));
+    ashes.style.opacity=String(ash?1:clamp((burn-87)/13,0,1));
+    steamFx.style.opacity=String(action==='fire'&&!ash?clamp((moisture-12)/48,0,.95):0);
+    smokeFx.style.opacity=String((burn>49&&!ash)?clamp((burn-49)/32,0,.9):(ash?.35:0));
+    waterFx.style.opacity=String(action==='water'&&!ash?1:0);
+    flameFx.style.opacity=String(action==='fire'&&!ash?clamp((42-moisture)/36,0,1):0);
+    // Keep even burnt quilt visually textured, never pure black.
+    firBtn.disabled=watBtn.disabled=ash;
+  }
+  function setAction(which){
+    if(ash && which)return;
+    action=which;
+    watBtn.classList.toggle('active',which==='water'); firBtn.classList.toggle('active',which==='fire');
+    update();
+  }
+  function bind(btn,which){
+    let pressedAt=0;
+    btn.addEventListener('pointerdown',e=>{
+      if(ash)return;
+      e.preventDefault();
+      pressedAt=performance.now();
+      try{btn.setPointerCapture(e.pointerId);}catch(_){}
+      setAction(which);
+    });
+    for(const eventName of ['pointerup','pointercancel','lostpointercapture']){
+      btn.addEventListener(eventName,()=>{if(action===which)setAction(null);});
+    }
+    // A quick tap still changes the blanket; a long hold won't get an extra boost on release.
+    btn.addEventListener('click',()=>{
+      if(ash)return;
+      if(performance.now()-pressedAt<170){step(which,.25);update();}
+    });
+  }
+  function step(which,dt){
+    if(ash)return;
+    if(which==='water'){
+      moisture=clamp(moisture+dt*26);
+      // Moisture stops active combustion, but char marks do not vanish magically.
+      if(burn>0)burn=clamp(burn-dt*2,0,100);
+    }else if(which==='fire'){
+      moisture=clamp(moisture-dt*29);
+      if(moisture<20) burn=clamp(burn+dt*(moisture<6?29:13));
+    }
+    if(burn>=99.7){burn=100;ash=true;setAction(null);}
+  }
+  bind(watBtn,'water');bind(firBtn,'fire');
+  window.addEventListener('blur',()=>setAction(null));
+  $('reset').addEventListener('click',()=>{moisture=32;burn=0;ash=false;setAction(null);update();});
+  function frame(now){const dt=Math.min((now-last)/1000,.05);last=now;if(action)step(action,dt);if(now-lastRender>60){update();lastRender=now;} requestAnimationFrame(frame);}
+  window.__blanketStageDebug=()=>({moisture,burn,ash,action,state:state()[0],fabric:stops[2].getAttribute('stop-color')});
+  update();requestAnimationFrame(frame);
 })();
 </script>
 </body>
