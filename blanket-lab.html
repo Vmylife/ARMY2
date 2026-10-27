@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#19251d">
+<title>豆腐干棉被｜獨立試玩</title>
+<style>
+  :root{color-scheme:dark;font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#19251d;overscroll-behavior:none}
+  canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+  canvas.grabbing{cursor:grabbing}
+  .top{position:absolute;left:0;right:0;top:0;padding:calc(18px + env(safe-area-inset-top)) 22px 0;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;gap:14px}
+  .heading{color:#f3f1dc;text-shadow:0 1px 10px #1019118c}
+  h1{margin:0 0 5px;font-size:clamp(19px,3vw,26px);font-weight:800;letter-spacing:1.8px}
+  .heading small{color:#c6cfb9;font-size:12px;letter-spacing:.5px}
+  button{pointer-events:auto;font:inherit;border:1px solid #a7b8a46b;background:#354636df;color:#f2f5e5;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:700;min-height:42px;touch-action:manipulation}
+  button:active{transform:scale(.96)}
+  .bottom{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;padding:12px 12px calc(22px + env(safe-area-inset-bottom));pointer-events:none}
+  .tips{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;max-width:95%;padding:11px 16px;background:#121c18c7;border:1px solid #98ac9680;border-radius:15px;box-shadow:0 8px 22px #0d160e70;color:#e1e7d7;font-size:12px}
+  .tips span+span:before{content:'·';margin-right:9px;color:#98b393}
+  .status{position:absolute;left:50%;bottom:94px;transform:translateX(-50%);pointer-events:none;white-space:nowrap;color:#f0eacc;background:#19251ad0;padding:7px 11px;border-radius:20px;font-size:12px;transition:opacity .25s;opacity:0}
+  .status.show{opacity:1}
+  @media(max-width:420px){.top{padding-left:15px;padding-right:15px} .tips{font-size:11px;gap:5px;padding:10px 9px}.tips span+span:before{margin-right:5px}.status{bottom:112px}}
+</style>
+</head>
+<body>
+<canvas id="scene" aria-label="可以抓住角落、拖曳折疊並推動整理的軟棉被"></canvas>
+<div class="top"><div class="heading"><h1>豆腐干棉被</h1><small>抓住棉被角，自己動手折成豆腐</small></div><button id="reset" type="button">重新攤開</button></div>
+<div class="status" id="status" role="status" aria-live="polite"></div>
+<div class="bottom"><div class="tips"><span>按住邊角拖曳折疊</span><span>放開讓被子落下</span><span>滑動被面推整</span><span>點一下壓平</span></div></div>
+<script>
+(()=>{'use strict';
+const canvas=document.getElementById('scene'),ctx=canvas.getContext('2d',{alpha:false});
+const status=document.getElementById('status');
+const cols=27, rows=21, W=2.05,D=1.56;
+const nodes=[],faces=[],border=[];
+let CW=innerWidth,CH=innerHeight,unit=150,cx=0,cy=0,last=performance.now(),pointer=null,folds=0;
+let showHints=true,statusTimeout=0,ambience=0;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
+const idx=(i,j)=>j*cols+i;
+function notify(t){status.textContent=t;status.classList.add('show');statusTimeout=performance.now()+1550;}
+function initialize(){
+ nodes.length=0; faces.length=0; border.length=0; folds=0;pointer=null;showHints=true;
+ const stagger=Math.random()*6.28;
+ for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){
+  const u=i/(cols-1),v=j/(rows-1),edge=Math.min(u,1-u,v,1-v);
+  const softness=Math.pow(1-smooth(edge*6),1.2);
+  const wave=Math.sin(i*.35+j*.23+stagger)*.031 + Math.cos(i*.20-j*.34)*.026;
+  const x=(u-.5)*W + Math.sin(v*10.1+u*5+stagger)*.029*softness + Math.sin(v*6.8)*.019;
+  const z=(v-.5)*D + Math.cos(u*8.1+v*4.5+stagger)*.029*softness;
+  const h=.112 + wave + Math.sin(u*11+v*8)*.018 + softness*.020;
+  nodes.push({i,j,u,v,x,z,h,tx:x,tz:z,th:h,vx:0,vz:0,vh:0,wrinkle:1,layer:0,phase:Math.sin(i*3.71+j*1.91)});
+ }
+ for(let j=0;j<rows-1;j++)for(let i=0;i<cols-1;i++)faces.push([idx(i,j),idx(i+1,j),idx(i+1,j+1),idx(i,j+1)]);
+ for(let i=0;i<cols;i++)border.push(idx(i,0));
+ for(let j=1;j<rows;j++)border.push(idx(cols-1,j));
+ for(let i=cols-2;i>=0;i--)border.push(idx(i,rows-1));
+ for(let j=rows-2;j>0;j--)border.push(idx(0,j));
+ canvas.classList.remove('grabbing');
+}
+function resize(){
+ CW=window.innerWidth;CH=window.innerHeight;
+ const ratio=Math.min(window.devicePixelRatio||1,2);
+ canvas.width=Math.round(CW*ratio);canvas.height=Math.round(CH*ratio);
+ canvas.style.width=CW+'px';canvas.style.height=CH+'px';ctx.setTransform(ratio,0,0,ratio,0,0);
+ unit=Math.min(CW/2.90,(CH-145)/2.45,265);
+ unit=Math.max(64,unit);
+ cx=CW*.50;cy=CH*.527;
+}
+function project(p){return {x:cx+unit*(p.x+p.z*.225),y:cy+unit*(p.z*.72-p.h*.91)};}
+function inverse(sx,sy){let A=(sx-cx)/unit,B=(sy-cy)/unit/.72;let z=B,x=A-z*.225;return {x,z};}
+function poly(points,color){ctx.beginPath();ctx.moveTo(points[0].x,points[0].y);for(let i=1;i<points.length;i++)ctx.lineTo(points[i].x,points[i].y);ctx.closePath();ctx.fillStyle=color;ctx.fill();}
+function path(points){ctx.beginPath();ctx.moveTo(points[0].x,points[0].y);for(let i=1;i<points.length;i++)ctx.lineTo(points[i].x,points[i].y);}
+function rectWorld(x0,z0,x1,z1,height=0){return [project({x:x0,z:z0,h:height}),project({x:x1,z:z0,h:height}),project({x:x1,z:z1,h:height}),project({x:x0,z:z1,h:height})];}
+function room(){
+ const g=ctx.createLinearGradient(0,0,CW,CH);g.addColorStop(0,'#263c30');g.addColorStop(.55,'#1b2d25');g.addColorStop(1,'#101b19');ctx.fillStyle=g;ctx.fillRect(0,0,CW,CH);
+ // Sparse floor tile seams, kept unobtrusive behind the bed.
+ ctx.save();ctx.strokeStyle='#adc1a010';ctx.lineWidth=1;
+ for(let x=-CW;x<CW*2;x+=unit*1.5){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x-CW*.22,CH);ctx.stroke();}
+ for(let y=-100;y<CH+180;y+=unit*.9){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(CW,y-CW*.035);ctx.stroke();}ctx.restore();
+ // Bed shadow, rails and mattress: all local to this standalone page.
+ const shadow=rectWorld(-1.3,-1.06,1.3,1.08,-.25).map(p=>({x:p.x+11,y:p.y+18}));
+ ctx.save();ctx.shadowColor='#000b';ctx.shadowBlur=26;poly(shadow,'#0b130f75');ctx.restore();
+ const top=rectWorld(-1.27,-1.0,1.27,1.0,0);
+ poly([top[3],top[2],{x:top[2].x,y:top[2].y+26},{x:top[3].x,y:top[3].y+26}],'#454e40');
+ poly([top[1],top[2],{x:top[2].x,y:top[2].y+26},{x:top[1].x,y:top[1].y+26}],'#343e34');
+ poly(top,'#a1a996');
+ poly(rectWorld(-1.225,-.95,1.225,.95,.012),'#aeb6a6');
+ ctx.save();path(rectWorld(-1.225,-.95,1.225,.95,.012));ctx.closePath();ctx.strokeStyle='#677967';ctx.lineWidth=2;ctx.stroke();ctx.restore();
+ // Subtle linen seams along the mattress edges.
+ ctx.save();ctx.strokeStyle='#dde4d077';ctx.lineWidth=1;
+ const outer=rectWorld(-1.18,-.91,1.18,.91,.015);path(outer);ctx.closePath();ctx.stroke();ctx.restore();
+}
+function bounds(prefs=nodes){let a=Infinity,b=-Infinity,c=Infinity,d=-Infinity;for(let n of prefs){a=Math.min(a,n.x);b=Math.max(b,n.x);c=Math.min(c,n.z);d=Math.max(d,n.z);}return {minX:a,maxX:b,minZ:c,maxZ:d};}
+function mesh(){
+ // Thin contact shadow beneath the irregular blanket outline.
+ const edge=border.map(i=>project({x:nodes[i].x,z:nodes[i].z,h:-.003}));
+ ctx.save();ctx.shadowColor='#06130da8';ctx.shadowBlur=14;ctx.shadowOffsetY=10;poly(edge,'#263a2860');ctx.restore();
+ const sorted=faces.map((face,q)=>({face,q,level:face.reduce((s,i)=>s+nodes[i].h,0)*.25}));
+ sorted.sort((a,b)=>a.level-b.level||a.q-b.q);
+ for(const {face,q,level} of sorted){
+  const a=nodes[face[0]],b=nodes[face[1]],c=nodes[face[2]],d=nodes[face[3]];
+  const s=[project(a),project(b),project(c),project(d)];
+  const hx=(b.h+c.h-a.h-d.h)*.5, hz=(d.h+c.h-a.h-b.h)*.5;
+  const brightness=clamp(46+hx*130-hz*96+Math.min(6,level*15),36,61);
+  const base=`hsl(${98+Math.sin(q*.043)*1.2} 24% ${brightness}%)`;
+  poly(s,base);
+  // Tiny fabric weave highlights, no texture download or external dependency.
+  if(q%8===0){ctx.strokeStyle='#d7e0c50b';ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo((s[0].x+s[3].x)/2,(s[0].y+s[3].y)/2);ctx.lineTo((s[1].x+s[2].x)/2,(s[1].y+s[2].y)/2);ctx.stroke();}
+ }
+ // Stitching along true deformed boundary shows folds without making them look rigid.
+ ctx.save();const sides=[];
+ for(let i=0;i<cols;i++)sides.push(idx(i,0));
+ for(let j=1;j<rows;j++)sides.push(idx(cols-1,j));
+ for(let i=cols-2;i>=0;i--)sides.push(idx(i,rows-1));
+ for(let j=rows-2;j>0;j--)sides.push(idx(0,j));
+ const out=sides.map(i=>project(nodes[i]));path(out);ctx.closePath();ctx.strokeStyle='#293e2b';ctx.lineWidth=2.6;ctx.lineJoin='round';ctx.stroke();
+ ctx.setLineDash([4,4]);ctx.strokeStyle='#b9c9ab8c';ctx.lineWidth=1.15;ctx.stroke();ctx.restore();
+ // Subtle internal creases across raised material.
+ ctx.save();ctx.globalAlpha=.14;ctx.strokeStyle='#1b3922';ctx.lineWidth=1.1;
+ for(let j=3;j<rows;j+=5){const ps=[];for(let i=0;i<cols;i++)ps.push(project(nodes[idx(i,j)]));path(ps);ctx.stroke();}
+ ctx.restore();
+}
+function cornerMarkers(){
+ if(pointer)return;
+ const q=[idx(0,0),idx(cols-1,0),idx(cols-1,rows-1),idx(0,rows-1)];
+ for(let k=0;k<4;k++){
+  const p=project(nodes[q[k]]),pulse=2*Math.sin(ambience*2.5+k)*.6;
+  ctx.beginPath();ctx.arc(p.x,p.y,Math.max(5,unit*.052)+pulse,0,Math.PI*2);ctx.fillStyle='#ead69dd0';ctx.fill();
+  ctx.strokeStyle='#fff9e0';ctx.lineWidth=1.6;ctx.stroke();
+ }
+}
+function pointerOverlay(){if(!pointer)return;
+ const pos=pointer.currentScreen;
+ if(pointer.type==='fold'&&pointer.axis){
+  let B=pointer.box,a=pointer.axis,mark=[];
+  if(a==='x')mark=[project({x:pointer.crease,z:B.minZ-.1,h:.025}),project({x:pointer.crease,z:B.maxZ+.1,h:.025})];
+  else mark=[project({x:B.minX-.1,z:pointer.crease,h:.025}),project({x:B.maxX+.1,z:pointer.crease,h:.025})];
+  ctx.save();ctx.beginPath();ctx.moveTo(mark[0].x,mark[0].y);ctx.lineTo(mark[1].x,mark[1].y);ctx.strokeStyle='#e6d692b2';ctx.lineWidth=1.8;ctx.setLineDash([7,7]);ctx.stroke();ctx.restore();
+ }
+ ctx.beginPath();ctx.arc(pos.x,pos.y,17,0,Math.PI*2);ctx.strokeStyle='#eee4b5d8';ctx.lineWidth=2;ctx.stroke();
+ ctx.beginPath();ctx.arc(pos.x,pos.y,4,0,Math.PI*2);ctx.fillStyle='#fff2c5';ctx.fill();
+}
+function animate(dt){
+ ambience+=dt;const k=55,drag=Math.pow(.82,dt*60);
+ for(const n of nodes){
+  n.vx=(n.vx+(n.tx-n.x)*k*dt)*drag;
+  n.vz=(n.vz+(n.tz-n.z)*k*dt)*drag;
+  n.vh=(n.vh+(n.th-n.h)*k*dt)*Math.pow(.80,dt*60);
+  n.x+=n.vx*dt;n.z+=n.vz*dt;n.h+=n.vh*dt;
+  n.h=Math.max(.027,n.h);
+ }
+}
+function draw(t){let dt=clamp((t-last)/1000,0,.040);last=t;
+ animate(dt);ctx.clearRect(0,0,CW,CH);room();mesh();if(showHints)cornerMarkers();pointerOverlay();
+ if(statusTimeout&&t>statusTimeout){status.classList.remove('show');statusTimeout=0;}
+ requestAnimationFrame(draw);
+}
+function isOnCloth(screen){
+ // Point in any rendered grid triangle: reliable when folds overlap.
+ const x=screen.x,y=screen.y;
+ function inTri(p,a,b,c){const cross=(u,v,w)=>(v.x-u.x)*(w.y-u.y)-(v.y-u.y)*(w.x-u.x);const a1=cross(a,b,p),a2=cross(b,c,p),a3=cross(c,a,p);return !(a1<0||a2<0||a3<0)&&!(a1>0||a2>0||a3>0);}
+ for(const face of faces){let a=project(nodes[face[0]]),b=project(nodes[face[1]]),c=project(nodes[face[2]]),d=project(nodes[face[3]]);if(inTri(screen,a,b,c)||inTri(screen,a,c,d))return true;}
+ return false;
+}
+function nearestEdge(p){
+ let best=null,dist=Infinity;
+ for(const id of border){const n=nodes[id],q=project(n);let d=Math.hypot(p.x-q.x,p.y-q.y);if(d<dist){dist=d;best=n;}}
+ return {n:best,d:dist};
+}
+function grab(e){
+ if(pointer)return;
+ const p={x:e.clientX,y:e.clientY},hit=isOnCloth(p),edge=nearestEdge(p);
+ const threshold=Math.min(52,unit*.29);
+ if(!hit&&edge.d>threshold)return;
+ // Long press on a cloth edge/corner folds; the inner material can be pushed.
+ const type=edge.d<threshold?'fold':'push';
+ let world=inverse(p.x,p.y);
+ pointer={id:e.pointerId,type,startScreen:p,currentScreen:p,lastScreen:p,startWorld:world,lastWorld:world,axis:null,box:null,crease:0,side:0,baseline:null,progress:0,moved:false,grip:edge.n};
+ canvas.classList.add('grabbing');canvas.setPointerCapture(e.pointerId);
+ e.preventDefault();
+}
+function chooseAxis(g,dx,dz){
+ g.axis=Math.abs(dx)>Math.abs(dz)*.83?'x':'z';
+ g.baseline=nodes.map(n=>({x:n.tx,z:n.tz,h:n.th,layer:n.layer}));
+ const bbox={minX:Infinity,maxX:-Infinity,minZ:Infinity,maxZ:-Infinity};
+ for(let i=0;i<nodes.length;i++){const n=g.baseline[i];bbox.minX=Math.min(bbox.minX,n.x);bbox.maxX=Math.max(bbox.maxX,n.x);bbox.minZ=Math.min(bbox.minZ,n.z);bbox.maxZ=Math.max(bbox.maxZ,n.z)}
+ g.box=bbox;
+ const axis=g.axis;
+ g.crease=axis==='x'?(bbox.minX+bbox.maxX)/2:(bbox.minZ+bbox.maxZ)/2;
+ const gripPos=g.grip[axis];
+ g.side=gripPos<g.crease?-1:1;
+ g.halfWidth=Math.max(.14,(axis==='x'?(bbox.maxX-bbox.minX):(bbox.maxZ-bbox.minZ))*.5);
+}
+function foldMove(g,dx,dz){
+ if(!g.axis)chooseAxis(g,dx,dz);
+ const move=g.axis==='x'?dx:dz;
+ const toward=-g.side*move;
+ g.progress=clamp(toward/(g.halfWidth*1.95),0,1.13);
+ const t=g.progress;
+ for(let i=0;i<nodes.length;i++){
+  const n=nodes[i],o=g.baseline[i],v=g.axis==='x'?o.x:o.z;
+  const sideDist=(v-g.crease)*g.side;
+  // A rounded hinge rather than rigid cardboard: soft influence near the fold.
+  const influence=smooth(sideDist/Math.max(.07,g.halfWidth*.19));
+  const arch=Math.sin(Math.PI*Math.min(1,t))*Math.sin(Math.PI*clamp(sideDist/g.halfWidth,0,1))*.28;
+  const lift=t>0?(t*.105+arch)*influence:0;
+  const foldDelta=(g.crease-v)*2*t*influence;
+  if(g.axis==='x'){n.tx=o.x+foldDelta;n.tz=o.z+Math.sin(n.v*16+t*3+n.phase)*t*.016*influence;}
+  else{n.tz=o.z+foldDelta;n.tx=o.x+Math.sin(n.u*16+t*3+n.phase)*t*.016*influence;}
+  n.th=o.h+lift;
+ }
+}
+function pushMove(g,world,last){
+ const dx=clamp(world.x-last.x,-.06,.06),dz=clamp(world.z-last.z,-.06,.06),r=.35;
+ for(const n of nodes){const q=Math.hypot(n.tx-world.x,n.tz-world.z),v=Math.exp(-(q*q)/(r*r));
+  n.tx=clamp(n.tx+dx*v*.75,-1.24,1.24);
+  n.tz=clamp(n.tz+dz*v*.75,-.99,.99);
+  n.th=clamp(n.th+.013*v,.038,1.3);
+ }
+}
+function move(e){
+ let g=pointer;if(!g||g.id!==e.pointerId)return;
+ const p={x:e.clientX,y:e.clientY};g.currentScreen=p;
+ const world=inverse(p.x,p.y),dx=world.x-g.startWorld.x,dz=world.z-g.startWorld.z;
+ if(Math.hypot(p.x-g.startScreen.x,p.y-g.startScreen.y)>6)g.moved=true;
+ if(g.moved){if(g.type==='fold')foldMove(g,dx,dz);else pushMove(g,world,g.lastWorld);showHints=false;}
+ g.lastWorld=world;g.lastScreen=p;e.preventDefault();
+}
+function finish(e){
+ let g=pointer;if(!g||g.id!==e.pointerId)return;
+ canvas.classList.remove('grabbing');
+ if(g.type==='fold'){
+  if(g.progress<.17){
+   if(g.baseline){g.baseline.forEach((o,i)=>{nodes[i].tx=o.x;nodes[i].tz=o.z;nodes[i].th=o.h;});}
+   else if(!g.moved)pressAt(g.startWorld);
+  }else{
+   folds++;
+   for(let i=0;i<nodes.length;i++){
+    const n=nodes[i];
+    // Preserve where the user actually released the fabric; allow soft settling.
+    const side=(g.baseline[i][g.axis]-g.crease)*g.side;
+    const active=smooth(side/Math.max(.07,g.halfWidth*.19));
+    n.layer=g.baseline[i].layer+active*.11*g.progress;
+    n.th=g.baseline[i].h+n.layer-g.baseline[i].layer+Math.max(0,Math.sin(Math.PI*clamp(g.progress,0,1)))*active*.040;
+    n.tx=clamp(n.tx,-1.26,1.26);
+    n.tz=clamp(n.tz,-1.06,1.06);
+   }
+   notify('折了 '+folds+' 次，可以繼續折、推邊整理');
+  }
+ }else if(!g.moved)pressAt(g.startWorld);
+ pointer=null;
+}
+function pressAt(pos){
+ for(const n of nodes){let dist=Math.hypot(n.tx-pos.x,n.tz-pos.z),v=Math.exp(-dist*dist/.10);
+  n.th=Math.max(.052+n.layer*.92,n.th-.036*v);
+ }
+}
+canvas.addEventListener('pointerdown',grab);
+canvas.addEventListener('pointermove',move);
+canvas.addEventListener('pointerup',finish);
+canvas.addEventListener('pointercancel',e=>{if(pointer&&pointer.id===e.pointerId){pointer=null;canvas.classList.remove('grabbing')}});
+canvas.addEventListener('contextmenu',e=>e.preventDefault());
+window.addEventListener('resize',resize,{passive:true});
+document.getElementById('reset').addEventListener('click',()=>{initialize();notify('已重新攤開棉被');});
+window.__blanketDebug=()=>({folds,pointerType:pointer?.type||null,progress:pointer?.progress||0,bounds:bounds(),corners:[idx(0,0),idx(cols-1,0),idx(cols-1,rows-1),idx(0,rows-1)].map(i=>project(nodes[i])),mesh:faces.length});
+initialize();resize();requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
