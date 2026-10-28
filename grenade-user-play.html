@@ -252,6 +252,11 @@ body.show-stats #counters{display:grid;}
 @media(max-height:710px){#result .report-achievement{min-height:78px;padding:5px 3px;gap:3px}#result .report-achievement .emblem{height:30px;width:30px;font-size:21px}#result .report-achievement strong{font-size:11px}#result .report-section-heading{font-size:11px}}
 @media(max-height:565px){#result .resultCard{overflow:auto}#achievementDetail .achievement-detail-card{padding:17px}}
 
+/* v1.42: return to the main camp without increasing the one-page report height. */
+#result #resultBtns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+#result #resultBtns button{min-width:0;white-space:nowrap;padding:7px 3px;font-size:clamp(10px,2.8vw,12px);min-height:42px}
+#result #returnCamp{font-weight:950}
+
 /* v1.36 — power is created in the workshop, not adjusted at the range. */
 #powerDock{position:fixed;top:calc(9px + env(safe-area-inset-top));right:12px;width:auto;max-width:calc(100vw - 24px);z-index:7;pointer-events:none;display:block}
 #powerDock.hide{display:none!important}
@@ -294,7 +299,7 @@ body.show-stats #counters{display:grid;}
   <div class="cards"><div class="cell"><small>紅軍擊殺</small><b id="rRed">0 / 9</b></div><div class="cell"><small>友軍誤殺</small><b id="rGreen" class="danger">0</b></div><div class="cell"><small>建築摧毀</small><b id="rBuildings">0 / 12</b></div></div>
   <div class="report-section"><div class="report-section-heading">本次達成成就 <small id="rAchievementsMeta">最多展示 3 項</small></div><div class="report-achievements" id="rAchievements"></div></div>
   <div class="report-section"><div class="report-section-heading">長官綜合評語</div><div class="report-officer"><strong id="rOfficerTitle">訓練主任批示</strong><span id="rOfficerComment">請確認戰績。</span></div></div>
-  <div id="resultBtns"><button class="accent" id="retry">重新挑戰（三投）</button><button class="ghost" id="openGallery">🏅 軍旅榮譽簿</button></div>
+  <div id="resultBtns"><button class="ghost" id="retry">重新挑戰</button><button class="ghost" id="openGallery">🏅 榮譽簿</button><button class="accent" id="returnCamp" type="button">返回軍營</button></div>
   <p class="muted report-footnote">基礎20＋紅軍最多70；友軍最多扣20、建築最多扣12；提前殲敵加分。成就與稱號以三投累計計算。</p>
  </div>
 </section>
@@ -422,6 +427,12 @@ function positionAimHUD(){
  const vx=r.x+Math.max(80,r.width/2+24);meter.style.left=clamp(vx,8,w-64)+'px';meter.style.top=clamp((r.top+r.bottom-mh)/2,138,h-mh-74)+'px';
 }
 $('retry').addEventListener('click',()=>{try{sessionStorage.removeItem(CRAFT_KEY)}catch(e){}if(embeddedMode)sendToWorkshop('ARMY_GRENADE_RETURN');else location.href='./grenade-workshop-test.html';});
+$('returnCamp').addEventListener('click',()=>{
+  // Scores and achievements have already been saved by the result screen.
+  try{sessionStorage.removeItem(CRAFT_KEY)}catch(e){}
+  if(embeddedMode)sendToWorkshop('ARMY_GRENADE_HOME');
+  else window.location.assign(new URL('./index.html',window.location.href).href);
+});
 function nextThrow(){
  if(phase!=='blast'||throwsUsed>=MAX_THROWS||world.counter.red>=9)return;
  world.finishBlast();world.prepareNextThrow();

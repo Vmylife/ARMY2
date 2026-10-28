@@ -273,6 +273,10 @@ window.addEventListener('message',event=>{
  }else if(data.type==='ARMY_GRENADE_ERROR'){
   arenaReady=false;arenaFailure=String(data.message||'3D 初始化失敗');
   if(pendingCraft)arenaNotice('無法啟動 3D 軍營',arenaFailure,true);
+ }else if(data.type==='ARMY_GRENADE_HOME'){
+  // Navigating from the workshop top-level window avoids loading the camp inside the 3D iframe.
+  try{sessionStorage.removeItem('ARMY2_grenade_craft_v1')}catch(e){}
+  window.location.assign(new URL('./index.html',window.location.href).href);
  }else if(data.type==='ARMY_GRENADE_RETURN'){
   // Starting a new crafted grenade is a NEW training; never navigate away.
   pendingCraft=null;arenaReady=false;throwingWarmStarted=false;
