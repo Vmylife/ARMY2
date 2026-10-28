@@ -14,10 +14,12 @@ const mix3=(a,b,k)=>a.map((v,i)=>lerp(v,b[i],k));
 // GTA-style spatial continuity: front of enemies -> rise -> overhead travel -> descend behind thrower.
 function introCamera(t){
  const [rx,rz]=RED_CENTER,[px,pz]=[PLAYER_ITEM.x,PLAYER_ITEM.z];
- const redEye=[rx,3.5,rz+11.6],redLook=[rx,1.05,rz]; // Face the red squad from the player side; no diagonal camera angle.
- const redAbove=[rx,77,rz-8.0],redTopLook=[rx,0,rz];
- const throwAbove=[px,77,pz],throwTopLook=[px,0,pz];
- const behind=[px-2.5,5.9,pz+11.2],aim=[px+6.3,1.35,pz-18.5];
+ // All four poses stay on the +Z side of their look targets.  In v1.5
+ // the camera crossed to -Z during ascent, forcing an unwanted 180° flip.
+ const redEye=[rx,3.4,rz+12.3],redLook=[rx,1.05,rz];
+ const redAbove=[rx,69,rz+11.3],redTopLook=[rx,0,rz];
+ const throwAbove=[px,69,pz+11.3],throwTopLook=[px,0,pz];
+ const behind=[px-1.00,1.9,pz+5.55],aim=[px+1.2,2.25,pz-12.0];
  if(t<.19)return {eye:redEye,target:redLook};
  if(t<.40){const u=smooth((t-.19)/.21);return {eye:mix3(redEye,redAbove,u),target:mix3(redLook,redTopLook,u)}};
  if(t<.70){const u=smooth((t-.40)/.30);return {eye:mix3(redAbove,throwAbove,u),target:mix3(redTopLook,throwTopLook,u)}};
@@ -160,7 +162,7 @@ class WebWorld{
  this.debrisBuf=g.createBuffer();this.flightBuf=g.createBuffer();this.starProgram=compile(g,`precision mediump float;attribute vec3 aStar;uniform float uTwist;varying float vBr;void main(){float a=atan(aStar.y,aStar.x)+uTwist*(1.-length(aStar.xy));float r=length(aStar.xy);gl_Position=vec4(cos(a)*r,sin(a)*r*.63,0.,1.);gl_PointSize=1.5+aStar.z*3.2;vBr=aStar.z;}`,`precision mediump float;varying float vBr;void main(){float r=length(gl_PointCoord-.5);if(r>.49)discard;gl_FragColor=vec4(mix(vec3(.30,.42,.9),vec3(1.,.82,.58),vBr),(.35+vBr*.65)*(1.-r));}`);
  const stars=[];for(let i=0;i<2000;i++){const arm=i%4,rad=Math.pow(rand(),.72)*.96,ang=arm*Math.PI*.5+rad*10.2+(rand()-.5)*(.12+rad*.2);stars.push(Math.cos(ang)*rad+(rand()-.5)*.025,Math.sin(ang)*rad+(rand()-.5)*.045,.2+rand()*.8);}this.starCount=stars.length/3;this.stars=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,this.stars);g.bufferData(g.ARRAY_BUFFER,new Float32Array(stars),g.STATIC_DRAW);g.enable(g.DEPTH_TEST);g.depthFunc(g.LEQUAL);g.clearColor(.57,.68,.70,1);}
  resize(){this.width=c.clientWidth||window.innerWidth;this.height=c.clientHeight||window.innerHeight;const dpr=Math.min(1.45,window.devicePixelRatio||1);c.width=Math.floor(this.width*dpr);c.height=Math.floor(this.height*dpr);if(this.backup){this.backup.width=c.width;this.backup.height=c.height;}if(this.gl)this.gl.viewport(0,0,c.width,c.height);}
- buildEvents(){this.events=[];const [ix,iz]=this.impact;buildings.forEach((v,i)=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'b',v}));soldiers.forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'s',v}));(this.nearBuildings||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'detail',v}));(this.actors||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'actor',v}));(this.campProps||[]).filter(v=>v.type==='treeA'||v.type==='treeB').forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'tree',v}));landmarks.forEach(v=>this.events.push({r:v.radius||Math.hypot(v.x-ix,v.z-iz),type:'land',v}));this.events.sort((a,b)=>a.r-b.r);this.eventIndex=0;this.counter={buildings:0,kills:0,red:0,green:0};this.newLandmarks=[];this.LM=new Set();if(this.nearBuildings)this.nearBuildings.forEach(b=>{b.hit=false;b.fragments=[]});if(this.actors)this.actors.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;a.anim?.setClip('Idle_11',{restart:true})});if(this.campProps)this.campProps.forEach(p=>{p.hit=false;p.fallT=0;p.tilt=0});this.bursts=[];if(this.thrower?.anim)this.thrower.anim.setClip('Idle_11',{restart:true});}
+ buildEvents(){this.events=[];const [ix,iz]=this.impact;buildings.forEach((v,i)=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'b',v}));soldiers.forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'s',v}));(this.nearBuildings||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'detail',v}));(this.actors||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'actor',v}));(this.campProps||[]).filter(v=>v.type==='treeA'||v.type==='treeB').forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'tree',v}));landmarks.forEach(v=>this.events.push({r:v.radius||Math.hypot(v.x-ix,v.z-iz),type:'land',v}));this.events.sort((a,b)=>a.r-b.r);this.eventIndex=0;this.counter={buildings:0,kills:0,red:0,green:0};this.newLandmarks=[];this.LM=new Set();if(this.nearBuildings)this.nearBuildings.forEach(b=>{b.hit=false;b.fragments=[]});if(this.actors)this.actors.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;a.anim?.setClip('Idle_11',{restart:true})});if(this.campProps)this.campProps.forEach(p=>{p.hit=false;p.fallT=0;p.tilt=0});this.bursts=[];if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}}
  setLanding(x,z){this.impact=[x,z];this.radius=-1;this.mode='field';this.buildEvents();}
  begin(powder,density,quality,broken){const amount=Math.max(0,powder)/600, comp=Math.max(1,density/.6);let max=6+Math.pow(amount,1.37)*Math.pow(comp,2.65)*17*Math.max(.06,quality)*(broken?.39:1);max=clamp(max,7,1500000);this.blastMax=max;this.blastDuration=2+Math.min(13,Math.log10(max+1)*2.1);this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();return max;}
  beginTestPower(power){const points=[[0,2.5],[10,13.3],[20,38],[35,140],[50,440],[65,1350],[75,2100],[85,18000],[92,165000],[100,1500000]];let max=1500000;for(let i=1;i<points.length;i++)if(power<=points[i][0]){const a=points[i-1],b=points[i],t=(power-a[0])/(b[0]-a[0]);max=Math.exp(Math.log(a[1])+(Math.log(b[1])-Math.log(a[1]))*t);break;}this.impactStarted=performance.now();this.blastMax=max;this.blastDuration=4.0+Math.min(11,Math.log10(max+1)*1.85);this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();this.lastHitR=0;this.bursts=[{x:this.impact[0],z:this.impact[1],age:0,life:3.5,size:Math.min(16,3.6+Math.log10(max+1)*2.8),type:'origin',seed:.27}];return max;}
@@ -194,6 +196,24 @@ class WebWorld{
     const fade=clamp((b.life-t)/Math.max(.1,b.life*.8),0,1);
     for(let i=0;i<4;i++){const ang=i*2.399+b.seed*11,rr=sz*(.25+t*(.28+i*.07)),sz2=sz*(.24+.13*(i%3)+t*.18);blob(b.x+Math.cos(ang)*rr,.75+sz*(.25+i*.10)+t*(1.8+i*.7),b.z+Math.sin(ang)*rr,sz2,sz2*.8,sz2,.29+i*.028,.28+i*.03,.25+i*.035,fade*(.63+.08*(i%2)),0.);}
   }
+  // The hot fire-and-smoke front travels WITH the shockwave. Old versions
+  // only animated the impact point for ~2s, so the rest looked like silent
+  // instant building collapse. Keep this visible until the camera leaves land.
+  if(this.radius>1.6&&this.radius<2400){
+    const rr=this.radius,n=rr<65?20:rr<400?25:30;
+    const sz=Math.max(2.3,rr*.19),height=Math.max(1.4,rr*.10),phase=this.timer;
+    for(let i=0;i<n;i++){
+      const ang=2*Math.PI*(i+.16*Math.sin(i*7.31+phase*.8))/n;
+      const wobble=.97+.035*Math.sin(i*2.71+phase*3.1),wave=rr*wobble;
+      const xx=this.impact[0]+Math.cos(ang)*wave,zz=this.impact[1]+Math.sin(ang)*wave;
+      g.blendFunc(g.SRC_ALPHA,g.ONE);
+      blob(xx,height*.58,zz,sz*.84,height*.90,sz*.84,1.,.51+.13*Math.sin(i*3.2+phase*5),.09,.52,1.);
+      if(i%2===0){g.blendFunc(g.SRC_ALPHA,g.ONE_MINUS_SRC_ALPHA);
+        const inner=rr*.82,smokeY=height*(1.1+.28*Math.sin(i*2.2+phase));
+        blob(this.impact[0]+Math.cos(ang)*inner,smokeY,this.impact[1]+Math.sin(ang)*inner,sz*.83,sz*.72,sz*.83,.28,.27,.25,.50,0.);
+      }
+    }
+  }
   // Bright center becomes a rising dust column, instead of immediately vanishing.
   if(this.timer<2.1&&this.bursts.length){const b=this.bursts[0],a=clamp(1-this.timer/2.1,0,1);g.blendFunc(g.SRC_ALPHA,g.ONE);blob(b.x,.7,b.z,1.9+this.timer*3.2,1.3+this.timer*2,1.9+this.timer*3.2,1.,.72,.19,a*.8,1.);}
   g.depthMask(true);g.disable(g.BLEND);g.enable(g.CULL_FACE);g.disableVertexAttribArray(a);
@@ -201,7 +221,8 @@ class WebWorld{
  drawRing(vp){if(this.radius<=1)return;const g=this.gl,p=this.ringP;g.useProgram(p);g.bindBuffer(g.ARRAY_BUFFER,this.ringBuf);const a=g.getAttribLocation(p,'aRing');g.enableVertexAttribArray(a);g.vertexAttribPointer(a,4,g.FLOAT,false,16,0);g.uniformMatrix4fv(g.getUniformLocation(p,'uVP'),false,vp);g.uniform2f(g.getUniformLocation(p,'uCenter'),this.impact[0],this.impact[1]);g.uniform1f(g.getUniformLocation(p,'uRadius'),this.radius);g.uniform1f(g.getUniformLocation(p,'uWidth'),Math.max(2,Math.min(65,this.radius*.04)));g.enable(g.BLEND);g.blendFunc(g.SRC_ALPHA,g.ONE);g.depthMask(false);g.drawArrays(g.TRIANGLES,0,this.ringVerts.length/4);g.depthMask(true);g.disable(g.BLEND);}
  drawLand(){const g=this.gl;g.clearColor(.66,.80,.91,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);
   const px=this.player[0],pz=this.player[1];let eye,tgt,dist=26;
-  const aimEye=[px-2.5,5.9,pz+11.2],aimTarget=[px+6.3,1.35,pz-18.5];
+  // Close over-the-shoulder view: visible back and nape, slightly upward look.
+  const aimEye=[px-1.00,1.9,pz+5.55],aimTarget=[px+1.2,2.25,pz-12.0];
   if(this.camPhase==='intro'){
     const pose=introCamera(clamp(this.introProgress||0,0,1));eye=pose.eye;tgt=pose.target;
     dist=clamp(Math.hypot(eye[0]-tgt[0],eye[2]-tgt[2]),12,92);
@@ -236,7 +257,7 @@ class WebWorld{
    this.nearBuildings=SCENE_BUILDINGS.map((o,i)=>({x:o.x,z:o.z,type:o.assetId,people:0,hit:false,fragments:[]}));
    this.actors=SCENE_SOLDIERS.filter(o=>o.uid!==PLAYER_ITEM.uid).map((o,i)=>({x:o.x,z:o.z,px:o.x,pz:o.z,rot:o.rot||0,angle:(o.rot||0)*Math.PI/180,enemy:o.team==='enemy',hit:false,renderLift:0,seed:(i*.731)%1}));
    this.campProps=SCENE_PROPS.map(o=>({uid:o.uid,type:o.assetId,x:o.x,z:o.z,scale:o.scale||1,yaw:(o.rot||0)*Math.PI/180,size:o.size,model:o.model}));
-   this.thrower={x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,angle:Math.atan2(-(RED_CENTER[0]-PLAYER_ITEM.x),-(RED_CENTER[1]-PLAYER_ITEM.z)),anim:{setClip(){},hasClip(){return true}}};
+   this.thrower={x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,angle:0,anim:{setClip(){},hasClip(){return true}}};
    this.modelState='unavailable';this.buildEvents();this.modelErrors.push('瀏覽器不支援 WebGL2，顯示簡化備援場景；建議用手機 Safari 或 Chrome');this.buildEvents();return;
   }
   this.nearBuildings=[];this.actors=[];this.detailed={};
@@ -245,7 +266,7 @@ class WebWorld{
   this.detailProxy=inst(this.nearBuildings.map(b=>({x:b.x,z:b.z,h:b.size[1],w:b.size[0],d:b.size[2],kind:0,seed:(b.idx%9)/9})),0);
   this.detailProxyBuf=this.gl.createBuffer();this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.detailProxyBuf);this.gl.bufferData(this.gl.ARRAY_BUFFER,this.detailProxy,this.gl.STATIC_DRAW);
   this.actors=SCENE_SOLDIERS.filter(o=>o.uid!==PLAYER_ITEM.uid).map((o,i)=>({uid:o.uid,x:o.x,z:o.z,px:o.x,pz:o.z,rot:o.rot||0,scale:o.scale||1,quality:o.quality||'low',enemy:o.team==='enemy',hit:false,flyT:0,renderLift:0,angle:(o.rot||0)*Math.PI/180,seed:(i*.731)%1}));
-  this.thrower={uid:PLAYER_ITEM.uid,x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,rot:PLAYER_ITEM.rot,quality:'high',enemy:false,hit:false,flyT:0,renderLift:0,angle:Math.atan2(-(RED_CENTER[0]-PLAYER_ITEM.x),-(RED_CENTER[1]-PLAYER_ITEM.z)),seed:.2};
+  this.thrower={uid:PLAYER_ITEM.uid,x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,rot:PLAYER_ITEM.rot,quality:'high',enemy:false,hit:false,flyT:0,renderLift:0,angle:0,seed:.2};
   try{
     const keys=['barracks','guardhouse','office'];
     await Promise.all(keys.map(async key=>{
@@ -363,6 +384,7 @@ class WebWorld{
    else for(const f of b.fragments){const model=mul(T(f.x,f.y,f.z),mul(R(f.rx,f.ry,f.rz),S3(s[0]*b.scale,s[1]*b.scale,s[2]*b.scale)));this.drawStaticMesh(f.p.geo,asset.tex,model,vp);}
   }
   const now=performance.now(),dt=Math.min(.034,Math.max(.001,(now-(this.lastDetailedTime||now))/1000));this.lastDetailedTime=now;
+  if(this.throwing&&this.thrower){const a=this.throwing,k=smooth(clamp((performance.now()-a.start)/400,0,1));this.thrower.angle=lerp(a.startAngle,a.endAngle,k);}
   for(const a of [...this.actors,this.thrower]){
    const dd=Math.hypot(a.px-focus[0],a.pz-focus[1]);if(dd>Math.min(160,dist*1.65+38))continue;
    const sa=this.soldierAssets[a.quality];if(!sa)continue;
@@ -375,16 +397,61 @@ class WebWorld{
    g.disable(g.CULL_FACE);g.drawElements(g.TRIANGLES,sa.geo.count,sa.geo.type,0);g.enable(g.CULL_FACE);
   }
   g.bindVertexArray(null);
+  if(this.camPhase==='aim'||this.camPhase==='throw'){
+    const held=this.heldGrenadePosition();if(held)this.drawGrenade(vp,mul(T(held[0],held[1],held[2]),mul(RY(this.thrower.angle),SC(.78))));
+  }
+ }
+ // Get the throwing character's animated wrist position in world coordinates.
+ heldGrenadePosition(){
+  const a=this.thrower;if(!a?.anim?.rightHandWorld)return null;
+  const hand=a.anim.rightHandWorld;
+  const m=mul(T(a.px,a.renderLift||0,a.pz),mul(RY(a.angle),hand));
+  const pos=[m[12],m[13],m[14]];
+  // A tiny offset from the wrist toward the fingers, without a fake prop spawn.
+  return [pos[0]+Math.sin(a.angle)*-.06,pos[1]+.045,pos[2]-Math.cos(a.angle)*.06];
+ }
+ makeGrenadePart(triangles){const g=this.gl,vao=g.createVertexArray();g.bindVertexArray(vao);const p=[],n=[],uv=[];
+  for(const tri of triangles){const A=tri[0],B=tri[1],C=tri[2],ab=B.map((q,i)=>q-A[i]),ac=C.map((q,i)=>q-A[i]),normal=norm(cross(ab,ac));
+   for(const v of tri){p.push(...v);n.push(...normal);uv.push(0,0);}}
+  for(const [index,data,size] of [[0,p,3],[1,n,3],[2,uv,2]]){const b=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,b);g.bufferData(g.ARRAY_BUFFER,new Float32Array(data),g.STATIC_DRAW);g.enableVertexAttribArray(index);g.vertexAttribPointer(index,size,g.FLOAT,false,0,0);}
+  const count=p.length/3,ib=new Uint16Array(count);for(let i=0;i<count;i++)ib[i]=i;const idx=g.createBuffer();g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,idx);g.bufferData(g.ELEMENT_ARRAY_BUFFER,ib,g.STATIC_DRAW);g.bindVertexArray(null);return {vao,count,indexType:g.UNSIGNED_SHORT};
+ }
+ setupGrenadeProp(){if(this.grenadeParts||!this.gl?.createVertexArray)return;const g=this.gl;
+  const surface=(rings,sections,shape)=>{const v=[];for(let r=0;r<rings.length-1;r++)for(let i=0;i<sections;i++){const a=i*Math.PI*2/sections,b=(i+1)*Math.PI*2/sections;const u=shape(rings[r],a,r),w=shape(rings[r],b,r),p=shape(rings[r+1],a,r+1),q=shape(rings[r+1],b,r+1);v.push([u,w,q],[u,q,p]);}return v};
+  const bodyRings=[[.055,.075],[.115,.155],[.23,.200],[.37,.203],[.50,.168],[.565,.100],[.584,.045]];
+  const body=surface(bodyRings,32,([y,r],ang,k)=>{const grooves=1+.080*Math.cos(ang*10);return [Math.cos(ang)*r*grooves,y,Math.sin(ang)*r*grooves]});
+  const cylinder=(ya,yb,r)=>surface([[ya,r],[yb,r]],20,([y,rr],ang)=>[Math.cos(ang)*rr,y,Math.sin(ang)*rr]);
+  const box=(x,y,z,w,h,d)=>{const a=[x-w/2,y-h/2,z-d/2],b=[x+w/2,y-h/2,z+d/2];const v=(ix,iy,iz)=>[ix?b[0]:a[0],iy?b[1]:a[1],iz?b[2]:a[2]];
+   return [[v(0,0,1),v(1,0,1),v(1,1,1)],[v(0,0,1),v(1,1,1),v(0,1,1)],[v(1,0,0),v(0,0,0),v(0,1,0)],[v(1,0,0),v(0,1,0),v(1,1,0)],[v(0,0,0),v(0,0,1),v(0,1,1)],[v(0,0,0),v(0,1,1),v(0,1,0)],[v(1,0,1),v(1,0,0),v(1,1,0)],[v(1,0,1),v(1,1,0),v(1,1,1)],[v(0,1,0),v(0,1,1),v(1,1,1)],[v(0,1,0),v(1,1,1),v(1,1,0)]];};
+  const torus=[];for(let i=0;i<26;i++)for(let j=0;j<6;j++){const fn=(i,j)=>{const ang=i*2*Math.PI/26,t=j*2*Math.PI/6;return [.14+(.105+.017*Math.cos(t))*Math.cos(ang),.72+(.105+.017*Math.cos(t))*Math.sin(ang),.02+.017*Math.sin(t)]};const a=fn(i,j),b=fn(i+1,j),c=fn(i+1,j+1),d=fn(i,j+1);torus.push([a,b,c],[a,c,d]);}
+  this.grenadeParts=[
+   {geo:this.makeGrenadePart(body),tint:[.30,.43,.25]},
+   {geo:this.makeGrenadePart(cylinder(.567,.682,.089)),tint:[.54,.57,.49]},
+   {geo:this.makeGrenadePart(box(.103,.70,-.015,.135,.046,.108)),tint:[.70,.70,.62]},
+   {geo:this.makeGrenadePart(box(.155,.655,-.040,.050,.17,.075)),tint:[.47,.51,.45]},
+   {geo:this.makeGrenadePart(torus),tint:[.82,.77,.57]}
+  ];this.grenadeBlank=this.blankTexture();
+ }
+ drawGrenade(vp,model){if(!this.gl?.createVertexArray)return;this.setupDetailPrograms();this.setupGrenadeProp();if(!this.grenadeParts)return;
+  const g=this.gl,p=this.detailProg,u=k=>g.getUniformLocation(p,k);g.useProgram(p);g.uniformMatrix4fv(u('uVP'),false,vp);g.uniformMatrix4fv(u('uModel'),false,model);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,this.grenadeBlank);g.uniform1i(u('uTex'),0);
+  for(const part of this.grenadeParts){g.uniform3fv(u('uTint'),part.tint);g.bindVertexArray(part.geo.vao);g.disable(g.CULL_FACE);g.drawElements(g.TRIANGLES,part.geo.count,part.geo.indexType,0);}g.enable(g.CULL_FACE);g.bindVertexArray(null);
  }
  drawFlight(vp){if(!this.flight||!this.gl||this.flight.done)return;const a=this.flight,t=Math.min(1,(performance.now()-a.start)/Math.max(1,a.duration));
   const x=lerp(a.from[0],a.to[0],t),z=lerp(a.from[2],a.to[2],t),y=lerp(a.from[1],.4,t)+Math.sin(t*Math.PI)*13;
-  this.flightPosition=[x,y,z];const d=inst([{x,y,z,h:.55,w:.43,d:.43,rgb:[.20,.40,.18]}],2),g=this.gl;
-  g.bindBuffer(g.ARRAY_BUFFER,this.flightBuf);g.bufferData(g.ARRAY_BUFFER,d,g.DYNAMIC_DRAW);this.instanceDraw(this.flightBuf,1,2,vp);
+  this.flightPosition=[x,y,z];
+  // Full recognisable pineapple grenade, ring and safety lever included.
+  const tilt=R(t*7.3, t*10.4, t*4.1);
+  this.drawGrenade(vp,mul(T(x,y,z),mul(tilt,SC(1.10))));
   if(t>=1){a.done=true;this.flightPosition=null;this.camPhase='blast';this.onLanding?.();}
  }
- playThrow(x,z,onLanding){const dx=x-this.player[0],dz=z-this.player[1];if(this.thrower)this.thrower.angle=Math.atan2(-dx,-dz);this.thrower.anim.setClip('baseball_pitching',{restart:true});this.throwing={start:performance.now(),duration:830,target:[x,z],onLanding};this.flight=null;this.camPhase='throw';}
- launchFlight(x,z,onLanding){const a=this.player,dx=x-a[0],dz=z-a[1],dl=Math.hypot(dx,dz)||1;this.throwing=null;this.camPhase='flight';this.flight={start:performance.now(),duration:1850,from:[a[0]+dx/dl*.85+.25,1.5,a[1]+dz/dl*.85],to:[x,.4,z],done:false};this.onLanding=onLanding;}
- resetDetailed(){this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.impactStarted=null;this.camPhase='aim';}
+ playThrow(x,z,onLanding){const dx=x-this.player[0],dz=z-this.player[1],endAngle=Math.atan2(-dx,-dz);this.thrower.anim.setClip('baseball_pitching',{restart:true});this.thrower.anim.speed=1.45;this.throwing={start:performance.now(),duration:1120,target:[x,z],onLanding,startAngle:this.thrower.angle,endAngle};this.flight=null;this.camPhase='throw';}
+ launchFlight(x,z,onLanding){const a=this.player,dx=x-a[0],dz=z-a[1],dl=Math.hypot(dx,dz)||1;
+  // Spawn at the actual animated right wrist at the throwing release, not ahead
+  // of the actor before the pitch has happened.
+  const wrist=this.heldGrenadePosition();const from=wrist||[a[0]+dx/dl*.58,1.3,a[1]+dz/dl*.58];
+  if(this.thrower)this.thrower.angle=this.throwing?.endAngle??this.thrower.angle;
+  this.throwing=null;this.camPhase='flight';this.flight={start:performance.now(),duration:1850,from,to:[x,.4,z],done:false};this.onLanding=onLanding;}
+ resetDetailed(){this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.impactStarted=null;if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
  drawSphere(vp,center,radius,earth,damage,hue){const g=this.gl,p=this.pPlanet;g.useProgram(p);g.bindBuffer(g.ARRAY_BUFFER,this.sphere);for(const [name,s,off] of [['aPos',3,0],['aNorm',3,12]]){const id=g.getAttribLocation(p,name);g.enableVertexAttribArray(id);g.vertexAttribPointer(id,s,g.FLOAT,false,24,off);}
  const u=n=>g.getUniformLocation(p,n);g.uniformMatrix4fv(u('uVP'),false,vp);g.uniform3fv(u('uCenter'),center);g.uniform1f(u('uScale'),radius);g.uniform1f(u('uDamage'),damage);g.uniform1f(u('uEarth'),earth);g.uniform1f(u('uHue'),hue);g.uniform1f(u('uTime'),this.time);
  g.drawArrays(g.TRIANGLES,0,this.sphereVertices.length/6);}
@@ -419,7 +486,7 @@ class WebWorld{
  let tx=this.radius>=0?this.impact[0]:this.player[0]+6.3,tz=this.radius>=0?this.impact[1]:this.player[1]-18.5;
  let eye=[tx+dist*.43,dist*.66,tz+dist*.95],center=[tx,0,tz];
  if(this.camPhase==='intro'){const pose=introCamera(clamp(this.introProgress||0,0,1));eye=pose.eye;center=pose.target;dist=Math.hypot(eye[0]-center[0],eye[2]-center[2]);tx=center[0];tz=center[2];}
- else if(this.camPhase==='aim'||this.camPhase==='throw'){eye=[this.player[0]-2.5,5.9,this.player[1]+11.2];center=[this.player[0]+6.3,1.35,this.player[1]-18.5];tx=center[0];tz=center[2];}
+ else if(this.camPhase==='aim'||this.camPhase==='throw'){eye=[this.player[0]-1.00,1.9,this.player[1]+5.55];center=[this.player[0]+1.2,2.25,this.player[1]-12.0];tx=center[0];tz=center[2];}
  if(this.camPhase==='flight'&&this.flight){const a=this.flight,t=clamp((performance.now()-a.start)/a.duration,0,1);tx=lerp(a.from[0],a.to[0],t);tz=lerp(a.from[2],a.to[2],t);dist=28;eye=[tx+dist*.4,dist*.60,tz+dist*.82];center=[tx,0,tz];}const f=norm(center.map((v,i)=>v-eye[i])),rt=norm(cross(f,[0,1,0])),up=cross(rt,f);
  const focal=h/(2*Math.tan(54*Math.PI/360/2));
  const proj=(x,y,z)=>{const d=[x-eye[0],y-eye[1],z-eye[2]],deep=dot(d,f);if(deep<1)return null;return [w*.5+focal*dot(d,rt)/deep,h*.5-focal*dot(d,up)/deep,deep];};
@@ -452,7 +519,9 @@ class WebWorld{
  }
  if(dist<240){for(const o of this.campProps||[]){if(o.type!=='treeA'&&o.type!=='treeB')continue;const t=o.tilt||0,dx=o.fallDX||0,dz=o.fallDZ||0;const top=proj(o.x+dx*3.4*Math.sin(t),3.4*Math.cos(t),o.z+dz*3.4*Math.sin(t)),bottom=proj(o.x,0,o.z);if(!top||!bottom)continue;const rad=clamp(135/bottom[2],2,20);ctx.strokeStyle='#836b49';ctx.lineWidth=Math.max(1,rad*.36);ctx.beginPath();ctx.moveTo(bottom[0],bottom[1]);ctx.lineTo(top[0],top[1]);ctx.stroke();for(let k=0;k<3;k++){ctx.fillStyle=['#86ac75','#7da16c','#91b57e'][k];ctx.beginPath();ctx.arc(top[0]+(k-1)*rad*.62,top[1]-(k%2)*rad*.23,rad*(.85-(k%2)*.08),0,Math.PI*2);ctx.fill();}}}
  if(dist<230){for(const s of SCENE_SOLDIERS){const p=proj(s.x,1,s.z);if(!p||p[2]>260)continue;const killed=this.radius>=0&&Math.hypot(s.x-this.impact[0],s.z-this.impact[1])<this.radius;ctx.fillStyle=killed?'#564b39':s.team==='enemy'?'#ce5548':'#5cb283';const hh=clamp(400/p[2],3,21);ctx.beginPath();ctx.arc(p[0],p[1]-hh*.8,hh*.3,0,Math.PI*2);ctx.fill();ctx.fillRect(p[0]-hh*.29,p[1]-hh*.52,hh*.58,hh*.72);}}
+  if(this.camPhase==='flight'&&this.flight){const a=this.flight,t=clamp((performance.now()-a.start)/a.duration,0,1),x=lerp(a.from[0],a.to[0],t),z=lerp(a.from[2],a.to[2],t),y=lerp(a.from[1],.4,t)+Math.sin(t*Math.PI)*13;const p=proj(x,y,z);if(p){const sz=clamp(290/Math.max(3,p[2]),6,23);ctx.fillStyle='#425d31';ctx.beginPath();ctx.ellipse(p[0],p[1],sz*.58,sz*.8,t*8,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#c6b77e';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p[0]+sz*.42,p[1]-sz*.72,sz*.34,0,Math.PI*2);ctx.stroke();}}
  if(this.radius>=0&&this.timer<3.2){const b=proj(this.impact[0],.9,this.impact[1]);if(b){const k=clamp(1-this.timer/3.2,0,1),size=clamp(950/Math.max(5,b[2]),7,160)*(1+this.timer*.9);const g=ctx.createRadialGradient(b[0],b[1],2,b[0],b[1],size);g.addColorStop(0,'rgba(255,249,199,'+(.83*k)+')');g.addColorStop(.24,'rgba(255,157,57,'+(.73*k)+')');g.addColorStop(.48,'rgba(215,96,30,'+(.46*k)+')');g.addColorStop(1,'rgba(46,48,40,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(b[0],b[1],size,0,Math.PI*2);ctx.fill();}}
+  if(this.radius>2&&this.mode==='field'){for(let j=0;j<20;j++){const a=j*Math.PI*2/20,r=this.radius*.96;const p=proj(this.impact[0]+r*Math.cos(a),1+Math.min(30,r*.09),this.impact[1]+r*Math.sin(a));if(!p)continue;const rad=clamp(280*Math.max(2,r*.16)/Math.max(4,p[2]),5,75);const grad=ctx.createRadialGradient(p[0],p[1],2,p[0],p[1],rad);grad.addColorStop(0,'rgba(255,196,84,.76)');grad.addColorStop(.48,'rgba(245,110,42,.46)');grad.addColorStop(1,'rgba(70,67,57,0)');ctx.fillStyle=grad;ctx.beginPath();ctx.arc(p[0],p[1],rad,0,Math.PI*2);ctx.fill();}}
  if(this.radius>=0){ctx.beginPath();let last=false;for(let i=0;i<=80;i++){const a=i/80*Math.PI*2;let p=proj(this.impact[0]+this.radius*Math.cos(a),.17,this.impact[1]+this.radius*Math.sin(a));if(p&&p[0]>-3e3&&p[0]<w+3e3&&p[1]>-3e3&&p[1]<h+3e3){if(!last)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1]);last=true}else last=false;}ctx.strokeStyle='#ffe1a2';ctx.lineWidth=3;ctx.shadowColor='#ffcb83';ctx.shadowBlur=14;ctx.stroke();ctx.shadowBlur=0;}
  }
  draw(){if(!this.gl){
