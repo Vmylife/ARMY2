@@ -175,7 +175,7 @@ void main(){
  frag=vec4(color,1.);
 }`;
 class WebWorld{
- constructor(){this.gl=null;this.fallback=null;this.ext=null;this.quality=1;this.width=0;this.height=0;this.impact=[0,17];this.radius=-1;this.time=0;this.mode='field';this.flyingT=0;this.mapDone=false;this.counter={buildings:0,kills:0,red:0,green:0};this.sorted=[];this.events=[];this.eventIndex=0;this.newLandmarks=[];this.LM=new Set();this.blastMax=0;this.blastDuration=10;this.timer=0;this.bursts=[];this.fxTick=0;
+ constructor(){this.gl=null;this.fallback=null;this.ext=null;this.quality=1;this.width=0;this.height=0;this.impact=[0,17];this.radius=-1;this.time=0;this.mobileDevice=!!(window.matchMedia?.('(pointer: coarse)').matches||navigator.maxTouchPoints>0);this.mobileFlightMode=false;this.flightCam=null;this.mode='field';this.flyingT=0;this.mapDone=false;this.counter={buildings:0,kills:0,red:0,green:0};this.sorted=[];this.events=[];this.eventIndex=0;this.newLandmarks=[];this.LM=new Set();this.blastMax=0;this.blastDuration=10;this.timer=0;this.bursts=[];this.fxTick=0;
  try{this.gl=c.getContext('webgl2',{alpha:false,antialias:true,powerPreference:'default'})||c.getContext('webgl',{alpha:false,antialias:false,powerPreference:'low-power'});if(!this.gl)throw Error('no WebGL');this.setup();}catch(e){console.warn('3D fallback:',e);const hadContext=!!this.gl;this.gl=null;
  if(hadContext){this.backup=document.createElement('canvas');this.backup.id='world3d-cpu';this.backup.style.cssText='position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;display:block';c.parentNode.insertBefore(this.backup,c.nextSibling);this.fallback=this.backup.getContext('2d');c.style.opacity='0';}
  else this.fallback=c.getContext('2d');}
@@ -230,7 +230,18 @@ class WebWorld{
  this.camp=inst(camp,2);this.roads=inst(roads,2);this.ground=inst([{x:0,y:-.28,z:0,w:3300,d:3300,h:.15,rgb:grass}],2);
  for(const k of ['bld','nearBld','troop','roads','ground','camp']){const buf=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,buf);g.bufferData(g.ARRAY_BUFFER,this[k],g.STATIC_DRAW);this[k+'Buf']=buf;}
  this.debrisBuf=g.createBuffer();this.flightBuf=g.createBuffer();g.enable(g.DEPTH_TEST);g.depthFunc(g.LEQUAL);g.clearColor(.57,.68,.70,1);}
- resize(){this.width=c.clientWidth||window.innerWidth;this.height=c.clientHeight||window.innerHeight;const dpr=Math.min(1.45,window.devicePixelRatio||1);c.width=Math.floor(this.width*dpr);c.height=Math.floor(this.height*dpr);if(this.backup){this.backup.width=c.width;this.backup.height=c.height;}if(this.gl)this.gl.viewport(0,0,c.width,c.height);}
+ resize(){this.width=c.clientWidth||window.innerWidth;this.height=c.clientHeight||window.innerHeight;
+  // Flight reveals the whole camp rapidly. Reduce only the 3D render resolution
+  // on touch devices, never the DOM HUD, actors or physical simulation.
+  const cap=this.mobileDevice&&this.mobileFlightMode?1.0:1.45;
+  const dpr=Math.min(cap,window.devicePixelRatio||1);
+  const width=Math.max(1,Math.round(this.width*dpr)),height=Math.max(1,Math.round(this.height*dpr));
+  if(c.width!==width||c.height!==height){c.width=width;c.height=height;
+   if(this.backup){this.backup.width=width;this.backup.height=height;}}
+  if(this.gl)this.gl.viewport(0,0,c.width,c.height);
+ }
+ setMobileFlightMode(active){if(!this.mobileDevice||this.mobileFlightMode===!!active)return;
+   this.mobileFlightMode=!!active;this.resize();}
  // Project the actual thrower position using the SAME over-the-shoulder camera
  // as drawLand. UI can follow the soldier instead of covering the scene.
  getPlayerScreen(){
@@ -320,18 +331,29 @@ class WebWorld{
  followFlightCamera(progress=0){
   const a=this.flight;
   if(!a)return {eye:playerAimPose().eye,target:playerAimPose().target};
-  const t=clamp(progress,0,1),dx=a.pos[0]-a.from[0],dz=a.pos[2]-a.from[2],len=Math.hypot(dx,dz)||1;
-  const nx=dx/len,nz=dz/len,x=a.pos[0],z=a.pos[2],y=a.pos[1];
+  const t=clamp(progress,0,1);
+  // Keep camera orientation consistent even after hitting a wall and bouncing
+  // backwards. Recomputing the heading from the moving grenade caused snaps.
+  const dir=a.cameraDir||[0,1],nx=dir[0],nz=dir[1],x=a.pos[0],z=a.pos[2],y=a.pos[1];
   const followEye=[x-nx*5+1.15,y+2.7,z-nz*5+1.10];
   const followTarget=[x,y+.18,z];
   const enter=smooth(clamp(t/.18,0,1));
-  const shoulderEye=playerAimPose().eye;
-  const shoulderTarget=playerAimPose().target;
-  return {eye:mix3(shoulderEye,followEye,enter),target:mix3(shoulderTarget,followTarget,enter)};
+  const aim=playerAimPose();
+  const wanted={eye:mix3(aim.eye,followEye,enter),target:mix3(aim.target,followTarget,enter)};
+  // Time-aware easing prevents abrupt jumps after an intermittent mobile frame.
+  const now=performance.now(),last=this.flightCam;
+  if(!last){this.flightCam={...wanted,lastTime:now};return wanted;}
+  const dt=clamp((now-last.lastTime)/1000,0,.10),alpha=1-Math.exp(-dt*17);
+  const result={eye:mix3(last.eye,wanted.eye,alpha),target:mix3(last.target,wanted.target,alpha)};
+  this.flightCam={...result,lastTime:now};return result;
  }
- landingCamera(){return this.followFlightCamera(1);}
+ landingCamera(){return this.flightCam||this.followFlightCamera(1);}
  drawGroundedGrenade(vp){if(this.camPhase==='landed'&&this.flight){const x=this.impact[0],z=this.impact[1];this.drawGrenade(vp,mul(T(x,.05,z),mul(R(0,0,Math.PI*.38),SC(.29))));}}
- drawLand(){const g=this.gl;g.clearColor(.66,.80,.91,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);
+ drawLand(){
+  // Update the projectile before computing the following camera; previously the
+  // camera used the previous frame's position and chased one frame behind.
+  if(this.camPhase==='flight'&&this.flight&&!this.flight.done)this.stepGrenadeFlight(performance.now());
+  const g=this.gl;g.clearColor(.66,.80,.91,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);
   const px=this.player[0],pz=this.player[1];let eye,tgt,dist=26;
   // Close over-the-shoulder view: visible back and nape, slightly upward look.
   const aimPose=playerAimPose(),aimEye=aimPose.eye,aimTarget=aimPose.target;
@@ -360,10 +382,11 @@ class WebWorld{
   if(this.camPhase==='blast'&&this.timer<1.6){const amp=Math.min(1.2,.25+Math.log10(this.blastMax+1)*.13)*Math.exp(-this.timer*2.7);eye[0]+=Math.sin(this.timer*69)*amp;eye[1]+=Math.sin(this.timer*103)*amp*.55;}
   this.camFocus=[tgt[0],tgt[2]];this.camDist=dist;
   const vp=mul(pers(54,c.width/c.height,.2,19000),lookAt(eye,tgt));
+  this.setupMobileFlightFrustum(vp);
   if(this.campGroundVAO)this.drawOriginalCampGround(vp);else this.instanceDraw(this.groundBuf,1,2,vp);
   if(this.bld.length){this.instanceDraw(this.bldBuf,this.bld.length/12,0,vp);this.instanceDraw(this.bldBuf,this.bld.length/12,1,vp);}
   if(this.modelState!=='ready'&&this.detailProxyBuf){this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,0,vp);this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,1,vp);}
-  this.frameDetailedActors=this.selectDetailedActors(dist);
+  this.frameDetailedActors=this.selectDetailedActors(dist).filter(a=>this.visibleDuringFlight(a.px,(a.renderLift||0)+1.05,a.pz,2*(a.scale||1)));
   this.drawHighFriendlySoldiers(vp);this.drawCampProps(vp,dist);this.drawDetailed(vp,dist);this.drawFlight(vp);this.drawGroundedGrenade(vp);this.debris(vp);this.drawRing(vp);this.drawExplosion(vp,dist);
   if(this.throwing?.phase==='pitch'&&performance.now()-this.throwing.pitchStart>=this.throwing.duration){const a=this.throwing;this.launchFlight(a.target[0],a.target[1],a.onLanding);}
  }
@@ -423,11 +446,31 @@ class WebWorld{
    this.propModels[item.type]={geo:this.staticGeometry(gltf,p),tex:await this.glbTexture(gltf,p),center:[(lo[0]+hi[0])/2,lo[1],(lo[2]+hi[2])/2],extents:hi.map((v,i)=>Math.max(.0001,v-lo[i])),pieces};
   }catch(e){this.modelErrors.push('場景小物件 '+item.type+': '+e.message);console.error(e);}}}));
  }
+ // Conservative viewport-only culling on mobile flight: nothing disappears
+ // due to distance, and all collision/destruction objects remain in the scene.
+ setupMobileFlightFrustum(vp){
+  if(!(this.mobileDevice&&this.camPhase==='flight')){this.flightFrustum=null;return;}
+  const m=vp,rows=[[m[0],m[4],m[8],m[12]],[m[1],m[5],m[9],m[13]],[m[2],m[6],m[10],m[14]],[m[3],m[7],m[11],m[15]]];
+  const planes=[];
+  for(let axis=0;axis<3;axis++)for(const sign of [1,-1]){
+   const p=[0,1,2,3].map(i=>rows[3][i]+sign*rows[axis][i]);
+   const len=Math.hypot(p[0],p[1],p[2])||1;planes.push(p.map(q=>q/len));
+  }
+  this.flightFrustum=planes;
+ }
+ visibleDuringFlight(x,y,z,radius=1){const planes=this.flightFrustum;
+  if(!planes)return true;const r=radius*1.35;
+  for(const p of planes)if(p[0]*x+p[1]*y+p[2]*z+p[3]<-r)return false;
+  return true;
+ }
  drawCampProps(vp,dist){
   if(this.modelState!=='ready'||!this.campProps||!this.propModels)return;
   this.setupDetailPrograms();if(!this.detailProg)return;
   const focus=this.camFocus||this.player;let drawnFragments=0;
   for(const p of this.campProps){const a=this.propModels[p.type];if(!a)continue;
+    // Skip only genuinely off-camera meshes during mobile tracking, never by distance.
+    if(!p.hit&&!this.visibleDuringFlight(p.x,(p.baseY||0)+(p.size?.[1]||1)*.5,p.z,
+      Math.hypot(...(p.size||[2,2,2]))*.55+1))continue;
     // No proximity cutoff: leave every prop visible regardless of camera elevation.
     const scaleVec=p.size.map((v,i)=>v/Math.max(.0001,a.extents?.[i]||1));
     if(!p.hit){const model2=mul(T(p.x,p.baseY||0,p.z),mul(RY(p.yaw||0),mul(S3(...scaleVec),T(-a.center[0],-a.center[1],-a.center[2]))));
@@ -570,7 +613,7 @@ class WebWorld{
   if(this.modelState!=='ready'||!this.soldierAssets?.high)return;
   this.setupHighFriendlyBatch();
   const g=this.gl,sa=this.soldierAssets.high;
-  const actors=this.actors.filter(a=>!a.enemy);
+  const actors=this.actors.filter(a=>!a.enemy&&this.visibleDuringFlight(a.px,(a.renderLift||0)+1.05,a.pz,2*(a.scale||1)));
   if(!actors.length)return;
   const now=performance.now(),dt=Math.min(.034,Math.max(.001,(now-(this.lastFriendlyTime||now))/1000));this.lastFriendlyTime=now;
   this.friendlyIdle.evaluate(dt);
@@ -597,8 +640,9 @@ class WebWorld{
  }
  drawDetailed(vp,dist){if(this.modelState!=='ready'||!this.gl?.createVertexArray)return;
   this.setupDetailPrograms();if(!this.detailProg)return;const g=this.gl,focus=this.camFocus||this.player;
-  for(const b of this.nearBuildings){ // all buildings stay rendered at any zoom
-   const asset=this.detailed[b.type];if(!asset)continue;const s=b.size.map((n,i)=>n/(asset.extents?.[i]||asset.baseSize?.[i]||1)),c=asset.center,ang=b.rot*Math.PI/180;
+  for(const b of this.nearBuildings){ // all buildings stay available at any zoom
+   const asset=this.detailed[b.type];if(!asset)continue;
+   if(!b.hit&&!this.visibleDuringFlight(b.x,(b.size?.[1]||3)*.5,b.z,Math.hypot(...(b.size||[4,3,4]))*.6+1))continue;const s=b.size.map((n,i)=>n/(asset.extents?.[i]||asset.baseSize?.[i]||1)),c=asset.center,ang=b.rot*Math.PI/180;
    if(!b.hit){const model=mul(T(b.x,0,b.z),mul(RY(ang),mul(S3(s[0]*b.scale,s[1]*b.scale,s[2]*b.scale),T(-c[0],-c[1],-c[2]))));this.drawStaticMesh(asset.whole,asset.tex,model,vp);}
    else for(const f of b.fragments){const model=mul(T(f.x,f.y,f.z),mul(R(f.rx,f.ry,f.rz),S3(f.scale[0],f.scale[1],f.scale[2])));this.drawStaticMesh(f.p.geo,asset.tex,model,vp);}
   }
@@ -763,7 +807,6 @@ class WebWorld{
   a.onLanding?.(this.impact.slice());
  }
  drawFlight(vp){if(!this.flight||!this.gl||this.flight.done)return;
-  this.stepGrenadeFlight(performance.now());
   const a=this.flight;if(a.done)return;
   const [x,y,z]=a.pos;
   const t=a.age;
@@ -779,6 +822,7 @@ class WebWorld{
   const delta=Math.atan2(Math.sin(targetYaw-startAngle),Math.cos(targetYaw-startAngle));
   const endAngle=startAngle+delta;
   this.thrower.anim.setClip('Idle_11',{restart:true});this.thrower.anim.speed=1;
+  this.setMobileFlightMode(true);
   this.throwing={start:performance.now(),turnDuration:360,pitchStart:0,
    phase:'turn',duration:1120,target:[x,z],onLanding,startAngle,endAngle};
   this.flight=null;this.camPhase='throw';
@@ -788,13 +832,13 @@ class WebWorld{
   // of the actor before the pitch has happened.
   const wrist=this.heldGrenadePosition();const from=wrist||[a[0]+dx/dl*.58,1.3,a[1]+dz/dl*.58];
   if(this.thrower)this.thrower.angle=this.throwing?.endAngle??this.thrower.angle;
-  this.throwing=null;this.camPhase='flight';
+  this.throwing=null;this.camPhase='flight';this.flightCam=null;
   const Tsec=1.85,gravity=30.0,fromY=from[1];
   this.flight={start:performance.now(),lastUpdate:performance.now(),duration:1850,age:0,accum:0,
-    from,to:[x,.4,z],pos:from.slice(),vel:[(x-from[0])/Tsec,(.4-fromY+gravity*Tsec*Tsec/2)/Tsec,(z-from[2])/Tsec],gravity,done:false,onLanding};
+    from,to:[x,.4,z],pos:from.slice(),cameraDir:[dx/dl,dz/dl],vel:[(x-from[0])/Tsec,(.4-fromY+gravity*Tsec*Tsec/2)/Tsec,(z-from[2])/Tsec],gravity,done:false,onLanding};
   this.onLanding=onLanding;}
 
- resetDetailed(){this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.friendlyKnockGroups?.clear();this.impactStarted=null;this.landingProgress=0;if(this.thrower?.anim){this.thrower.angle=Math.atan2(this.throwForward[0],this.throwForward[1]);this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
+ resetDetailed(){this.setMobileFlightMode(false);this.flightCam=null;this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.friendlyKnockGroups?.clear();this.impactStarted=null;this.landingProgress=0;if(this.thrower?.anim){this.thrower.angle=Math.atan2(this.throwForward[0],this.throwForward[1]);this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
  drawFallback(){
  // CPU backup draws actual perspective-projected 3D boxes, shaded faces and rooftops.
  // No textures / 3D library needed; designed for WebGL-disabled phones.
