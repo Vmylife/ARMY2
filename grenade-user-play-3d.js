@@ -163,10 +163,15 @@ const CAMP_GROUND_FS=`#version 300 es
 precision highp float;
 in vec3 vColor;in vec3 vNormal;in vec2 vXZ;
 uniform float uRadius;uniform vec2 uImpact;
+uniform vec2 uPastImpact[2];uniform float uPastRadius[2];uniform int uPastCount;
 out vec4 frag;
 void main(){
  float sunlight=max(0.,dot(normalize(vNormal),normalize(vec3(-.5,1.,.4))));
  vec3 color=vColor*(.82+.22*sunlight);
+ for(int i=0;i<2;i++){if(i>=uPastCount)break;
+  float pd=distance(vXZ,uPastImpact[i]);float mark=1.-smoothstep(uPastRadius[i]-1.25,uPastRadius[i]+1.65,pd);
+  color=mix(color,color*vec3(.27,.24,.23),mark*.83);
+ }
  if(uRadius>=0.05){float d=distance(vXZ,uImpact);
   float soot=1.-smoothstep(uRadius-1.25,uRadius+1.65,d);
   float flame=exp(-pow((d-uRadius)/1.2,2.));
@@ -175,7 +180,7 @@ void main(){
  frag=vec4(color,1.);
 }`;
 class WebWorld{
- constructor(){this.gl=null;this.fallback=null;this.ext=null;this.quality=1;this.width=0;this.height=0;this.impact=[0,17];this.radius=-1;this.time=0;this.mobileDevice=!!(window.matchMedia?.('(pointer: coarse)').matches||navigator.maxTouchPoints>0);this.mobileFlightMode=false;this.flightCam=null;this.mode='field';this.flyingT=0;this.mapDone=false;this.counter={buildings:0,kills:0,red:0,green:0};this.sorted=[];this.events=[];this.eventIndex=0;this.newLandmarks=[];this.LM=new Set();this.blastMax=0;this.blastDuration=10;this.timer=0;this.bursts=[];this.fxTick=0;
+ constructor(){this.gl=null;this.fallback=null;this.ext=null;this.quality=1;this.width=0;this.height=0;this.impact=[0,17];this.radius=-1;this.time=0;this.mobileDevice=!!(window.matchMedia?.('(pointer: coarse)').matches||navigator.maxTouchPoints>0);this.mobileFlightMode=false;this.flightCam=null;this.mode='field';this.flyingT=0;this.mapDone=false;this.counter={buildings:0,kills:0,red:0,green:0};this.blastHistory=[];this.sorted=[];this.events=[];this.eventIndex=0;this.newLandmarks=[];this.LM=new Set();this.blastMax=0;this.blastDuration=10;this.timer=0;this.bursts=[];this.fxTick=0;
  try{this.gl=c.getContext('webgl2',{alpha:false,antialias:true,powerPreference:'default'})||c.getContext('webgl',{alpha:false,antialias:false,powerPreference:'low-power'});if(!this.gl)throw Error('no WebGL');this.setup();}catch(e){console.warn('3D fallback:',e);const hadContext=!!this.gl;this.gl=null;
  if(hadContext){this.backup=document.createElement('canvas');this.backup.id='world3d-cpu';this.backup.style.cssText='position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;display:block';c.parentNode.insertBefore(this.backup,c.nextSibling);this.fallback=this.backup.getContext('2d');c.style.opacity='0';}
  else this.fallback=c.getContext('2d');}
@@ -198,6 +203,9 @@ class WebWorld{
   g.useProgram(this.campGroundProgram);g.uniformMatrix4fv(g.getUniformLocation(this.campGroundProgram,'uVP'),false,vp);
   g.uniform1f(g.getUniformLocation(this.campGroundProgram,'uRadius'),this.radius);
   g.uniform2f(g.getUniformLocation(this.campGroundProgram,'uImpact'),this.impact[0],this.impact[1]);
+  const past=(this.blastHistory||[]).slice(-2);g.uniform1i(g.getUniformLocation(this.campGroundProgram,'uPastCount'),past.length);
+  g.uniform2fv(g.getUniformLocation(this.campGroundProgram,'uPastImpact[0]'),new Float32Array([past[0]?.x??0,past[0]?.z??0,past[1]?.x??0,past[1]?.z??0]));
+  g.uniform1fv(g.getUniformLocation(this.campGroundProgram,'uPastRadius[0]'),new Float32Array([past[0]?.radius??0,past[1]?.radius??0]));
   g.bindVertexArray(this.campGroundVAO);g.disable(g.CULL_FACE);g.drawArrays(g.TRIANGLES,0,this.campGroundCount);
   g.enable(g.CULL_FACE);g.bindVertexArray(null);
  }
@@ -252,18 +260,42 @@ class WebWorld{
   return {x:middle.x,y:middle.y,top:Math.min(head.y,foot.y),bottom:Math.max(head.y,foot.y),width:Math.max(55,Math.abs(head.y-foot.y)*.48)};
  }
 
- buildEvents(){this.events=[];const [ix,iz]=this.impact;buildings.forEach((v,i)=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'b',v}));soldiers.forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'s',v}));(this.nearBuildings||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'detail',v}));(this.actors||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'actor',v}));(this.campProps||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'prop',v}));landmarks.forEach(v=>this.events.push({r:v.radius||Math.hypot(v.x-ix,v.z-iz),type:'land',v}));this.events.sort((a,b)=>a.r-b.r);this.eventIndex=0;this.counter={buildings:0,kills:0,red:0,green:0};this.newLandmarks=[];this.LM=new Set();if(this.nearBuildings)this.nearBuildings.forEach(b=>{b.hit=false;b.fragments=[]});if(this.actors)this.actors.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;a.anim?.setClip('Idle_11',{restart:true})});if(this.campProps)this.campProps.forEach(p=>{p.hit=false;p.fallT=0;p.tilt=0;p.fragments=[]});this.bursts=[];this.friendlyKnockGroups?.clear();if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}}
- setLanding(x,z){this.impact=[x,z];this.radius=-1;this.mode='field';this.buildEvents();}
+ // New training resets destroyed objects. A later grenade only queues survivors.
+ buildEvents({preserve=false}={}){
+  this.events=[];const [ix,iz]=this.impact;
+  if(!preserve){
+   this.counter={buildings:0,kills:0,red:0,green:0};this.blastHistory=[];
+   this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});
+   this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;a.anim?.setClip('Idle_11',{restart:true})});
+   this.campProps?.forEach(p=>{p.hit=false;p.fallT=0;p.tilt=0;p.fragments=[]});
+   this.friendlyKnockGroups?.clear();
+  }
+  (this.nearBuildings||[]).forEach(v=>{if(!v.hit)this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'detail',v})});
+  (this.actors||[]).forEach(v=>{if(!v.hit)this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'actor',v})});
+  (this.campProps||[]).forEach(v=>{if(!v.hit)this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'prop',v})});
+  this.events.sort((a,b)=>a.r-b.r);this.eventIndex=0;
+  this.newLandmarks=[];this.LM=new Set();this.bursts=[];
+ }
+ setLanding(x,z,preserve=false){this.impact=[x,z];this.radius=-1;this.mode='field';this.buildEvents({preserve});}
+ // A shot finished: remember its scorch, leave rubble and wounded actors untouched.
+ finishBlast(){this.blastHistory.push({x:this.impact[0],z:this.impact[1],radius:this.blastMax});this.blastHistory=this.blastHistory.slice(-3);}
+ // Re-arm the same soldier, without resetting buildings, props, casualties or squads.
+ prepareNextThrow(){
+  this.setMobileFlightMode(false);this.flightCam=null;this.flight=null;this.throwing=null;this.flightPosition=null;
+  this.impactStarted=null;this.landingProgress=0;this.bursts=[];this.timer=0;this.radius=-1;this.blastMax=0;
+  this.mode='field';this.camPhase='aim';
+  if(this.thrower?.anim){this.thrower.angle=Math.atan2(this.throwForward[0],this.throwForward[1]);this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}
+ }
  begin(powder,density,quality,broken){const strength=Math.max(0,powder)/600*Math.max(.2,density/.6)*Math.max(.05,quality)*(broken?.4:1);return this.beginTestPower(clamp(Math.sqrt(strength)*20,0,100));}
- beginTestPower(power){const points=[[0,0],[10,6],[20,13],[35,23],[50,36],[65,50],[80,71],[90,91],[100,120]];let max=120;for(let i=1;i<points.length;i++)if(power<=points[i][0]){const a=points[i-1],b=points[i],t=clamp((power-a[0])/(b[0]-a[0]),0,1);max=lerp(a[1],b[1],t);break;}this.impactStarted=performance.now();this.blastMax=max;this.blastDuration=max>55?6.2:4.0+max*.024;this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();this.lastHitR=0;this.bursts=max>0?[{x:this.impact[0],z:this.impact[1],age:0,life:4.3,size:Math.min(12,2.2+Math.log10(max+1)*2.2),type:'origin',seed:.27}]:[];return max;}
+ beginTestPower(power){const points=[[0,0],[10,6],[20,13],[35,23],[50,36],[65,50],[80,71],[90,91],[100,120]];let max=120;for(let i=1;i<points.length;i++)if(power<=points[i][0]){const a=points[i-1],b=points[i],t=clamp((power-a[0])/(b[0]-a[0]),0,1);max=lerp(a[1],b[1],t);break;}this.impactStarted=performance.now();this.blastMax=max;this.blastDuration=max>55?6.2:4.0+max*.024;this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents({preserve:true});this.lastHitR=0;this.bursts=max>0?[{x:this.impact[0],z:this.impact[1],age:0,life:4.3,size:Math.min(12,2.2+Math.log10(max+1)*2.2),type:'origin',seed:.27}]:[];return max;}
  advance(dt){if(this.timer>=this.blastDuration)return true;
   this.timer=Math.min(this.blastDuration,this.timer+dt);this.time+=dt;
   const x=clamp(this.timer/this.blastDuration,0,1);
   this.radius=this.blastMax*smooth(x); // single camp only; no off-map simulation
   while(this.eventIndex<this.events.length&&this.events[this.eventIndex].r<=this.radius){const e=this.events[this.eventIndex++];
-   if(e.type==='detail'){this.counter.buildings++;this.explodeBuilding(e.v);this.addBurst(e.v.x,e.v.z,'impact');}
-   else if(e.type==='prop'){this.explodeProp(e.v);this.addBurst(e.v.x,e.v.z,'dust');}
-   else if(e.type==='actor'){this.counter.kills++;if(e.v.enemy)this.counter.red++;else this.counter.green++;this.hitActor(e.v);}
+   if(e.type==='detail'&&!e.v.hit){this.counter.buildings++;this.explodeBuilding(e.v);this.addBurst(e.v.x,e.v.z,'impact');}
+   else if(e.type==='prop'&&!e.v.hit){this.explodeProp(e.v);this.addBurst(e.v.x,e.v.z,'dust');}
+   else if(e.type==='actor'&&!e.v.hit){this.counter.kills++;if(e.v.enemy)this.counter.red++;else this.counter.green++;this.hitActor(e.v);}
   }
   this.stepActors(dt);this.stepFragments(dt);this.stepTrees(dt);
   for(const b of this.bursts)b.age+=dt;this.bursts=this.bursts.filter(b=>b.age<b.life);
@@ -838,7 +870,7 @@ class WebWorld{
     from,to:[x,.4,z],pos:from.slice(),cameraDir:[dx/dl,dz/dl],vel:[(x-from[0])/Tsec,(.4-fromY+gravity*Tsec*Tsec/2)/Tsec,(z-from[2])/Tsec],gravity,done:false,onLanding};
   this.onLanding=onLanding;}
 
- resetDetailed(){this.setMobileFlightMode(false);this.flightCam=null;this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.friendlyKnockGroups?.clear();this.impactStarted=null;this.landingProgress=0;if(this.thrower?.anim){this.thrower.angle=Math.atan2(this.throwForward[0],this.throwForward[1]);this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
+ resetDetailed(){this.setMobileFlightMode(false);this.flightCam=null;this.blastHistory=[];this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.campProps?.forEach(p=>{p.hit=false;p.fallT=0;p.tilt=0;p.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.friendlyKnockGroups?.clear();this.impactStarted=null;this.landingProgress=0;if(this.thrower?.anim){this.thrower.angle=Math.atan2(this.throwForward[0],this.throwForward[1]);this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
  drawFallback(){
  // CPU backup draws actual perspective-projected 3D boxes, shaded faces and rooftops.
  // No textures / 3D library needed; designed for WebGL-disabled phones.
