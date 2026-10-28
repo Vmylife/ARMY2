@@ -347,7 +347,7 @@ class WebWorld{
   if(this.bld.length){this.instanceDraw(this.bldBuf,this.bld.length/12,0,vp);this.instanceDraw(this.bldBuf,this.bld.length/12,1,vp);}
   if(this.modelState!=='ready'&&this.detailProxyBuf){this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,0,vp);this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,1,vp);}
   this.frameDetailedActors=this.selectDetailedActors(dist);
-  this.drawDistantSoldiers(vp,dist);this.drawCampProps(vp,dist);this.drawDetailed(vp,dist);this.drawFlight(vp);this.drawGroundedGrenade(vp);this.debris(vp);this.drawRing(vp);this.drawExplosion(vp,dist);
+  this.drawLowSoldiers(vp);this.drawCampProps(vp,dist);this.drawDetailed(vp,dist);this.drawFlight(vp);this.drawGroundedGrenade(vp);this.debris(vp);this.drawRing(vp);this.drawExplosion(vp,dist);
   if(this.throwing&&performance.now()-this.throwing.start>=this.throwing.duration){const a=this.throwing;this.launchFlight(a.target[0],a.target[1],a.onLanding);}
  }
  async initDetailedAssets(){
@@ -364,7 +364,7 @@ class WebWorld{
   // Far-view low-detail proxies retain the user's exact building placement.
   this.detailProxy=inst(this.nearBuildings.map(b=>({x:b.x,z:b.z,h:b.size[1],w:b.size[0],d:b.size[2],kind:0,seed:(b.idx%9)/9})),0);
   this.detailProxyBuf=this.gl.createBuffer();this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.detailProxyBuf);this.gl.bufferData(this.gl.ARRAY_BUFFER,this.detailProxy,this.gl.STATIC_DRAW);
-  this.actors=SCENE_SOLDIERS.filter(o=>o.uid!==PLAYER_ITEM.uid).map((o,i)=>({uid:o.uid,x:o.x,z:o.z,px:o.x,pz:o.z,rot:o.rot||0,scale:o.scale||1,quality:'high',enemy:o.team==='enemy',hit:false,flyT:0,renderLift:0,angle:(o.rot||0)*Math.PI/180,seed:(i*.731)%1}));
+  this.actors=SCENE_SOLDIERS.filter(o=>o.uid!==PLAYER_ITEM.uid).map((o,i)=>({uid:o.uid,x:o.x,z:o.z,px:o.x,pz:o.z,rot:o.rot||0,scale:o.scale||1,quality:o.team==='enemy'?'high':'low',enemy:o.team==='enemy',hit:false,flyT:0,renderLift:0,angle:(o.rot||0)*Math.PI/180,seed:(i*.731)%1}));
   this.thrower={uid:PLAYER_ITEM.uid,x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,rot:PLAYER_ITEM.rot,quality:'high',enemy:false,hit:false,flyT:0,renderLift:0,angle:Math.atan2(this.throwForward[0],this.throwForward[1]),seed:.2,scale:PLAYER_ITEM.scale||1};
   try{
     // All six original camp building types, keyed by the actual GLB path rather than
@@ -495,32 +495,76 @@ class WebWorld{
    if(f.y<.17){f.y=.17;f.vy=Math.max(0,-f.vy*.22);f.vx*=.91;f.vz*=.91;f.ax*=.94;f.az*=.94;}
  }}
  soldierDetailRange(dist){return dist>110?0:Math.max(28,Math.min(56,dist*.75+19));}
- // Fixed high-detail budget: nearby friendly soldiers use the 5,205-triangle cadet,
- // but the entire camp remains visible through batched, very-low-cost distant proxies.
- selectDetailedActors(dist){
+ // One animated high-quality rig per red soldier; friendlies are drawn using the
+ // original low-quality GLB mesh with a single shared idle skeleton (GPU instancing).
+ // Unlike v1.22, there are no green cube stand-ins and no 40-character cap.
+ selectDetailedActors(){
   if(this.modelState!=='ready'||!this.actors)return [];
-  const focus=this.camFocus||this.player,range=this.soldierDetailRange(dist);
-  if(range<=0)return [];
-  const ranked=[];
-  for(const a of this.actors){
-   const d=Math.hypot(a.px-focus[0],a.pz-focus[1]);
-   if(d<=range)ranked.push({a,d});
-  }
-  ranked.sort((a,b)=>a.d-b.d);
-  // 40 animated cadets + the thrower; keeps CPU bone updates manageable on phones.
-  return ranked.slice(0,40).map(v=>v.a);
+  return this.actors.filter(a=>a.enemy);
  }
- drawDistantSoldiers(vp,dist){
-  if(!this.actors||!this.gl||!this.troopBuf)return;
-  const detailed=new Set(this.frameDetailedActors||[]);
-  const far=this.actors.filter(a=>!detailed.has(a));
-  // Even at maximum zoom, every friendly soldier and all nine red enemies stay drawn.
-  const data=inst(far.map((a,i)=>({x:a.px,z:a.pz,y:a.renderLift||0,
-     h:a.hit?.35*(a.scale||1):1.7*(a.scale||1),w:a.hit?1.35:.7,d:a.hit?1.05:.65,enemy:a.enemy,seed:(i*.131)%1})),3);
-  this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.troopBuf);
-  this.gl.bufferData(this.gl.ARRAY_BUFFER,data,this.gl.DYNAMIC_DRAW);
-  this.instanceDraw(this.troopBuf,far.length,3,vp);
-  this.instanceDraw(this.troopBuf,far.length,4,vp);
+ setupLowSoldierBatch(){
+  if(this.lowBatch||!this.soldierAssets?.low)return;
+  const g=this.gl,sa=this.soldierAssets.low;
+  this.lowProg=compile(g,`#version 300 es
+   precision highp float;
+   layout(location=0)in vec3 p;layout(location=1)in vec3 n;layout(location=2)in vec2 uv;
+   layout(location=3)in vec4 j;layout(location=4)in vec4 w;
+   layout(location=5)in vec4 iPose; // x, y, z, yaw
+   layout(location=6)in vec3 iState; // scale, defeated, idle phase
+   uniform mat4 uVP,uBones[44];uniform float uTime;
+   out vec2 vUV;out vec3 vN;
+   void main(){
+    ivec4 ji=ivec4(j+.5);
+    mat4 skin=uBones[ji.x]*w.x+uBones[ji.y]*w.y+uBones[ji.z]*w.z+uBones[ji.w]*w.w;
+    vec3 local=(skin*vec4(p,1.)).xyz;
+    vec3 normal=mat3(skin)*n;
+    float fall=iState.y*1.25;
+    float cs=cos(fall),sn=sin(fall);
+    local=vec3(local.x,local.y*cs-local.z*sn,local.y*sn+local.z*cs);
+    normal=vec3(normal.x,normal.y*cs-normal.z*sn,normal.y*sn+normal.z*cs);
+    float yaw=iPose.w,cy=cos(yaw),sy=sin(yaw);
+    local=vec3(local.x*cy+local.z*sy,local.y,-local.x*sy+local.z*cy);
+    normal=vec3(normal.x*cy+normal.z*sy,normal.y,-normal.x*sy+normal.z*cy);
+    local*=iState.x;
+    local+=iPose.xyz;
+    gl_Position=uVP*vec4(local,1.);
+    vN=normalize(normal);vUV=uv;
+   }`, `#version 300 es
+   precision highp float;in vec2 vUV;in vec3 vN;uniform sampler2D uTex;out vec4 frag;
+   void main(){vec3 col=texture(uTex,vUV).rgb;float l=.70+.31*max(0.,dot(normalize(vN),normalize(vec3(-.4,1.1,.55))));frag=vec4(col*l,1.);}`);
+  const vao=sa.geo.vao;
+  g.bindVertexArray(vao);
+  const buffer=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,buffer);
+  for(const [location,components,offset] of [[5,4,0],[6,3,4*4]]){
+   g.enableVertexAttribArray(location);g.vertexAttribPointer(location,components,g.FLOAT,false,7*4,offset);
+   g.vertexAttribDivisor(location,1);
+  }
+  g.bindVertexArray(null);
+  this.lowBatch={vao,buffer};
+  this.lowIdle=sa.makeAnim();
+ }
+ drawLowSoldiers(vp){
+  if(this.modelState!=='ready'||!this.soldierAssets?.low)return;
+  this.setupLowSoldierBatch();
+  const g=this.gl,sa=this.soldierAssets.low;
+  const actors=this.actors.filter(a=>!a.enemy);
+  if(!actors.length)return;
+  const instances=new Float32Array(actors.length*7);
+  actors.forEach((a,i)=>{
+   const p=i*7;instances[p]=a.px;instances[p+1]=a.renderLift||0;instances[p+2]=a.pz;
+   instances[p+3]=a.angle;instances[p+4]=a.scale||1;
+   instances[p+5]=a.hit?1:0;instances[p+6]=a.seed;
+  });
+  g.bindBuffer(g.ARRAY_BUFFER,this.lowBatch.buffer);
+  g.bufferData(g.ARRAY_BUFFER,instances,g.DYNAMIC_DRAW);
+  const elapsed=performance.now(),dt=Math.min(.034,Math.max(.001,(elapsed-(this.lastLowTime||elapsed))/1000));this.lastLowTime=elapsed;
+  this.lowIdle.evaluate(dt);
+  g.useProgram(this.lowProg);const u=n=>g.getUniformLocation(this.lowProg,n);
+  g.uniformMatrix4fv(u('uVP'),false,vp);g.uniformMatrix4fv(u('uBones[0]'),false,this.lowIdle.bones);
+  g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,sa.tex);g.uniform1i(u('uTex'),0);
+  g.bindVertexArray(this.lowBatch.vao);g.disable(g.CULL_FACE);
+  g.drawElementsInstanced(g.TRIANGLES,sa.geo.count,sa.geo.type,0,actors.length);
+  g.enable(g.CULL_FACE);g.bindVertexArray(null);
  }
  drawDetailed(vp,dist){if(this.modelState!=='ready'||!this.gl?.createVertexArray)return;
   this.setupDetailPrograms();if(!this.detailProg)return;const g=this.gl,focus=this.camFocus||this.player;
