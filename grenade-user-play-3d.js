@@ -2,7 +2,7 @@ import {loadGlb} from "./src/core/glb111.js";
 import {RigAnimator} from "./src/characters/rigAnimator.js";
 import './src/map/activeCampLayout116.js?v=126';
 import {makeEnvironment as makeOriginalCampGround} from './src/map/ground103.js?v=103';
-const USER_SCENE = await fetch('./grenade-user-scene.json').then(async r=>{if(!r.ok)throw Error('找不到手榴彈場景 JSON');return r.json()});
+const USER_SCENE = await fetch('./grenade-user-scene.json?v=24').then(async r=>{if(!r.ok)throw Error('找不到手榴彈場景 JSON');return r.json()});
 /* Army grenade arena v1.0. Custom dependency-free WebGL instanced 3D.
  * Fictional game-only explosion scales and estimates: not physical modelling.
  */
@@ -348,7 +348,7 @@ class WebWorld{
   if(this.modelState!=='ready'&&this.detailProxyBuf){this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,0,vp);this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,1,vp);}
   this.frameDetailedActors=this.selectDetailedActors(dist);
   this.drawLowSoldiers(vp);this.drawCampProps(vp,dist);this.drawDetailed(vp,dist);this.drawFlight(vp);this.drawGroundedGrenade(vp);this.debris(vp);this.drawRing(vp);this.drawExplosion(vp,dist);
-  if(this.throwing&&performance.now()-this.throwing.start>=this.throwing.duration){const a=this.throwing;this.launchFlight(a.target[0],a.target[1],a.onLanding);}
+  if(this.throwing?.phase==='pitch'&&performance.now()-this.throwing.pitchStart>=this.throwing.duration){const a=this.throwing;this.launchFlight(a.target[0],a.target[1],a.onLanding);}
  }
  async initDetailedAssets(){
   this.modelState='loading';this.modelErrors=[];
@@ -574,7 +574,7 @@ class WebWorld{
    else for(const f of b.fragments){const model=mul(T(f.x,f.y,f.z),mul(R(f.rx,f.ry,f.rz),S3(f.scale[0],f.scale[1],f.scale[2])));this.drawStaticMesh(f.p.geo,asset.tex,model,vp);}
   }
   const now=performance.now(),dt=Math.min(.034,Math.max(.001,(now-(this.lastDetailedTime||now))/1000));this.lastDetailedTime=now;
-  if(this.throwing&&this.thrower){const a=this.throwing,k=smooth(clamp((performance.now()-a.start)/400,0,1));this.thrower.angle=lerp(a.startAngle,a.endAngle,k);}
+  // v1.24: orientation is updated before drawing; the pitch never starts during the 90-degree turn.
   // Animated GLBs are used nearby; all other soldiers are drawn by a single
   // lightweight instanced pass. No count cap or distance-based disappearance.
   const visibleActors=this.frameDetailedActors||[];
@@ -637,7 +637,21 @@ class WebWorld{
   this.drawGrenade(vp,mul(T(x,y,z),mul(tilt,SC(.39))));
   if(t>=1){a.done=true;this.flightPosition=null;this.camPhase='landed';this.landingProgress=0;this.onLanding?.();}
  }
- playThrow(x,z,onLanding){const dx=x-this.player[0],dz=z-this.player[1],endAngle=Math.atan2(dx,dz);this.thrower.anim.setClip('baseball_pitching',{restart:true});this.thrower.anim.speed=1.45;this.throwing={start:performance.now(),duration:1120,target:[x,z],onLanding,startAngle:this.thrower.angle,endAngle};this.flight=null;this.camPhase='throw';}
+ playThrow(x,z,onLanding){
+  const dx=x-this.player[0],dz=z-this.player[1];
+  // The supplied baseball_pitching clip throws 90° to the MODEL'S left.
+  // Turn its facing 90° to the right of the selected world-space target first.
+  // This changes animation orientation only; meterLanding and the actual
+  // grenade destination remain exactly as calibrated by the player.
+  const targetYaw=Math.atan2(dx,dz)+Math.PI/2;
+  const startAngle=this.thrower.angle;
+  const delta=Math.atan2(Math.sin(targetYaw-startAngle),Math.cos(targetYaw-startAngle));
+  const endAngle=startAngle+delta;
+  this.thrower.anim.setClip('Idle_11',{restart:true});this.thrower.anim.speed=1;
+  this.throwing={start:performance.now(),turnDuration:360,pitchStart:0,
+   phase:'turn',duration:1120,target:[x,z],onLanding,startAngle,endAngle};
+  this.flight=null;this.camPhase='throw';
+ }
  launchFlight(x,z,onLanding){const a=this.player,dx=x-a[0],dz=z-a[1],dl=Math.hypot(dx,dz)||1;
   // Spawn at the actual animated right wrist at the throwing release, not ahead
   // of the actor before the pitch has happened.
@@ -695,8 +709,22 @@ class WebWorld{
   if(this.radius>2&&this.mode==='field'){for(let j=0;j<20;j++){const a=j*Math.PI*2/20,r=this.radius*.96;const p=proj(this.impact[0]+r*Math.cos(a),1+Math.min(30,r*.09),this.impact[1]+r*Math.sin(a));if(!p)continue;const rad=clamp(280*Math.max(2,r*.16)/Math.max(4,p[2]),5,75);const grad=ctx.createRadialGradient(p[0],p[1],2,p[0],p[1],rad);grad.addColorStop(0,'rgba(255,196,84,.76)');grad.addColorStop(.48,'rgba(245,110,42,.46)');grad.addColorStop(1,'rgba(70,67,57,0)');ctx.fillStyle=grad;ctx.beginPath();ctx.arc(p[0],p[1],rad,0,Math.PI*2);ctx.fill();}}
  if(this.radius>=0){ctx.beginPath();let last=false;for(let i=0;i<=80;i++){const a=i/80*Math.PI*2;let p=proj(this.impact[0]+this.radius*Math.cos(a),.17,this.impact[1]+this.radius*Math.sin(a));if(p&&p[0]>-3e3&&p[0]<w+3e3&&p[1]>-3e3&&p[1]<h+3e3){if(!last)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1]);last=true}else last=false;}ctx.strokeStyle='#ffe1a2';ctx.lineWidth=3;ctx.shadowColor='#ffcb83';ctx.shadowBlur=14;ctx.stroke();ctx.shadowBlur=0;}
  }
- draw(){if(!this.gl){
-  if(this.throwing&&performance.now()-this.throwing.start>=this.throwing.duration){const a=this.throwing;this.launchFlight(a.target[0],a.target[1],a.onLanding);}
+ updateThrowPose(now=performance.now()){
+  const a=this.throwing;
+  if(!a||!this.thrower)return;
+  if(a.phase==='turn'){
+   const t=smooth(clamp((now-a.start)/a.turnDuration,0,1));
+   this.thrower.angle=lerp(a.startAngle,a.endAngle,t);
+   if(t>=1){
+    this.thrower.angle=a.endAngle;
+    a.phase='pitch';a.pitchStart=now;
+    this.thrower.anim.setClip('baseball_pitching',{restart:true});
+    this.thrower.anim.speed=1.45;
+   }
+  }else if(a.phase==='pitch')this.thrower.angle=a.endAngle;
+ }
+ draw(){this.updateThrowPose();if(!this.gl){
+  if(this.throwing?.phase==='pitch'&&performance.now()-this.throwing.pitchStart>=this.throwing.duration){const a=this.throwing;this.launchFlight(a.target[0],a.target[1],a.onLanding);}
   if(this.flight&&!this.flight.done&&(performance.now()-this.flight.start)>=this.flight.duration){this.flight.done=true;this.camPhase='landed';this.landingProgress=0;this.onLanding?.();}
   this.drawFallback();return;}
   try{this.drawLand();}catch(e){if(!this.errored){console.error('軍營試炸渲染錯誤',e);this.errored=true;}}}
