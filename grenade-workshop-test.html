@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#132018">
-<title>國軍手榴彈｜調配與投擲試玩 v1.0</title>
+<title>國軍手榴彈｜製作工坊 v1.33</title>
 <style>
 :root{--ink:#eaf1da;--muted:#a9baa5;--gold:#efc977;--good:#a1d991;--bad:#f29b76;--panel:rgba(18,34,26,.95);--edge:#ffffff20}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:#132119;color:var(--ink);font-family:system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;touch-action:manipulation;user-select:none;-webkit-user-select:none}
@@ -71,42 +71,88 @@ body.fieldmode #guide{margin-bottom:8px}body.fieldmode #scene{pointer-events:non
 #resultCounts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}#resultCounts .outcomeCell{padding:10px 4px}#resultCounts strong{font-size:20px}
 #landmarkResults{color:#edce8d;font-size:12px;line-height:1.6;margin:8px 0}
 @media(max-height:650px){#impactHud{padding:7px 11px}.impactCell{padding:6px}.impactGrid{margin:5px 0}}
+/* v1.33: minimalist intro / workbench and reliable full-screen press QTE */
+.introMinimal{display:flex;flex-direction:column;gap:12px;text-align:center;padding:28px 20px}
+.introMinimal h1{font-size:clamp(24px,5.6vw,31px);margin:2px 0 16px;letter-spacing:.4px}
+.introMinimal .btn{min-height:56px;font-size:17px}
+#qteTapLayer{display:none;position:fixed;inset:0;z-index:10;background:transparent;touch-action:none;cursor:pointer}
+body.pressmode #qteTapLayer{display:block}
+body.shapemode #guide{display:none!important}
+.actionThree .btn{gap:8px;font-size:clamp(13px,3.4vw,16px)}
+.actionThree .btn .ico{font-size:25px}
+#gallery .galCard{min-height:100px}
+#gallery .galCard small{font-size:11px}
+#gallery .galCard p{font-size:11px;color:#bfceb7;line-height:1.4;margin:6px 0 0}
 </style>
 </head>
 <body>
 <canvas id="world3d" aria-label="3D 爆炸戰場"></canvas><canvas id="scene" aria-label="遊戲場景"></canvas><div id="screenTint"></div>
 <div id="root">
   <header id="head">
-    <div class="heading"><div class="logo">💣</div><div class="headingText"><div class="headingTitle">手榴彈製作訓練 <span style="color:#eaca8c;font-size:10px">PROTOTYPE 1.0</span></div><div class="headingSub" id="headerSub">軍械庫 · 綠桶實驗區</div></div><button id="restart" aria-label="重新開始">↻</button></div>
+    <div class="heading"><div class="logo">💣</div><div class="headingText"><div class="headingTitle">手榴彈製作訓練 <span style="color:#eaca8c;font-size:10px">v1.33</span></div><div class="headingSub" id="headerSub">軍械庫 · 綠桶實驗區</div></div><button id="restart" aria-label="重新開始">↻</button></div>
     <div id="steps"><div class="step active"></div><div class="step"></div><div class="step"></div><div class="step"></div></div>
     <div id="stats"><div class="stat" id="gramStat"><label>目前火藥</label><div class="statValue"><strong id="gramText">0</strong><small>克</small></div></div><div class="stat" id="densityStat"><label>遊戲密度</label><div class="statValue"><strong id="densityText">0.60</strong><small>密度值</small></div></div></div>
   </header>
-  <div id="toast"></div>
+  <div id="toast"></div><div id="qteTapLayer" role="button" tabindex="0" aria-label="點擊畫面壓實"></div>
   <div id="guide"><div id="stageRound">已壓實 0 次</div><div id="stageName">自由裝填與壓實</div><div id="stageDesc">留意桶口：快滿時才會看見火藥；想倒就倒、想壓就壓。</div></div>
   <div id="controls" class="hidden"></div>
 </div>
 <div id="impactHud"><div id="blastPhase">💥 衝擊波擴散中</div><div class="impactGrid"><div class="impactCell"><span>摧毀建築</span><strong id="deadBuildings">0</strong></div><div class="impactCell"><span>擊殺人數</span><strong id="deadPeople">0</strong></div></div><div id="landmarkToast"></div></div><div id="blastFlash"></div>
-<div id="gallery"><div class="galInner"><div class="kicker">軍旅訓練 · 地標圖鑑</div><h2>💥 被你炸掉的地標</h2><p style="color:#b8c9b5;font-size:12px">只有爆炸實際波及才會解鎖。地標位置和宇宙尺度均為遊戲化示意。</p><div class="galCards" id="galCards"></div><button id="closeGallery" class="btn primary full">返回遊戲</button></div></div>
-<div id="intro"><div class="modal"><div class="kicker">國軍訓練中心 · 獨立試玩</div><div class="introMark">🛢️</div><h1>這桶東西，真的能丟嗎？</h1><p>從一只軍綠色大桶子開始，自由加入火藥、反覆壓實。隨時可以收手，但千萬別倒到滿出來！最後親手把大桶轉成手榴彈，再試試看能丟多準。</p><div class="introSteps"><div class="introStep"><span>1</span>按住倒火藥；桶身不透明，火藥接近桶口才看得見，溢出會強制停機</div><div class="introStep"><span>2</span>隨時壓實 QTE，也可以連續倒入或連續壓實</div><div class="introStep"><span>3</span>主動進轉輪定型，或因溢出、破殼被迫進入</div><div class="introStep"><span>4</span>控制左右和遠近 · 讓 3D 建築真正被爆炸波及</div></div><button class="btn primary full" id="startBtn">開始訓練　→</button><div class="underText">這次可以一路玩到爆炸、即時計數與地標圖鑑。所有火藥與威力數值均為虛構遊戲設定。<button id="galleryBtn" class="btn ghost full">🗂 查看地標圖鑑</button></div></div></div>
-<div id="endOverlay"><div class="modal"><div class="kicker">爆炸演習 · 本回合完成</div><div style="font-size:43px;margin-bottom:6px">🎯</div><h2 id="endHeading">投擲完成！</h2><p id="endDesc">爆炸已經結束。</p><div id="outcomeCoords"><div class="outcomeCell"><small>投擲距離</small><strong id="distVal">0.0 m</strong></div><div class="outcomeCell"><small>偏離目標</small><strong id="missVal">0.0 m</strong></div></div><div class="outcomeCell" style="margin-bottom:16px"><small>本次火藥／密度</small><strong id="finalVal" style="font-size:20px">0 克 · 0.00</strong></div><div id="resultCounts"><div class="outcomeCell"><small>摧毀建築</small><strong id="endBuildings">0</strong></div><div class="outcomeCell"><small>擊殺人數</small><strong id="endPeople">0</strong></div></div><div class="outcomeCell" style="margin:10px 0;padding:10px 12px;text-align:left"><small>投擲精準成績</small><strong id="accuracyScore" style="font-size:21px">—</strong><div id="teamResult" style="font-size:12px;color:#c4d7bd;margin-top:4px"></div></div><div id="landmarkResults"></div><button class="btn primary full" id="retryBtn">再製作一顆　↻</button><button class="btn ghost full" id="endGalleryBtn">🗂 查看地標圖鑑</button><div class="underText">不顯示外殼耐久、定型品質或失敗原因。</div></div></div>
+<div id="gallery"><div class="galInner"><div class="kicker">國軍手榴彈 · 收集紀錄</div><h2>🏅 成就圖鑑</h2><p id="achievementProgress" class="dim"></p><div class="galCards" id="galCards"></div><button id="closeGallery" class="btn primary full">返回遊戲</button></div></div>
+<div id="intro"><div class="modal introMinimal"><h1>這東西，真的能丟嗎？</h1><button class="btn primary full" id="startBtn">開始遊戲</button><button id="galleryBtn" class="btn ghost full">🏅 成就圖鑑</button></div></div>
+<div id="endOverlay"><div class="modal"><div class="kicker">爆炸演習 · 本回合完成</div><div style="font-size:43px;margin-bottom:6px">🎯</div><h2 id="endHeading">投擲完成！</h2><p id="endDesc">爆炸已經結束。</p><div id="outcomeCoords"><div class="outcomeCell"><small>投擲距離</small><strong id="distVal">0.0 m</strong></div><div class="outcomeCell"><small>偏離目標</small><strong id="missVal">0.0 m</strong></div></div><div class="outcomeCell" style="margin-bottom:16px"><small>本次火藥／密度</small><strong id="finalVal" style="font-size:20px">0 克 · 0.00</strong></div><div id="resultCounts"><div class="outcomeCell"><small>摧毀建築</small><strong id="endBuildings">0</strong></div><div class="outcomeCell"><small>擊殺人數</small><strong id="endPeople">0</strong></div></div><div class="outcomeCell" style="margin:10px 0;padding:10px 12px;text-align:left"><small>投擲精準成績</small><strong id="accuracyScore" style="font-size:21px">—</strong><div id="teamResult" style="font-size:12px;color:#c4d7bd;margin-top:4px"></div></div><div id="landmarkResults"></div><button class="btn primary full" id="retryBtn">再製作一顆　↻</button><button class="btn ghost full" id="endGalleryBtn">🏅 成就圖鑑</button><div class="underText">不顯示外殼耐久、定型品質或失敗原因。</div></div></div>
 <script src="./grenade-3d.js"></script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);const cv=$('scene'),ctx=cv.getContext('2d');
-const WORLD=window.GrenadeWorld;let hadNewLandmarks=new Set(),lastLandmarkShown=0;const saveKey='ARMY2_grenade_landmarks_v1';function loadGallery(){try{return JSON.parse(localStorage.getItem(saveKey)||'[]')}catch(e){return []}}function storeGallery(n){try{localStorage.setItem(saveKey,JSON.stringify([...new Set([...loadGallery(),...n])]))}catch(e){}}
-function showGallery(){const gotten=new Set(loadGallery());$('galCards').innerHTML=window.GrenadeLandmarks.map(l=>`<div class="galCard ${gotten.has(l.name)?'':'locked'}"><small>${l.kind}　${gotten.has(l.name)?'✓ 已解鎖':'🔒 未解鎖'}</small><strong>${gotten.has(l.name)?l.name:'？？？？'}</strong></div>`).join('');$('gallery').classList.add('show')}
+const WORLD=window.GrenadeWorld;
+let hadNewLandmarks=new Set(),lastLandmarkShown=0;
+const achievements=[
+ {id:'first-powder',name:'開工大吉',desc:'第一次開始裝填'},
+ {id:'half-full',name:'半桶勇士',desc:'把桶子裝填到一半'},
+ {id:'press-one',name:'壓實初體驗',desc:'完成第一次壓實'},
+ {id:'press-perfect',name:'神之手',desc:'壓實得到 PERFECT'},
+ {id:'press-three',name:'三連壓',desc:'同一顆連續完成 3 次壓實'},
+ {id:'press-six',name:'壓實狂人',desc:'同一顆完成 6 次壓實'},
+ {id:'overflow',name:'貪心沒有極限',desc:'裝填到溢出，強制進入轉輪'},
+ {id:'broken',name:'這桶不太妙',desc:'壓實失手，造成桶殼損壞'},
+ {id:'wheel',name:'轉輪學徒',desc:'第一次完成轉輪定型'},
+ {id:'wheel-perfect',name:'模具大師',desc:'定型非常接近隱藏目標形狀'},
+ {id:'first-throw',name:'飛吧！手榴彈',desc:'完成一次投擲'},
+ {id:'accurate',name:'精準投手',desc:'投擲落點距離目標不超過 3 公尺'},
+ {id:'first-blast',name:'轟隆一聲',desc:'看完一次完整爆炸'},
+ {id:'building-one',name:'拆遷新秀',desc:'單次炸毀至少 1 棟建築'},
+ {id:'building-five',name:'軍營都更計畫',desc:'單次炸毀至少 5 棟建築'},
+ {id:'red-three',name:'紅軍剋星',desc:'單次擊倒至少 3 名紅軍'},
+ {id:'clean',name:'軍紀模範生',desc:'擊倒紅軍，且沒有誤傷友軍'},
+ {id:'friendly-ten',name:'敵軍派來的嗎',desc:'單次誤傷至少 10 名友軍'}
+];
+const achievementKey='ARMY2_grenade_workshop_achievements_v1';
+let roundAchievements=new Set();
+function loadGallery(){try{const v=JSON.parse(localStorage.getItem(achievementKey)||'[]');return Array.isArray(v)?v:[]}catch(e){return []}}
+const earnedAchievements=new Set(loadGallery());
+function unlockAchievement(id){
+ const known=achievements.some(a=>a.id===id);if(!known||earnedAchievements.has(id))return;
+ earnedAchievements.add(id);roundAchievements.add(id);
+ try{localStorage.setItem(achievementKey,JSON.stringify([...earnedAchievements]))}catch(e){}
+}
+function showGallery(){const gotten=earnedAchievements;
+ $('achievementProgress').textContent=`已解鎖 ${gotten.size} / ${achievements.length} 項成就`;
+ $('galCards').innerHTML=achievements.map(a=>`<div class="galCard ${gotten.has(a.id)?'':'locked'}"><small>${gotten.has(a.id)?'🏅 已解鎖':'🔒 尚未解鎖'}</small><strong>${gotten.has(a.id)?a.name:'？？？？'}</strong><p>${gotten.has(a.id)?a.desc:'完成遊戲中的特殊挑戰後解鎖'}</p></div>`).join('');
+ $('gallery').classList.add('show')
+}
 let W=0,H=0,DPR=1;
 let S={},rafTime=0,lastT=0,pouring=false,shapeDragging=false,lastAngle=0,qtePos=0,aimPos=0,toastClock=0;
 const BARREL_SPACE=1000; /* abstract game-only visual capacity, not a physical formula */
 const powderLevel=()=>S.powder/(Math.max(.1,S.density)*BARREL_SPACE);
 const TAU=Math.PI*2, clamp=(v,l,h)=>Math.max(l,Math.min(h,v)),rnd=(a,b)=>a+Math.random()*(b-a),ease=t=>t*t*(3-2*t),fmt=n=>Math.floor(n).toLocaleString('en-US');
-function reset(){S={phase:'intro',powder:0,density:0.60,round:1,totalPressed:0,lastPourPress:0,hp:100,broken:false,spillTime:0,shape:0,shapeTarget:rnd(.91,1.08),power:0,qteCenter:.5,qteSpeed:1.8,qteClock:0,compressT:0,compressMode:'',aimX:0,aimZ:0,aimClock:0,throwT:0,shotX:0,shotZ:0,particles:[],shake:0,shotRot:0};pouring=false;shapeDragging=false;lastT=0;renderHUD();$('intro').style.display='flex';$('endOverlay').classList.remove('show');$('impactHud').classList.remove('show');$('world3d').style.display='none';document.body.classList.remove('fieldmode','blastmode');if(WORLD){WORLD.radius=-1;WORLD.mode='field';WORLD.counter={buildings:0,kills:0};}hadNewLandmarks=new Set();lastLandmarkShown=0;$('controls').classList.add('hidden');$('guide').classList.add('hidden');}
+function reset(){S={phase:'intro',powder:0,density:0.60,round:1,totalPressed:0,lastPourPress:0,hp:100,broken:false,spillTime:0,shape:0,shapeTarget:rnd(.91,1.08),power:0,qteCenter:.5,qteSpeed:1.8,qteClock:0,compressT:0,compressMode:'',aimX:0,aimZ:0,aimClock:0,throwT:0,shotX:0,shotZ:0,particles:[],shake:0,shotRot:0};pouring=false;shapeDragging=false;lastT=0;renderHUD();$('intro').style.display='flex';$('endOverlay').classList.remove('show');$('impactHud').classList.remove('show');$('world3d').style.display='none';document.body.classList.remove('fieldmode','blastmode');if(WORLD){WORLD.radius=-1;WORLD.mode='field';WORLD.counter={buildings:0,kills:0};}hadNewLandmarks=new Set();lastLandmarkShown=0;roundAchievements=new Set();$('controls').classList.add('hidden');$('guide').classList.add('hidden');}
 function phase(p){S.phase=p;renderHUD();}
 function toast(text,ms=1300){const el=$('toast');el.textContent=text;el.classList.add('show');toastClock=performance.now()+ms;}
 function stepIndex(){return ['fill','press'].includes(S.phase)?0:S.phase==='shape'?1:['aimX','aimZ'].includes(S.phase)?2:3;}
 function renderHUD(){
  const ph=S.phase,work=ph==='fill'||ph==='press';
- document.body.classList.toggle('workmode',work);const field=['aimX','aimZ','flight','blast','end'].includes(ph);document.body.classList.toggle('fieldmode',field);document.body.classList.toggle('blastmode',ph==='blast');$('world3d').style.display=field?'block':'none';$('impactHud').classList.toggle('show',ph==='blast');
+ document.body.classList.toggle('workmode',work);document.body.classList.toggle('pressmode',ph==='press');document.body.classList.toggle('shapemode',ph==='shape');const field=['aimX','aimZ','flight','blast','end'].includes(ph);document.body.classList.toggle('fieldmode',field);document.body.classList.toggle('blastmode',ph==='blast');$('world3d').style.display=field?'block':'none';$('impactHud').classList.toggle('show',ph==='blast');
  $('stats').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='blast'||ph==='flight');
  $('steps').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='blast');
  $('guide').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='blast');
@@ -120,22 +166,21 @@ function renderHUD(){
  $('stageName').textContent=titles[ph]||'';$('stageDesc').textContent=desc[ph]||'';
  const ctl=$('controls');ctl.replaceChildren();
  if(work){
-   ctl.innerHTML=`<div id="workTitle"><div class="smallTitle">${ph==='press'?'壓實時機 · 注意桶上的指針':'自由操作 · 觀察火藥高度'}</div><span class="dim" id="workHint">${ph==='press'?'點桶上的指針也能壓實':'快到桶口才看得到火藥'}</span></div>
-   <div class="actionThree">
-    <button id="pourBtn" class="btn" ${ph==='press'?'disabled':''}><span class="ico">⬇</span><span>按住倒火藥</span><small>放開就停</small></button>
-    <button id="pressBtn" class="btn ${ph==='press'?'live':'primary'}" ${S.powder<15?'disabled':''}><span class="ico">${ph==='press'?'🎯':'⚙'}</span><span>${ph==='press'?'立即壓實！':'啟動壓實'}</span><small>${ph==='press'?'抓準 QTE':'可連續壓實'}</small></button>
-    <button id="shapeBtn" class="btn ghost" ${ph==='press'||S.powder<15?'disabled':''}><span class="ico">↻</span><span>轉輪定型</span><small>隨時收手</small></button>
-   </div><div class="underText">${ph==='press'?'指針跑到亮區時按「立即壓實」；失誤可能弄壞外殼。':'桶身不透明；等火藥快到桶口才會露出，注意別倒滿。'}</div>`;
+   ctl.innerHTML=`<div class="actionThree">
+    <button id="pourBtn" class="btn" ${ph==='press'?'disabled':''}><span class="ico">⬇</span><span>倒火藥</span></button>
+    <button id="pressBtn" class="btn ${ph==='press'?'live':'primary'}" ${ph==='press'||S.powder<15?'disabled':''}><span class="ico">⚙</span><span>${ph==='press'?'點畫面壓實':'啟動壓實'}</span></button>
+    <button id="shapeBtn" class="btn ghost" ${ph==='press'||S.powder<15?'disabled':''}><span class="ico">↻</span><span>轉輪定型</span></button>
+   </div>`;
    const btn=$('pourBtn');
    if(ph==='fill'){
      btn.addEventListener('pointerdown',e=>{e.preventDefault();if(S.phase!=='fill')return;btn.setPointerCapture(e.pointerId);pouring=true;btn.classList.add('isHeld')});
      const stop=()=>{pouring=false;btn.classList.remove('isHeld')};
      btn.addEventListener('pointerup',stop);btn.addEventListener('pointercancel',stop);btn.addEventListener('lostpointercapture',stop);
    }
-   $('pressBtn').addEventListener('click',()=>{if(S.phase==='press')finishPress();else startPress()});
+   $('pressBtn').addEventListener('click',()=>{if(S.phase==='fill')startPress()});
    $('shapeBtn').addEventListener('click',()=>{if(S.phase==='fill'&&S.powder>=15)startShape()});
  }else if(ph==='shape'){
-   ctl.innerHTML=`<div id="wheelLayout"><div id="wheelPad"><div id="wheelFace"></div><div id="wheelRot"><div id="wheelGrip"></div></div><div id="wheelCenter">↻ 旋轉</div></div><div id="rotateInstructions"><b>將桶子慢慢定型</b><br>順時針轉動轉輪。<br>覺得外觀適合了，就按完成。<br><span class="dim">超過頭不能轉回去。</span></div></div><button id="shapeDone" class="btn primary full">完成定型 · 前往投擲　→</button>`;
+   ctl.innerHTML=`<div id="wheelLayout"><div id="wheelPad"><div id="wheelFace"></div><div id="wheelRot"><div id="wheelGrip"></div></div><div id="wheelCenter">↻ 旋轉</div></div><div id="rotateInstructions"><b>將桶子慢慢定型</b><br>順時針轉動轉輪。<br>覺得外觀適合了，就按完成。</div></div><button id="shapeDone" class="btn primary full">完成定型 · 前往投擲　→</button>`;
    const wheel=$('wheelPad');wheel.addEventListener('pointerdown',e=>{e.preventDefault();wheel.setPointerCapture(e.pointerId);shapeDragging=true;lastAngle=pointerAngle(e,wheel)});
    wheel.addEventListener('pointermove',e=>{if(!shapeDragging||S.phase!=='shape')return;e.preventDefault();const a=pointerAngle(e,wheel);let d=a-lastAngle;if(d>Math.PI)d-=TAU;if(d<-Math.PI)d+=TAU;lastAngle=a;if(d>0&&d<1.3){S.shape=clamp(S.shape+d/TAU*.38,0,1.65);S.shake=Math.min(.4,S.shake+.012);updateWheel();}});
    const stop=()=>{shapeDragging=false};wheel.addEventListener('pointerup',stop);wheel.addEventListener('pointercancel',stop);wheel.addEventListener('lostpointercapture',stop);
@@ -164,20 +209,20 @@ function finishPress(){if(S.phase!=='press')return;
  // Diminishing returns on repeatedly pressing an unchanged load, but extra presses are always possible.
  const repeat=Math.max(0,S.totalPressed-S.lastPourPress);
  gain*=Math.max(.42,1-repeat*.10);
- S.totalPressed++;S.round=S.totalPressed+1;S.hp=clamp(S.hp-loss,0,100);S.broken=S.hp<=0;
+ S.totalPressed++;unlockAchievement('press-one');if(label==='PERFECT！')unlockAchievement('press-perfect');if(S.totalPressed>=3)unlockAchievement('press-three');if(S.totalPressed>=6)unlockAchievement('press-six');S.round=S.totalPressed+1;S.hp=clamp(S.hp-loss,0,100);S.broken=S.hp<=0;
  S.density=clamp(S.density+gain*(1+Math.log1p(S.round)*.13),.3,9.99);
  S.shake=.85;S.compressT=1;S.compressMode=label;S.particles=[];
- if(S.broken){S.spillTime=0;startShape();toast(`${label}　外殼損壞！強制進入定型！`,2200)}
+ if(S.broken){unlockAchievement('broken');S.spillTime=0;startShape();toast(`${label}　外殼損壞！強制進入定型！`,2200)}
  else{phase('fill');toast(`${label}　桶內火藥下降，可以繼續裝填／壓實`,1250)}
 }
 function triggerOverflow(){if(S.phase!=='fill')return;
- pouring=false;S.spillTime=1.55;S.shake=1.2;startShape();
+ unlockAchievement('overflow');pouring=false;S.spillTime=1.55;S.shake=1.2;startShape();
  toast('⚠ 火藥滿出來造成危險！強制進入定型！',3100);
 }
 function startShape(){S.shape=0;S.shapeTarget=rnd(.88,1.07)+Math.min(.13,S.round*.009);phase('shape')}
 function startAim(){// Play-only quality score. Hidden from the player.
- const closeness=Math.abs(S.shape-S.shapeTarget);S.shapeQuality=Math.max(.08,1/(1+Math.pow(closeness/.23,2)));S.aimClock=0;phase('aimX');}
-function startFlight(){S.phase='flight';S.throwT=0;S.shotX=(S.aimX-.5)*18;S.shotZ=5+(1-S.aimZ)*24;S.shotRot=rnd(-3,3);S.shake=.25;if(WORLD)WORLD.setLanding(S.shotX,S.shotZ);renderHUD();}
+ const closeness=Math.abs(S.shape-S.shapeTarget);S.shapeQuality=Math.max(.08,1/(1+Math.pow(closeness/.23,2)));if(closeness<=.08)unlockAchievement('wheel-perfect');unlockAchievement('wheel');S.aimClock=0;phase('aimX');}
+function startFlight(){S.phase='flight';S.throwT=0;S.shotX=(S.aimX-.5)*18;S.shotZ=5+(1-S.aimZ)*24;S.shotRot=rnd(-3,3);S.shake=.25;unlockAchievement('first-throw');if(Math.hypot(S.shotX,S.shotZ-17)<=3)unlockAchievement('accurate');if(WORLD)WORLD.setLanding(S.shotX,S.shotZ);renderHUD();}
 function endFlight(){
  phase('blast');if(WORLD)WORLD.begin(S.powder,S.density,S.shapeQuality,S.broken);
  $('deadBuildings').textContent='0';$('deadPeople').textContent='0';$('blastPhase').textContent='💥 衝擊波開始擴散！';$('landmarkToast').textContent='';
@@ -196,15 +241,17 @@ function finishBlast(){
  const title=rad>1050000?'銀河系級':rad>340000?'恆星級':rad>2100?'星球級':rad>600?'都市級':rad>105?'城鎮級':rad>35?'營區級':rad>9?'建築級':'一般手榴彈';
  $('endHeading').textContent=title+'！';
  $('endDesc').textContent=`爆炸演習結束。最大衝擊範圍約 ${fmt(rad)} 遊戲公尺。`;
- const found=WORLD?WORLD.newLandmarks:[],already=new Set(loadGallery()),newly=found.filter(n=>!already.has(n));storeGallery(found);
- $('landmarkResults').textContent=newly.length?'🗂 新解鎖：'+newly.join('、'):found.length?'🗂 本次摧毀：'+found.join('、'):'這次沒有波及地標。';
+ unlockAchievement('first-blast');
+ if(cnt.buildings>=1)unlockAchievement('building-one');if(cnt.buildings>=5)unlockAchievement('building-five');
+ if((cnt.red||0)>=3)unlockAchievement('red-three');if((cnt.red||0)>0&&(cnt.green||0)===0)unlockAchievement('clean');
+ if((cnt.green||0)>=10)unlockAchievement('friendly-ten');
+ const newNames=achievements.filter(a=>roundAchievements.has(a.id)).map(a=>a.name);
+ $('landmarkResults').textContent=newNames.length?'🏅 本次新成就：'+newNames.join('、'):'🏅 查看成就圖鑑，收集更多特殊成就';
  $('endOverlay').classList.add('show');
 }
-function boot(){reset();$('startBtn').addEventListener('click',()=>{$('intro').style.display='none';S.phase='fill';S.round=1;phase('fill')});$('galleryBtn').addEventListener('click',showGallery);$('endGalleryBtn').addEventListener('click',showGallery);$('closeGallery').addEventListener('click',()=>$('gallery').classList.remove('show'));$('retryBtn').addEventListener('click',()=>{reset();$('intro').style.display='none';S.phase='fill';phase('fill')});$('restart').addEventListener('click',()=>{if(confirm('要重新開始這次訓練嗎？'))reset()});cv.addEventListener('pointerdown',e=>{
- if(S.phase!=='press')return;
- const hb=$('head').getBoundingClientRect().bottom,cb=$('controls').getBoundingClientRect().top,cy=clamp((hb+cb)*.5+19,H*.34,H*.60);const bw=Math.min(W*.55,222),bx=W*.5-bw*.5,by=cy-73;
- if(e.clientX>=bx-9&&e.clientX<=bx+bw+9&&e.clientY>=by-40&&e.clientY<=by+55){e.preventDefault();finishPress()}
-});window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden)pouring=false});resize();requestAnimationFrame(loop)}
+function boot(){reset();$('startBtn').addEventListener('click',()=>{$('intro').style.display='none';S.phase='fill';S.round=1;phase('fill')});$('galleryBtn').addEventListener('click',showGallery);$('endGalleryBtn').addEventListener('click',showGallery);$('closeGallery').addEventListener('click',()=>$('gallery').classList.remove('show'));$('retryBtn').addEventListener('click',()=>{reset();$('intro').style.display='none';S.phase='fill';phase('fill')});$('restart').addEventListener('click',()=>{if(confirm('要重新開始這次訓練嗎？'))reset()});const qteTap=$('qteTapLayer');
+ qteTap.addEventListener('pointerdown',e=>{if(S.phase!=='press')return;e.preventDefault();e.stopPropagation();finishPress()});
+ qteTap.addEventListener('keydown',e=>{if(S.phase==='press'&&(e.key==='Enter'||e.key===' ')){e.preventDefault();finishPress()}});window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden)pouring=false});resize();requestAnimationFrame(loop)}
 function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=Math.max(1,window.innerWidth);H=Math.max(1,window.innerHeight);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0)}
 function rr(x,y,w,h,r,fill,stroke,lw=1){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
 function line(x1,y1,x2,y2,color,width=2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
@@ -260,8 +307,8 @@ function drawWorkshop(t){const visibleTop=$('head').getBoundingClientRect().bott
  }
  if(S.phase==='press'){
    const bw=Math.min(W*.55,222),bx=px-bw/2,by=cy-73;
-   rr(bx-9,by-40,bw+18,95,12,'#0c201ae6','#f2d28b9b',2);
-   ctx.textAlign='center';ctx.font='900 13px system-ui';ctx.fillStyle='#ffe4a5';ctx.fillText('抓準時機！點這裡壓實',px,by-17);
+   rr(bx-9,by-16,bw+18,70,12,'#0c201ae6','#f2d28b9b',2);
+   
    rr(bx,by-6,bw,32,8,'#1e3929','#d2dcb288',1);
    rr(bx+bw*(S.qteCenter-.075),by-5,bw*.15,30,2,'#e4e9a45f','#e8eebe',1);
    rr(bx+bw*(S.qteCenter-.018),by-5,bw*.036,30,2,'#dae8a2aa');
@@ -388,7 +435,7 @@ function loop(ms){const t=ms/1000,actualDt=Math.max(0,lastT?t-lastT:0),dt=Math.m
  if(pouring&&S.phase==='fill'){
    // This is an abstract visual fill system for the game, not real powder compaction data.
    const add=dt*(180+Math.min(110,S.totalPressed*9));
-   S.powder+=add;S.lastPourPress=S.totalPressed;
+   S.powder+=add;S.lastPourPress=S.totalPressed;if(S.powder>=15)unlockAchievement('first-powder');if(powderLevel()>=.5)unlockAchievement('half-full');
    updateStats();
    if(powderLevel()>=1){triggerOverflow()}
  }
@@ -401,7 +448,7 @@ function loop(ms){const t=ms/1000,actualDt=Math.max(0,lastT?t-lastT:0),dt=Math.m
      $('deadBuildings').textContent=fmt(WORLD.counter.buildings);$('deadPeople').textContent=fmt(WORLD.counter.kills);
      const rad=WORLD.radius;
      $('blastPhase').textContent=rad>1050000?'🌌 銀河級衝擊！':rad>2100?'🌍 星球災害擴散中':rad>650?'🏙 都市持續崩塌':rad>90?'🏘 建築連鎖毀滅':'💥 衝擊波擴散中';
-     const lm=WORLD.newLandmarks;if(lm.length>lastLandmarkShown){$('landmarkToast').textContent='🗂 地標摧毀：'+lm[lm.length-1];lastLandmarkShown=lm.length;}
+     
      $('blastFlash').style.opacity=String(Math.max(0,.8-WORLD.timer*1.5));
      if(finished)finishBlast();
    }
