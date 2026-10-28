@@ -26,17 +26,31 @@ body.aiming #msg{display:none}
 @media(orientation:landscape) and (max-height:530px){#top{top:5px;left:8px;right:auto;width:210px}h1{font-size:12px}#caption,#version{font-size:9px}#titlebar{padding:5px}#counters{gap:3px}#counters strong{font-size:16px}#counters span{font-size:10px}#msg{font-size:10px}#powerDock{top:9px;right:10px}#meterH{bottom:calc(9px + env(safe-area-inset-bottom));width:53%;left:23.5%;height:19px}#aimHint{bottom:calc(31px + env(safe-area-inset-bottom));font-size:10px}#meterV{height:113px;width:20px}#tapHint{font-size:10px}}
 #blastFlash{position:fixed;inset:0;pointer-events:none;z-index:3;background:radial-gradient(ellipse at 50% 57%,rgba(255,236,178,.89),rgba(255,152,61,.39) 45%,transparent 83%);opacity:0;transition:none;mix-blend-mode:screen}
 
-/* v1.9 - visual direction & distance meters, without success/OK zones. */
-#meterH{left:50%;width:min(88vw,420px);height:142px;bottom:calc(8px + env(safe-area-inset-bottom));transform:translateX(-50%);background:transparent;border:0;border-radius:0;box-shadow:none;backdrop-filter:none;overflow:visible}
-#meterH svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 2px 2px #fff8)}
-#meterH .dir-labels{display:flex;position:absolute;top:0;left:0;right:0;justify-content:space-between;pointer-events:none;color:#14221a;font-size:11px;font-weight:900;text-shadow:0 1px 2px #fffa}
-#meterV{width:27px;height:175px;z-index:5;border:2px solid #202a25;border-radius:6px;background:#e0e5d8c9;box-shadow:0 2px 8px #0006;backdrop-filter:none;overflow:visible}
-#meterV:before{content:'';position:absolute;inset:4px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 15px,#162e2345 16px,#162e2345 17px);pointer-events:none}
-#needleV{left:-7px;right:-7px;top:50%;height:5px;background:#d82929;box-shadow:0 1px 4px #220,0 0 0 1px #fff9;transform:translateY(-50%);border-radius:3px}
-@media(orientation:landscape) and (max-height:530px){#meterH{left:50%;width:min(48vw,320px);height:103px;bottom:calc(5px + env(safe-area-inset-bottom))}#meterV{height:126px;width:24px}}
+/* v1.9.1 - tactical military HUD meters, no OK zones. */
+#meterH{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(76vw,368px);height:126px;z-index:6;padding:10px 12px 12px;background:linear-gradient(180deg,#183124f5,#0f2319f0);border:1px solid #c8bb8290;border-radius:18px;clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px),0 14px);box-shadow:0 12px 28px #0007,inset 0 0 0 1px #ffffff0a;backdrop-filter:blur(10px);overflow:hidden;pointer-events:none}
+#meterH.hide,#meterV.hide,#aimHint.hide,#tapHero.hide{display:none}
+#meterH:before,#meterH:after{content:'';position:absolute;border:1px solid #d8cd98aa;opacity:.55}
+#meterH:before{left:10px;top:10px;width:24px;height:14px;border-right:0;border-bottom:0}
+#meterH:after{right:10px;bottom:10px;width:24px;height:14px;border-left:0;border-top:0}
+#meterH .meter-title{position:absolute;left:0;right:0;top:8px;text-align:center;color:#d8cc98;font-weight:900;font-size:10px;letter-spacing:1.6px;line-height:1.2;text-shadow:0 1px 2px #0009}
+#meterH .meter-title span{display:block;margin-top:2px;color:#f3f0de;font-size:12px;letter-spacing:.5px}
+#meterH svg{position:absolute;left:14px;right:14px;bottom:28px;width:calc(100% - 28px);height:74px;overflow:visible;filter:drop-shadow(0 2px 3px #000a)}
+#meterH .dir-labels{display:flex;position:absolute;left:18px;right:18px;bottom:8px;justify-content:space-between;align-items:center;pointer-events:none;color:#d7dac7;font-size:11px;font-weight:900;text-shadow:0 1px 2px #000c}
+#meterH .dir-labels span:nth-child(2){opacity:.96}
+#meterV{position:fixed;z-index:6;width:56px;height:184px;padding:18px 0;background:linear-gradient(180deg,#183124f2,#0f2319ed);border:1px solid #c8bb8290;border-radius:16px;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px),0 10px);box-shadow:0 12px 28px #0007,inset 0 0 0 1px #ffffff0a;backdrop-filter:blur(10px);overflow:hidden;pointer-events:none}
+#meterV:before{content:'';position:absolute;left:50%;top:24px;bottom:24px;width:12px;transform:translateX(-50%);border:1px solid #8a947f6e;background:repeating-linear-gradient(to bottom,#f0f1e806 0,#f0f1e806 12px,#d8dcb920 12px,#d8dcb920 13px),linear-gradient(180deg,#ecefdf18,#e7ead90c);border-radius:8px;pointer-events:none}
+#meterV:after{content:'';position:absolute;left:9px;top:9px;width:16px;height:12px;border-left:1px solid #d8cd98aa;border-top:1px solid #d8cd98aa;opacity:.55}
+#meterV .meter-v-title{position:absolute;top:4px;left:0;right:0;text-align:center;color:#d8cc98;font-weight:900;font-size:9px;letter-spacing:1.2px;text-shadow:0 1px 2px #0009}
+#meterV .meter-v-top,#meterV .meter-v-bottom{position:absolute;left:0;right:0;text-align:center;color:#f3f0de;font-weight:900;font-size:12px;text-shadow:0 1px 2px #000c}
+#meterV .meter-v-top{top:18px}
+#meterV .meter-v-bottom{bottom:18px}
+#needleV{position:absolute;left:7px;right:7px;top:50%;height:5px;background:linear-gradient(90deg,#ff8a8a,#dc3232,#ff8a8a);border-radius:999px;box-shadow:0 0 0 1px #fff6,0 0 8px #9f1d1d;transform:translateY(-50%)}
+#aimHint{position:fixed;z-index:6;left:50%;bottom:calc(58px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:min(88vw,340px);padding:7px 12px;border-radius:999px;background:#11271ee3;border:1px solid #ccb9847c;color:#f4e5a8;white-space:nowrap;pointer-events:none;text-align:center;font-size:12px;font-weight:900;text-shadow:0 1px 3px #061a12;box-shadow:0 6px 18px #0005}
+@media(max-height:730px){#meterH{bottom:calc(88px + env(safe-area-inset-bottom));width:min(80vw,350px);height:120px}#aimHint{bottom:calc(54px + env(safe-area-inset-bottom))}}
+@media(orientation:landscape) and (max-height:530px){#meterH{bottom:calc(16px + env(safe-area-inset-bottom));width:min(46vw,312px);height:100px;padding:8px 10px 10px}#meterH .meter-title{top:6px;font-size:9px}#meterH .meter-title span{font-size:11px}#meterH svg{left:12px;right:12px;bottom:22px;height:58px;width:calc(100% - 24px)}#meterH .dir-labels{left:15px;right:15px;bottom:6px;font-size:10px}#meterV{width:46px;height:132px}#meterV .meter-v-title{font-size:8px}#meterV .meter-v-top,#meterV .meter-v-bottom{font-size:10px}#aimHint{bottom:calc(12px + env(safe-area-inset-bottom));font-size:10px;padding:5px 9px}}
 </style></head><body>
 <canvas id="world3d"></canvas>
-<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.9 無跳鏡跟拍</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
+<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.9.1 戰術 HUD</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
 <div id="powerDock" class="hide">
   <button id="powerToggle" aria-expanded="false" aria-controls="powerDrawer" aria-label="展開或收合手榴彈威力設定">💥 威力 <strong id="powerMiniValue">10</strong> <span id="powerChevron">▾</span></button>
   <div id="powerDrawer" hidden><div class="powerHead"><span>威力（0～100）</span><span id="powerOut">10</span></div>
@@ -47,13 +61,21 @@ body.aiming #msg{display:none}
 </div>
 <div id="aimHint" class="hide" aria-live="polite">左右方向 · 點主角確認</div>
 <div id="meterH" class="hide" aria-label="左右方向計量條">
- <svg viewBox="0 0 300 142" preserveAspectRatio="none" aria-hidden="true">
-  <path d="M8 14 C46 41 116 112 145 130 Q150 134 155 130 C184 112 254 41 292 14" fill="none" stroke="#18221c" stroke-width="3.6" stroke-linecap="round" />
-  <line id="needleH" x1="150" y1="129" x2="150" y2="14" stroke="#d72929" stroke-width="3" stroke-linecap="round" />
+ <div class="meter-title">TACTICAL HUD<span>投擲方位</span></div>
+ <svg viewBox="0 0 320 100" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M24 14 L160 88 L296 14" fill="none" stroke="#111712" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>
+  <path d="M24 14 L160 88 L296 14" fill="none" stroke="#cbbf86" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M40 26 L160 80 L280 26" fill="none" stroke="#53695a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+  <line x1="62" y1="28" x2="72" y2="24" stroke="#8e9678" stroke-width="2"/>
+  <line x1="160" y1="68" x2="160" y2="60" stroke="#8e9678" stroke-width="2"/>
+  <line x1="248" y1="24" x2="258" y2="28" stroke="#8e9678" stroke-width="2"/>
+  <line id="needleHGlow" x1="160" y1="88" x2="160" y2="14" stroke="#ffb3b3" stroke-width="6" stroke-linecap="round" opacity=".22"/>
+  <line id="needleH" x1="160" y1="88" x2="160" y2="14" stroke="#e13b3b" stroke-width="3.6" stroke-linecap="round"/>
+  <circle cx="160" cy="88" r="5" fill="#dfcf8d" stroke="#233428" stroke-width="2"/>
  </svg>
- <div class="dir-labels"><span>左</span><span>中</span><span>右</span></div>
+ <div class="dir-labels"><span>左翼</span><span>中央</span><span>右翼</span></div>
 </div>
-<div id="meterV" class="hide" aria-label="遠近計量條"><div id="needleV"></div></div>
+<div id="meterV" class="hide" aria-label="遠近計量條"><div class="meter-v-title">RANGE</div><div class="meter-v-top">遠</div><div id="needleV"></div><div class="meter-v-bottom">近</div></div>
 
 
 <div id="blastFlash" aria-hidden="true"></div><div id="badge"></div><button id="skipIntro" style="position:fixed;right:14px;top:calc(175px + env(safe-area-inset-top));z-index:8;display:none;background:#1c422ce3">跳過開場</button>
@@ -120,7 +142,7 @@ function positionAimHUD(){
  const r=world.getPlayerScreen?.();if(!r||!Number.isFinite(r.x))return;
  const w=window.innerWidth,h=window.innerHeight;
  const meter=$('meterV'),mh=meter.offsetHeight||175;
- const vx=r.x+Math.max(65,r.width/2+13);meter.style.left=clamp(vx,7,w-32)+'px';meter.style.top=clamp((r.top+r.bottom-mh)/2,135,h-mh-62)+'px';
+ const vx=r.x+Math.max(80,r.width/2+24);meter.style.left=clamp(vx,8,w-64)+'px';meter.style.top=clamp((r.top+r.bottom-mh)/2,138,h-mh-74)+'px';
 }
 $('reset').addEventListener('click',reset);$('resetBottom').addEventListener('click',reset);$('retry').addEventListener('click',reset);
 const openGallery=()=>{const list=new Set(saved());$('galleryGrid').innerHTML=window.GrenadeLandmarks.map(l=>`<div class="gal ${list.has(l.name)?'':'locked'}"><small>${l.kind} · ${list.has(l.name)?'✓ 已解鎖':'🔒 未解鎖'}</small><strong>${list.has(l.name)?l.name:'？？？'}</strong></div>`).join('');$('gallery').classList.add('show')};
@@ -128,7 +150,7 @@ $('galleryButton').addEventListener('click',openGallery);$('seeGallery').addEven
 function result(){if(phase!=='blast')return;setState('end');world.camPhase='blast';$('resultHeading').textContent=power>=85?'報告長官！宇宙出事了！':power>=65?'報告長官！災情擴大！':power>=20?'報告長官！整片都炸了！':'手榴彈試炸完成';$('rBuildings').textContent=fmt(world.counter.buildings);$('rKills').textContent=fmt(world.counter.kills);$('rRed').textContent=fmt(world.counter.red);$('rGreen').textContent=fmt(world.counter.green);$('newLandmarks').textContent=reportedLandmarks.size?`本次波及地標：${[...reportedLandmarks].join('、')}`:'本次沒有解鎖新地標';$('result').classList.add('show');}
 function tick(t){requestAnimationFrame(tick);const dt=clamp((t-old)/1000,0,.045);old=t;
  if(phase==='intro'){clock+=dt;world.introProgress=Math.min(1,clock/9);if(clock>=9){reset();$('msg').textContent='鏡頭下降到投擲者後方，紅軍在右前方';}}
- if(phase==='aimX'||phase==='aimZ'){clock+=dt;pos=.5+.5*Math.sin(clock*(phase==='aimX'?3.25:3.77));if(phase==='aimX')$('needleH').setAttribute('x2',String(8+284*pos));else $('needleV').style.top=`${(1-pos)*100}%`;positionAimHUD();}
+ if(phase==='aimX'||phase==='aimZ'){clock+=dt;pos=.5+.5*Math.sin(clock*(phase==='aimX'?3.25:3.77));if(phase==='aimX'){const dirX=24+272*pos;$('needleH').setAttribute('x2',String(dirX));$('needleHGlow').setAttribute('x2',String(dirX));}else $('needleV').style.top=`${(1-pos)*100}%`;positionAimHUD();}
  if(phase==='landed'){landingClock+=dt;world.landingProgress=clamp(landingClock/1.0,0,1);if(landingClock>=1.0)detonate();}
  if(phase==='blast'){$('blastFlash').style.opacity=String(Math.min(.83,Math.exp(-world.timer*4.3)*(.25+Math.log10(world.blastMax+1)*.13)));if(world.advance(dt)){if(!resultTimer)resultTimer=t+1550;if(t>=resultTimer)result();}
    $('buildings').textContent=fmt(world.counter.buildings);$('kills').textContent=fmt(world.counter.kills);
