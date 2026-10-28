@@ -287,18 +287,24 @@ document.getElementById('arenaRetry').addEventListener('click',()=>{
  makeArenaFrame();
 });
 // v1.39: all values are fictional GAME balance parameters, not real-world explosive guidance.
-// Reward the amount players invested, not how full the variable-sized visual barrel looks.
-// A tiny fill must stay weak even after excellent QTE and wheel performance.
+// v1.41: Camp-only arcade balance. These are fictional game scores, not physical ratios.
+// The former 1250-unit denominator reached maximum far too early after a few QTEs.
+// Stored amount is the main input. Good QTE / shaping improve efficiency only;
+// repeated QTE presses on the same small load cannot create extra power.
 function craftingPower(){
- const amount=clamp(S.powder/1250,0,1);
- const press=clamp((S.density-.60)/1.35,0,1)*clamp(S.hp/100,.20,1);
+ const amount=clamp(S.powder/4200,0,1);
+ const press=clamp((S.density-.60)/2.40,0,1)*clamp(S.hp/100,.15,1);
  const closeness=Math.abs(S.shape-S.shapeTarget);
  const shape=clamp(1/(1+Math.pow(closeness/.23,2)),.08,1);
- const quality=(.66+.34*press)*(.75+.25*shape);
- const balanced=10+90*Math.pow(amount,1.10)*quality;
- const limit=S.broken?70:S.overflowed?85:100;
- return {power:clamp(Math.round(Math.min(limit,balanced)),10,100),
-  fill:Math.round(amount*100),press:Math.round(press*100),shape:Math.round(shape*100)};
+ const quality=(.64+.36*press)*(.82+.18*shape);
+ const balanced=10+90*Math.pow(amount,1.40)*quality;
+ // Six or seven presses may create a useful grenade, but not a camp-wide blast.
+ // High-end results remain possible with a longer, well-controlled run.
+ const safePresses=Math.max(0,S.totalPressed);
+ const pressCeiling=Math.min(100,35+8*Math.min(5,safePresses)+4*Math.max(0,safePresses-5));
+ const failureCeiling=S.broken?60:S.overflowed?78:100;
+ const power=clamp(Math.round(Math.min(balanced,pressCeiling,failureCeiling)),10,100);
+ return {power,fill:Math.round(amount*100),press:Math.round(press*100),shape:Math.round(shape*100)};
 }
 function enterThrowTraining(){
  if(S.phase!=='shape')return;
