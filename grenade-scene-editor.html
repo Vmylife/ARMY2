@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>手榴彈場景編輯器｜ARMY2</title>
-<link rel="stylesheet" href="./grenade-scene-editor.css?v=2">
+<link rel="stylesheet" href="./grenade-scene-editor.css?v=3">
 </head>
 <body>
 <header class="topbar">
  <div><b>💣 手榴彈場景編輯器</b><small>獨立場景 · 不影響原軍營</small></div>
  <div class="topactions"><a href="./editor.html">原軍營編輯器</a><button id="togglePanel">收合工具</button></div>
 </header>
-<main id="stage"><canvas id="world" aria-label="3D 編輯場景"></canvas><div id="loading">載入低配模型中…</div>
+<main id="stage"><canvas id="world" aria-label="3D 編輯場景"></canvas><div id="loading">正在載入模型…</div>
  <div id="camHelp">點選或拖曳模型 · 小物件可先選取再開啟「移動選取」 · 空白處平移</div>
  <div class="camera"><button id="moveSelected">移動選取：關</button><button id="camOrbit">旋轉視角：關</button><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="homeCamera">回中心</button></div>
 </main>
@@ -19,11 +19,13 @@
  <div class="section">
   <div class="sectionTitle"><b>新增模型</b><span id="objectCount">0 個物件</span></div>
   <div class="two"><label>分類<select id="category"><option value="building">建築（手榴彈用）</option><option value="soldier">士兵（手榴彈用）</option><option value="prop">環境物件（手榴彈用）</option><option value="ground">道路與地面（手榴彈用）</option></select></label><label>素材<select id="template"></select></label></div>
+  <p class="qualityHint">每個建築、士兵、環境模型都有「低／高」兩種版本，且能在場景中混用。</p>
   <div class="btnRow"><button id="add" class="primary">＋ 放到鏡頭中心</button><button id="duplicate">複製選取</button><button id="remove" class="danger">刪除選取</button></div>
   <details><summary>場景物件清單（可快速選取）</summary><select id="objectList" size="5" style="margin-top:8px"></select></details>
  </div>
  <div class="section editFields">
   <div class="sectionTitle"><b id="chosen">尚未選取物件</b><span id="selectionInfo">點擊場景中的模型即可選取</span></div>
+  <div id="selectedQualityWrap" class="qualitySwitch" hidden><label>選取物件的畫質<select id="selectedQuality"><option value="low">低畫質（輕量版）</option><option value="high">高畫質（原版貼圖）</option></select></label><span>切換後保留位置、旋轉與縮放</span></div>
   <div class="fields">
    <label>X<input type="number" id="fieldX" step="0.5"></label><label>Z<input type="number" id="fieldZ" step="0.5"></label>
    <label>角度°<input type="number" id="fieldRot" step="15"></label><label>縮放<input type="number" id="fieldScale" step="0.1" min="0.1" max="12"></label>
@@ -39,10 +41,10 @@
   <div class="btnRow"><button data-nudge="x-">←</button><button data-nudge="z+">↑</button><button data-nudge="z-">↓</button><button data-nudge="x+">→</button><button data-nudge="rot-">↶ 15°</button><button data-nudge="rot+">15° ↷</button></div>
  </div>
  <div class="section last"><div class="btnRow"><button id="undo">↶ 復原</button><button id="redo">↷ 重做</button><button id="export" class="primary">匯出場景 JSON</button><button id="import">匯入 JSON</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
-  <p id="hint">場景會自動存在這台裝置。你可以建立多個手榴彈場景，匯出的 JSON 會包含物件座標、角度、縮放與低配模型路徑，以及可破壞建築對應的碎塊模型。</p>
+  <p id="hint">場景會自動存在這台裝置。你可以建立多個手榴彈場景，匯出的 JSON 會記住每個模型的高／低畫質選擇、座標、角度、縮放及可破壞建築的對應碎塊路徑。道路和地面是純色幾何，不分高低貼圖。</p>
   <div id="message"></div>
  </div>
 </aside>
-<script type="module" src="./grenade-scene-editor.js?v=2"></script>
+<script type="module" src="./grenade-scene-editor.js?v=3"></script>
 </body>
 </html>

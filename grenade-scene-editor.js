@@ -4,16 +4,16 @@ import {RigAnimator} from './src/characters/rigAnimator.js';
 const $=id=>document.getElementById(id),cap=(v,a,b)=>Math.max(a,Math.min(b,v));
 const PATH='./assets/grenade-low/';
 const ASSETS=[
- {id:'barracks',type:'building',name:'營舍（手榴彈用）',file:'grenade-barracks-low.glb',fracture:'grenade-barracks-fractured-low.glb',size:[14,4.4,6.6]},
- {id:'guardhouse',type:'building',name:'哨所（手榴彈用）',file:'grenade-guardhouse-low.glb',fracture:'grenade-guardhouse-fractured-low.glb',size:[7.3,4,6.8]},
- {id:'office',type:'building',name:'辦公大樓（手榴彈用）',file:'grenade-office-low.glb',fracture:'grenade-office-fractured-low.glb',size:[14,10,11]},
- {id:'friendly',type:'soldier',name:'友軍士兵（手榴彈用）',file:'grenade-soldier-low.glb',size:[1.12,1.7,.86],side:'friendly',animation:'Knock_Down'},
- {id:'enemy',type:'soldier',name:'紅軍士兵（手榴彈用）',file:'grenade-soldier-low.glb',size:[1.12,1.7,.86],side:'enemy',animation:'Knock_Down'},
- {id:'treeA',type:'prop',name:'樹木 A（手榴彈用）',file:'grenade-tree-a-low.glb',size:[4.4,5.5,4.4]},
- {id:'treeB',type:'prop',name:'樹木 B（手榴彈用）',file:'grenade-tree-b-low.glb',size:[4.7,5.5,4.7]},
- {id:'sandbag',type:'prop',name:'沙包（手榴彈用）',file:'grenade-sandbag-low.glb',size:[3,1.2,1.9]},
- {id:'barrel',type:'prop',name:'桶子（手榴彈用）',file:'grenade-barrel-low.glb',size:[1.3,1.5,1.3]},
- {id:'grenadeCrate',type:'prop',name:'手榴彈投擲箱（手榴彈用）',file:'grenade-throw-crate-low.glb',size:[2.0,1.15,1.6]},
+ {id:'barracks',type:'building',name:'營舍（手榴彈用）',highFile:'./assets/buildings/building-1-barracks.glb',highFracture:'./assets/buildings/destructible/barracks-fractured.glb',file:'grenade-barracks-low.glb',fracture:'grenade-barracks-fractured-low.glb',size:[14,4.4,6.6]},
+ {id:'guardhouse',type:'building',name:'哨所（手榴彈用）',highFile:'./assets/buildings/building-4-guardhouse.glb',highFracture:'./assets/buildings/destructible/guardhouse-fractured.glb',file:'grenade-guardhouse-low.glb',fracture:'grenade-guardhouse-fractured-low.glb',size:[7.3,4,6.8]},
+ {id:'office',type:'building',name:'辦公大樓（手榴彈用）',highFile:'./assets/buildings/building-6-office.glb',highFracture:'./assets/buildings/destructible/office-fractured.glb',file:'grenade-office-low.glb',fracture:'grenade-office-fractured-low.glb',size:[14,10,11]},
+ {id:'friendly',type:'soldier',name:'友軍士兵（手榴彈用）',highFile:'./assets/characters/cadet/cadet-green.glb',file:'grenade-soldier-low.glb',size:[1.12,1.7,.86],side:'friendly',animation:'Knock_Down'},
+ {id:'enemy',type:'soldier',name:'紅軍士兵（手榴彈用）',highFile:'./assets/characters/cadet/cadet-green.glb',file:'grenade-soldier-low.glb',size:[1.12,1.7,.86],side:'enemy',animation:'Knock_Down'},
+ {id:'treeA',type:'prop',name:'樹木 A（手榴彈用）',highFile:'./assets/props/tree-a.glb',file:'grenade-tree-a-low.glb',size:[4.4,5.5,4.4]},
+ {id:'treeB',type:'prop',name:'樹木 B（手榴彈用）',highFile:'./assets/props/tree-b.glb',file:'grenade-tree-b-low.glb',size:[4.7,5.5,4.7]},
+ {id:'sandbag',type:'prop',name:'沙包（手榴彈用）',highFile:'./assets/props/sandbag.glb',file:'grenade-sandbag-low.glb',size:[3,1.2,1.9]},
+ {id:'barrel',type:'prop',name:'桶子（手榴彈用）',highFile:'./assets/props/barrel.glb',file:'grenade-barrel-low.glb',size:[1.3,1.5,1.3]},
+ {id:'grenadeCrate',type:'prop',name:'手榴彈投擲箱（手榴彈用）',highFile:'./assets/props/grenade-crate.glb',file:'grenade-throw-crate-low.glb',size:[2.0,1.15,1.6]},
  {id:'road',type:'ground',name:'米色道路（手榴彈用）',size:[8,.09,28],color:[.85,.82,.71]},
  {id:'path',type:'ground',name:'步道（手榴彈用）',size:[3,.08,20],color:[.92,.88,.78]},
  {id:'plaza',type:'ground',name:'訓練廣場（手榴彈用）',size:[24,.10,24],color:[.81,.79,.68]},
@@ -21,6 +21,11 @@ const ASSETS=[
  {id:'throwPoint',type:'ground',name:'投擲站位標記（手榴彈用）',size:[2,.09,2],color:[.97,.70,.27]}
 ];
 const BY=Object.fromEntries(ASSETS.map(a=>[a.id,a]));
+// Quality is stored on every placed model; existing scenes without this field remain low.
+const qualityOf=o=>o?.quality==='high'?'high':'low';
+const modelPath=(a,q='low')=>a?.file?(q==='high'&&a.highFile?a.highFile:PATH+a.file):null;
+const fracturePath=(a,q='low')=>a?.fracture?(q==='high'&&a.highFracture?a.highFracture:PATH+a.fracture):null;
+const qualityName=o=>BY[o.assetId]?.file?(qualityOf(o)==='high'?'高':'低'):'';
 const STORAGE='army-grenade-user-scenes-v1';
 const initial=()=>({id:'scene-1',name:'手榴彈場景 1',serial:0,objects:[]});
 let store;try{store=JSON.parse(localStorage.getItem(STORAGE))}catch{};
@@ -29,7 +34,7 @@ let scene=store.scenes.find(x=>x.id===store.active)||store.scenes[0];let selecte
 let yaw=.55,pitch=.90,distance=96,pivot={x:0,z:0};
 const history=[],future=[];
 const canvas=$('world'),ctx2=canvas.getContext('webgl2',{antialias:true,alpha:false,depth:true,powerPreference:'high-performance'});
-let gl=ctx2,program=null,skinProgram=null,flatProgram=null,anim=null,loading=0,loaded=0;
+let gl=ctx2,program=null,skinProgram=null,flatProgram=null,loading=0,loaded=0;
 const geom=new Map(),busy=new Set(),cache=new Map();
 const CP=(a)=>JSON.parse(JSON.stringify(a));
 const msg=s=>{$('message').textContent=s};
@@ -39,12 +44,12 @@ function undo(){if(!history.length)return;future.push(CP(scene.objects));scene.o
 function redo(){if(!future.length)return;history.push(CP(scene.objects));scene.objects=future.pop();selected=null;setMoveSelectedMode(false);changed()}
 function listScenes(){const sel=$('scenes');sel.replaceChildren();for(const s of store.scenes){const o=document.createElement('option');o.value=s.id;o.textContent=s.name;sel.append(o)}sel.value=scene.id}
 function changed(){save();listObjects();editFields()}
-function listObjects(){const sel=$('objectList');sel.replaceChildren();for(const [i,o] of scene.objects.entries()){const a=BY[o.assetId],op=document.createElement('option');op.value=o.uid;op.textContent=`${i+1}. ${a?.name||o.assetId}`;sel.add(op)}if(selected)sel.value=selected;$('objectCount').textContent=scene.objects.length+' 個物件'}
-function editFields(){const o=scene.objects.find(x=>x.uid===selected),a=o&&BY[o.assetId];$('chosen').textContent=a?a.name:'尚未選取物件';$('selectionInfo').textContent=o?`#${o.uid}`:'點擊 3D 場景物件';for(const [key,field] of [['x','fieldX'],['z','fieldZ'],['rot','fieldRot'],['scale','fieldScale'],['width','fieldWidth'],['depth','fieldDepth']])$(field).value=o?Number(o[key]??(key==='width'?a.size[0]:a.size[2])).toFixed(key==='rot'?0:2):'';
+function listObjects(){const sel=$('objectList');sel.replaceChildren();for(const [i,o] of scene.objects.entries()){const a=BY[o.assetId],op=document.createElement('option');op.value=o.uid;op.textContent=`${i+1}. ${a?.name||o.assetId}${a?.file?'｜'+qualityName(o):''}`;sel.add(op)}if(selected)sel.value=selected;$('objectCount').textContent=scene.objects.length+' 個物件'}
+function editFields(){const o=scene.objects.find(x=>x.uid===selected),a=o&&BY[o.assetId];$('chosen').textContent=a?a.name+(a.file?'｜'+qualityName(o)+'畫質':''):'尚未選取物件';$('selectionInfo').textContent=o?`#${o.uid}`:'點擊 3D 場景物件';$('selectedQualityWrap').hidden=!a?.file;$('selectedQuality').value=qualityOf(o);for(const [key,field] of [['x','fieldX'],['z','fieldZ'],['rot','fieldRot'],['scale','fieldScale'],['width','fieldWidth'],['depth','fieldDepth']])$(field).value=o?Number(o[key]??(key==='width'?a.size[0]:a.size[2])).toFixed(key==='rot'?0:2):'';
  const ground=a?.type==='ground';$('widthWrap').hidden=!ground;$('depthWrap').hidden=!ground;
  for(const field of document.querySelectorAll('.fields input'))field.disabled=!o;$('duplicate').disabled=!o;$('remove').disabled=!o}
 function select(o){selected=o?.uid||null;if(!selected&&moveSelectedMode)setMoveSelectedMode(false);editFields();listObjects()}
-function add(id){const a=BY[id];if(!a)return;checkpoint();const uid='g'+(++scene.serial);const n={uid,assetId:id,x:Number(pivot.x.toFixed(2)),z:Number(pivot.z.toFixed(2)),rot:0,scale:1};if(a.type==='ground'){n.width=a.size[0];n.depth=a.size[2]}scene.objects.push(n);select(n);changed();ensureAsset(a);msg('新增 '+a.name)}
+function add(choice){const [id,requestedQuality]=choice.split(':');const a=BY[id];if(!a)return;const quality=a.file&&requestedQuality==='high'?'high':'low';checkpoint();const uid='g'+(++scene.serial);const n={uid,assetId:id,quality,x:Number(pivot.x.toFixed(2)),z:Number(pivot.z.toFixed(2)),rot:0,scale:1};if(a.type==='ground'){n.width=a.size[0];n.depth=a.size[2]}scene.objects.push(n);select(n);changed();ensureAsset(a,quality);msg('新增 '+a.name+(a.file?'（'+(quality==='high'?'高':'低')+'畫質）':''))}
 function deleteSelected(){if(!selected)return;checkpoint();scene.objects=scene.objects.filter(x=>x.uid!==selected);select(null);changed()}
 function duplicate(){const o=scene.objects.find(x=>x.uid===selected);if(!o)return;checkpoint();const d={...o,uid:'g'+(++scene.serial),x:o.x+2,z:o.z+2};scene.objects.push(d);select(d);changed()}
 function batchAdd(){const o=scene.objects.find(x=>x.uid===selected);if(!o){msg('請先選取一個物件');return;}
@@ -58,18 +63,20 @@ function batchAdd(){const o=scene.objects.find(x=>x.uid===selected);if(!o){msg('
 function newScene(){let name=prompt('新場景名稱（不會影響原軍營）','手榴彈場景 '+(store.scenes.length+1));if(name===null)return;name=name.trim()||'未命名手榴彈場景';const s={id:'scene-'+Date.now()+'-'+Math.floor(Math.random()*1000),name,serial:0,objects:[]};store.scenes.push(s);scene=s;history.length=0;future.length=0;select(null);setMoveSelectedMode(false);pivot={x:0,z:0};distance=96;listScenes();changed();msg('已新增空白場景：'+name)}
 function renameScene(){const v=prompt('修改場景名稱',scene.name);if(v===null)return;scene.name=v.trim()||scene.name;listScenes();save()}
 function deleteScene(){if(!confirm('確定要刪除場景「'+scene.name+'」？此操作不會影響主遊戲。'))return;store.scenes=store.scenes.filter(x=>x!==scene);if(!store.scenes.length)store.scenes=[initial()];scene=store.scenes[0];history.length=0;future.length=0;selected=null;setMoveSelectedMode(false);listScenes();changed()}
-function exportScene(){const data={format:'army-grenade-scene',schemaVersion:1,exportedAt:new Date().toISOString(),sceneId:scene.id,sceneName:scene.name,map:{width:280,depth:280,groundColor:'#adc9a7'},throwOrigin:(scene.objects.find(o=>o.assetId==='throwPoint')||{x:0,z:0}),totalObjects:scene.objects.length,items:scene.objects.map(o=>{const a=BY[o.assetId];return{...o,category:a.type,name:a.name,model:a.file?PATH+a.file:null,destructible:a.fracture?{fracturedModel:PATH+a.fracture,pieces:a.id==='barracks'?23:a.id==='guardhouse'?30:42}:null,team:a.side||null,size:a.size}})};
+function exportScene(){const data={format:'army-grenade-scene',schemaVersion:1,exportedAt:new Date().toISOString(),sceneId:scene.id,sceneName:scene.name,map:{width:280,depth:280,groundColor:'#adc9a7'},throwOrigin:(scene.objects.find(o=>o.assetId==='throwPoint')||{x:0,z:0}),totalObjects:scene.objects.length,items:scene.objects.map(o=>{const a=BY[o.assetId];return{...o,quality:qualityOf(o),category:a.type,name:a.name,model:modelPath(a,qualityOf(o)),destructible:a.fracture?{fracturedModel:fracturePath(a,qualityOf(o)),pieces:a.id==='barracks'?23:a.id==='guardhouse'?30:42}:null,team:a.side||null,size:a.size}})};
  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=('手榴彈場景_'+scene.name.replace(/[\\/:*?"<>|]/g,'_')+'.json');document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);msg('已匯出 '+data.totalObjects+' 個物件，將 JSON 傳給我即可接入試炸場')}
 async function importScene(file){try{const data=JSON.parse(await file.text());if(data.format!=='army-grenade-scene'||data.schemaVersion!==1||!Array.isArray(data.items))throw Error('請使用此編輯器匯出的場景 JSON');if(data.items.length>6000)throw Error('單次最多匯入 6,000 個物件');
-  const invalid=data.items.filter(x=>!BY[x.assetId]||![x.x,x.z,x.rot,x.scale].every(Number.isFinite));if(invalid.length)throw Error('匯入檔包含不支援的模型或座標');
-  const name=(data.sceneName||file.name.replace('.json',''))+'（匯入）';const s={id:'scene-'+Date.now(),name,serial:Math.max(...data.items.map(x=>Number(String(x.uid).replace(/^g/,''))||0),0),objects:data.items.map(x=>({uid:x.uid,assetId:x.assetId,x:x.x,z:x.z,rot:x.rot,scale:x.scale,width:x.width,depth:x.depth}))};
-  store.scenes.push(s);scene=s;selected=null;setMoveSelectedMode(false);history.length=0;future.length=0;listScenes();changed();for(const a of ASSETS)if(s.objects.some(o=>o.assetId===a.id))ensureAsset(a);msg('匯入完成：'+s.objects.length+' 個物件');
+  const invalid=data.items.filter(x=>!BY[x.assetId]||![x.x,x.z,x.rot,x.scale].every(Number.isFinite)||!['low','high',undefined,null].includes(x.quality));if(invalid.length)throw Error('匯入檔包含不支援的模型或座標');
+  const name=(data.sceneName||file.name.replace('.json',''))+'（匯入）';const s={id:'scene-'+Date.now(),name,serial:Math.max(...data.items.map(x=>Number(String(x.uid).replace(/^g/,''))||0),0),objects:data.items.map(x=>({uid:x.uid,assetId:x.assetId,quality:BY[x.assetId].file?qualityOf(x):'low',x:x.x,z:x.z,rot:x.rot,scale:x.scale,width:x.width,depth:x.depth}))};
+  store.scenes.push(s);scene=s;selected=null;setMoveSelectedMode(false);history.length=0;future.length=0;listScenes();changed();for(const o of s.objects){const a=BY[o.assetId];if(a?.file)ensureAsset(a,qualityOf(o))};msg('匯入完成：'+s.objects.length+' 個物件');
  }catch(err){msg('匯入失敗：'+err.message)}}
-function refreshTemplates(){const type=$('category').value,sel=$('template'),prev=sel.value;sel.replaceChildren();for(const a of ASSETS.filter(x=>x.type===type)){const op=document.createElement('option');op.value=a.id;op.textContent=a.name;sel.add(op)}if([...sel.options].some(x=>x.value===prev))sel.value=prev}
+function refreshTemplates(){const type=$('category').value,sel=$('template'),prev=sel.value;sel.replaceChildren();for(const a of ASSETS.filter(x=>x.type===type)){for(const q of (a.file?['low','high']:['low'])){const op=document.createElement('option');op.value=a.id+':'+q;op.textContent=a.name+(a.file?'｜'+(q==='high'?'高畫質（原版）':'低畫質（輕量）'):'');sel.add(op)}}if([...sel.options].some(x=>x.value===prev))sel.value=prev}
+function changeSelectedQuality(){const o=scene.objects.find(x=>x.uid===selected);if(!o||!BY[o.assetId]?.file)return;const q=$('selectedQuality').value;if(q===qualityOf(o))return;checkpoint();o.quality=q;ensureAsset(BY[o.assetId],q);changed();msg('已切換成'+(q==='high'?'高畫質原版':'低畫質輕量版')+'；位置與縮放保持不變')}
+
 function setFields(){const o=scene.objects.find(x=>x.uid===selected);if(!o)return;let diff={};for(const [key,field] of [['x','fieldX'],['z','fieldZ'],['rot','fieldRot'],['scale','fieldScale'],['width','fieldWidth'],['depth','fieldDepth']]){let n=Number($(field).value);if(!Number.isFinite(n))continue;if(key==='scale')n=cap(n,.1,12);if(key==='width'||key==='depth')n=cap(n,1,150);if(key==='x'||key==='z')n=cap(n,-135,135);if((key!=='width'&&key!=='depth'||BY[o.assetId].type==='ground')&&o[key]!==n)diff[key]=n}
  if(Object.keys(diff).length){checkpoint();Object.assign(o,diff);changed()}}
-function setupUI(){listScenes();refreshTemplates();changed();$('scenes').onchange=()=>{scene=store.scenes.find(x=>x.id===$('scenes').value)||scene;selected=null;setMoveSelectedMode(false);history.length=0;future.length=0;changed();for(const o of scene.objects){if(BY[o.assetId])ensureAsset(BY[o.assetId])}};
- $('newScene').onclick=newScene;$('batchAdd').onclick=batchAdd;$('renameScene').onclick=renameScene;$('deleteScene').onclick=deleteScene;$('category').onchange=refreshTemplates;$('add').onclick=()=>add($('template').value);$('remove').onclick=deleteSelected;$('duplicate').onclick=duplicate;
+function setupUI(){listScenes();refreshTemplates();changed();$('scenes').onchange=()=>{scene=store.scenes.find(x=>x.id===$('scenes').value)||scene;selected=null;setMoveSelectedMode(false);history.length=0;future.length=0;changed();for(const o of scene.objects){if(BY[o.assetId])ensureAsset(BY[o.assetId],qualityOf(o))}};
+ $('newScene').onclick=newScene;$('batchAdd').onclick=batchAdd;$('renameScene').onclick=renameScene;$('deleteScene').onclick=deleteScene;$('category').onchange=refreshTemplates;$('selectedQuality').onchange=changeSelectedQuality;$('add').onclick=()=>add($('template').value);$('remove').onclick=deleteSelected;$('duplicate').onclick=duplicate;
  $('objectList').onchange=()=>select(scene.objects.find(x=>x.uid===$('objectList').value));
  for(const field of document.querySelectorAll('.fields input'))field.onchange=setFields;
  for(const b of document.querySelectorAll('[data-nudge]'))b.onclick=()=>{const o=scene.objects.find(x=>x.uid===selected);if(!o)return;checkpoint();const key=b.dataset.nudge;if(key==='x-')o.x-=.5;else if(key==='x+')o.x+=.5;else if(key==='z-')o.z-=.5;else if(key==='z+')o.z+=.5;else o.rot+=(key==='rot+'?15:-15);changed()};
@@ -192,14 +199,17 @@ function gpuAsset(gltf){const a=gltf.json.meshes[0].primitives[0],pr=a.attribute
  return{mesh,count:inds.length,itype:gltf.json.accessors[a.indices].componentType,lo,hi,textureSource:source,skin:pr.JOINTS_0!==undefined}}
 async function texture(gltf,source){if(source==null)return white;const blob=gltf.imageFrom(source),url=URL.createObjectURL(blob),img=new Image();try{await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url})}finally{URL.revokeObjectURL(url)}
  const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);gl.generateMipmap(gl.TEXTURE_2D);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);return t}
-async function ensureAsset(a){if(!a.file||!gl)return;if(cache.has(a.file)||busy.has(a.file))return;busy.add(a.file);loading++;$('loading').hidden=false;
- try{const g=await loadGlb(PATH+a.file);const geo=gpuAsset(g),tex=await texture(g,geo.textureSource);cache.set(a.file,{geo,tex,g});if(geo.skin){anim=new RigAnimator(g);anim.setClip(anim.hasClip('Idle_11')?'Idle_11':'Walking',{restart:true});anim.evaluate(.01)}loaded++;}
- catch(e){console.error('Grenade low model failed',a.file,e);msg('模型載入失敗：'+a.file+'（'+e.message+'）')}
- busy.delete(a.file);loading--;$('loading').textContent='正在載入低配素材… '+loaded+' 種';if(!loading)$('loading').hidden=true}
+async function ensureAsset(a,q='low'){const path=modelPath(a,q);if(!path||!gl)return;if(cache.has(path)||busy.has(path))return;busy.add(path);loading++;$('loading').hidden=false;
+ try{const g=await loadGlb(path),geo=gpuAsset(g),tex=await texture(g,geo.textureSource);let animator=null;
+  if(geo.skin){animator=new RigAnimator(g);animator.setClip(animator.hasClip('Idle_11')?'Idle_11':'Walking',{restart:true});animator.evaluate(.01)}
+  cache.set(path,{geo,tex,g,animator});loaded++;}
+ catch(e){console.error('Grenade model failed',path,e);msg('模型載入失敗：'+path+'（'+e.message+'）')}
+ busy.delete(path);loading--;$('loading').textContent='正在載入素材… '+loaded+' 種';if(!loading)$('loading').hidden=true}
+
 function modelMatrix(a,o,geo){const sz=a.size,oScale=o.scale||1,lo=geo.lo,hi=geo.hi,midX=(lo[0]+hi[0])/2,midZ=(lo[2]+hi[2])/2;
  const sx=sz[0]*oScale/Math.max(.0001,hi[0]-lo[0]),sy=sz[1]*oScale/Math.max(.0001,hi[1]-lo[1]),sz0=sz[2]*oScale/Math.max(.0001,hi[2]-lo[2]);
  return mul(T(o.x,0,o.z),mul(ry(o.rot*Math.PI/180),mul(S(sx,sy,sz0),T(-midX,-lo[1],-midZ))))}
-function staticDraw(a,o,vp){const m=cache.get(a.file);if(!m)return;const p=m.geo.skin?skinProgram:program;gl.useProgram(p);const u=n=>gl.getUniformLocation(p,n);gl.uniformMatrix4fv(u('uVP'),false,vp);gl.uniformMatrix4fv(u('uModel'),false,modelMatrix(a,o,m.geo));gl.uniform3f(u('uTint'),1,1,1);gl.uniform1f(u('uRed'),a.side==='enemy'?1:0);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,m.tex);gl.uniform1i(u('uTex'),0);if(m.geo.skin){if(anim)gl.uniformMatrix4fv(u('uBones[0]'),false,anim.bones);else return}
+function staticDraw(a,o,vp){const m=cache.get(modelPath(a,qualityOf(o)));if(!m)return;const p=m.geo.skin?skinProgram:program;gl.useProgram(p);const u=n=>gl.getUniformLocation(p,n);gl.uniformMatrix4fv(u('uVP'),false,vp);gl.uniformMatrix4fv(u('uModel'),false,modelMatrix(a,o,m.geo));gl.uniform3f(u('uTint'),1,1,1);gl.uniform1f(u('uRed'),a.side==='enemy'?1:0);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,m.tex);gl.uniform1i(u('uTex'),0);if(m.geo.skin){if(m.animator)gl.uniformMatrix4fv(u('uBones[0]'),false,m.animator.bones);else return}
  gl.bindVertexArray(m.geo.mesh);gl.disable(gl.CULL_FACE);gl.drawElements(gl.TRIANGLES,m.geo.count,m.geo.itype,0);gl.enable(gl.CULL_FACE)}
 function flatDraw(vp,model,color){gl.useProgram(flatProgram);const u=n=>gl.getUniformLocation(flatProgram,n);gl.uniformMatrix4fv(u('uVP'),false,vp);gl.uniformMatrix4fv(u('uModel'),false,model);gl.uniform3fv(u('uColor'),color);gl.bindVertexArray(cubeVAO);gl.disable(gl.CULL_FACE);gl.drawArrays(gl.TRIANGLES,0,cube.length/3);gl.enable(gl.CULL_FACE)}
 function drawWebGL(){const w=canvas.clientWidth,h=canvas.clientHeight;const ratio=Math.min(window.devicePixelRatio||1,1.75);if(canvas.width!==Math.round(w*ratio)||canvas.height!==Math.round(h*ratio)){canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio)}gl.viewport(0,0,canvas.width,canvas.height);gl.clearColor(.66,.82,.91,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
@@ -209,19 +219,19 @@ function drawWebGL(){const w=canvas.clientWidth,h=canvas.clientHeight;const rati
  // Cross marker at the origin / throwing point (not an actual placed object)
  flatDraw(vp,mul(T(0,-.024,0),S(2.5,.02,.35)),[.97,.77,.36]);flatDraw(vp,mul(T(0,-.023,0),S(.35,.02,2.5)),[.97,.77,.36]);
  const ord=[...scene.objects].sort((x,y)=>Number(BY[x.assetId]?.type==='ground')-Number(BY[y.assetId]?.type==='ground')).reverse();
- if(anim)anim.evaluate(.016);
+ for(const c of cache.values())if(c.animator)c.animator.evaluate(.016);
  for(const o of ord){const a=BY[o.assetId];if(!a)continue;
  const camDistance=Math.hypot(o.x-pivot.x,o.z-pivot.z);
  if(camDistance>distance*1.65+30&&selected!==o.uid)continue;
  const useProxy=distance>125 && a.type!=='ground' && (a.type==='soldier'||distance>190);
  if(a.type==='ground'){const wd=o.width||a.size[0],dp=o.depth||a.size[2];flatDraw(vp,mul(T(o.x,-.020,o.z),mul(ry(o.rot*Math.PI/180),S(wd*o.scale,.07,dp*o.scale))),a.color)}
- else if(!useProxy&&cache.has(a.file))staticDraw(a,o,vp);else{flatDraw(vp,mul(T(o.x,0,o.z),S(a.size[0]*o.scale,a.size[1]*o.scale,a.size[2]*o.scale)),a.type==='building'?[.73,.74,.69]:a.type==='soldier'?a.side==='enemy'?[.70,.22,.19]:[.24,.57,.32]:[.49,.64,.46])}
+ else if(!useProxy&&cache.has(modelPath(a,qualityOf(o))))staticDraw(a,o,vp);else{flatDraw(vp,mul(T(o.x,0,o.z),S(a.size[0]*o.scale,a.size[1]*o.scale,a.size[2]*o.scale)),a.type==='building'?[.73,.74,.69]:a.type==='soldier'?a.side==='enemy'?[.70,.22,.19]:[.24,.57,.32]:[.49,.64,.46])}
  if(selected===o.uid){const r=Math.max(a.size[0],a.size[2])*.62*o.scale;flatDraw(vp,mul(T(o.x,.11,o.z),S(r*2,.025,.13)),[1,.75,.24]);flatDraw(vp,mul(T(o.x,.112,o.z),S(.13,.026,r*2)),[1,.75,.24])}}
  gl.bindVertexArray(null)}
 function draw2D(){let c=canvas.getContext('2d');if(!c)return;const w=canvas.width=canvas.clientWidth,h=canvas.height=canvas.clientHeight;c.fillStyle='#b2cda6';c.fillRect(0,0,w,h);let ss=Math.min(w,h)/140*96/distance;for(let x=-120;x<=120;x+=20){c.strokeStyle='#98b995';c.beginPath();c.moveTo(w/2+(x-pivot.x)*ss,0);c.lineTo(w/2+(x-pivot.x)*ss,h);c.stroke()}
  for(let z=-120;z<=120;z+=20){c.strokeStyle='#98b995';c.beginPath();c.moveTo(0,h/2+(z-pivot.z)*ss);c.lineTo(w,h/2+(z-pivot.z)*ss);c.stroke()}
  for(const o of scene.objects){const a=BY[o.assetId],x=w/2+(o.x-pivot.x)*ss,y=h/2+(o.z-pivot.z)*ss;c.fillStyle=a.type==='soldier'?a.side==='enemy'?'#b6402f':'#368348':a.type==='building'?'#d9d2b4':a.type==='ground'?'#e8dabc':'#6b995f';const wd=(o.width||a.size[0])*ss*o.scale,dp=(o.depth||a.size[2])*ss*o.scale;c.save();c.translate(x,y);c.rotate(o.rot*Math.PI/180);c.fillRect(-wd/2,-dp/2,wd,dp);if(selected===o.uid){c.strokeStyle='#efbc3b';c.lineWidth=3;c.strokeRect(-wd/2-2,-dp/2-2,wd+4,dp+4)}c.restore()}}
 function loop(){try{if(gl)drawWebGL();else draw2D()}catch(e){console.error(e);if(!loop.errored){msg('3D 預覽失敗：'+e.message);loop.errored=true}}requestAnimationFrame(loop)}
-function boot(){setupUI();pointerEvents();try{initGL();if(!gl)$('loading').hidden=true;else{const needed=[...new Set(scene.objects.map(x=>x.assetId))];if(!needed.length)needed.push('barracks','enemy','treeA');needed.forEach(id=>ensureAsset(BY[id]));if(!loading)$('loading').hidden=true}}catch(e){console.error(e);msg('初始化失敗：'+e.message);$('loading').hidden=true}
+function boot(){setupUI();pointerEvents();try{initGL();if(!gl)$('loading').hidden=true;else{if(scene.objects.length){for(const o of scene.objects){const a=BY[o.assetId];if(a?.file)ensureAsset(a,qualityOf(o))}}else{['barracks','enemy','treeA'].forEach(id=>ensureAsset(BY[id],'low'))};if(!loading)$('loading').hidden=true}}catch(e){console.error(e);msg('初始化失敗：'+e.message);$('loading').hidden=true}
  requestAnimationFrame(loop)}
 boot();

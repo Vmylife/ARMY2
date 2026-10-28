@@ -13,3 +13,10 @@ html,body,#stage,#stage *,header,header *,button,summary,#panel .sectionTitle {
 
 #panel,#panel label,#panel p,#panel details,#panel summary{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #panel input,#panel select,#panel textarea{-webkit-user-select:text;user-select:text}
+
+/* v1.2 high / low models: easy to change quality after placement. */
+.qualityHint{font-size:11px;color:#bdd0ba;margin:8px 0 2px;line-height:1.4}
+.qualitySwitch{padding:9px;margin-bottom:10px;border:1px solid #6c8869;background:#223d2d;border-radius:10px;display:flex;align-items:end;gap:8px}
+.qualitySwitch label{flex:1}
+.qualitySwitch span{font-size:10px;color:#aabea8;max-width:108px;line-height:1.4}
+@media(max-width:760px){.qualitySwitch{padding:7px}.qualitySwitch select{padding:8px}}
