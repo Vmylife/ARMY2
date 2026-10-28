@@ -47,13 +47,7 @@ const buildings=[],soldiers=[],landmarks=[
 {name:'艾菲爾鐵塔',x:-790,z:230,kind:'世界'},
 {name:'自由女神像',x:1020,z:-250,kind:'世界'},
 {name:'埃及金字塔',x:-1270,z:-260,kind:'世界'},
-{name:'地球',radius:2100,kind:'太陽系'},
-{name:'月球',radius:5400,kind:'太陽系'},
-{name:'火星',radius:16000,kind:'太陽系'},
-{name:'木星',radius:57000,kind:'太陽系'},
-{name:'土星',radius:135000,kind:'太陽系'},
-{name:'太陽',radius:340000,kind:'太陽系'},
-{name:'銀河系',radius:1050000,kind:'銀河'}
+{name:'地球',radius:2300,kind:'極限'}
 ];
 const ITEMS=USER_SCENE.items;
 const PLAYER_ITEM=ITEMS.find(v=>v.uid==='g888')||ITEMS.filter(v=>v.team==='friendly'&&v.quality==='high').find(v=>ITEMS.some(q=>q.assetId==='sandbag'&&Math.hypot(q.x-v.x,q.z-v.z)<5));
@@ -125,11 +119,14 @@ gl_FragColor=vec4(col,1.);}`;
 const RING_VS=`precision highp float;attribute vec4 aRing;uniform mat4 uVP;uniform vec2 uCenter;uniform float uRadius,uWidth;varying float vAl;void main(){float r=max(0.,uRadius+aRing.z*uWidth);vec3 p=vec3(uCenter.x+aRing.x*r,.52,uCenter.y+aRing.y*r);gl_Position=uVP*vec4(p,1.);vAl=aRing.w;}`;
 const RING_FS=`precision mediump float;varying float vAl;void main(){gl_FragColor=vec4(1.,.63,.23,vAl*.82);}`;
 const PLANET_VS=`precision highp float;attribute vec3 aPos;attribute vec3 aNorm;uniform mat4 uVP;uniform vec3 uCenter;uniform float uScale;varying vec3 vP,vN;void main(){vP=aPos;vN=aNorm;gl_Position=uVP*vec4(uCenter+aPos*uScale,1.);}`;
-const PLANET_FS=`precision mediump float;uniform float uDamage,uEarth,uHue,uTime;varying vec3 vP,vN;void main(){vec3 n=normalize(vN);float light=.31+.67*max(0.,dot(n,normalize(vec3(-.55,.8,.8))));float terrain=sin(n.x*13.+sin(n.z*7.)*3.)*sin(n.y*18.+n.x*9.)+sin(n.z*32.+n.x*11.)*.4;
+const PLANET_FS=`precision mediump float;uniform float uDamage,uEarth,uHue,uTime,uBlastR;uniform vec3 uBlast;varying vec3 vP,vN;void main(){vec3 n=normalize(vN);float light=.31+.67*max(0.,dot(n,normalize(vec3(-.55,.8,.8))));float terrain=sin(n.x*13.+sin(n.z*7.)*3.)*sin(n.y*18.+n.x*9.)+sin(n.z*32.+n.x*11.)*.4;
 vec3 earth=mix(vec3(.05,.30,.62),vec3(.20,.55,.33),smoothstep(.17,.42,terrain));earth=mix(earth,vec3(.78,.82,.75),smoothstep(.75,.88,n.y));
 vec3 base=mix(vec3(.39,.30,.22)+vec3(.27,.12,.04)*sin(terrain*2.+uHue),earth,uEarth);
 float c=abs(sin(n.x*28.+sin(n.y*12.))+sin(n.y*20.+n.z*10.))*.5;float crack=1.-smoothstep(.035,.14,c);base=mix(base,vec3(1.,.42,.08),crack*clamp(uDamage,0.,1.)*.93);
 float rim=pow(1.-abs(n.z),3.);base+=vec3(.09,.18,.28)*rim*uEarth;
+float active=smoothstep(.001,.02,uBlastR);float geo=1.-dot(normalize(vP),normalize(uBlast));
+float scorch=1.-smoothstep(uBlastR,uBlastR+.08,geo);float edge=smoothstep(max(0.,uBlastR-.035),uBlastR+.01,geo)-smoothstep(uBlastR+.01,uBlastR+.065,geo);
+base=mix(base,base*vec3(.18,.17,.16),scorch*.96*active*uEarth);base+=vec3(.95,.38,.08)*edge*.75*active;
 gl_FragColor=vec4(base*light+vec3(1.,.27,.05)*uDamage*crack*.45,1.);}`;
 const FX_VS=`precision highp float;attribute vec3 p;uniform mat4 uVP;uniform vec3 uCenter;uniform vec3 uSize;varying vec3 vP;void main(){vP=p;gl_Position=uVP*vec4(uCenter+p*uSize,1.);}`;
 const FX_FS=`precision mediump float;varying vec3 vP;uniform vec3 uColor;uniform float uAlpha,uHot,uTime;void main(){
@@ -174,13 +171,13 @@ class WebWorld{
 
  buildEvents(){this.events=[];const [ix,iz]=this.impact;buildings.forEach((v,i)=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'b',v}));soldiers.forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'s',v}));(this.nearBuildings||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'detail',v}));(this.actors||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'actor',v}));(this.campProps||[]).filter(v=>v.type==='treeA'||v.type==='treeB').forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'tree',v}));landmarks.forEach(v=>this.events.push({r:v.radius||Math.hypot(v.x-ix,v.z-iz),type:'land',v}));this.events.sort((a,b)=>a.r-b.r);this.eventIndex=0;this.counter={buildings:0,kills:0,red:0,green:0};this.newLandmarks=[];this.LM=new Set();if(this.nearBuildings)this.nearBuildings.forEach(b=>{b.hit=false;b.fragments=[]});if(this.actors)this.actors.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;a.anim?.setClip('Idle_11',{restart:true})});if(this.campProps)this.campProps.forEach(p=>{p.hit=false;p.fallT=0;p.tilt=0});this.bursts=[];if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}}
  setLanding(x,z){this.impact=[x,z];this.radius=-1;this.mode='field';this.buildEvents();}
- begin(powder,density,quality,broken){const amount=Math.max(0,powder)/600, comp=Math.max(1,density/.6);let max=6+Math.pow(amount,1.37)*Math.pow(comp,2.65)*17*Math.max(.06,quality)*(broken?.39:1);max=clamp(max,7,1500000);this.blastMax=max;this.blastDuration=2+Math.min(13,Math.log10(max+1)*2.1);this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();return max;}
- beginTestPower(power){const points=[[0,2.5],[10,13.3],[20,38],[35,140],[50,440],[65,1350],[75,2100],[85,18000],[92,165000],[100,1500000]];let max=1500000;for(let i=1;i<points.length;i++)if(power<=points[i][0]){const a=points[i-1],b=points[i],t=(power-a[0])/(b[0]-a[0]);max=Math.exp(Math.log(a[1])+(Math.log(b[1])-Math.log(a[1]))*t);break;}this.impactStarted=performance.now();this.blastMax=max;this.blastDuration=4.0+Math.min(11,Math.log10(max+1)*1.85);this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();this.lastHitR=0;this.bursts=[{x:this.impact[0],z:this.impact[1],age:0,life:3.5,size:Math.min(12,2.2+Math.log10(max+1)*2.2),type:'origin',seed:.27}];return max;}
+ begin(powder,density,quality,broken){const amount=Math.max(0,powder)/600, comp=Math.max(1,density/.6);let max=6+Math.pow(amount,1.37)*Math.pow(comp,2.65)*17*Math.max(.06,quality)*(broken?.39:1);max=clamp(max,7,2300);this.blastMax=max;this.blastDuration=2.5+Math.min(10,Math.log10(max+1)*1.8);this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();return max;}
+ beginTestPower(power){const points=[[0,2.5],[10,13.3],[20,38],[35,140],[50,440],[65,1350],[75,1750],[88,2050],[100,2300]];let max=2300;for(let i=1;i<points.length;i++)if(power<=points[i][0]){const a=points[i-1],b=points[i],t=(power-a[0])/(b[0]-a[0]);max=Math.exp(Math.log(a[1])+(Math.log(b[1])-Math.log(a[1]))*t);break;}this.impactStarted=performance.now();this.blastMax=max;this.blastDuration=4.8+Math.min(6.5,Math.log10(max+1)*1.35);this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();this.lastHitR=0;this.bursts=[{x:this.impact[0],z:this.impact[1],age:0,life:4.3,size:Math.min(12,2.2+Math.log10(max+1)*2.2),type:'origin',seed:.27}];return max;}
  advance(dt){if(this.timer>=this.blastDuration)return true;this.timer=Math.min(this.blastDuration,this.timer+dt);this.time+=dt;const x=clamp(this.timer/this.blastDuration,0,1),smooth=1-Math.pow(1-x,1.12);this.radius=Math.expm1(Math.log1p(this.blastMax)*smooth);
  while(this.eventIndex<this.events.length&&this.events[this.eventIndex].r<=this.radius){const e=this.events[this.eventIndex++];if(e.type==='b'){this.counter.buildings++;this.counter.kills+=e.v.people;}else if(e.type==='detail'){this.counter.buildings++;this.counter.kills+=e.v.people;this.explodeBuilding(e.v);this.addBurst(e.v.x,e.v.z,'impact');}else if(e.type==='tree'){this.hitTree(e.v);}else if(e.type==='actor'){this.counter.kills++;if(e.v.enemy)this.counter.red++;else this.counter.green++;this.hitActor(e.v);}else if(e.type==='s'){this.counter.kills++;if(e.v.enemy)this.counter.red++;else this.counter.green++;}else if(!this.LM.has(e.v.name)){this.LM.add(e.v.name);this.newLandmarks.push(e.v.name);}}
  // Far-field is intentionally abstracted; beyond detailed city we only simulate clusters/census.
  if(this.radius>1550){const ratio=Math.max(0,this.radius/1550-1);const hidden=Math.round(64000*Math.pow(ratio,1.12));const occupants=Math.round(560000*Math.pow(ratio,1.24));this.counter.buildings=buildings.length+(this.nearBuildings?.length||0)+hidden;this.counter.kills=Math.max(this.counter.kills,Math.round(occupants));}
- this.stepActors(dt);this.stepFragments(dt);this.stepTrees(dt);for(const b of this.bursts)b.age+=dt;this.bursts=this.bursts.filter(b=>b.age<b.life);if(this.radius>=820000)this.mode='galaxy';else if(this.radius>=1950)this.mode='space';return this.timer>=this.blastDuration;}
+ this.stepActors(dt);this.stepFragments(dt);this.stepTrees(dt);for(const b of this.bursts)b.age+=dt;this.bursts=this.bursts.filter(b=>b.age<b.life);this.mode=this.radius>=1700?'earth':'field';return this.timer>=this.blastDuration;}
  attribBase(program){const g=this.gl;const loc=(name)=>g.getAttribLocation(program,name),set=(id,size,stride,off)=>{if(id<0)return;g.enableVertexAttribArray(id);g.vertexAttribPointer(id,size,g.FLOAT,false,stride,off);};g.bindBuffer(g.ARRAY_BUFFER,this.geo);set(loc('aPos'),3,24,0);set(loc('aNorm'),3,24,12);}
  instanceDraw(buf,n,part,vp){if(!n)return;const g=this.gl,p=this.p;g.useProgram(p);const u=(name)=>g.getUniformLocation(p,name);g.uniformMatrix4fv(u('uVP'),false,vp);g.uniform1f(u('uPart'),part);g.uniform1f(u('uRadius'),this.radius);g.uniform1f(u('uTime'),this.time);g.uniform2f(u('uImpact'),this.impact[0],this.impact[1]);this.attribBase(p);
  const attrs=['iLoc','iShape','iTint'];g.bindBuffer(g.ARRAY_BUFFER,buf);attrs.forEach((name,i)=>{const loc=g.getAttribLocation(p,name);if(loc<0)return;g.enableVertexAttribArray(loc);g.vertexAttribPointer(loc,4,g.FLOAT,false,48,i*16);if(g.vertexAttribDivisor)g.vertexAttribDivisor(loc,1);else this.ext.vertexAttribDivisorANGLE(loc,1);});
@@ -223,6 +220,14 @@ class WebWorld{
         blob(this.impact[0]+Math.cos(ang)*inner,smokeY,this.impact[1]+Math.sin(ang)*inner,sz*.83,sz*.72,sz*.83,.28,.27,.25,.50,0.);
       }
     }
+  }
+  // A large expanding hemispherical blast bowl rides on top of the ground shock.
+  if(this.radius>1.2&&this.radius<2400){
+    const shellR=Math.max(2.4,this.radius*.98),shellH=Math.max(.9,Math.min(90,Math.pow(shellR,.78)*.72));
+    const shellAlpha=clamp(.24-(this.radius/Math.max(1,this.blastMax))*.12, .08, .24);
+    g.blendFunc(g.SRC_ALPHA,g.ONE_MINUS_SRC_ALPHA);
+    blob(this.impact[0],shellH*.42,this.impact[1],shellR,shellH,shellR,1.,.56,.12,shellAlpha,.55);
+    blob(this.impact[0],shellH*.34,this.impact[1],shellR*.82,shellH*.78,shellR*.82,.24,.21,.19,shellAlpha*.55,0.);
   }
   // Bright center becomes a rising dust column, instead of immediately vanishing.
   if(this.timer<2.1&&this.bursts.length){const b=this.bursts[0],a=clamp(1-this.timer/2.1,0,1);g.blendFunc(g.SRC_ALPHA,g.ONE);const core=Math.max(.20,Math.min(this.radius*.48,1.7+this.timer*2.4));blob(b.x,.7,b.z,core,core*.85,core,1.,.72,.19,a*.8,1.);}
@@ -485,33 +490,36 @@ class WebWorld{
   this.throwing=null;this.camPhase='flight';this.flight={start:performance.now(),duration:1850,from,to:[x,.4,z],done:false};this.onLanding=onLanding;}
  resetDetailed(){this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.impactStarted=null;this.landingProgress=0;if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
  drawSphere(vp,center,radius,earth,damage,hue){const g=this.gl,p=this.pPlanet;g.useProgram(p);g.bindBuffer(g.ARRAY_BUFFER,this.sphere);for(const [name,s,off] of [['aPos',3,0],['aNorm',3,12]]){const id=g.getAttribLocation(p,name);g.enableVertexAttribArray(id);g.vertexAttribPointer(id,s,g.FLOAT,false,24,off);}
- const u=n=>g.getUniformLocation(p,n);g.uniformMatrix4fv(u('uVP'),false,vp);g.uniform3fv(u('uCenter'),center);g.uniform1f(u('uScale'),radius);g.uniform1f(u('uDamage'),damage);g.uniform1f(u('uEarth'),earth);g.uniform1f(u('uHue'),hue);g.uniform1f(u('uTime'),this.time);
+ const u=n=>g.getUniformLocation(p,n);g.uniformMatrix4fv(u('uVP'),false,vp);g.uniform3fv(u('uCenter'),center);g.uniform1f(u('uScale'),radius);g.uniform1f(u('uDamage'),damage);g.uniform1f(u('uEarth'),earth);g.uniform1f(u('uHue'),hue);g.uniform1f(u('uTime'),this.time);const blast=arguments[6]||[0,0,1],blastR=arguments[7]||0;const ub=u('uBlast');if(ub)g.uniform3fv(ub,blast);const ur=u('uBlastR');if(ur)g.uniform1f(ur,blastR);
  g.drawArrays(g.TRIANGLES,0,this.sphereVertices.length/6);}
- drawSpace(){const g=this.gl;g.clearColor(.012,.018,.052,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);const vp=mul(pers(49,c.width/c.height,.1,500),lookAt([18,13,38],[0,0,0]));const rad=this.radius,dm=clamp((rad-2000)/5000,0,1),vanish=clamp((rad-9500)/5000,0,1);if(vanish<.999)this.drawSphere(vp,[0,0,0],Math.max(.01,9*(1-vanish*.95)),1,dm,0);
- // Planet debris / small bodies move outward as the shock expands.
- if(rad>4700)for(let i=0;i<11;i++){let a=i*2.4+this.time*.26,rr=6+dm*13+(i%3)*1.6;this.drawSphere(vp,[Math.sin(a)*rr,Math.cos(i*3.1)*8,Math.cos(a)*rr],.4+((i*7)%9)*.20,0,.65,3);}
- const orbits=[{r:5400,pos:[-14,1,-5],sz:2.0,col:1},{r:16000,pos:[18,4,-8],sz:2.4,col:2},{r:57000,pos:[-24,-6,-17],sz:5,col:4},{r:135000,pos:[27,-8,-25],sz:4.4,col:5},{r:340000,pos:[0,4,-38],sz:10,col:6}];
- orbits.forEach((p,i)=>{const damage=clamp((rad-p.r)/(p.r*.65),0,1);const size=p.sz*(1-.95*clamp((rad-p.r*1.65)/p.r,0,1));if(size>.1)this.drawSphere(vp,p.pos,size,0,damage,p.col);});}
- drawGalaxy(){const g=this.gl;g.clearColor(.006,.009,.031,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.useProgram(this.starProgram);g.enable(g.BLEND);g.blendFunc(g.SRC_ALPHA,g.ONE);g.bindBuffer(g.ARRAY_BUFFER,this.stars);const loc=g.getAttribLocation(this.starProgram,'aStar');g.enableVertexAttribArray(loc);g.vertexAttribPointer(loc,3,g.FLOAT,false,12,0);g.uniform1f(g.getUniformLocation(this.starProgram,'uTwist'),this.time*.018);g.drawArrays(g.POINTS,0,this.starCount);g.disable(g.BLEND);}
+ drawEarth(){const g=this.gl;g.clearColor(.02,.03,.075,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);
+  const scale=10.8,blastDir=norm([0.72,.26,.64]);
+  const k=clamp((this.radius-1700)/Math.max(1,this.blastMax-1700),0,1);
+  let eye,target;
+  if(k<.34){const u=smooth(k/.34);eye=mix3([13,5.5,8.5],[18,8.5,13.5],u);target=mix3(blastDir.map(v=>v*scale),[1.9,.8,1.0],u);}
+  else if(k<.72){const u=smooth((k-.34)/.38);eye=mix3([18,8.5,13.5],[27,12.5,20.5],u);target=mix3([1.9,.8,1.0],[0,0,0],u);}
+  else {const u=smooth((k-.72)/.28);eye=mix3([27,12.5,20.5],[37,16.5,29.5],u);target=[0,0,0];}
+  const vp=mul(pers(43,c.width/c.height,.1,240),lookAt(eye,target));
+  const damage=clamp(.28+k*.85,0,1),blastR=lerp(.010,.62,k);
+  this.drawSphere(vp,[0,0,0],scale,1,damage,0,blastDir,blastR);
+  if(k>.1){for(let i=0;i<11;i++){const ang=i*Math.PI*2/11+this.time*.35;const rr=scale*(1.23+.10*Math.sin(i*2.3+this.time));const y=Math.sin(i*3.1+this.time*.6)*1.6;this.drawSphere(vp,[Math.cos(ang)*rr,y,Math.sin(ang)*rr],.22+(i%3)*.06,0,.40,3,blastDir,0);}}}
  drawFallback(){
  // CPU backup draws actual perspective-projected 3D boxes, shaded faces and rooftops.
  // No textures / 3D library needed; designed for WebGL-disabled phones.
  const ctx=this.fallback;if(!ctx)return;
  const w=c.width,h=c.height;
  const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,this.mode!=='field'?'#080c1d':'#a9d0eb');sky.addColorStop(.50,this.mode!=='field'?'#11122b':'#d5e5c8');sky.addColorStop(1,this.mode!=='field'?'#070b1b':'#abc49e');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
- if(this.mode==='galaxy'){const cx=w/2,cy=h/2;ctx.fillStyle='#f6dfaf';for(let i=0;i<850;i++){const a=i*2.4,r=Math.pow((i*.6180339887)%1,.68)*Math.min(w,h)*.45,arm=i%4*Math.PI/2,an=arm+r/35+Math.sin(i*6.13)*.1;ctx.globalAlpha=.15+((i%11)/11)*.80;const xx=cx+Math.cos(an)*r,yy=cy+Math.sin(an)*r*.6;ctx.beginPath();ctx.arc(xx,yy,0.5+(i%3)*.45,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;return;}
- if(this.mode==='space'){
-   // Deep-space scene: stars, Earth, cracking planet and other planets, all game-scale.
-   for(let i=0;i<190;i++){const x=((i*171.17+Math.sin(i)*77)%1+1)%1*w,y=((i*131.78+Math.cos(i*13)*19)%1+1)%1*h;ctx.globalAlpha=.20+(i%9)*.075;ctx.fillStyle=i%8===0?'#ffdca2':'#d2e7ff';ctx.fillRect(x,y,(i%5===0?2:1),i%5===0?2:1);}ctx.globalAlpha=1;
-   let rad=this.radius,damage=clamp((rad-2100)/5600,0,1),vanish=clamp((rad-11000)/4600,0,1);
-   const x=w*.5,y=h*.52,R=Math.min(w*.35,h*.34)*(1-vanish*.9);
-   if(vanish<.99){const grad=ctx.createRadialGradient(x-R*.3,y-R*.4,R*.01,x,y,R);grad.addColorStop(0,'#bdd8eb');grad.addColorStop(.22,damage>.5?'#e9ae5b':'#4388bf');grad.addColorStop(.70,damage>.5?'#906e50':'#15638c');grad.addColorStop(1,'#152943');ctx.fillStyle=grad;ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.fill();ctx.save();ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.clip();ctx.fillStyle='#417955';for(let i=0;i<11;i++){ctx.beginPath();let ax=x+Math.sin(i*4.33)*R*.83,ay=y+Math.cos(i*5.52)*R*.8;ctx.ellipse(ax,ay,R*.10+R*(i%4)*.035,R*.065+R*(i%3)*.045,i,0,Math.PI*2);ctx.fill();}ctx.restore();
-    ctx.strokeStyle='#ffc378';ctx.shadowColor='#ff923c';ctx.shadowBlur=17*damage;ctx.lineWidth=2.5*damage;
-    for(let i=0;i<11;i++){const ang=i*2.4+1.5;ctx.beginPath();ctx.moveTo(x+Math.sin(ang)*R*.07,y+Math.cos(ang)*R*.1);ctx.lineTo(x+Math.sin(ang+.4)*R*.50,y+Math.cos(ang+.4)*R*.53);ctx.lineTo(x+Math.sin(ang+.8)*R*.91,y+Math.cos(ang+.8)*R*.91);ctx.stroke();}ctx.shadowBlur=0;
-   }
-   if(rad>4800)for(let i=0;i<14;i++){const a=i*2.4+this.time*.4,r=R*.5+vanish*170+damage*(i%4)*25;ctx.fillStyle=i%3===0?'#c3a577':'#677d8d';ctx.beginPath();ctx.arc(x+Math.cos(a)*r,y+Math.sin(a)*r*.65,4+i%4*2,0,Math.PI*2);ctx.fill();}
-   const bodies=[['月球',5400,-.36,.36,7,'#adada6'],['火星',16000,.36,.27,10,'#bd744e'],['木星',57000,-.34,.74,20,'#c9a37c'],['土星',135000,.79,.48,15,'#e3ce8d'],['太陽',340000,.1,-.2,24,'#ffb957']];
-   for(const [name,threshold,px,py,r,color] of bodies){if(rad<threshold*.18)continue;const dead=rad>threshold;ctx.globalAlpha=dead?.55:1;ctx.fillStyle=color;ctx.beginPath();ctx.arc(w*(.5+px),h*(.5+py),r,0,Math.PI*2);ctx.fill();if(name==='土星'){ctx.save();ctx.translate(w*(.5+px),h*(.5+py));ctx.rotate(-.3);ctx.strokeStyle='#eed7a4';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(0,0,25,10,0,0,Math.PI*2);ctx.stroke();ctx.restore();}ctx.globalAlpha=1;}
+ if(this.mode==='earth'){
+   for(let i=0;i<190;i++){const sx=((i*171.17+Math.sin(i)*77)%1+1)%1*w,sy=((i*131.78+Math.cos(i*13)*19)%1+1)%1*h;ctx.globalAlpha=.20+(i%9)*.075;ctx.fillStyle=i%8===0?'#ffdca2':'#d2e7ff';ctx.fillRect(sx,sy,(i%5===0?2:1),i%5===0?2:1);}ctx.globalAlpha=1;
+   const k=clamp((this.radius-1700)/Math.max(1,this.blastMax-1700),0,1);
+   const R1=Math.min(w*.42,h*.46),R2=Math.min(w*.31,h*.34),R3=Math.min(w*.22,h*.24);
+   const R=k<.34?lerp(R1,R2,smooth(k/.34)):k<.72?lerp(R2,R3,smooth((k-.34)/.38)):lerp(R3,Math.min(w*.18,h*.19),smooth((k-.72)/.28));
+   const x=w*.5,y=h*.54;const grad=ctx.createRadialGradient(x-R*.30,y-R*.35,R*.02,x,y,R);grad.addColorStop(0,'#cde0ee');grad.addColorStop(.24,'#4d8bc0');grad.addColorStop(.74,'#16527d');grad.addColorStop(1,'#0f2438');ctx.fillStyle=grad;ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.fill();
+   ctx.save();ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.clip();ctx.fillStyle='#4b7d52';
+   const continents=k<.34?[[.18,-.08,.28,.17,.2],[.33,.01,.12,.10,-.4],[.08,.16,.10,.08,.5]]:k<.72?[[-.18,-.08,.22,.15,-.2],[.02,-.02,.30,.18,.1],[.25,.12,.18,.12,.5]]:[[-.22,-.12,.22,.14,-.5],[.02,-.02,.36,.20,.08],[.28,.13,.17,.12,.55],[-.02,.20,.12,.08,.3]];
+   for(const c of continents){ctx.beginPath();ctx.ellipse(x+R*c[0],y+R*c[1],R*c[2],R*c[3],c[4],0,Math.PI*2);ctx.fill();}
+   const scorchR=lerp(R*.05,R*.48,k),edgeR=scorchR*1.08;ctx.fillStyle='#151313';ctx.beginPath();ctx.arc(x+R*.18,y-R*.02,scorchR,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(255,138,61,.72)';ctx.lineWidth=Math.max(2,R*.025);ctx.beginPath();ctx.arc(x+R*.18,y-R*.02,edgeR,0,Math.PI*2);ctx.stroke();
+   ctx.fillStyle='#d6d6c8';ctx.beginPath();ctx.arc(x+R*.18,y-R*.02,Math.max(2,R*.015),0,Math.PI*2);ctx.fill();ctx.restore();
    return;
  }
  let dist=this.radius<0?31:clamp(this.radius*.88+24,24,7600);
@@ -562,7 +570,7 @@ class WebWorld{
   if(this.throwing&&performance.now()-this.throwing.start>=this.throwing.duration){const a=this.throwing;this.launchFlight(a.target[0],a.target[1],a.onLanding);}
   if(this.flight&&!this.flight.done&&(performance.now()-this.flight.start)>=this.flight.duration){this.flight.done=true;this.camPhase='landed';this.landingProgress=0;this.onLanding?.();}
   return this.drawFallback();}
-  try{this.mode==='galaxy'?this.drawGalaxy():this.mode==='space'?this.drawSpace():this.drawLand();}catch(e){if(!this.errored){console.error('3D draw',e);this.errored=true;}}}
+  try{this.mode==='earth'?this.drawEarth():this.drawLand();}catch(e){if(!this.errored){console.error('3D draw',e);this.errored=true;}}}
 }
 window.GrenadeWorld=new WebWorld();window.GrenadeLandmarks=landmarks;window.GrenadeUserScene=USER_SCENE;
 })();
