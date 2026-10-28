@@ -167,7 +167,7 @@ body.show-stats #counters{display:grid;}
 #powerToggle{display:flex;align-items:center;gap:6px}
 #throwCount{margin-left:4px;font-size:10px;color:#e6daa6;white-space:nowrap;border-left:1px solid #d0c98a6a;padding-left:7px}
 #result{padding:calc(7px + env(safe-area-inset-top)) 9px calc(7px + env(safe-area-inset-bottom))}
-#result .resultCard{width:min(530px,100%);height:auto;max-height:calc(100dvh - 14px - env(safe-area-inset-top) - env(safe-area-inset-bottom));padding:10px 12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:0;border-radius:15px}
+#result .resultCard{width:min(530px,100%);height:100%;max-height:calc(100dvh - 14px - env(safe-area-inset-top) - env(safe-area-inset-bottom));padding:10px 12px 10px;overflow:hidden;display:flex;flex-direction:column;gap:0;border-radius:15px}
 #result .report-topline{font-size:9px;line-height:1.1;flex:none}
 #result .report-id{font-size:9px}
 #result .report-title{padding:0 0 4px;margin:4px 0 6px;flex:none}
@@ -206,7 +206,7 @@ body.show-stats #counters{display:grid;}
 #result .report-officer{padding:7px 9px;font-size:11px;line-height:1.4}
 #result .report-officer strong{font-size:10px;margin:0 0 1px}
 #result #newLandmarks{font-size:9px;line-height:1.2;margin:2px 0 5px;flex:none}
-#result #resultBtns{margin-top:8px;gap:6px;flex:none}
+#result #resultBtns{margin-top:auto;gap:6px;flex:none}
 #result #resultBtns button{min-height:39px;padding:6px 7px;font-size:12px}
 #result .report-footnote{display:none}
 @media(max-height:710px){
@@ -222,9 +222,39 @@ body.show-stats #counters{display:grid;}
 }
 @media(max-height:560px){#result .resultCard{overflow-y:auto;display:block}#result .report-title-row strong{font-size:9px}#result #resultBtns{margin-top:4px}}
 
+
+/* v1.34 — larger achievement medals, tap for report details; no redundant labels. */
+#result .report-title{margin-bottom:8px;padding-bottom:7px}
+#result .report-achievements{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#result .report-section-heading{font-size:12px;margin-bottom:6px;padding-bottom:4px}
+#result #rAchievementsMeta{font-size:9px}
+#result .report-achievement{min-width:0;min-height:91px;width:100%;padding:9px 5px 7px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;border-radius:11px;border:1px solid #dfc98165;background:linear-gradient(160deg,#294537,#1d382b);box-shadow:inset 0 1px #f2dda524;position:relative;white-space:normal;touch-action:manipulation}
+#result .report-achievement .emblem{height:37px;width:37px;display:grid;place-items:center;font-size:25px;flex:none;background:#45573b;border:1px solid #e2d39850;border-radius:9px}
+#result .report-achievement .ach-copy{width:100%;flex:none;min-width:0}
+#result .report-achievement strong{font-size:clamp(12px,3.5vw,14px);font-weight:900;line-height:1.18;overflow-wrap:anywhere;display:block;color:#f3e6bb}
+#result .report-achievement .ach-new{position:absolute;right:3px;top:3px;font-size:8px;padding:2px 4px}
+#result .report-achievement:active{transform:scale(.975);background:#3b5741}
+#result .report-achievement:focus-visible,.gal:focus-visible{outline:3px solid #f0d68d;outline-offset:2px}
+#result .report-no-achievement{min-height:62px;display:grid;place-items:center}
+#gallery .gal{width:100%;display:block;text-align:left;min-height:98px;white-space:normal;font-weight:normal}
+#gallery .gal:active{transform:scale(.99)}
+#achievementDetail{position:fixed;z-index:30;inset:0;display:none;align-items:center;justify-content:center;padding:calc(16px + env(safe-area-inset-top)) 18px calc(16px + env(safe-area-inset-bottom));background:rgba(3,13,9,.82);backdrop-filter:blur(9px)}
+#achievementDetail.show{display:flex}
+.achievement-detail-card{width:min(400px,100%);max-height:100%;overflow:auto;border:1px solid #e7d3989c;border-radius:22px;background:linear-gradient(155deg,#2b4635,#122a1e 76%);box-shadow:0 24px 80px #000b;padding:25px 22px 20px;text-align:center;position:relative}
+.achievement-detail-close{position:absolute;right:11px;top:10px;width:38px;height:38px;min-height:0;padding:0;border-radius:50%;font-size:28px;font-weight:500;background:#ffffff12;color:#f6e4b7}
+.achievement-detail-icon{display:grid;place-items:center;width:76px;height:76px;margin:0 auto 12px;border-radius:20px;border:1px solid #eadba76d;background:#415b42;font-size:42px;box-shadow:inset 0 1px #ffffff33}
+.achievement-detail-rarity{font-size:11px;color:#dfca88;letter-spacing:2px;font-weight:900}
+#achDetailName{font-size:clamp(22px,6vw,27px);line-height:1.25;color:#f7e4a7;margin:7px 0 20px}
+.achievement-detail-label{text-align:left;color:#d6bf7b;font-weight:900;font-size:12px;margin:13px 0 7px;letter-spacing:1px}
+.achievement-detail-requirement{font-size:14px;color:#f0eddb;text-align:left;line-height:1.7;margin:0;padding:12px 13px;border-radius:11px;background:#10271e;border:1px solid #ffffff1a}
+.achievement-detail-quote{margin:0;background:#1a3629;border-left:3px solid #e2ca7d;text-align:left;border-radius:0 10px 10px 0;padding:12px 13px;color:#f9e4a9;font-size:16px;font-weight:850;line-height:1.7}
+.achievement-detail-confirm{width:100%;min-height:47px;margin-top:20px;background:linear-gradient(145deg,#f6df9a,#e3b768);color:#1f3024;border:0;border-radius:12px;font-size:15px}
+@media(max-height:710px){#result .report-achievement{min-height:78px;padding:5px 3px;gap:3px}#result .report-achievement .emblem{height:30px;width:30px;font-size:21px}#result .report-achievement strong{font-size:11px}#result .report-section-heading{font-size:11px}}
+@media(max-height:565px){#result .resultCard{overflow:auto}#achievementDetail .achievement-detail-card{padding:17px}}
+
 </style></head><body>
 <canvas id="world3d"></canvas>
-<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.32 三投累計鑑測</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻ 重投</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
+<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.34 成就詳情</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻ 重投</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
 <div id="powerDock" class="hide">
   <button id="powerToggle" aria-expanded="false" aria-controls="powerDrawer" aria-label="展開或收合手榴彈威力設定">💥 威力 <strong id="powerMiniValue">10</strong><small id="throwCount">第 1 / 3 投</small> <span id="powerChevron">▾</span></button>
   <div id="powerDrawer" hidden><div class="powerHead"><span>威力（0～100）</span><span id="powerOut">10</span></div>
@@ -258,19 +288,31 @@ body.show-stats #counters{display:grid;}
 <section id="result" role="dialog" aria-modal="true" aria-labelledby="resultHeading" aria-hidden="true">
  <div class="resultCard">
   <div class="report-topline"><span>國軍手榴彈投擲鑑測 · 結算報告</span><span class="report-id">訓練科目 04 / 100 分</span></div>
-  <div class="report-title"><div><h2 id="resultHeading">戰果暨軍紀調查報告</h2><p id="reportRound">國軍新兵訓練 · 3 投合計</p></div><div class="report-stamp" id="reportStamp">鑑測<br>完成</div></div>
+  <div class="report-title"><div><h2 id="resultHeading">戰果暨軍紀調查報告</h2></div><div class="report-stamp" id="reportStamp">鑑測<br>完成</div></div>
   <div class="report-score"><div class="report-score-main"><span class="report-mini-label">手榴彈訓練總分</span><div class="report-numeric"><span id="rScore">1</span><small> / 100</small></div></div><div class="report-grade"><strong id="rGradeText">F 級｜你個爛砲兵</strong><span id="rScoreNote">評分依實際戰果計算</span><div class="report-best" id="rBest">個人最高：—</div></div></div>
   <div class="report-dual"><div class="report-rank"><div><small>戰果評價</small><span id="rBattleText">敵軍擊殺</span></div><b class="value" id="rBattleRank">F</b></div><div class="report-rank"><div><small>軍紀評價</small><span id="rDisciplineText">友軍及營產</span></div><b class="value" id="rDisciplineRank">S</b></div></div>
   <div class="cards"><div class="cell"><small>紅軍擊殺</small><b id="rRed">0 / 9</b></div><div class="cell"><small>友軍誤殺</small><b id="rGreen" class="danger">0</b></div><div class="cell"><small>建築摧毀</small><b id="rBuildings">0 / 12</b></div></div>
-  <div class="report-section"><div class="report-section-heading">軍方核定稱號</div><div class="report-titles"><div class="report-title-row"><span>⚔️ 作戰</span><strong id="rEnemyTitle">—</strong></div><div class="report-title-row"><span>⚖️ 軍紀</span><strong id="rFriendlyTitle">—</strong></div><div class="report-title-row"><span>🏗️ 營產</span><strong id="rBuildingTitle">—</strong></div></div></div>
   <div class="report-section"><div class="report-section-heading">本次達成成就 <small id="rAchievementsMeta">最多展示 3 項</small></div><div class="report-achievements" id="rAchievements"></div></div>
   <div class="report-section"><div class="report-section-heading">長官綜合評語</div><div class="report-officer"><strong id="rOfficerTitle">訓練主任批示</strong><span id="rOfficerComment">請確認戰績。</span></div></div>
-  <div id="newLandmarks">本局紅軍 9 名。</div>
   <div id="resultBtns"><button class="accent" id="retry">重新挑戰（三投）</button><button class="ghost" id="openGallery">🏅 軍旅榮譽簿</button></div>
   <p class="muted report-footnote">基礎20＋紅軍最多70；友軍最多扣20、建築最多扣12；提前殲敵加分。成就與稱號以三投累計計算。</p>
  </div>
 </section>
 <section id="gallery" role="dialog" aria-modal="true" aria-labelledby="galleryHeading" aria-hidden="true"><div class="galleryBody"><div class="report-topline"><span>國軍訓練紀錄 · 軍旅榮譽簿</span><span id="galleryCount">0 / 0</span></div><h2 id="galleryHeading">已取得勳章與隱藏成就</h2><p class="muted" style="margin:6px 0">成就會儲存在這個瀏覽器。未解鎖的隱藏成就不顯示名稱。</p><div id="galleryGrid" class="galGrid"></div><button class="accent" id="closeGallery" style="width:100%">返回結算報告</button></div></section>
+
+<section id="achievementDetail" role="dialog" aria-modal="true" aria-labelledby="achDetailName" aria-hidden="true">
+ <div class="achievement-detail-card" role="document">
+  <button type="button" id="closeAchievementDetail" class="achievement-detail-close" aria-label="關閉成就詳情">×</button>
+  <div id="achDetailIcon" class="achievement-detail-icon">🏅</div>
+  <div id="achDetailRarity" class="achievement-detail-rarity">成就等級</div>
+  <h2 id="achDetailName">成就名稱</h2>
+  <div class="achievement-detail-label">解鎖條件</div>
+  <p id="achDetailRequirement" class="achievement-detail-requirement"></p>
+  <div class="achievement-detail-label">長官特別批示</div>
+  <blockquote id="achDetailQuote" class="achievement-detail-quote"></blockquote>
+  <button type="button" class="achievement-detail-confirm" id="achievementDetailOkay">收到，長官！</button>
+ </div>
+</section>
 
 <script type="module">
 import './grenade-user-play-3d.js?v=132';
@@ -380,20 +422,17 @@ function result(){
  const progress=saveProgress(report);
  currentReport=report;
  setState('end');world.camPhase='blast';
- setText('reportRound',report.throwsUsed+' / 3 投結算'+(report.earlyBonus?' · 提前殲敵獎勵 +'+report.earlyBonus+' 分':' · 三投鑑測結束'));
  setText('rScore',report.score);setText('rGradeText',report.grade+' 級｜'+report.gradeLabel);
  setText('rScoreNote',report.scoreNote);setText('rBest','個人最高：'+progress.bestScore+' 分'+(report.score>oldProgress.bestScore?' · 本次刷新紀錄！':''));
  setText('rBattleRank',report.battleGrade);setText('rBattleText',report.red+' / '+report.redTotal+' 名紅軍');
  setText('rDisciplineRank',report.disciplineGrade);$('rDisciplineRank').classList.toggle('bad',report.disciplineScore<60);
  setText('rDisciplineText','誤殺 '+report.green+' ／毀建 '+report.buildings);
  setText('rRed',report.red+' / '+report.redTotal);setText('rGreen',report.green);setText('rBuildings',report.buildings+' / '+report.buildingTotal);
- setText('rEnemyTitle',report.enemyTitle);setText('rFriendlyTitle',report.friendlyTitle);setText('rBuildingTitle',report.buildingTitle);
  setText('rOfficerTitle','訓練主任批示 · '+report.mainTitle);setText('rOfficerComment','「'+report.officerComment+'」');
- setText('newLandmarks','紅軍第 '+world.redSquadId+' 組／9 人；共投 '+throwsUsed+' 次；累計解鎖 '+progress.unlockedIds.length+' / '+ACHIEVEMENTS.length+' 項成就。最佳成績將保留供主遊戲日後整合。');
- setText('rAchievementsMeta','本次達成 '+report.achievements.length+' 項 · 展示最多 3 項');
+ setText('rAchievementsMeta','本局 '+report.achievements.length+' 項 · 點卡片查看詳情');
  const list=$('rAchievements');list.replaceChildren();
  for(const ach of report.achievements.slice(0,3)){
-  const row=document.createElement('div');row.className='report-achievement';
+  const row=document.createElement('button');row.type='button';row.className='report-achievement';row.setAttribute('aria-label','查看成就：'+ach.name);row.addEventListener('click',()=>openAchievementDetail(ach,true));
   const ico=document.createElement('span');ico.className='emblem';ico.textContent=ach.icon;
   const copy=document.createElement('div');copy.className='ach-copy';
   const title=document.createElement('strong');title.textContent=ach.name;
@@ -406,11 +445,72 @@ function result(){
  $('result').classList.add('show');$('result').setAttribute('aria-hidden','false');
  $('result').querySelector('.resultCard').scrollTop=0;
 }
+
+// Single-page report achievement details (also available in the honor book).
+const ACHIEVEMENT_QUOTES={
+ "elite": "國防部終於找到一個不用寫悔過書的兵，決定先列入保育名單。",
+ "catastrophe": "敵軍沒了，友軍沒了，營區也沒了。你到底是在鑑測還是在重開伺服器？",
+ "undercover": "紅軍指揮官送來一面錦旗，還問你有沒有興趣轉服。",
+ "renovation": "工程連表示感謝，主計室表示要先離職。",
+ "peace": "這場爆炸最大的受害者，是長官手上那支紅筆。",
+ "war_win_f": "戰報寫「大捷」，軍紀簿寫「你先別走」。",
+ "enemy_full": "九個紅軍一個不留，班長終於不用再幫你畫靶。",
+ "clean_sweep": "整個軍營第一次有人把投彈當投彈，而不是都更公聽會。",
+ "friendly_150": "你的通緝照已經比新兵照更常出現在營區公布欄。",
+ "friendly_50": "紅軍看了你的戰報，表示願意分你一半獎金。",
+ "friend_30": "你不是來接受訓練的，你是來幫軍法官衝業績的。",
+ "enemy_six": "紅軍聽見你的名字，已經開始討論請病假。",
+ "enemy_three": "終於有人相信你知道紅色制服代表什麼了。",
+ "enemy_one": "第一個敵軍倒下時，班長感動得差點拍手。",
+ "demolition_ten": "營區平面圖現在唯一準確的地方，是「您在此處」。",
+ "demolition_six": "你只投了三顆，拆遷進度卻超過工程標案。",
+ "demolition_three": "你跟營產股唯一的共同點，就是都在數房子。",
+ "first_building": "主計室已經開始查你的薪水能扣到民國幾年。",
+ "friend_15": "點名簿變薄了，檢討報告卻變厚了。",
+ "friend_4": "敵我識別這門課，你可能需要重修到退伍。",
+ "friendly_one": "恭喜你精準命中，問題是那個人站在你這邊。",
+ "nothing_else": "長官第一次發現，原來手榴彈可以不用附修繕估價單。",
+ "no_buildings": "營舍安然無恙，連長晚上終於可以睡在自己床上。",
+ "no_friends": "友軍全員平安，政戰主任已經在寫感謝狀了。",
+ "red_zero_bldg": "敵軍一根頭髮都沒少，營舍倒是先辦了告別式。",
+ "one_red_no_friend": "一顆只收一個人頭，精準得像在點外送。",
+ "one_miss": "那最後一個紅軍現在應該正在群組裡瘋狂炫耀。",
+ "nine_and_nine": "戰術上叫交換比，軍紀上叫你不要再交換了。",
+ "worst": "你的考績已經不是甲乙丙，是「先到辦公室來」。",
+ "no_red_many": "紅軍不但沒損失，還開始替你加油。",
+ "grade_s": "你的成績單被貼上公布欄，班長連膠帶都捨不得撕。",
+ "quick_one": "人家三顆才考完，你第一顆就讓連長提早下班。",
+ "quick_two": "省下一顆手榴彈，主計室終於有件事能感謝你。",
+ "grade_a": "差一點就滿分，長官決定先稱讚你再挑毛病。"
+};
+let achievementFocusReturn=null;
+function openAchievementDetail(achievement,unlocked=true){
+ achievementFocusReturn=document.activeElement;
+ const hidden=!unlocked&&achievement.secret;
+ setText('achDetailIcon',unlocked?achievement.icon:'🔒');
+ setText('achDetailName',hidden?'？？？ 未解鎖成就':achievement.name);
+ setText('achDetailRarity',unlocked?(achievement.rarity+' · 已解鎖'):(achievement.rarity+' · 尚未解鎖'));
+ setText('achDetailRequirement',hidden?'這項隱藏成就尚未解鎖，達成特殊條件後才會公開。':achievement.description);
+ setText('achDetailQuote',hidden?'「機密等級：連長也不知道要怎麼拿。」':(unlocked?'「'+(ACHIEVEMENT_QUOTES[achievement.id]||'長官已經無話可說。')+'」':'「達成條件之後，長官才會發表意見。」'));
+ const panel=$('achievementDetail');panel.classList.add('show');panel.setAttribute('aria-hidden','false');
+ $('closeAchievementDetail').focus({preventScroll:true});
+}
+function closeAchievementDetail(){
+ const panel=$('achievementDetail');if(!panel.classList.contains('show'))return;
+ panel.classList.remove('show');panel.setAttribute('aria-hidden','true');
+ if(achievementFocusReturn?.isConnected)achievementFocusReturn.focus({preventScroll:true});
+ achievementFocusReturn=null;
+}
+$('closeAchievementDetail').addEventListener('click',closeAchievementDetail);
+$('achievementDetailOkay').addEventListener('click',closeAchievementDetail);
+$('achievementDetail').addEventListener('click',e=>{if(e.target===$('achievementDetail'))closeAchievementDetail()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('achievementDetail').classList.contains('show')){e.stopImmediatePropagation();closeAchievementDetail();}});
+
 function openGallery(){
  const saved=readProgress(),unlocked=new Set(saved.unlockedIds),grid=$('galleryGrid');grid.replaceChildren();
  setText('galleryCount',unlocked.size+' / '+ACHIEVEMENTS.length);
  for(const achievement of ACHIEVEMENTS){
-  const known=unlocked.has(achievement.id),cell=document.createElement('div');cell.className='gal'+(known?'':' locked');
+  const known=unlocked.has(achievement.id),cell=document.createElement('button');cell.type='button';cell.className='gal'+(known?'':' locked');cell.setAttribute('aria-label','查看成就：'+(known?achievement.name:'未解鎖成就'));cell.addEventListener('click',()=>openAchievementDetail(achievement,known));
   const icon=document.createElement('div');icon.className='gal-icon';icon.textContent=known?achievement.icon:'🔒';
   const type=document.createElement('small');type.textContent=achievement.secret?'隱藏成就':achievement.rarity;
   const name=document.createElement('strong');name.textContent=known?achievement.name:(achievement.secret?'??? 未知成就':achievement.name);
