@@ -2,7 +2,7 @@ import {loadGlb} from "./src/core/glb111.js";
 import {RigAnimator} from "./src/characters/rigAnimator.js";
 import './src/map/activeCampLayout116.js?v=126';
 import {makeEnvironment as makeOriginalCampGround} from './src/map/ground103.js?v=103';
-const USER_SCENE = await fetch('./grenade-user-scene.json?v=24').then(async r=>{if(!r.ok)throw Error('找不到手榴彈場景 JSON');return r.json()});
+const USER_SCENE = await fetch('./grenade-user-scene.json?v=28').then(async r=>{if(!r.ok)throw Error('找不到手榴彈場景 JSON');return r.json()});
 /* Army grenade arena v1.0. Custom dependency-free WebGL instanced 3D.
  * Fictional game-only explosion scales and estimates: not physical modelling.
  */
