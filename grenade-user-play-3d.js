@@ -223,7 +223,7 @@ class WebWorld{
   return {x:middle.x,y:middle.y,top:Math.min(head.y,foot.y),bottom:Math.max(head.y,foot.y),width:Math.max(55,Math.abs(head.y-foot.y)*.48)};
  }
 
- buildEvents(){this.events=[];const [ix,iz]=this.impact;buildings.forEach((v,i)=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'b',v}));soldiers.forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'s',v}));(this.nearBuildings||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'detail',v}));(this.actors||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'actor',v}));(this.campProps||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'prop',v}));landmarks.forEach(v=>this.events.push({r:v.radius||Math.hypot(v.x-ix,v.z-iz),type:'land',v}));this.events.sort((a,b)=>a.r-b.r);this.eventIndex=0;this.counter={buildings:0,kills:0,red:0,green:0};this.newLandmarks=[];this.LM=new Set();if(this.nearBuildings)this.nearBuildings.forEach(b=>{b.hit=false;b.fragments=[]});if(this.actors)this.actors.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;a.anim?.setClip('Idle_11',{restart:true})});if(this.campProps)this.campProps.forEach(p=>{p.hit=false;p.fallT=0;p.tilt=0;p.fragments=[]});this.bursts=[];this.lowKnockGroups?.clear();if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}}
+ buildEvents(){this.events=[];const [ix,iz]=this.impact;buildings.forEach((v,i)=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'b',v}));soldiers.forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'s',v}));(this.nearBuildings||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'detail',v}));(this.actors||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'actor',v}));(this.campProps||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'prop',v}));landmarks.forEach(v=>this.events.push({r:v.radius||Math.hypot(v.x-ix,v.z-iz),type:'land',v}));this.events.sort((a,b)=>a.r-b.r);this.eventIndex=0;this.counter={buildings:0,kills:0,red:0,green:0};this.newLandmarks=[];this.LM=new Set();if(this.nearBuildings)this.nearBuildings.forEach(b=>{b.hit=false;b.fragments=[]});if(this.actors)this.actors.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;a.anim?.setClip('Idle_11',{restart:true})});if(this.campProps)this.campProps.forEach(p=>{p.hit=false;p.fallT=0;p.tilt=0;p.fragments=[]});this.bursts=[];this.friendlyKnockGroups?.clear();if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}}
  setLanding(x,z){this.impact=[x,z];this.radius=-1;this.mode='field';this.buildEvents();}
  begin(powder,density,quality,broken){const strength=Math.max(0,powder)/600*Math.max(.2,density/.6)*Math.max(.05,quality)*(broken?.4:1);return this.beginTestPower(clamp(Math.sqrt(strength)*20,0,100));}
  beginTestPower(power){const points=[[0,0],[10,6],[20,13],[35,23],[50,36],[65,50],[80,71],[90,91],[100,120]];let max=120;for(let i=1;i<points.length;i++)if(power<=points[i][0]){const a=points[i-1],b=points[i],t=clamp((power-a[0])/(b[0]-a[0]),0,1);max=lerp(a[1],b[1],t);break;}this.impactStarted=performance.now();this.blastMax=max;this.blastDuration=max>55?6.2:4.0+max*.024;this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();this.lastHitR=0;this.bursts=max>0?[{x:this.impact[0],z:this.impact[1],age:0,life:4.3,size:Math.min(12,2.2+Math.log10(max+1)*2.2),type:'origin',seed:.27}]:[];return max;}
@@ -346,7 +346,7 @@ class WebWorld{
   if(this.bld.length){this.instanceDraw(this.bldBuf,this.bld.length/12,0,vp);this.instanceDraw(this.bldBuf,this.bld.length/12,1,vp);}
   if(this.modelState!=='ready'&&this.detailProxyBuf){this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,0,vp);this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,1,vp);}
   this.frameDetailedActors=this.selectDetailedActors(dist);
-  this.drawLowSoldiers(vp);this.drawCampProps(vp,dist);this.drawDetailed(vp,dist);this.drawFlight(vp);this.drawGroundedGrenade(vp);this.debris(vp);this.drawRing(vp);this.drawExplosion(vp,dist);
+  this.drawHighFriendlySoldiers(vp);this.drawCampProps(vp,dist);this.drawDetailed(vp,dist);this.drawFlight(vp);this.drawGroundedGrenade(vp);this.debris(vp);this.drawRing(vp);this.drawExplosion(vp,dist);
   if(this.throwing?.phase==='pitch'&&performance.now()-this.throwing.pitchStart>=this.throwing.duration){const a=this.throwing;this.launchFlight(a.target[0],a.target[1],a.onLanding);}
  }
  async initDetailedAssets(){
@@ -363,7 +363,7 @@ class WebWorld{
   // Far-view low-detail proxies retain the user's exact building placement.
   this.detailProxy=inst(this.nearBuildings.map(b=>({x:b.x,z:b.z,h:b.size[1],w:b.size[0],d:b.size[2],kind:0,seed:(b.idx%9)/9})),0);
   this.detailProxyBuf=this.gl.createBuffer();this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.detailProxyBuf);this.gl.bufferData(this.gl.ARRAY_BUFFER,this.detailProxy,this.gl.STATIC_DRAW);
-  this.actors=SCENE_SOLDIERS.filter(o=>o.uid!==PLAYER_ITEM.uid).map((o,i)=>({uid:o.uid,x:o.x,z:o.z,px:o.x,pz:o.z,rot:o.rot||0,scale:o.scale||1,quality:o.team==='enemy'?'high':'low',enemy:o.team==='enemy',hit:false,flyT:0,renderLift:0,angle:(o.rot||0)*Math.PI/180,seed:(i*.731)%1}));
+  this.actors=SCENE_SOLDIERS.filter(o=>o.uid!==PLAYER_ITEM.uid).map((o,i)=>({uid:o.uid,x:o.x,z:o.z,px:o.x,pz:o.z,rot:o.rot||0,scale:o.scale||1,quality:'high',enemy:o.team==='enemy',hit:false,flyT:0,renderLift:0,angle:(o.rot||0)*Math.PI/180,seed:(i*.731)%1}));
   this.thrower={uid:PLAYER_ITEM.uid,x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,rot:PLAYER_ITEM.rot,quality:'high',enemy:false,hit:false,flyT:0,renderLift:0,angle:Math.atan2(this.throwForward[0],this.throwForward[1]),seed:.2,scale:PLAYER_ITEM.scale||1};
   try{
     // All six original camp building types, keyed by the actual GLB path rather than
@@ -380,14 +380,14 @@ class WebWorld{
       this.detailed[sample.type]=asset;
     }catch(err){this.modelErrors.push('建築破壞模型 '+sample.type+': '+err.message);console.error(err);}}));
     this.soldierAssets={};
-    for(const quality of ['low','high']){
-      const model=quality==='low'?'./assets/grenade-low/grenade-soldier-low.glb':'./assets/characters/cadet/cadet-green.glb';
+    for(const quality of ['high']){
+      const model='./assets/characters/cadet/cadet-green.glb';
       const cadet=await loadGlb(model),geo=this.skinGeometry(cadet),tex=await this.glbTexture(cadet,cadet.json.meshes[0].primitives[0]);
       const template=new RigAnimator(cadet);
       const makeAnim=()=>{const anim=Object.create(RigAnimator.prototype);Object.assign(anim,{gltf:cadet,j:template.j,nodes:template.nodes,inverse:template.inverse,joints:template.joints,parents:template.parents,meshIndex:template.meshIndex,clips:template.clips,clip:'Idle',clock:0,speed:1,bones:new Float32Array(template.bones.length),globals:new Map(),prevClip:null,transition:0,prevTime:0,completed:false,rifleAim:0,recoil:0,handNode:template.handNode,rightHandWorld:null,leftHandNode:template.leftHandNode,leftHandWorld:null});anim.setClip(anim.hasClip('Idle_11')?'Idle_11':'Walking',{restart:true});anim.evaluate(.001);return anim;};
       this.soldierAssets[quality]={geo,tex,makeAnim};
     }
-    // Do not build ~280 full skeletons on load. Give a rig only to an actor when detailed rendering is needed.
+    // One high-detail soldier GLB is shared by all friendly instances; no 255 independent skeletons are needed.
     this.thrower.anim=this.soldierAssets.high.makeAnim();
     // All environmental fracture meshes must finish loading before allowing 
     // the player to start a blast; otherwise objects could disappear unbroken.
@@ -483,12 +483,12 @@ class WebWorld{
  hitActor(a){if(a.hit)return;a.hit=true;a.flyT=0;const dx=a.x-this.impact[0],dz=a.z-this.impact[1],d=Math.hypot(dx,dz)||1;
    a.vx=dx/d*(7.5+a.seed*6.2);a.vz=dz/d*(7.5+a.seed*6.2);a.vy=4.5+a.seed*3.5;
    if(a.anim){a.anim.setClip('Knock_Down',{restart:true});a.anim.speed=1.15;}
-   if(!a.enemy&&this.soldierAssets?.low){
+   if(!a.enemy&&this.soldierAssets?.high){
     // Keep low-quality rendering instanced, but stagger Knock_Down into time buckets.
     // A late-hit NPC must start a fresh animation, not jump to an old group's final pose.
-    if(!this.lowKnockGroups)this.lowKnockGroups=new Map();
+    if(!this.friendlyKnockGroups)this.friendlyKnockGroups=new Map();
     const bucket=Math.floor(Math.max(0,this.timer||0)/.30);a.knockBucket=bucket;
-    if(!this.lowKnockGroups.has(bucket)){const rig=this.soldierAssets.low.makeAnim();rig.setClip('Knock_Down',{restart:true});rig.speed=1.15;this.lowKnockGroups.set(bucket,rig);}
+    if(!this.friendlyKnockGroups.has(bucket)){const rig=this.soldierAssets.high.makeAnim();rig.setClip('Knock_Down',{restart:true});rig.speed=1.15;this.friendlyKnockGroups.set(bucket,rig);}
    }
  }
  stepActors(dt){if(!this.actors)return;for(const a of this.actors){if(!a.hit)continue;a.flyT+=dt;const k=Math.min(1,a.flyT/1.5);
@@ -500,17 +500,17 @@ class WebWorld{
    if(f.y<.17){f.y=.17;f.vy=Math.max(0,-f.vy*.22);f.vx*=.91;f.vz*=.91;f.ax*=.94;f.az*=.94;}
  }}
  soldierDetailRange(dist){return dist>110?0:Math.max(28,Math.min(56,dist*.75+19));}
- // One animated high-quality rig per red soldier; friendlies are drawn using the
- // original low-quality GLB mesh with a single shared idle skeleton (GPU instancing).
- // Unlike v1.22, there are no green cube stand-ins and no 40-character cap.
+ // Red soldiers receive individual high-quality rigs. All friendly soldiers use
+ // the SAME high-quality GLB mesh and texture via GPU instancing, with shared
+ // Idle/Knock_Down poses. No low-quality GLB, box stand-ins or 40-person cap.
  selectDetailedActors(){
   if(this.modelState!=='ready'||!this.actors)return [];
   return this.actors.filter(a=>a.enemy);
  }
- setupLowSoldierBatch(){
-  if(this.lowBatch||!this.soldierAssets?.low)return;
-  const g=this.gl,sa=this.soldierAssets.low;
-  this.lowProg=compile(g,`#version 300 es
+ setupHighFriendlyBatch(){
+  if(this.friendlyBatch||!this.soldierAssets?.high)return;
+  const g=this.gl,sa=this.soldierAssets.high;
+  this.friendlyBatchProg=compile(g,`#version 300 es
    precision highp float;
    layout(location=0)in vec3 p;layout(location=1)in vec3 n;layout(location=2)in vec2 uv;
    layout(location=3)in vec4 j;layout(location=4)in vec4 w;
@@ -545,33 +545,33 @@ class WebWorld{
    g.vertexAttribDivisor(location,1);
   }
   g.bindVertexArray(null);
-  this.lowBatch={vao,buffer};
-  this.lowIdle=sa.makeAnim();this.lowKnockGroups=new Map();
+  this.friendlyBatch={vao,buffer};
+  this.friendlyIdle=sa.makeAnim();this.friendlyKnockGroups=new Map();
  }
- drawLowSoldiers(vp){
-  if(this.modelState!=='ready'||!this.soldierAssets?.low)return;
-  this.setupLowSoldierBatch();
-  const g=this.gl,sa=this.soldierAssets.low;
+ drawHighFriendlySoldiers(vp){
+  if(this.modelState!=='ready'||!this.soldierAssets?.high)return;
+  this.setupHighFriendlyBatch();
+  const g=this.gl,sa=this.soldierAssets.high;
   const actors=this.actors.filter(a=>!a.enemy);
   if(!actors.length)return;
-  const now=performance.now(),dt=Math.min(.034,Math.max(.001,(now-(this.lastLowTime||now))/1000));this.lastLowTime=now;
-  this.lowIdle.evaluate(dt);
-  if(this.lowKnockGroups)for(const rig of this.lowKnockGroups.values())rig.evaluate(dt);
-  const groups=[[actors.filter(a=>!a.hit),this.lowIdle]];
-  if(this.lowKnockGroups)for(const [bucket,rig] of this.lowKnockGroups){
+  const now=performance.now(),dt=Math.min(.034,Math.max(.001,(now-(this.lastFriendlyTime||now))/1000));this.lastFriendlyTime=now;
+  this.friendlyIdle.evaluate(dt);
+  if(this.friendlyKnockGroups)for(const rig of this.friendlyKnockGroups.values())rig.evaluate(dt);
+  const groups=[[actors.filter(a=>!a.hit),this.friendlyIdle]];
+  if(this.friendlyKnockGroups)for(const [bucket,rig] of this.friendlyKnockGroups){
    const affected=actors.filter(a=>a.hit&&a.knockBucket===bucket);
    if(affected.length)groups.push([affected,rig]);
   }
-  g.useProgram(this.lowProg);const u=n=>g.getUniformLocation(this.lowProg,n);
+  g.useProgram(this.friendlyBatchProg);const u=n=>g.getUniformLocation(this.friendlyBatchProg,n);
   g.uniformMatrix4fv(u('uVP'),false,vp);
   g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,sa.tex);g.uniform1i(u('uTex'),0);
-  g.bindVertexArray(this.lowBatch.vao);g.disable(g.CULL_FACE);
+  g.bindVertexArray(this.friendlyBatch.vao);g.disable(g.CULL_FACE);
   for(const [members,anim] of groups){
    if(!members.length)continue;
    const instances=new Float32Array(members.length*7);
    members.forEach((a,i)=>{const p=i*7;instances[p]=a.px;instances[p+1]=a.renderLift||0;instances[p+2]=a.pz;
      instances[p+3]=a.angle;instances[p+4]=a.scale||1;instances[p+5]=a.hit?1:0;instances[p+6]=a.seed;});
-   g.bindBuffer(g.ARRAY_BUFFER,this.lowBatch.buffer);g.bufferData(g.ARRAY_BUFFER,instances,g.DYNAMIC_DRAW);
+   g.bindBuffer(g.ARRAY_BUFFER,this.friendlyBatch.buffer);g.bufferData(g.ARRAY_BUFFER,instances,g.DYNAMIC_DRAW);
    g.uniformMatrix4fv(u('uBones[0]'),false,anim.bones);
    g.drawElementsInstanced(g.TRIANGLES,sa.geo.count,sa.geo.type,0,members.length);
   }
@@ -586,8 +586,8 @@ class WebWorld{
   }
   const now=performance.now(),dt=Math.min(.034,Math.max(.001,(now-(this.lastDetailedTime||now))/1000));this.lastDetailedTime=now;
   // v1.24: orientation is updated before drawing; the pitch never starts during the 90-degree turn.
-  // Animated GLBs are used nearby; all other soldiers are drawn by a single
-  // lightweight instanced pass. No count cap or distance-based disappearance.
+ // Each red soldier and the thrower use animated high-quality GLBs.
+ // Every friendly uses the identical high-quality mesh in an instanced pass.
   const visibleActors=this.frameDetailedActors||[];
   for(const a of [...visibleActors,this.thrower]){
    const sa=this.soldierAssets.high;if(!sa)continue;
@@ -737,7 +737,7 @@ class WebWorld{
     from,to:[x,.4,z],pos:from.slice(),vel:[(x-from[0])/Tsec,(.4-fromY+gravity*Tsec*Tsec/2)/Tsec,(z-from[2])/Tsec],gravity,done:false,onLanding};
   this.onLanding=onLanding;}
 
- resetDetailed(){this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.lowKnockGroups?.clear();this.impactStarted=null;this.landingProgress=0;if(this.thrower?.anim){this.thrower.angle=Math.atan2(this.throwForward[0],this.throwForward[1]);this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
+ resetDetailed(){this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.friendlyKnockGroups?.clear();this.impactStarted=null;this.landingProgress=0;if(this.thrower?.anim){this.thrower.angle=Math.atan2(this.throwForward[0],this.throwForward[1]);this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
  drawFallback(){
  // CPU backup draws actual perspective-projected 3D boxes, shaded faces and rooftops.
  // No textures / 3D library needed; designed for WebGL-disabled phones.
