@@ -286,16 +286,19 @@ document.getElementById('arenaRetry').addEventListener('click',()=>{
  arenaNotice('重新載入 3D 投擲場','正在重新建立軍營模型與 GPU 資源…');
  makeArenaFrame();
 });
-// Entirely fictional game numbers: a forgiving floor, a hard-to-reach ceiling.
+// v1.39: all values are fictional GAME balance parameters, not real-world explosive guidance.
+// Reward the amount players invested, not how full the variable-sized visual barrel looks.
+// A tiny fill must stay weak even after excellent QTE and wheel performance.
 function craftingPower(){
- const fill=clamp(powderLevel(),0,1);
+ const amount=clamp(S.powder/1250,0,1);
  const press=clamp((S.density-.60)/1.35,0,1)*clamp(S.hp/100,.20,1);
  const closeness=Math.abs(S.shape-S.shapeTarget);
  const shape=clamp(1/(1+Math.pow(closeness/.23,2)),.08,1);
- const base=15+85*Math.pow(fill,.9)*(.45+.55*press)*(.65+.35*shape);
+ const quality=(.66+.34*press)*(.75+.25*shape);
+ const balanced=10+90*Math.pow(amount,1.10)*quality;
  const limit=S.broken?70:S.overflowed?85:100;
- return {power:clamp(Math.round(Math.min(limit,base)),10,100),
-  fill:Math.round(fill*100),press:Math.round(press*100),shape:Math.round(shape*100)};
+ return {power:clamp(Math.round(Math.min(limit,balanced)),10,100),
+  fill:Math.round(amount*100),press:Math.round(press*100),shape:Math.round(shape*100)};
 }
 function enterThrowTraining(){
  if(S.phase!=='shape')return;
