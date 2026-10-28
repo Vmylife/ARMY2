@@ -86,20 +86,16 @@ body.aiming:has(#meterH:not(.hide)) #aimHint{display:none}
 
 
 /* Cinematic camera altitude guide; never blocks the world or touch controls. */
-#earthCaption{position:fixed;left:50%;bottom:calc(82px + env(safe-area-inset-bottom));z-index:3;transform:translateX(-50%);width:max-content;max-width:90vw;padding:8px 16px;text-align:center;border-radius:11px;border:1px solid #e6d9a169;background:#0b1d20ce;color:#f5ebcf;box-shadow:0 8px 22px #0007;pointer-events:none;backdrop-filter:blur(9px)}
-#earthCaption.hide{display:none}
-#earthCaption strong{display:block;font-size:14px;font-weight:900;letter-spacing:1px}
-#earthCaption span{display:block;color:#b8c9b9;font-size:10px;letter-spacing:.5px;margin-top:1px}
 @media(orientation:landscape) and (max-height:530px){#earthCaption{bottom:calc(24px + env(safe-area-inset-bottom));padding:5px 9px}}
 </style></head><body>
 <canvas id="world3d"></canvas>
-<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.14 軍營破壞修復</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
+<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.19 營區限定｜紅軍九人隨機組</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
 <div id="powerDock" class="hide">
   <button id="powerToggle" aria-expanded="false" aria-controls="powerDrawer" aria-label="展開或收合手榴彈威力設定">💥 威力 <strong id="powerMiniValue">10</strong> <span id="powerChevron">▾</span></button>
   <div id="powerDrawer" hidden><div class="powerHead"><span>威力（0～100）</span><span id="powerOut">10</span></div>
     <input id="powerSlider" aria-label="選擇爆炸威力" type="range" min="0" max="100" step="1" value="10">
-    <div id="powerHint">10 約 1～2 棟，100 為最大威力</div>
-    <div id="powerTools"><button id="resetBottom" class="ghost">重新瞄準</button><button id="galleryButton" class="ghost">地標圖鑑</button></div>
+    <div id="powerHint">威力 100 最多覆蓋整座軍營</div>
+    <div id="powerTools"><button id="resetBottom" class="ghost">重新瞄準</button></div>
   </div>
 </div>
 <div id="aimHint" class="hide" aria-live="polite">左右方向 · 點主角確認</div>
@@ -121,16 +117,15 @@ body.aiming:has(#meterH:not(.hide)) #aimHint{display:none}
 <div id="meterV" class="hide" aria-label="遠近計量條"><div class="meter-v-title">RANGE</div><div class="meter-v-top">遠</div><div id="needleV"></div><div class="meter-v-bottom">近</div></div>
 
 
-<div id="earthCaption" class="hide"><strong id="earthStageTitle">台灣上空</strong><span id="earthStageDetail">鏡頭持續升高・衝擊波持續擴散</span></div>
+
 <div id="blastFlash" aria-hidden="true"></div><div id="badge"></div><button id="skipIntro" style="position:fixed;right:14px;top:calc(175px + env(safe-area-inset-top));z-index:8;display:none;background:#1c422ce3">跳過開場</button>
-<div id="loading"><div class="loadCard"><div style="font-size:44px">🏗️</div><b>正在載入真實 3D 模型</b><p id="loadingDetail">載入你的 3D 場景、角色動畫和破壞模型…<br>場景 213 個物件，含高／低畫質兵與碎裂建築。</p><button class="accent" id="loadingButton" disabled>載入中…</button></div></div>
-<section id="result"><div class="resultCard"><div style="font-size:11px;color:#f2d38e;letter-spacing:1.8px;font-weight:800">國軍手榴彈試炸報告</div><h2 id="resultHeading">爆炸結束</h2><div class="cards"><div class="cell"><small>摧毀建築</small><b id="rBuildings">0</b></div><div class="cell"><small>擊殺人數</small><b id="rKills">0</b></div><div class="cell"><small>紅軍擊殺</small><b id="rRed">0</b></div><div class="cell"><small>友軍誤傷</small><b id="rGreen">0</b></div></div><div id="newLandmarks">本次波及地標：無</div><div id="resultBtns"><button class="accent" id="retry">再投一次</button><button id="seeGallery">地標圖鑑</button></div><p class="muted" style="margin-bottom:0">遊戲虛構爆炸尺度；遠距離破壞統計為場景模擬值。暫不計算真實物理傷害。</p></div></section>
-<section id="gallery"><div class="galleryBody"><div style="display:flex;align-items:center;justify-content:space-between"><h2 style="margin:0">🌍 地標圖鑑</h2><button id="closeGallery">返回</button></div><p class="muted">只有衝擊波實際到達後才解鎖。地理位置採遊戲化排列，非現實比例。</p><div class="galGrid" id="galleryGrid"></div></div></section>
+<div id="loading"><div class="loadCard"><div style="font-size:44px">🏗️</div><b>正在載入真實 3D 模型</b><p id="loadingDetail">載入你的 3D 場景、角色動畫和破壞模型…<br>場景 559 個原始物件；每場只出 9 名紅軍，其餘 3 組不載入。</p><button class="accent" id="loadingButton" disabled>載入中…</button></div></div>
+<section id="result"><div class="resultCard"><div style="font-size:11px;color:#f2d38e;letter-spacing:1.8px;font-weight:800">國軍手榴彈試炸報告</div><h2 id="resultHeading">爆炸結束</h2><div class="cards"><div class="cell"><small>摧毀建築</small><b id="rBuildings">0</b></div><div class="cell"><small>擊殺人數</small><b id="rKills">0</b></div><div class="cell"><small>紅軍擊殺</small><b id="rRed">0</b></div><div class="cell"><small>友軍誤傷</small><b id="rGreen">0</b></div></div><div id="newLandmarks">本局紅軍：9 人</div><div id="resultBtns"><button class="accent" id="retry">再投一次</button></div><p class="muted" style="margin-bottom:0">僅在軍營內試炸；顯示的是遊戲內爆炸與可破壞物件，不包含真實物理傷害。</p></div></section>
+
 <script type="module">
-import './grenade-user-play-3d.js?v=25';
+import './grenade-user-play-3d.js?v=30';
 const $=id=>document.getElementById(id),world=window.GrenadeWorld,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),fmt=n=>Math.floor(n).toLocaleString('en-US');
-let phase='intro',pos=.5,direction=.5,clock=0,x=0,z=50,power=10,old=performance.now(),reportedLandmarks=new Set(),prevGallery=[],badgeTimer=0,resultTimer=0,landingClock=0;
-const key='ARMY2_grenade_landmarks_v1',saved=()=>{try{return JSON.parse(localStorage.getItem(key)||'[]')}catch{return []}},store=names=>{try{localStorage.setItem(key,JSON.stringify([...new Set([...saved(),...names])]))}catch{}};
+let phase='intro',pos=.5,direction=.5,clock=0,x=0,z=50,power=10,old=performance.now(),badgeTimer=0,resultTimer=0,landingClock=0;
 const badge=t=>{const e=$('badge');e.textContent=t;e.classList.add('show');badgeTimer=performance.now()+1800;};
 function setState(p){
  phase=p;const aiming=p==='aimX'||p==='aimZ';document.body.classList.toggle('aiming',aiming);
@@ -145,22 +140,28 @@ function setState(p){
 function closePower(){$('powerDrawer').hidden=true;$('powerToggle').setAttribute('aria-expanded','false');$('powerChevron').textContent='▾';}
 function togglePower(){const open=$('powerDrawer').hidden;$('powerDrawer').hidden=!open;$('powerToggle').setAttribute('aria-expanded',String(open));$('powerChevron').textContent=open?'▴':'▾';}
 $('powerToggle').addEventListener('click',togglePower);
-function updateTitle(){const p=Number($('powerSlider').value);power=p;$('powerOut').textContent=p;$('powerMiniValue').textContent=p;let title=p===0?'幾乎無威力':p<=10?'小範圍 · 可炸毀單棟建築':p<=20?'營區級':p<=35?'城鎮級':p<=50?'都市級':p<=65?'大範圍':p<=75?'台灣級':p<=88?'亞洲級':'地球級';$('powerHint').textContent=`${title} · 75 起會進入台灣／亞洲／地球縮放演出`;}
-$('powerSlider').addEventListener('input',updateTitle);$('skipIntro').addEventListener('click',()=>reset());
-function reset(){$('earthCaption').classList.add('hide');$('blastFlash').style.opacity='0';$('skipIntro').style.display='none';world.setLanding(world.redCenter[0],world.redCenter[1]);world.resetDetailed();world.camPhase='aim';world.blastMax=0;world.timer=0;world.radius=-1;world.mode='field';world.time=0;world.buildEvents();$('buildings').textContent='0';$('kills').textContent='0';reportedLandmarks=new Set();$('result').classList.remove('show');setState('aimX');$('msg').textContent='紅軍位於右前方：操作左右、遠近兩條計量條';clock=0;pos=.5;resultTimer=0;landingClock=0;world.landingProgress=0;}
+function updateTitle(){const p=Number($('powerSlider').value);power=p;$('powerOut').textContent=p;$('powerMiniValue').textContent=p;const title=p===0?'未引爆':p<=20?'局部爆炸':p<=50?'訓練區爆炸':p<=80?'大範圍營區爆炸':'全營區爆炸';$('powerHint').textContent=title+' · 威力 100 最多覆蓋整座軍營';}
+$('powerSlider').addEventListener('input',updateTitle);$('skipIntro').addEventListener('click',()=>reset(false));
+function reset(newRound=true){
+ if(newRound)world.rollEnemySquad();
+ $('blastFlash').style.opacity='0';$('skipIntro').style.display='none';
+ world.setLanding(world.redCenter[0],world.redCenter[1]);world.resetDetailed();world.camPhase='aim';
+ world.blastMax=0;world.timer=0;world.radius=-1;world.mode='field';world.time=0;world.buildEvents();
+ $('buildings').textContent='0';$('kills').textContent='0';$('result').classList.remove('show');
+ setState('aimX');$('msg').textContent='本局紅軍第 '+(world.redSquadId||1)+' 組（9 人） · 左右選方向、上下選距離';
+ clock=0;pos=.5;resultTimer=0;landingClock=0;world.landingProgress=0;
+}
 let audioCtx=null;function blastSound(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioCtx=audioCtx||new AC();if(audioCtx.state==='suspended')audioCtx.resume();const t=audioCtx.currentTime;const n=audioCtx.sampleRate*.9|0,buf=audioCtx.createBuffer(1,n,audioCtx.sampleRate),data=buf.getChannelData(0);for(let i=0;i<n;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);const src=audioCtx.createBufferSource(),low=audioCtx.createBiquadFilter(),gain=audioCtx.createGain();src.buffer=buf;low.type='lowpass';low.frequency.setValueAtTime(650,t);low.frequency.exponentialRampToValueAtTime(70,t+.7);gain.gain.setValueAtTime(.48,t);gain.gain.exponentialRampToValueAtTime(.001,t+.83);src.connect(low);low.connect(gain);gain.connect(audioCtx.destination);src.start(t);src.stop(t+.86);const osc=audioCtx.createOscillator(),og=audioCtx.createGain();osc.type='sine';osc.frequency.setValueAtTime(110,t);osc.frequency.exponentialRampToValueAtTime(39,t+.40);og.gain.setValueAtTime(.5,t);og.gain.exponentialRampToValueAtTime(.001,t+.52);osc.connect(og);og.connect(audioCtx.destination);osc.start(t);osc.stop(t+.55);}catch(e){console.warn('Sound',e)}}
 function shoot(){if(!audioCtx){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume()}catch{}}setState('flight');$('msg').textContent='💣 手榴彈飛行中…';world.playThrow(x,z,()=>{if(phase!=='flight')return;world.setLanding(x,z);world.camPhase='landed';world.landingProgress=0;landingClock=0;setState('landed');$('msg').textContent='💣 手榴彈落地……';});}
 function detonate(){if(phase!=='landed')return;world.beginTestPower(power);world.camPhase='blast';blastSound();setState('blast');$('msg').textContent='💥 衝擊波、爆炸碗罩與地表焦黑正在擴散！';}
-// Far-end coordinates are calibrated against the user's scene editor.
-// For any direction, the distance meter interpolates continuously from the
-// thrower's feet (bottom = near) to the chosen far endpoint (top = far).
-const FAR_LEFT=[-41.70,61.61],FAR_MIDDLE=[7.50,34.83],FAR_RIGHT=[59.90,48.90];
+// Aim fan is anchored at the real thrower, facing the randomly chosen red squad.
+// Full distance covers the practice camp only, never city/country/globe.
 function meterLanding(dir,range){
- const d=clamp(dir,0,1),r=clamp(range,0,1),mix=(a,b,t)=>a+(b-a)*t;
- const far=d<=.5?[mix(FAR_LEFT[0],FAR_MIDDLE[0],d*2),mix(FAR_LEFT[1],FAR_MIDDLE[1],d*2)]
-  :[mix(FAR_MIDDLE[0],FAR_RIGHT[0],(d-.5)*2),mix(FAR_MIDDLE[1],FAR_RIGHT[1],(d-.5)*2)];
- const near=world.player;
- return [mix(near[0],far[0],r),mix(near[1],far[1],r)];
+ const d=clamp(dir,0,1),r=clamp(range,0,1);
+ const f=world.throwForward||[.7,.7],right=[f[1],-f[0]],a=(d-.5)*Math.PI*.88;
+ const dx=f[0]*Math.cos(a)+right[0]*Math.sin(a),dz=f[1]*Math.cos(a)+right[1]*Math.sin(a);
+ const dist=.9+r*69;
+ return [clamp(world.player[0]+dx*dist,-52,50),clamp(world.player[1]+dz*dist,-39,43)];
 }
 function confirmAim(){
  if(phase==='aimX'){direction=pos;setState('aimZ');closePower();clock=0;}
@@ -188,25 +189,26 @@ function positionAimHUD(){
  const meter=$('meterV'),mh=meter.offsetHeight||175;
  const vx=r.x+Math.max(80,r.width/2+24);meter.style.left=clamp(vx,8,w-64)+'px';meter.style.top=clamp((r.top+r.bottom-mh)/2,138,h-mh-74)+'px';
 }
-$('reset').addEventListener('click',reset);$('resetBottom').addEventListener('click',reset);$('retry').addEventListener('click',reset);
-const openGallery=()=>{const list=new Set(saved());$('galleryGrid').innerHTML=window.GrenadeLandmarks.map(l=>`<div class="gal ${list.has(l.name)?'':'locked'}"><small>${l.kind} · ${list.has(l.name)?'✓ 已解鎖':'🔒 未解鎖'}</small><strong>${list.has(l.name)?l.name:'？？？'}</strong></div>`).join('');$('gallery').classList.add('show')};
-$('galleryButton').addEventListener('click',openGallery);$('seeGallery').addEventListener('click',openGallery);$('closeGallery').addEventListener('click',()=>$('gallery').classList.remove('show'));
-function result(){if(phase!=='blast')return;$('earthCaption').classList.add('hide');setState('end');world.camPhase='blast';$('resultHeading').textContent=power>=90?'報告長官！衝擊波已席捲整個地球！':power>=75?'報告長官！災情擴大到整個區域！':power>=20?'報告長官！整片都炸了！':'手榴彈試炸完成';$('rBuildings').textContent=fmt(world.counter.buildings);$('rKills').textContent=fmt(world.counter.kills);$('rRed').textContent=fmt(world.counter.red);$('rGreen').textContent=fmt(world.counter.green);$('newLandmarks').textContent=reportedLandmarks.size?`本次波及地標：${[...reportedLandmarks].join('、')}`:'本次沒有解鎖新地標';$('result').classList.add('show');}
+$('reset').addEventListener('click',()=>reset(true));$('resetBottom').addEventListener('click',()=>reset(true));$('retry').addEventListener('click',()=>reset(true));
+function result(){if(phase!=='blast')return;setState('end');world.camPhase='blast';
+ $('resultHeading').textContent=power>=90?'報告長官！全營區爆炸結束！':power>=50?'報告長官！營區災情擴大！':'手榴彈試炸完成';
+ $('rBuildings').textContent=fmt(world.counter.buildings);$('rKills').textContent=fmt(world.counter.kills);
+ $('rRed').textContent=fmt(world.counter.red);$('rGreen').textContent=fmt(world.counter.green);
+ $('newLandmarks').textContent='本局紅軍第 '+world.redSquadId+' 組／9 人；僅統計實際軍營內物件。';$('result').classList.add('show');}
 function tick(t){requestAnimationFrame(tick);const dt=clamp((t-old)/1000,0,.045);old=t;
- if(phase==='intro'){clock+=dt;world.introProgress=Math.min(1,clock/9);if(clock>=9){reset();$('msg').textContent='鏡頭下降到投擲者後方，紅軍在右前方';}}
+ if(phase==='intro'){clock+=dt;world.introProgress=Math.min(1,clock/7);if(clock>=7){reset(false);$('msg').textContent='鏡頭已到投擲者後方；每場隨機選出一組紅軍';}}
  if(phase==='aimX'||phase==='aimZ'){clock+=dt;pos=.5+.5*Math.sin(clock*(phase==='aimX'?3.25:3.77));if(phase==='aimX'){const dirX=24+272*pos;$('grenadeDirectionRay').setAttribute('x2',String(dirX));$('needleHGlow').setAttribute('x2',String(dirX));}else $('needleV').style.top=`${16+(1-pos)*68}%`;positionAimHUD();}
  if(phase==='landed'){landingClock+=dt;world.landingProgress=clamp(landingClock/1.0,0,1);if(landingClock>=1.0)detonate();}
  if(phase==='blast'){$('blastFlash').style.opacity=String(Math.min(.83,Math.exp(-world.timer*4.3)*(.25+Math.log10(world.blastMax+1)*.13)));if(world.advance(dt)){if(!resultTimer)resultTimer=t+1550;if(t>=resultTimer)result();}
    $('buildings').textContent=fmt(world.counter.buildings);$('kills').textContent=fmt(world.counter.kills);
-   for(const name of world.newLandmarks){if(!reportedLandmarks.has(name)){reportedLandmarks.add(name);store([name]);badge('🏛️ 地標解鎖：'+name);}}
-   if(world.earthStage)$('msg').textContent='🌍 鏡頭持續上升，衝擊波沿地表擴張…';else if(world.radius>60)$('msg').textContent='💥 衝擊波、爆炸碗罩與焦黑地面持續擴散…';
+   if(world.radius>40)$('msg').textContent='💥 營區衝擊波持續擴散，建築與器材逐漸碎裂…';
  }
- world.draw();const earthOn=phase==='blast'&&world.globe?.opacity>.08;$('earthCaption').classList.toggle('hide',!earthOn);if(earthOn){const name=world.globe.stage;$('earthStageTitle').textContent=name==='taiwan'?'台灣上空':name==='asia'?'東亞 → 亞洲': '地球外圍';$('earthStageDetail').textContent=name==='earth'?'焦黑區沿球面擴張・地球級':'鏡頭升高・地表衝擊波持續擴散';}if(t>badgeTimer)$('badge').classList.remove('show');}
+ world.draw();if(t>badgeTimer)$('badge').classList.remove('show');}
 let loadingStarted=false;
-function startWhenReady(){if(loadingStarted)return;loadingStarted=true;$('loading').classList.add('hidden');world.camPhase='intro';world.introProgress=0;setState('intro');clock=0;$('msg').textContent='🎬 紅軍正面 → 升空俯視 → 移到主角上空 → 下降到背後';$('skipIntro').style.display='block';requestAnimationFrame(tick);}
-const loadingInterval=setInterval(()=>{if(world.modelState==='ready'){clearInterval(loadingInterval);$('loadingDetail').textContent='已載入你的場景、原版角色動畫及六種建築與完整器材碎裂模型。';$('loadingButton').disabled=false;$('loadingButton').textContent='開始 3D 試炸';}
+function startWhenReady(){if(loadingStarted)return;loadingStarted=true;$('loading').classList.add('hidden');world.camPhase='intro';world.introProgress=0;setState('intro');clock=0;$('msg').textContent='🎬 本場紅軍第 '+world.redSquadId+' 組（9 人）→ 回到投擲者';$('skipIntro').style.display='block';requestAnimationFrame(tick);}
+const loadingInterval=setInterval(()=>{if(world.modelState==='ready'){clearInterval(loadingInterval);$('loadingDetail').textContent='已載入你匯出的軍營場景；本局紅軍第 '+world.redSquadId+' 組（9 人），保留原版地形及碎裂模型。';$('loadingButton').disabled=false;$('loadingButton').textContent='開始 3D 試炸';}
 else if(world.modelState==='partial'||world.modelState==='unavailable'){clearInterval(loadingInterval);$('loadingDetail').textContent='部分 3D 模型載入失敗，請確認已上傳所有可破壞建築及道具 GLB 與主遊戲模型。'+(world.modelErrors?.[0]||'');$('loadingButton').disabled=false;$('loadingButton').textContent='進入相容試驗場';}
 },500);
 $('loadingButton').addEventListener('click',startWhenReady);updateTitle();
-window.__grenadeTest={world,reset,shoot,skipIntro:()=>reset(),setPower:p=>{$('powerSlider').value=p;updateTitle()},setAim:(a,b)=>{x=a;z=b},startBlast:()=>{world.setLanding(world.redCenter[0],world.redCenter[1]);world.camPhase='blast';world.beginTestPower(Number($('powerSlider').value));blastSound();setState('blast');},get state(){return phase}};
+window.__grenadeTest={world,reset,shoot,skipIntro:()=>reset(false),setPower:p=>{$('powerSlider').value=p;updateTitle()},setAim:(a,b)=>{x=a;z=b},startBlast:()=>{world.setLanding(world.redCenter[0],world.redCenter[1]);world.camPhase='blast';world.beginTestPower(Number($('powerSlider').value));blastSound();setState('blast');},get state(){return phase}};
 </script></body></html>
