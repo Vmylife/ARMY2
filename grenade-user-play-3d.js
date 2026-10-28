@@ -1,5 +1,6 @@
 import {loadGlb} from "./src/core/glb111.js";
 import {RigAnimator} from "./src/characters/rigAnimator.js";
+import {GrenadeEarthCinematic} from "./grenade-earth-cinematic.js";
 const USER_SCENE = await fetch('./grenade-user-scene.json').then(async r=>{if(!r.ok)throw Error('找不到手榴彈場景 JSON');return r.json()});
 /* Army grenade arena v1.0. Custom dependency-free WebGL instanced 3D.
  * Fictional game-only explosion scales and estimates: not physical modelling.
@@ -134,7 +135,7 @@ class WebWorld{
  if(hadContext){this.backup=document.createElement('canvas');this.backup.id='world3d-cpu';this.backup.style.cssText='position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;display:none';c.parentNode.insertBefore(this.backup,c.nextSibling);this.fallback=this.backup.getContext('2d');c.style.opacity='0';}
  else this.fallback=c.getContext('2d');}
 
- this.resize();window.addEventListener('resize',()=>this.resize());this.player=[PLAYER_ITEM.x,PLAYER_ITEM.z];this.redCenter=RED_CENTER;this.camPhase='intro';this.introProgress=0;this.resetCamTarget=null;this.buildEvents();this.initDetailedAssets();}
+ this.resize();window.addEventListener('resize',()=>this.resize());this.player=[PLAYER_ITEM.x,PLAYER_ITEM.z];this.redCenter=RED_CENTER;this.camPhase='intro';this.introProgress=0;this.resetCamTarget=null;this.globe=new GrenadeEarthCinematic();this.buildEvents();this.initDetailedAssets();}
  setup(){const g=this.gl;this.ext=g.drawArraysInstanced?null:g.getExtension('ANGLE_instanced_arrays');if(!g.drawArraysInstanced&&!this.ext)throw Error('no instancing');this.p=compile(g,VS,FS);this.pPlanet=compile(g,PLANET_VS,PLANET_FS);this.ringP=compile(g,RING_VS,RING_FS);this.geo=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,this.geo);g.bufferData(g.ARRAY_BUFFER,new Float32Array(cube),g.STATIC_DRAW);
  this.ringVerts=[];const M=128;for(let i=0;i<M;i++){const th=i*Math.PI*2/M,th2=(i+1)*Math.PI*2/M;const vert=(a,off,alpha)=>[Math.cos(a),Math.sin(a),off,alpha];for(const [o1,a1,o2,a2] of [[-1,.04,-.10,.65],[-.10,.65,.12,1],[.12,1,1,.02]]){this.ringVerts.push(...vert(th,o1,a1),...vert(th,o2,a2),...vert(th2,o2,a2),...vert(th,o1,a1),...vert(th2,o2,a2),...vert(th2,o1,a1));}}
  this.ringBuf=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,this.ringBuf);g.bufferData(g.ARRAY_BUFFER,new Float32Array(this.ringVerts),g.STATIC_DRAW);
@@ -162,14 +163,14 @@ class WebWorld{
  }
 
  buildEvents(){this.events=[];const [ix,iz]=this.impact;buildings.forEach((v,i)=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'b',v}));soldiers.forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'s',v}));(this.nearBuildings||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'detail',v}));(this.actors||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'actor',v}));(this.campProps||[]).filter(v=>v.type==='treeA'||v.type==='treeB').forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'tree',v}));landmarks.forEach(v=>this.events.push({r:v.radius||Math.hypot(v.x-ix,v.z-iz),type:'land',v}));this.events.sort((a,b)=>a.r-b.r);this.eventIndex=0;this.counter={buildings:0,kills:0,red:0,green:0};this.newLandmarks=[];this.LM=new Set();if(this.nearBuildings)this.nearBuildings.forEach(b=>{b.hit=false;b.fragments=[]});if(this.actors)this.actors.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;a.anim?.setClip('Idle_11',{restart:true})});if(this.campProps)this.campProps.forEach(p=>{p.hit=false;p.fallT=0;p.tilt=0});this.bursts=[];if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}}
- setLanding(x,z){this.impact=[x,z];this.radius=-1;this.mode='field';this.earthStage='';this.buildEvents();}
+ setLanding(x,z){this.impact=[x,z];this.radius=-1;this.mode='field';this.earthStage='';this.globe?.reset();this.buildEvents();}
  begin(powder,density,quality,broken){const amount=Math.max(0,powder)/600, comp=Math.max(1,density/.6);let max=6+Math.pow(amount,1.37)*Math.pow(comp,2.65)*17*Math.max(.06,quality)*(broken?.39:1);max=clamp(max,7,2300);this.blastMax=max;this.blastDuration=2.5+Math.min(10,Math.log10(max+1)*1.8);this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();return max;}
- beginTestPower(power){const points=[[0,2.5],[10,13.3],[20,38],[35,140],[50,440],[65,1350],[75,1750],[88,2050],[100,2300]];let max=2300;for(let i=1;i<points.length;i++)if(power<=points[i][0]){const a=points[i-1],b=points[i],t=(power-a[0])/(b[0]-a[0]);max=Math.exp(Math.log(a[1])+(Math.log(b[1])-Math.log(a[1]))*t);break;}this.impactStarted=performance.now();this.blastMax=max;this.blastDuration=4.8+Math.min(6.5,Math.log10(max+1)*1.35);this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();this.lastHitR=0;this.bursts=[{x:this.impact[0],z:this.impact[1],age:0,life:4.3,size:Math.min(12,2.2+Math.log10(max+1)*2.2),type:'origin',seed:.27}];return max;}
- advance(dt){if(this.timer>=this.blastDuration)return true;this.timer=Math.min(this.blastDuration,this.timer+dt);this.time+=dt;const x=clamp(this.timer/this.blastDuration,0,1),smooth=1-Math.pow(1-x,1.12);this.radius=Math.expm1(Math.log1p(this.blastMax)*smooth);
+ beginTestPower(power){const points=[[0,2.5],[10,13.3],[20,38],[35,140],[50,440],[65,1350],[75,1750],[88,2050],[100,2300]];let max=2300;for(let i=1;i<points.length;i++)if(power<=points[i][0]){const a=points[i-1],b=points[i],t=(power-a[0])/(b[0]-a[0]);max=Math.exp(Math.log(a[1])+(Math.log(b[1])-Math.log(a[1]))*t);break;}this.impactStarted=performance.now();this.blastMax=max;this.blastDuration=max>=1650?12.2:4.8+Math.min(6.5,Math.log10(max+1)*1.35);this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();this.lastHitR=0;this.bursts=[{x:this.impact[0],z:this.impact[1],age:0,life:4.3,size:Math.min(12,2.2+Math.log10(max+1)*2.2),type:'origin',seed:.27}];return max;}
+ advance(dt){if(this.timer>=this.blastDuration)return true;this.timer=Math.min(this.blastDuration,this.timer+dt);this.time+=dt;const x=clamp(this.timer/this.blastDuration,0,1),blend=1-Math.pow(1-x,1.12);if(this.blastMax>=1650){const phase=.40;this.radius=x<phase?Math.expm1(Math.log1p(1030)*smooth(x/phase)):1030+(this.blastMax-1030)*smooth((x-phase)/(1-phase));}else this.radius=Math.expm1(Math.log1p(this.blastMax)*blend);
  while(this.eventIndex<this.events.length&&this.events[this.eventIndex].r<=this.radius){const e=this.events[this.eventIndex++];if(e.type==='b'){this.counter.buildings++;this.counter.kills+=e.v.people;}else if(e.type==='detail'){this.counter.buildings++;this.counter.kills+=e.v.people;this.explodeBuilding(e.v);this.addBurst(e.v.x,e.v.z,'impact');}else if(e.type==='tree'){this.hitTree(e.v);}else if(e.type==='actor'){this.counter.kills++;if(e.v.enemy)this.counter.red++;else this.counter.green++;this.hitActor(e.v);}else if(e.type==='s'){this.counter.kills++;if(e.v.enemy)this.counter.red++;else this.counter.green++;}else if(!this.LM.has(e.v.name)){this.LM.add(e.v.name);this.newLandmarks.push(e.v.name);}}
  // Far-field is intentionally abstracted; beyond detailed city we only simulate clusters/census.
  if(this.radius>1550){const ratio=Math.max(0,this.radius/1550-1);const hidden=Math.round(64000*Math.pow(ratio,1.12));const occupants=Math.round(560000*Math.pow(ratio,1.24));this.counter.buildings=buildings.length+(this.nearBuildings?.length||0)+hidden;this.counter.kills=Math.max(this.counter.kills,Math.round(occupants));}
- this.stepActors(dt);this.stepFragments(dt);this.stepTrees(dt);for(const b of this.bursts)b.age+=dt;this.bursts=this.bursts.filter(b=>b.age<b.life);this.mode=this.radius>=1700?'earth':'field';return this.timer>=this.blastDuration;}
+ this.stepActors(dt);this.stepFragments(dt);this.stepTrees(dt);for(const b of this.bursts)b.age+=dt;this.bursts=this.bursts.filter(b=>b.age<b.life);this.mode='field';const geo=this.blastMax>=1650&&this.radius>=1030;const k=clamp((this.radius-1030)/1270,0,1);this.earthStage=geo?(k<.34?'taiwan':k<.86?'asia':'earth'):'';return this.timer>=this.blastDuration;}
  attribBase(program){const g=this.gl;const loc=(name)=>g.getAttribLocation(program,name),set=(id,size,stride,off)=>{if(id<0)return;g.enableVertexAttribArray(id);g.vertexAttribPointer(id,size,g.FLOAT,false,stride,off);};g.bindBuffer(g.ARRAY_BUFFER,this.geo);set(loc('aPos'),3,24,0);set(loc('aNorm'),3,24,12);}
  instanceDraw(buf,n,part,vp){if(!n)return;const g=this.gl,p=this.p;g.useProgram(p);const u=(name)=>g.getUniformLocation(p,name);g.uniformMatrix4fv(u('uVP'),false,vp);g.uniform1f(u('uPart'),part);g.uniform1f(u('uRadius'),this.radius);g.uniform1f(u('uTime'),this.time);g.uniform2f(u('uImpact'),this.impact[0],this.impact[1]);this.attribBase(p);
  const attrs=['iLoc','iShape','iTint'];g.bindBuffer(g.ARRAY_BUFFER,buf);attrs.forEach((name,i)=>{const loc=g.getAttribLocation(p,name);if(loc<0)return;g.enableVertexAttribArray(loc);g.vertexAttribPointer(loc,4,g.FLOAT,false,48,i*16);if(g.vertexAttribDivisor)g.vertexAttribDivisor(loc,1);else this.ext.vertexAttribDivisorANGLE(loc,1);});
@@ -480,64 +481,16 @@ class WebWorld{
   const wrist=this.heldGrenadePosition();const from=wrist||[a[0]+dx/dl*.58,1.3,a[1]+dz/dl*.58];
   if(this.thrower)this.thrower.angle=this.throwing?.endAngle??this.thrower.angle;
   this.throwing=null;this.camPhase='flight';this.flight={start:performance.now(),duration:1850,from,to:[x,.4,z],done:false};this.onLanding=onLanding;}
- resetDetailed(){this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.impactStarted=null;this.landingProgress=0;if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
+ resetDetailed(){this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.impactStarted=null;this.landingProgress=0;this.globe?.reset();if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
  drawSphere(vp,center,radius,earth,damage,hue){const g=this.gl,p=this.pPlanet;g.useProgram(p);g.bindBuffer(g.ARRAY_BUFFER,this.sphere);for(const [name,s,off] of [['aPos',3,0],['aNorm',3,12]]){const id=g.getAttribLocation(p,name);g.enableVertexAttribArray(id);g.vertexAttribPointer(id,s,g.FLOAT,false,24,off);}
  const u=n=>g.getUniformLocation(p,n);g.uniformMatrix4fv(u('uVP'),false,vp);g.uniform3fv(u('uCenter'),center);g.uniform1f(u('uScale'),radius);g.uniform1f(u('uDamage'),damage);g.uniform1f(u('uEarth'),earth);g.uniform1f(u('uHue'),hue);g.uniform1f(u('uTime'),this.time);const blast=arguments[6]||[0,0,1],blastR=arguments[7]||0;const ub=u('uBlast');if(ub)g.uniform3fv(ub,blast);const ur=u('uBlastR');if(ur)g.uniform1f(ur,blastR);
  g.drawArrays(g.TRIANGLES,0,this.sphereVertices.length/6);}
- drawEarthLabel(vp,pos,text){const ctx=this.fallback;if(!ctx)return;const project=(x,y,z)=>{const v=[x,y,z,1];const cx=vp[0]*v[0]+vp[4]*v[1]+vp[8]*v[2]+vp[12],cy=vp[1]*v[0]+vp[5]*v[1]+vp[9]*v[2]+vp[13],cw=vp[3]*v[0]+vp[7]*v[1]+vp[11]*v[2]+vp[15];if(cw<=0)return null;return [(cx/cw*.5+.5)*c.width,(.5-cy/cw*.5)*c.height];};const p=project(pos[0],pos[1],pos[2]);if(!p)return;ctx.save();ctx.font='bold 24px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='rgba(7,18,14,.78)';const padX=18,padY=10,w=ctx.measureText(text).width+padX*2,h=42;ctx.beginPath();ctx.roundRect?.(p[0]-w/2,p[1]-h/2,w,h,16);if(!ctx.roundRect){ctx.rect(p[0]-w/2,p[1]-h/2,w,h);}ctx.fill();ctx.strokeStyle='rgba(241,214,140,.85)';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#f6efca';ctx.fillText(text,p[0],p[1]+1);ctx.restore();}
-
- drawEarth(){const g=this.gl;g.clearColor(.012,.018,.052,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);
-  const scale=10.8,blastDir=norm([0.80,.18,.56]);
-  const k=clamp((this.radius-1700)/Math.max(1,this.blastMax-1700),0,1);
-  this.earthStage=k<.34?'taiwan':k<.72?'asia':'earth';
-  let eye,target;
-  if(k<.34){
-    const u=smooth(k/.34);
-    eye=mix3([9.8,2.8,7.6],[12.8,5.7,10.6],u);
-    target=mix3(blastDir.map(v=>v*scale),blastDir.map(v=>v*(scale*.93)),u);
-  }else if(k<.72){
-    const u=smooth((k-.34)/.38);
-    eye=mix3([12.8,5.7,10.6],[18.8,9.8,15.4],u);
-    target=mix3(blastDir.map(v=>v*(scale*.93)),blastDir.map(v=>v*(scale*.63)),u);
-  }else{
-    const u=smooth((k-.72)/.28);
-    eye=mix3([18.8,9.8,15.4],[27.8,14.8,23.6],u);
-    target=mix3(blastDir.map(v=>v*(scale*.63)),[0,0,0],u);
-  }
-  const vp=mul(pers(42,c.width/c.height,.1,260),lookAt(eye,target));
-  const blastR=lerp(.018,1.98,k),damage=clamp(.20+k*.95,0,1);
-  this.drawSphere(vp,[0,0,0],scale,1,damage,0,blastDir,blastR);
-  if(k<.34){
-    const labelPos=[blastDir[0]*scale*1.01,blastDir[1]*scale*1.01,blastDir[2]*scale*1.01];
-    this.drawEarthLabel(vp,labelPos,'台灣');
-  }else if(k<.72){
-    const labelPos=[blastDir[0]*scale*.96-1.1,blastDir[1]*scale*.96+.65,blastDir[2]*scale*.96+.15];
-    this.drawEarthLabel(vp,labelPos,'亞洲');
-  }
- }
  drawFallback(){
  // CPU backup draws actual perspective-projected 3D boxes, shaded faces and rooftops.
  // No textures / 3D library needed; designed for WebGL-disabled phones.
  const ctx=this.fallback;if(!ctx)return;
  const w=c.width,h=c.height;
  const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,this.mode!=='field'?'#080c1d':'#a9d0eb');sky.addColorStop(.50,this.mode!=='field'?'#11122b':'#d5e5c8');sky.addColorStop(1,this.mode!=='field'?'#070b1b':'#abc49e');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
- if(this.mode==='earth'){
-   for(let i=0;i<190;i++){const sx=((i*171.17+Math.sin(i)*77)%1+1)%1*w,sy=((i*131.78+Math.cos(i*13)*19)%1+1)%1*h;ctx.globalAlpha=.20+(i%9)*.075;ctx.fillStyle=i%8===0?'#ffdca2':'#d2e7ff';ctx.fillRect(sx,sy,(i%5===0?2:1),i%5===0?2:1);}ctx.globalAlpha=1;
-   const k=clamp((this.radius-1700)/Math.max(1,this.blastMax-1700),0,1);const stage=k<.34?'taiwan':k<.72?'asia':'earth';this.earthStage=stage;
-   const Rstage=stage==='taiwan'?Math.min(w*.86,h*.88):stage==='asia'?Math.min(w*.67,h*.70):Math.min(w*.43,h*.46);
-   const mixA=stage==='taiwan'?smooth(k/.34):stage==='asia'?smooth((k-.34)/.38):smooth((k-.72)/.28);
-   const R=stage==='taiwan'?lerp(Math.min(w*.98,h*.98),Math.min(w*.72,h*.74),mixA):stage==='asia'?lerp(Math.min(w*.72,h*.74),Math.min(w*.50,h*.52),mixA):lerp(Math.min(w*.50,h*.52),Math.min(w*.38,h*.40),mixA);
-   const x=w*.5+(stage==='taiwan'?-w*.05*(1-mixA):stage==='asia'?-w*.02*(1-mixA):0),y=stage==='taiwan'?h*.78:stage==='asia'?h*.66:h*.53;
-   const grad=ctx.createRadialGradient(x-R*.28,y-R*.33,R*.02,x,y,R);grad.addColorStop(0,'#d4e5f1');grad.addColorStop(.24,'#4e8fc4');grad.addColorStop(.74,'#185683');grad.addColorStop(1,'#0d2234');ctx.fillStyle=grad;ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.fill();
-   ctx.save();ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.clip();ctx.fillStyle='#4b7d52';
-   const continents=stage==='taiwan'?[[.08,-.04,.20,.13,.2],[.17,.01,.10,.07,-.3],[.24,.05,.045,.034,0],[.29,.00,.025,.018,0]]:stage==='asia'?[[-.10,-.08,.18,.13,-.4],[.05,-.03,.34,.18,.12],[.30,.12,.14,.09,.55],[.18,-.10,.05,.04,-.5]]:[[-.24,-.10,.18,.12,-.6],[-.06,-.02,.22,.15,-.2],[.08,-.02,.34,.18,.08],[.30,.12,.15,.10,.55],[.02,.23,.12,.07,.25],[-.28,.18,.12,.08,.8]];
-   for(const c of continents){ctx.beginPath();ctx.ellipse(x+R*c[0],y+R*c[1],R*c[2],R*c[3],c[4],0,Math.PI*2);ctx.fill();}
-   // Taiwan island marker in close / medium views
-   if(stage!=='earth'){ctx.fillStyle='#f1e4a1';ctx.beginPath();ctx.ellipse(x+R*.26,y+R*.00,R*.020,R*.040,.20,0,Math.PI*2);ctx.fill();}
-   const scorch=lerp(R*.03,R*1.34,k),ring=scorch*1.015;ctx.fillStyle='rgba(16,14,14,.88)';ctx.beginPath();ctx.arc(x+R*.20,y-R*.02,scorch,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(255,133,56,.90)';ctx.lineWidth=Math.max(2,R*.026);ctx.beginPath();ctx.arc(x+R*.20,y-R*.02,ring,0,Math.PI*2);ctx.stroke();ctx.restore();
-   if(stage==='taiwan'||stage==='asia'){const label=stage==='taiwan'?'台灣':'亞洲';ctx.font='bold 22px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';const lx=stage==='taiwan'?x+R*.28:x+R*.02,ly=stage==='taiwan'?y-R*.22:y-R*.28;const bw=ctx.measureText(label).width+28,bh=40;ctx.fillStyle='rgba(7,18,14,.78)';ctx.strokeStyle='rgba(241,214,140,.85)';ctx.lineWidth=2;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(lx-bw/2,ly-bh/2,bw,bh,16);else ctx.rect(lx-bw/2,ly-bh/2,bw,bh);ctx.fill();ctx.stroke();ctx.fillStyle='#f6efca';ctx.fillText(label,lx,ly+1);}
-   return;
- }
  let dist=this.radius<0?31:clamp(this.radius*.88+24,24,7600);
  let tx=this.radius>=0?this.impact[0]:this.player[0]+6.3,tz=this.radius>=0?this.impact[1]:this.player[1]-18.5;
  let eye=[tx+dist*.43,dist*.66,tz+dist*.95],center=[tx,0,tz];
@@ -585,8 +538,8 @@ class WebWorld{
  draw(){if(!this.gl){
   if(this.throwing&&performance.now()-this.throwing.start>=this.throwing.duration){const a=this.throwing;this.launchFlight(a.target[0],a.target[1],a.onLanding);}
   if(this.flight&&!this.flight.done&&(performance.now()-this.flight.start)>=this.flight.duration){this.flight.done=true;this.camPhase='landed';this.landingProgress=0;this.onLanding?.();}
-  return this.drawFallback();}
-  try{this.mode==='earth'?this.drawEarth():this.drawLand();}catch(e){if(!this.errored){console.error('3D draw',e);this.errored=true;}}}
+  const opaque=this.globe?.render(this.radius,this.blastMax,this.time);if(!opaque)return this.drawFallback();return;}
+  try{const showGlobe=this.globe?.render(this.radius,this.blastMax,this.time);if(!showGlobe)this.drawLand();}catch(e){if(!this.errored){console.error('3D draw',e);this.errored=true;}}}
 }
 window.GrenadeWorld=new WebWorld();window.GrenadeLandmarks=landmarks;window.GrenadeUserScene=USER_SCENE;
 })();
