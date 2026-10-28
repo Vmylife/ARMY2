@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "exportedAt": "2026-10-28T00:00:00Z",
   "sceneId": "main-camp-destructible",
-  "sceneName": "主遊戲完整軍營｜全物件可破壞",
+  "sceneName": "主遊戲完整軍營｜無士兵・低畫質建築・可破壞",
   "map": {
     "width": 280,
     "depth": 280,
@@ -13,11 +13,11 @@
     "x": -21,
     "z": -9
   },
-  "totalObjects": 213,
+  "totalObjects": 188,
   "items": [
     {
       "uid": "g1001",
-      "quality": "high",
+      "quality": "low",
       "rot": 90,
       "scale": 1,
       "assetId": "barracks",
@@ -26,7 +26,7 @@
       "category": "building",
       "name": "營舍（連隊寢室）",
       "sourceBuildingId": "barracks",
-      "model": "./assets/buildings/building-1-barracks.glb",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
       "size": [
         17.472,
         2.8,
@@ -40,7 +40,7 @@
     },
     {
       "uid": "g1002",
-      "quality": "high",
+      "quality": "low",
       "rot": 180,
       "scale": 1,
       "assetId": "community",
@@ -49,7 +49,7 @@
       "category": "building",
       "name": "中山室",
       "sourceBuildingId": "office",
-      "model": "./assets/buildings/building-2-community.glb",
+      "model": "./assets/grenade-low/grenade-community-low.glb",
       "size": [
         11.83,
         3.35,
@@ -63,7 +63,7 @@
     },
     {
       "uid": "g1003",
-      "quality": "high",
+      "quality": "low",
       "rot": 90,
       "scale": 1,
       "assetId": "office",
@@ -72,7 +72,7 @@
       "category": "building",
       "name": "辦公大樓",
       "sourceBuildingId": "hq",
-      "model": "./assets/buildings/building-6-office.glb",
+      "model": "./assets/grenade-low/grenade-office-low.glb",
       "size": [
         11.1625,
         3.9485,
@@ -86,7 +86,7 @@
     },
     {
       "uid": "g1004",
-      "quality": "high",
+      "quality": "low",
       "rot": 180,
       "scale": 1,
       "assetId": "guardhouse",
@@ -95,7 +95,7 @@
       "category": "building",
       "name": "彈藥庫",
       "sourceBuildingId": "ammo",
-      "model": "./assets/buildings/building-4-guardhouse.glb",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
       "size": [
         4.641,
         2.45,
@@ -109,7 +109,7 @@
     },
     {
       "uid": "g1005",
-      "quality": "high",
+      "quality": "low",
       "rot": 88.698,
       "scale": 1,
       "assetId": "smallRear",
@@ -118,7 +118,7 @@
       "category": "building",
       "name": "毒氣體驗室／核生化教室",
       "sourceBuildingId": "chem",
-      "model": "./assets/buildings/building-3-small-rear-fixed.glb",
+      "model": "./assets/grenade-low/grenade-small-rear-low.glb",
       "size": [
         6.461,
         2.8,
@@ -132,7 +132,7 @@
     },
     {
       "uid": "g1006",
-      "quality": "high",
+      "quality": "low",
       "rot": 180,
       "scale": 1,
       "assetId": "smallRear",
@@ -141,7 +141,7 @@
       "category": "building",
       "name": "營站（福利社）",
       "sourceBuildingId": "store",
-      "model": "./assets/buildings/building-3-small-rear-fixed.glb",
+      "model": "./assets/grenade-low/grenade-small-rear-low.glb",
       "size": [
         5.096,
         2.6,
@@ -155,7 +155,7 @@
     },
     {
       "uid": "g1007",
-      "quality": "high",
+      "quality": "low",
       "rot": -90,
       "scale": 1,
       "assetId": "community",
@@ -164,7 +164,7 @@
       "category": "building",
       "name": "餐廳（廚房）",
       "sourceBuildingId": "canteen",
-      "model": "./assets/buildings/building-2-community.glb",
+      "model": "./assets/grenade-low/grenade-community-low.glb",
       "size": [
         8.645,
         3,
@@ -178,7 +178,7 @@
     },
     {
       "uid": "g1008",
-      "quality": "high",
+      "quality": "low",
       "rot": -90,
       "scale": 1,
       "assetId": "wash",
@@ -187,7 +187,7 @@
       "category": "building",
       "name": "洗手／洗碗區",
       "sourceBuildingId": "wash",
-      "model": "./assets/buildings/building-5-wash.glb",
+      "model": "./assets/grenade-low/grenade-wash-low.glb",
       "size": [
         3.7346,
         1.75,
@@ -201,7 +201,7 @@
     },
     {
       "uid": "g1009",
-      "quality": "high",
+      "quality": "low",
       "rot": -90,
       "scale": 1,
       "assetId": "smallRear",
@@ -210,7 +210,7 @@
       "category": "building",
       "name": "醫務所",
       "sourceBuildingId": "medic",
-      "model": "./assets/buildings/building-3-small-rear-fixed.glb",
+      "model": "./assets/grenade-low/grenade-small-rear-low.glb",
       "size": [
         3.822,
         2.5,
@@ -224,7 +224,7 @@
     },
     {
       "uid": "g1010",
-      "quality": "high",
+      "quality": "low",
       "rot": 0,
       "scale": 1,
       "assetId": "barracks",
@@ -233,7 +233,7 @@
       "category": "building",
       "name": "軍械室",
       "sourceBuildingId": "armory",
-      "model": "./assets/buildings/building-1-barracks.glb",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
       "size": [
         5.551,
         2.35,
@@ -247,7 +247,7 @@
     },
     {
       "uid": "g1011",
-      "quality": "high",
+      "quality": "low",
       "rot": 0,
       "scale": 1,
       "assetId": "smallRear",
@@ -256,7 +256,7 @@
       "category": "building",
       "name": "會客室",
       "sourceBuildingId": "visitor",
-      "model": "./assets/buildings/building-3-small-rear-fixed.glb",
+      "model": "./assets/grenade-low/grenade-small-rear-low.glb",
       "size": [
         4.823,
         2.35,
@@ -270,7 +270,7 @@
     },
     {
       "uid": "g1012",
-      "quality": "high",
+      "quality": "low",
       "rot": -90,
       "scale": 1,
       "assetId": "guardhouse",
@@ -279,7 +279,7 @@
       "category": "building",
       "name": "大門哨口",
       "sourceBuildingId": "guard",
-      "model": "./assets/buildings/building-4-guardhouse.glb",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
       "size": [
         2.184,
         2.5,
@@ -4911,531 +4911,6 @@
         0.59033,
         0.95264,
         0.50732
-      ]
-    },
-    {
-      "uid": "g888",
-      "quality": "high",
-      "rot": 160,
-      "scale": 1,
-      "assetId": "friendly",
-      "x": -21,
-      "z": -9,
-      "category": "soldier",
-      "name": "投擲者",
-      "team": "friendly",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1190",
-      "quality": "high",
-      "rot": 180,
-      "scale": 1,
-      "assetId": "enemy",
-      "x": 2,
-      "z": 23,
-      "category": "soldier",
-      "name": "紅軍",
-      "team": "enemy",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1191",
-      "quality": "high",
-      "rot": 180,
-      "scale": 1,
-      "assetId": "enemy",
-      "x": 4,
-      "z": 23,
-      "category": "soldier",
-      "name": "紅軍",
-      "team": "enemy",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1192",
-      "quality": "high",
-      "rot": 180,
-      "scale": 1,
-      "assetId": "enemy",
-      "x": 6,
-      "z": 23,
-      "category": "soldier",
-      "name": "紅軍",
-      "team": "enemy",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1193",
-      "quality": "high",
-      "rot": 180,
-      "scale": 1,
-      "assetId": "enemy",
-      "x": 8,
-      "z": 23,
-      "category": "soldier",
-      "name": "紅軍",
-      "team": "enemy",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1194",
-      "quality": "high",
-      "rot": 180,
-      "scale": 1,
-      "assetId": "enemy",
-      "x": 2,
-      "z": 25.3,
-      "category": "soldier",
-      "name": "紅軍",
-      "team": "enemy",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1195",
-      "quality": "high",
-      "rot": 180,
-      "scale": 1,
-      "assetId": "enemy",
-      "x": 4,
-      "z": 25.3,
-      "category": "soldier",
-      "name": "紅軍",
-      "team": "enemy",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1196",
-      "quality": "high",
-      "rot": 180,
-      "scale": 1,
-      "assetId": "enemy",
-      "x": 6,
-      "z": 25.3,
-      "category": "soldier",
-      "name": "紅軍",
-      "team": "enemy",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1197",
-      "quality": "high",
-      "rot": 180,
-      "scale": 1,
-      "assetId": "enemy",
-      "x": 8,
-      "z": 25.3,
-      "category": "soldier",
-      "name": "紅軍",
-      "team": "enemy",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1198",
-      "quality": "high",
-      "rot": 180,
-      "scale": 1,
-      "assetId": "enemy",
-      "x": 2,
-      "z": 27.6,
-      "category": "soldier",
-      "name": "紅軍",
-      "team": "enemy",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1199",
-      "quality": "high",
-      "rot": 180,
-      "scale": 1,
-      "assetId": "enemy",
-      "x": 4,
-      "z": 27.6,
-      "category": "soldier",
-      "name": "紅軍",
-      "team": "enemy",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1200",
-      "quality": "high",
-      "rot": 180,
-      "scale": 1,
-      "assetId": "enemy",
-      "x": 6,
-      "z": 27.6,
-      "category": "soldier",
-      "name": "紅軍",
-      "team": "enemy",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1201",
-      "quality": "high",
-      "rot": 180,
-      "scale": 1,
-      "assetId": "enemy",
-      "x": 8,
-      "z": 27.6,
-      "category": "soldier",
-      "name": "紅軍",
-      "team": "enemy",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1202",
-      "quality": "high",
-      "rot": 0,
-      "scale": 1,
-      "assetId": "friendly",
-      "x": -47,
-      "z": 18,
-      "category": "soldier",
-      "name": "友軍",
-      "team": "friendly",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1203",
-      "quality": "high",
-      "rot": 0,
-      "scale": 1,
-      "assetId": "friendly",
-      "x": -45,
-      "z": 18,
-      "category": "soldier",
-      "name": "友軍",
-      "team": "friendly",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1204",
-      "quality": "high",
-      "rot": 0,
-      "scale": 1,
-      "assetId": "friendly",
-      "x": -43,
-      "z": 18,
-      "category": "soldier",
-      "name": "友軍",
-      "team": "friendly",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1205",
-      "quality": "high",
-      "rot": 0,
-      "scale": 1,
-      "assetId": "friendly",
-      "x": -41,
-      "z": 18,
-      "category": "soldier",
-      "name": "友軍",
-      "team": "friendly",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1206",
-      "quality": "high",
-      "rot": 0,
-      "scale": 1,
-      "assetId": "friendly",
-      "x": -47,
-      "z": 19.8,
-      "category": "soldier",
-      "name": "友軍",
-      "team": "friendly",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1207",
-      "quality": "high",
-      "rot": 0,
-      "scale": 1,
-      "assetId": "friendly",
-      "x": -45,
-      "z": 19.8,
-      "category": "soldier",
-      "name": "友軍",
-      "team": "friendly",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1208",
-      "quality": "high",
-      "rot": 0,
-      "scale": 1,
-      "assetId": "friendly",
-      "x": -43,
-      "z": 19.8,
-      "category": "soldier",
-      "name": "友軍",
-      "team": "friendly",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1209",
-      "quality": "high",
-      "rot": 0,
-      "scale": 1,
-      "assetId": "friendly",
-      "x": -41,
-      "z": 19.8,
-      "category": "soldier",
-      "name": "友軍",
-      "team": "friendly",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1210",
-      "quality": "high",
-      "rot": 0,
-      "scale": 1,
-      "assetId": "friendly",
-      "x": -47,
-      "z": 21.6,
-      "category": "soldier",
-      "name": "友軍",
-      "team": "friendly",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1211",
-      "quality": "high",
-      "rot": 0,
-      "scale": 1,
-      "assetId": "friendly",
-      "x": -45,
-      "z": 21.6,
-      "category": "soldier",
-      "name": "友軍",
-      "team": "friendly",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1212",
-      "quality": "high",
-      "rot": 0,
-      "scale": 1,
-      "assetId": "friendly",
-      "x": -43,
-      "z": 21.6,
-      "category": "soldier",
-      "name": "友軍",
-      "team": "friendly",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
-      ]
-    },
-    {
-      "uid": "g1213",
-      "quality": "high",
-      "rot": 0,
-      "scale": 1,
-      "assetId": "friendly",
-      "x": -41,
-      "z": 21.6,
-      "category": "soldier",
-      "name": "友軍",
-      "team": "friendly",
-      "model": "./assets/characters/cadet/cadet-green.glb",
-      "destructible": {
-        "kind": "knock-down"
-      },
-      "size": [
-        1.12,
-        1.7,
-        0.86
       ]
     }
   ]

@@ -7,7 +7,7 @@
 </head>
 <body>
 <header class="topbar">
- <div><b>💣 手榴彈場景編輯器</b><small>預載主遊戲軍營 · 建築與器材可破壞 · 不影響主遊戲</small></div>
+ <div><b>💣 手榴彈場景編輯器</b><small>已清空軍營士兵 · 建築低畫質 · 碎裂系統保留 · 不影響主遊戲</small></div>
  <div class="topactions"><a href="./editor.html">原軍營編輯器</a><button id="togglePanel">收合工具</button></div>
 </header>
 <main id="stage"><canvas id="world" aria-label="3D 編輯場景"></canvas><div id="loading">正在載入模型…</div>
@@ -19,7 +19,7 @@
  <div class="section">
   <div class="sectionTitle"><b>新增模型</b><span id="objectCount">0 個物件</span></div>
   <div class="two"><label>分類<select id="category"><option value="building">建築（手榴彈用）</option><option value="soldier">士兵（手榴彈用）</option><option value="prop">環境物件（手榴彈用）</option><option value="ground">道路與地面（手榴彈用）</option></select></label><label>素材<select id="template"></select></label></div>
-  <p class="qualityHint">原有模型可切換畫質；新增的完整軍營建築與器材使用原版模型，並配置獨立碎裂模型。</p>
+  <p class="qualityHint">軍營 12 棟建築預設低畫質；爆炸時仍使用各自碎裂模型。編輯器不會刪除主遊戲人物。</p>
   <div class="btnRow"><button id="add" class="primary">＋ 放到鏡頭中心</button><button id="duplicate">複製選取</button><button id="remove" class="danger">刪除選取</button></div>
   <details><summary>場景物件清單（可快速選取）</summary><select id="objectList" size="5" style="margin-top:8px"></select></details>
  </div>
@@ -45,6 +45,6 @@
   <div id="message"></div>
  </div>
 </aside>
-<script type="module" src="./grenade-scene-editor.js?v=15"></script>
+<script type="module" src="./grenade-scene-editor.js?v=16"></script>
 </body>
 </html>

@@ -5,9 +5,9 @@ import {RigAnimator} from './src/characters/rigAnimator.js';
 const $=id=>document.getElementById(id),cap=(v,a,b)=>Math.max(a,Math.min(b,v));
 const PATH='./assets/grenade-low/';
 const ASSETS=[
- {id:'community',type:'building',name:'中山室／餐廳（可碎裂）',highFile:'./assets/buildings/building-2-community.glb',highFracture:'./assets/buildings/destructible/building-2-community-fractured.glb',size:[14, 4.7, 7]},
- {id:'smallRear',type:'building',name:'營站／醫務所／會客室（可碎裂）',highFile:'./assets/buildings/building-3-small-rear-fixed.glb',highFracture:'./assets/buildings/destructible/building-3-small-rear-fixed-fractured.glb',size:[6, 3.5, 5]},
- {id:'wash',type:'building',name:'洗手／洗碗區（可碎裂）',highFile:'./assets/buildings/building-5-wash.glb',highFracture:'./assets/buildings/destructible/building-5-wash-fractured.glb',size:[6, 3, 6]},
+ {id:'community',type:'building',name:'中山室／餐廳（可碎裂）',file:'grenade-community-low.glb',highFile:'./assets/buildings/building-2-community.glb',highFracture:'./assets/buildings/destructible/building-2-community-fractured.glb',size:[14, 4.7, 7]},
+ {id:'smallRear',type:'building',name:'營站／醫務所／會客室（可碎裂）',file:'grenade-small-rear-low.glb',highFile:'./assets/buildings/building-3-small-rear-fixed.glb',highFracture:'./assets/buildings/destructible/building-3-small-rear-fixed-fractured.glb',size:[6, 3.5, 5]},
+ {id:'wash',type:'building',name:'洗手／洗碗區（可碎裂）',file:'grenade-wash-low.glb',highFile:'./assets/buildings/building-5-wash.glb',highFracture:'./assets/buildings/destructible/building-5-wash-fractured.glb',size:[6, 3, 6]},
  {id:'streetlamp',type:'prop',name:'路燈（可碎裂）',highFile:'./assets/props/streetlamp.glb',highFracture:'./assets/props/destructible/streetlamp-fractured.glb',size:[0.5, 5, 0.26]},
  {id:'target',type:'prop',name:'射擊靶架（可碎裂）',highFile:'./assets/props/target.glb',highFracture:'./assets/props/destructible/target-fractured.glb',size:[1.5, 2, 0.9]},
  {id:'crate',type:'prop',name:'木箱（可碎裂）',highFile:'./assets/props/crate.glb',highFracture:'./assets/props/destructible/crate-fractured.glb',size:[1.6, 1, 0.9]},
@@ -42,7 +42,7 @@ const qualityOf=o=>o?.quality==='high'?'high':'low';
 const hasModel=a=>!!(a&&(a.file||a.highFile));
 const hasTwoQualities=a=>!!(a?.file&&a?.highFile);
 const modelPath=(a,q='low')=>!a?null:q==='high'&&a.highFile?a.highFile:a.file?PATH+a.file:a.highFile||null;
-const fracturePath=(a,q='low')=>!a?null:q==='high'&&a.highFracture?a.highFracture:a.fracture?PATH+a.fracture:a.highFracture||null;
+const fracturePath=(a,q='low')=>!a?null:a.type==='building'&&a.highFracture?a.highFracture:q==='high'&&a.highFracture?a.highFracture:a.fracture?PATH+a.fracture:a.highFracture||null;
 const qualityName=o=>hasModel(BY[o.assetId])?(qualityOf(o)==='high'?'高':'低'):'';
 const STORAGE='army-grenade-user-scenes-v1';
 const initial=()=>({id:'scene-1',name:'手榴彈場景 1',serial:0,objects:[]});
@@ -81,12 +81,12 @@ function batchAdd(){const o=scene.objects.find(x=>x.uid===selected);if(!o){msg('
 function newScene(){let name=prompt('新場景名稱（不會影響原軍營）','手榴彈場景 '+(store.scenes.length+1));if(name===null)return;name=name.trim()||'未命名手榴彈場景';const s={id:'scene-'+Date.now()+'-'+Math.floor(Math.random()*1000),name,serial:0,objects:[]};store.scenes.push(s);scene=s;history.length=0;future.length=0;select(null);setMoveSelectedMode(false);pivot={x:0,z:0};distance=96;listScenes();changed();msg('已新增空白場景：'+name)}
 function renameScene(){const v=prompt('修改場景名稱',scene.name);if(v===null)return;scene.name=v.trim()||scene.name;listScenes();save()}
 function deleteScene(){if(!confirm('確定要刪除場景「'+scene.name+'」？此操作不會影響主遊戲。'))return;store.scenes=store.scenes.filter(x=>x!==scene);if(!store.scenes.length)store.scenes=[initial()];scene=store.scenes[0];history.length=0;future.length=0;selected=null;setMoveSelectedMode(false);listScenes();changed()}
-function exportScene(){const data={format:'army-grenade-scene',schemaVersion:1,exportedAt:new Date().toISOString(),sceneId:scene.id,sceneName:scene.name,map:{width:280,depth:280,groundColor:'#adc9a7'},throwOrigin:(scene.objects.find(o=>o.assetId==='throwPoint')||scene.objects.find(o=>o.uid==='g888')||{x:0,z:0}),totalObjects:scene.objects.length,items:scene.objects.map(o=>{const a=BY[o.assetId];const model=modelPath(a,qualityOf(o));const fracturedModel=fracturePath(a,qualityOf(o));return{...o,quality:qualityOf(o),category:a.type,name:o.name||a.name,model,destructible:fracturedModel?{fracturedModel,kind:o.destructible?.kind||'mesh-fragments'}:a.type==='ground'?{kind:'scorched-ground'}:o.destructible||null,team:o.team||a.side||null,size:o.size||a.size}})};
+function exportScene(){const data={format:'army-grenade-scene',schemaVersion:1,exportedAt:new Date().toISOString(),sceneId:scene.id,sceneName:scene.name,map:{width:280,depth:280,groundColor:'#adc9a7'},throwOrigin:(scene.throwOrigin||scene.objects.find(o=>o.assetId==='throwPoint')||scene.objects.find(o=>o.uid==='g888')||{x:0,z:0}),totalObjects:scene.objects.length,items:scene.objects.map(o=>{const a=BY[o.assetId];const model=modelPath(a,qualityOf(o));const fracturedModel=fracturePath(a,qualityOf(o));return{...o,quality:qualityOf(o),category:a.type,name:o.name||a.name,model,destructible:fracturedModel?{fracturedModel,kind:o.destructible?.kind||'mesh-fragments'}:a.type==='ground'?{kind:'scorched-ground'}:o.destructible||null,team:o.team||a.side||null,size:o.size||a.size}})};
  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=('手榴彈場景_'+scene.name.replace(/[\/:*?"<>|]/g,'_')+'.json');document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);msg('已匯出 '+data.totalObjects+' 個物件，保留原始模型及碎裂模型位置')}
 async function importData(data,label='匯入'){if(data.format!=='army-grenade-scene'||data.schemaVersion!==1||!Array.isArray(data.items))throw Error('請使用此編輯器匯出的場景 JSON');if(data.items.length>6000)throw Error('單次最多匯入 6,000 個物件');const invalid=data.items.filter(x=>!BY[x.assetId]||![x.x,x.z,x.rot,x.scale].every(Number.isFinite)||!['low','high',undefined,null].includes(x.quality));if(invalid.length)throw Error('匯入檔包含不支援的模型或座標：'+invalid.map(x=>x.assetId).slice(0,6).join(','));
- const name=(data.sceneName||label)+'（匯入）';const serial=Math.max(...data.items.map(x=>Number(String(x.uid).replace(/^g/,''))||0),0);const s={id:'scene-'+Date.now(),name,serial:Math.max(serial,1000),objects:data.items.map(x=>({...x,quality:hasModel(BY[x.assetId])?qualityOf(x):'low'}))};store.scenes.push(s);scene=s;selected=null;setMoveSelectedMode(false);history.length=0;future.length=0;listScenes();changed();pivot={x:0,z:0};distance=115;const unique=new Map();for(const o of s.objects){const a=BY[o.assetId];if(hasModel(a))unique.set(o.assetId+':'+qualityOf(o),[a,qualityOf(o)]);}const queue=[...unique.values()];void Promise.all(Array.from({length:3},async()=>{while(queue.length){const [a,q]=queue.shift();await ensureAsset(a,q);}}));msg('已載入完整軍營：'+s.objects.length+' 個物件，建築／圍欄／器材均可破壞');}
+ const name=(data.sceneName||label)+'（匯入）';const serial=Math.max(...data.items.map(x=>Number(String(x.uid).replace(/^g/,''))||0),0);const s={id:'scene-'+Date.now(),name,serial:Math.max(serial,1000),throwOrigin:data.throwOrigin||{x:0,z:0},objects:data.items.map(x=>({...x,quality:hasModel(BY[x.assetId])?qualityOf(x):'low'}))};store.scenes.push(s);scene=s;selected=null;setMoveSelectedMode(false);history.length=0;future.length=0;listScenes();changed();pivot={x:0,z:0};distance=115;const unique=new Map();for(const o of s.objects){const a=BY[o.assetId];if(hasModel(a))unique.set(o.assetId+':'+qualityOf(o),[a,qualityOf(o)]);}const queue=[...unique.values()];void Promise.all(Array.from({length:3},async()=>{while(queue.length){const [a,q]=queue.shift();await ensureAsset(a,q);}}));msg('已載入低畫質無士兵軍營：'+s.objects.length+' 個物件，建築／圍欄／器材仍可破壞');}
 async function importScene(file){try{await importData(JSON.parse(await file.text()),file.name)}catch(err){msg('匯入失敗：'+err.message);console.error(err)}}
-async function importMainCamp(){try{if(!confirm('載入主遊戲完整軍營？會建立新場景，原本場景不受影響。'))return;const r=await fetch('./main-camp-destructible.json?v=1');if(!r.ok)throw Error('找不到內建軍營 JSON');await importData(await r.json(),'完整軍營')}catch(err){msg('載入軍營失敗：'+err.message);console.error(err)}}
+async function importMainCamp(){try{if(!confirm('載入主遊戲完整軍營？會建立新場景，原本場景不受影響。'))return;const r=await fetch('./main-camp-destructible.json?v=15');if(!r.ok)throw Error('找不到內建軍營 JSON');await importData(await r.json(),'完整軍營')}catch(err){msg('載入軍營失敗：'+err.message);console.error(err)}}
 function refreshTemplates(){const type=$('category').value,sel=$('template'),prev=sel.value;sel.replaceChildren();for(const a of ASSETS.filter(x=>x.type===type)){for(const q of (hasTwoQualities(a)?['low','high']:hasModel(a)?['high']:['low'])){const op=document.createElement('option');op.value=a.id+':'+q;op.textContent=a.name+(hasModel(a)?'｜'+(q==='high'?'原版模型・可破壞':'低畫質（輕量）'):'');sel.add(op)}}if([...sel.options].some(x=>x.value===prev))sel.value=prev}
 function changeSelectedQuality(){const o=scene.objects.find(x=>x.uid===selected);if(!o||!hasTwoQualities(BY[o.assetId]))return;const q=$('selectedQuality').value;if(q===qualityOf(o))return;checkpoint();o.quality=q;ensureAsset(BY[o.assetId],q);changed();msg('已切換成'+(q==='high'?'高畫質原版':'低畫質輕量版')+'；位置與縮放保持不變')}
 
@@ -253,7 +253,7 @@ function loop(){try{if(gl)drawWebGL();else draw2D()}catch(e){console.error(e);if
 // Never delete previous user-created scenes or overwrite an already edited camp.
 async function seedMainCampOnFirstOpen(){
  if(store.mainCampSeedVersion===14)return;
- const res=await fetch('./main-camp-destructible.json?v=14',{cache:'no-store'});
+ const res=await fetch('./main-camp-destructible.json?v=15',{cache:'no-store'});
  if(!res.ok)throw Error('完整軍營場景檔無法載入（HTTP '+res.status+'）');
  const data=await res.json();
  if(data.format!=='army-grenade-scene'||data.schemaVersion!==1||!Array.isArray(data.items))throw Error('內建軍營資料格式錯誤');
@@ -262,7 +262,7 @@ async function seedMainCampOnFirstOpen(){
  let camp=store.scenes.find(s=>s.id==='main-camp-destructible');
  if(!camp){
    const serial=Math.max(1000,...data.items.map(o=>Number(String(o.uid).replace(/^g/,''))||0));
-   camp={id:'main-camp-destructible',name:'🏕️ 主遊戲完整軍營｜全可破壞',serial,objects:data.items.map(o=>({...o}))};
+   camp={id:'main-camp-destructible',name:'🏕️ 主遊戲完整軍營｜低畫質・無士兵',serial,throwOrigin:data.throwOrigin,objects:data.items.map(o=>({...o}))};
    if(store.scenes.length===1&&store.scenes[0].id==='scene-1'&&store.scenes[0].objects.length===0)store.scenes=[camp];
    else store.scenes.unshift(camp);
  }
@@ -270,7 +270,34 @@ async function seedMainCampOnFirstOpen(){
  pivot={x:0,z:5};distance=155;yaw=.46;pitch=.98;
  save();
 }
-async function boot(){try{await seedMainCampOnFirstOpen()}catch(err){console.error('完整軍營預載失敗',err);msg('軍營預載失敗：'+err.message+'，可使用「載入完整軍營」重試')}
+// v1.15: remove all soldiers from the existing active editor camp (not the actual game),
+// and switch every building in the complete-camp layouts to a real low-res asset.
+// Apply once to saved scenes; never reset user-edited coordinates or other objects.
+function migrateCampLightScene(){
+ if(store.mainCampLightVersion===15)return;
+ let removed=0,optimized=0;
+ for(const s of store.scenes){
+  const isMain=s.id==='main-camp-destructible'||s.name?.includes('完整軍營');
+  if(!isMain && s!==scene)continue;
+  const before=s.objects.length;
+  s.objects=s.objects.filter(o=>BY[o.assetId]?.type!=='soldier'&&o.category!=='soldier');
+  removed+=before-s.objects.length;
+  if(!isMain)continue;
+  if(!s.throwOrigin)s.throwOrigin={x:-21,z:-9};
+  for(const o of s.objects){
+   const a=BY[o.assetId];if(a?.type!=='building')continue;
+   o.quality='low';o.model=modelPath(a,'low');
+   const fracture=fracturePath(a,'low');
+   if(fracture)o.destructible={...(o.destructible||{}),fracturedModel:fracture,kind:'mesh-fragments'};
+   optimized++;
+  }
+ }
+ selected=null;history.length=0;future.length=0;
+ store.mainCampLightVersion=15;
+ save();
+ if(removed||optimized)msg('已移除 '+removed+' 名士兵，'+optimized+' 棟軍營建築已改用低畫質模型');
+}
+async function boot(){try{await seedMainCampOnFirstOpen();migrateCampLightScene()}catch(err){console.error('完整軍營預載失敗',err);msg('軍營預載失敗：'+err.message+'，可使用「載入完整軍營」重試')}
  setupUI();pointerEvents();try{initGL();if(!gl)$('loading').hidden=true;else{if(scene.objects.length){for(const o of scene.objects){const a=BY[o.assetId];if(hasModel(a))ensureAsset(a,qualityOf(o))}}else{['barracks','enemy','treeA'].forEach(id=>ensureAsset(BY[id],'low'))};if(!loading)$('loading').hidden=true}}catch(e){console.error(e);msg('初始化失敗：'+e.message);$('loading').hidden=true}
  requestAnimationFrame(loop)}
 boot();
