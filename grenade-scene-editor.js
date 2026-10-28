@@ -1,6 +1,7 @@
 import {loadGlb} from './src/core/glb111.js';
 import {RigAnimator} from './src/characters/rigAnimator.js';
 // Grenade-only scene editing. Never modifies the live camp objects or scene.
+// Red team: recolor green uniform texels only. Skin, hair, eyes and boots retain original colors.
 const $=id=>document.getElementById(id),cap=(v,a,b)=>Math.max(a,Math.min(b,v));
 const PATH='./assets/grenade-low/';
 const ASSETS=[
@@ -177,7 +178,7 @@ function shader(gl,t,src){const s=gl.createShader(t);gl.shaderSource(s,src);gl.c
 function makeProgram(vs,fs){const p=gl.createProgram();gl.attachShader(p,shader(gl,gl.VERTEX_SHADER,vs));gl.attachShader(p,shader(gl,gl.FRAGMENT_SHADER,fs));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));return p}
 const VS=`#version 300 es\nprecision highp float;layout(location=0)in vec3 p;layout(location=1)in vec3 n;layout(location=2)in vec2 uv;uniform mat4 uVP,uModel;out vec2 vUV;out vec3 vN;void main(){gl_Position=uVP*uModel*vec4(p,1.);vUV=uv;vN=normalize(mat3(uModel)*n);}`;
 const SKINVS=`#version 300 es\nprecision highp float;layout(location=0)in vec3 p;layout(location=1)in vec3 n;layout(location=2)in vec2 uv;layout(location=3)in vec4 j;layout(location=4)in vec4 w;uniform mat4 uVP,uModel,uBones[44];out vec2 vUV;out vec3 vN;void main(){ivec4 ji=ivec4(j+.5);mat4 m=uBones[ji.x]*w.x+uBones[ji.y]*w.y+uBones[ji.z]*w.z+uBones[ji.w]*w.w;gl_Position=uVP*uModel*m*vec4(p,1.);vUV=uv;vN=normalize(mat3(uModel)*mat3(m)*n);}`;
-const FS=`#version 300 es\nprecision mediump float;in vec2 vUV;in vec3 vN;uniform sampler2D uTex;uniform vec3 uTint;uniform float uRed;out vec4 outColor;void main(){vec3 col=texture(uTex,vUV).rgb;col=mix(col,vec3(.78,.19,.14)*(.50+col.r*.50),uRed*.72);float light=.76+.29*max(0.,dot(normalize(vN),normalize(vec3(-.45,1.,.60))));outColor=vec4(col*uTint*light,1.);}`;
+const FS=`#version 300 es\nprecision mediump float;in vec2 vUV;in vec3 vN;uniform sampler2D uTex;uniform vec3 uTint;uniform float uRed;out vec4 outColor;void main(){vec3 col=texture(uTex,vUV).rgb;float cloth=smoothstep(.025,.10,col.g-col.r)*smoothstep(.055,.13,col.g-col.b);vec3 redCloth=vec3(min(1.,col.g*1.58),col.g*.47,col.g*.38);col=mix(col,redCloth,uRed*cloth);float light=.76+.29*max(0.,dot(normalize(vN),normalize(vec3(-.45,1.,.60))));outColor=vec4(col*uTint*light,1.);}`;
 const FLATVS=`#version 300 es\nprecision highp float;layout(location=0)in vec3 p;uniform mat4 uVP,uModel;void main(){gl_Position=uVP*uModel*vec4(p,1.);}`;
 const FLATFS=`#version 300 es\nprecision mediump float;uniform vec3 uColor;out vec4 outColor;void main(){outColor=vec4(uColor,1.);}`;
 const cube=[];function face(a,b,c,d){for(const q of [a,b,c,a,c,d])cube.push(...q)}

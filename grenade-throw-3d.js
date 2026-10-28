@@ -300,7 +300,7 @@ class WebWorld{
     `#version 300 es
     precision mediump float;in vec2 vUV;in vec3 vN;uniform sampler2D uTex;uniform vec3 uTint;uniform float uRed;out vec4 frag;
     void main(){vec3 base=texture(uTex,vUV).rgb;float l=.7+.31*max(0.,dot(normalize(vN),normalize(vec3(-.4,1.1,.55))));
-      vec3 c=mix(base,vec3(.85,.13,.10)*(.4+base.r*.55),uRed*.64);frag=vec4(c*l,1.);}`);
+      float cloth=smoothstep(.025,.10,base.g-base.r)*smoothstep(.055,.13,base.g-base.b);vec3 redCloth=vec3(min(1.,base.g*1.58),base.g*.47,base.g*.38);vec3 c=mix(base,redCloth,uRed*cloth);frag=vec4(c*l,1.);}`);
  }
  drawStaticMesh(geo,tex,model,vp){const g=this.gl,p=this.detailProg;g.useProgram(p);g.uniformMatrix4fv(g.getUniformLocation(p,'uVP'),false,vp);g.uniformMatrix4fv(g.getUniformLocation(p,'uModel'),false,model);g.uniform3f(g.getUniformLocation(p,'uTint'),1,1,1);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,tex);g.uniform1i(g.getUniformLocation(p,'uTex'),0);g.bindVertexArray(geo.vao);g.drawElements(g.TRIANGLES,geo.count,geo.indexType,0);}
  explodeBuilding(b){if(b.hit)return;b.hit=true;b.fragments=[];const info=this.detailed?.[b.type];if(!info)return;
