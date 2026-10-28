@@ -16,9 +16,12 @@ const mix3=(a,b,k)=>a.map((v,i)=>lerp(v,b[i],k));
 // GTA-style spatial continuity: front of enemies -> rise -> overhead travel -> descend behind thrower.
 function introCamera(t){
  const pose=playerAimPose(),[rx,rz]=RED_CENTER,[px,pz]=[PLAYER_ITEM.x,PLAYER_ITEM.z];
- const redEye=[rx,4.0,rz+9.2],redLook=[rx,1.05,rz];
- const redAbove=[rx,37,rz+7],redTop=[rx,0,rz];
- const throwAbove=[px,37,pz+7],throwTop=[px,0,pz];
+ // Keep the camera on the thrower's side of the red squad at every altitude.
+ // Its horizontal forward vector never flips, including the overhead transition.
+ const [fx,fz]=pose.forward;
+ const redEye=[rx-fx*9.2,4.0,rz-fz*9.2],redLook=[rx,1.05,rz];
+ const redAbove=[rx-fx*7,37,rz-fz*7],redTop=[rx,0,rz];
+ const throwAbove=[px-fx*7,37,pz-fz*7],throwTop=[px,0,pz];
  if(t<.17)return {eye:redEye,target:redLook};
  if(t<.42){const u=smooth((t-.17)/.25);return {eye:mix3(redEye,redAbove,u),target:mix3(redLook,redTop,u)};}
  if(t<.74){const u=smooth((t-.42)/.32);return {eye:mix3(redAbove,throwAbove,u),target:mix3(redTop,throwTop,u)};}
@@ -49,6 +52,8 @@ for(let i=0;i<ALL_RED.length;i+=9)ENEMY_GROUPS.push(ALL_RED.slice(i,i+9));
 let activeGroupIndex=Math.floor(Math.random()*ENEMY_GROUPS.length);
 const RED_ITEMS=[];
 const RED_CENTER=[0,0];
+// v1.21: stable screen-forward direction is the calibrated midpoint, not the randomly selected squad.
+const AIM_CENTER=[39.17,30.58];
 const SCENE_BUILDINGS=ITEMS.filter(v=>v.category==='building');
 const SCENE_SOLDIERS=ITEMS.filter(v=>v.team==='friendly');
 const SCENE_PROPS=ITEMS.filter(v=>v.category==='prop');
@@ -62,7 +67,7 @@ function updateRedSelection(index){
 }
 updateRedSelection(activeGroupIndex);
 function playerAimPose(){
- const fx=RED_CENTER[0]-PLAYER_ITEM.x,fz=RED_CENTER[1]-PLAYER_ITEM.z,len=Math.hypot(fx,fz)||1;
+ const fx=AIM_CENTER[0]-PLAYER_ITEM.x,fz=AIM_CENTER[1]-PLAYER_ITEM.z,len=Math.hypot(fx,fz)||1;
  const nx=fx/len,nz=fz/len,rx=nz,rz=-nx;
  return {forward:[nx,nz],right:[rx,rz],eye:[PLAYER_ITEM.x-nx*5.6+rx*.75,2.0,PLAYER_ITEM.z-nz*5.6+rz*.75],target:[PLAYER_ITEM.x+nx*19,2.35,PLAYER_ITEM.z+nz*19]};
 }
@@ -339,10 +344,9 @@ class WebWorld{
   this.camFocus=[tgt[0],tgt[2]];this.camDist=dist;
   const vp=mul(pers(54,c.width/c.height,.2,19000),lookAt(eye,tgt));
   if(this.campGroundVAO)this.drawOriginalCampGround(vp);else this.instanceDraw(this.groundBuf,1,2,vp);
-  if(dist>100){this.instanceDraw(this.bldBuf,this.bld.length/12,0,vp);this.instanceDraw(this.bldBuf,this.bld.length/12,1,vp);}
-  if(dist>180&&this.detailProxyBuf){this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,0,vp);this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,1,vp);}
-  if(dist>85){this.instanceDraw(this.troopBuf,this.troop.length/12,3,vp);this.instanceDraw(this.troopBuf,this.troop.length/12,4,vp);}
-  this.drawCampProps(vp,dist);this.drawDetailed(vp,dist);this.drawFlight(vp);this.drawGroundedGrenade(vp);this.debris(vp);this.drawRing(vp);this.drawExplosion(vp,dist);
+  if(this.bld.length){this.instanceDraw(this.bldBuf,this.bld.length/12,0,vp);this.instanceDraw(this.bldBuf,this.bld.length/12,1,vp);}
+  if(this.modelState!=='ready'&&this.detailProxyBuf){this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,0,vp);this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,1,vp);}
+  this.drawDistantSoldiers(vp,dist);this.drawCampProps(vp,dist);this.drawDetailed(vp,dist);this.drawFlight(vp);this.drawGroundedGrenade(vp);this.debris(vp);this.drawRing(vp);this.drawExplosion(vp,dist);
   if(this.throwing&&performance.now()-this.throwing.start>=this.throwing.duration){const a=this.throwing;this.launchFlight(a.target[0],a.target[1],a.onLanding);}
  }
  async initDetailedAssets(){
@@ -351,7 +355,7 @@ class WebWorld{
    this.nearBuildings=SCENE_BUILDINGS.map((o,i)=>({x:o.x,z:o.z,type:o.assetId,people:0,hit:false,fragments:[]}));
    this.actors=SCENE_SOLDIERS.filter(o=>o.uid!==PLAYER_ITEM.uid).map((o,i)=>({x:o.x,z:o.z,px:o.x,pz:o.z,rot:o.rot||0,angle:(o.rot||0)*Math.PI/180,enemy:o.team==='enemy',hit:false,renderLift:0,seed:(i*.731)%1}));
    this.campProps=SCENE_PROPS.map(o=>({uid:o.uid,type:o.assetId,x:o.x,z:o.z,scale:o.scale||1,scaleXYZ:o.scaleXYZ,baseY:o.baseY||0,yaw:(o.rot||0)*Math.PI/180,size:o.size,model:o.model,fracturePath:o.destructible?.fracturedModel,hit:false,fragments:[]}));
-   this.thrower={x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,angle:0,anim:{setClip(){},hasClip(){return true}}};
+   this.thrower={x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,angle:Math.atan2(-this.throwForward[0],-this.throwForward[1]),anim:{setClip(){},hasClip(){return true}}};
    this.modelState='unavailable';this.buildEvents();this.modelErrors.push('瀏覽器不支援 WebGL2，顯示簡化備援場景；建議用手機 Safari 或 Chrome');this.buildEvents();return;
   }
   this.nearBuildings=[];this.actors=[];this.detailed={};
@@ -401,16 +405,16 @@ class WebWorld{
   }catch(e){this.modelErrors.push('場景小物件 '+item.type+': '+e.message);console.error(e);}}}));
  }
  drawCampProps(vp,dist){
-  if(this.modelState!=='ready'||dist>370||!this.campProps||!this.propModels)return;
+  if(this.modelState!=='ready'||!this.campProps||!this.propModels)return;
   this.setupDetailPrograms();if(!this.detailProg)return;
   const focus=this.camFocus||this.player;let drawnFragments=0;
   for(const p of this.campProps){const a=this.propModels[p.type];if(!a)continue;
-    const dd=Math.hypot(p.x-focus[0],p.z-focus[1]);if(dd>Math.max(120,dist*1.3))continue;
+    // No proximity cutoff: leave every prop visible regardless of camera elevation.
     const sv=p.size.map((v,i)=>v/(a.extents?.[i]||1));const scale=(p.scaleXYZ||[p.scale,p.scale,p.scale]);
     const scaleVec=sv.map((v,i)=>v*(scale[i]||1));
     if(!p.hit){const model2=mul(T(p.x,p.baseY||0,p.z),mul(RY(p.yaw||0),mul(S3(...scaleVec),T(-a.center[0],-(a.center[1]-a.extents[1]/2),-a.center[2]))));
        this.drawStaticMesh(a.geo,a.tex,model2,vp);
-    }else if(dist<265&&p.fragments){for(const f of p.fragments){if(drawnFragments++>260)break;
+    }else if(p.fragments){for(const f of p.fragments){drawnFragments++;
        const model=mul(T(f.x,f.y,f.z),mul(R(f.rx,f.ry,f.rz),S3(...f.scale)));this.drawStaticMesh(f.p.geo,a.tex,model,vp);
     }}
   }
@@ -488,18 +492,33 @@ class WebWorld{
    f.x+=f.vx*dt;f.y+=f.vy*dt;f.z+=f.vz*dt;f.vy-=17*dt;f.rx+=f.ax*dt;f.rz+=f.az*dt;
    if(f.y<.17){f.y=.17;f.vy=Math.max(0,-f.vy*.22);f.vx*=.91;f.vz*=.91;f.ax*=.94;f.az*=.94;}
  }}
- drawDetailed(vp,dist){if(this.modelState!=='ready'||!this.gl?.createVertexArray||dist>370)return;
+ soldierDetailRange(dist){return dist>110?0:Math.max(28,Math.min(56,dist*.75+19));}
+ drawDistantSoldiers(vp,dist){
+  if(!this.actors||!this.gl||!this.troopBuf)return;
+  const focus=this.camFocus||this.player,near=this.modelState==='ready'?this.soldierDetailRange(dist):0;
+  const far=this.actors.filter(a=>Math.hypot(a.px-focus[0],a.pz-focus[1])>near);
+  // Even at maximum zoom, every friendly soldier and all nine red enemies stay drawn.
+  const data=inst(far.map((a,i)=>({x:a.px,z:a.pz,y:a.renderLift||0,
+     h:a.hit?.35*(a.scale||1):1.7*(a.scale||1),w:a.hit?1.35:.7,d:a.hit?1.05:.65,enemy:a.enemy,seed:(i*.131)%1})),3);
+  this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.troopBuf);
+  this.gl.bufferData(this.gl.ARRAY_BUFFER,data,this.gl.DYNAMIC_DRAW);
+  this.instanceDraw(this.troopBuf,far.length,3,vp);
+  this.instanceDraw(this.troopBuf,far.length,4,vp);
+ }
+ drawDetailed(vp,dist){if(this.modelState!=='ready'||!this.gl?.createVertexArray)return;
   this.setupDetailPrograms();if(!this.detailProg)return;const g=this.gl,focus=this.camFocus||this.player;
-  for(const b of this.nearBuildings){if(Math.hypot(b.x-focus[0],b.z-focus[1])>Math.max(125,dist*1.4))continue;
+  for(const b of this.nearBuildings){ // all buildings stay rendered at any zoom
    const asset=this.detailed[b.type];if(!asset)continue;const s=b.size.map((n,i)=>n/(asset.extents?.[i]||asset.baseSize?.[i]||1)),c=asset.center,ang=b.rot*Math.PI/180;
    if(!b.hit){const model=mul(T(b.x,0,b.z),mul(RY(ang),mul(S3(s[0]*b.scale,s[1]*b.scale,s[2]*b.scale),T(-c[0],-c[1],-c[2]))));this.drawStaticMesh(asset.whole,asset.tex,model,vp);}
    else for(const f of b.fragments){const model=mul(T(f.x,f.y,f.z),mul(R(f.rx,f.ry,f.rz),S3(f.scale[0],f.scale[1],f.scale[2])));this.drawStaticMesh(f.p.geo,asset.tex,model,vp);}
   }
   const now=performance.now(),dt=Math.min(.034,Math.max(.001,(now-(this.lastDetailedTime||now))/1000));this.lastDetailedTime=now;
   if(this.throwing&&this.thrower){const a=this.throwing,k=smooth(clamp((performance.now()-a.start)/400,0,1));this.thrower.angle=lerp(a.startAngle,a.endAngle,k);}
-  const visibleActors=dist>85?[]:this.actors.filter(a=>Math.hypot(a.px-focus[0],a.pz-focus[1])<Math.min(70,dist*1.2+24)).sort((a,b)=>Math.hypot(a.px-focus[0],a.pz-focus[1])-Math.hypot(b.px-focus[0],b.pz-focus[1])).slice(0,125);
+  // Animated GLBs are used nearby; all other soldiers are drawn by a single
+  // lightweight instanced pass. No count cap or distance-based disappearance.
+  const nearRange=this.soldierDetailRange(dist);
+  const visibleActors=this.actors.filter(a=>Math.hypot(a.px-focus[0],a.pz-focus[1])<=nearRange);
   for(const a of [...visibleActors,this.thrower]){
-   const dd=Math.hypot(a.px-focus[0],a.pz-focus[1]);if(dd>Math.min(160,dist*1.65+38))continue;
    const sa=this.soldierAssets[a.quality];if(!sa)continue;
    // Reuse animation clocks at distance, preserving near-view knockdown / throw.
    a.anim.evaluate(dt);const p=this.cadetProg,u=n=>g.getUniformLocation(p,n);
@@ -564,7 +583,7 @@ class WebWorld{
   const wrist=this.heldGrenadePosition();const from=wrist||[a[0]+dx/dl*.58,1.3,a[1]+dz/dl*.58];
   if(this.thrower)this.thrower.angle=this.throwing?.endAngle??this.thrower.angle;
   this.throwing=null;this.camPhase='flight';this.flight={start:performance.now(),duration:1850,from,to:[x,.4,z],done:false};this.onLanding=onLanding;}
- resetDetailed(){this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.impactStarted=null;this.landingProgress=0;if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
+ resetDetailed(){this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.impactStarted=null;this.landingProgress=0;if(this.thrower?.anim){this.thrower.angle=Math.atan2(-this.throwForward[0],-this.throwForward[1]);this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
  drawFallback(){
  // CPU backup draws actual perspective-projected 3D boxes, shaded faces and rooftops.
  // No textures / 3D library needed; designed for WebGL-disabled phones.
@@ -607,8 +626,8 @@ class WebWorld{
  if(!hit&&b.h>6&&o.depth<230){const cx=proj(b.x,b.h*.53,b.z+b.d*.501),ww=proj(b.x+b.w*.25,b.h*.53,b.z+b.d*.501);if(cx&&ww&&Math.abs(ww[0]-cx[0])>2.5){ctx.fillStyle='#587b8b';const sz=clamp(Math.abs(ww[0]-cx[0])*.65,1,8);for(let row=0;row<3;row++)for(let col=-1;col<=1;col++){let a=proj(b.x+col*b.w*.24,b.h*(.22+row*.22),b.z+b.d*.502);if(a)ctx.fillRect(a[0]-sz*.5,a[1]-sz*.43,sz,sz*.7);}}}
  if(hit&&tt<.8&&o.depth<340){const p=proj(b.x,b.h*.30,b.z);if(p){ctx.fillStyle='#bd997b7c';ctx.beginPath();ctx.ellipse(p[0],p[1],clamp(15+tt*20,3,52),clamp(6+tt*12,3,30),0,0,Math.PI*2);ctx.fill();}}
  }
- if(dist<240){for(const o of this.campProps||[]){if(o.type!=='treeA'&&o.type!=='treeB')continue;const t=o.tilt||0,dx=o.fallDX||0,dz=o.fallDZ||0;const top=proj(o.x+dx*3.4*Math.sin(t),3.4*Math.cos(t),o.z+dz*3.4*Math.sin(t)),bottom=proj(o.x,0,o.z);if(!top||!bottom)continue;const rad=clamp(135/bottom[2],2,20);ctx.strokeStyle='#836b49';ctx.lineWidth=Math.max(1,rad*.36);ctx.beginPath();ctx.moveTo(bottom[0],bottom[1]);ctx.lineTo(top[0],top[1]);ctx.stroke();for(let k=0;k<3;k++){ctx.fillStyle=['#86ac75','#7da16c','#91b57e'][k];ctx.beginPath();ctx.arc(top[0]+(k-1)*rad*.62,top[1]-(k%2)*rad*.23,rad*(.85-(k%2)*.08),0,Math.PI*2);ctx.fill();}}}
- if(dist<230){for(const s of SCENE_SOLDIERS){const p=proj(s.x,1,s.z);if(!p||p[2]>260)continue;const killed=this.radius>=0&&Math.hypot(s.x-this.impact[0],s.z-this.impact[1])<this.radius;ctx.fillStyle=killed?'#564b39':s.team==='enemy'?'#ce5548':'#5cb283';const hh=clamp(400/p[2],3,21);ctx.beginPath();ctx.arc(p[0],p[1]-hh*.8,hh*.3,0,Math.PI*2);ctx.fill();ctx.fillRect(p[0]-hh*.29,p[1]-hh*.52,hh*.58,hh*.72);}}
+ {for(const o of this.campProps||[]){if(o.type!=='treeA'&&o.type!=='treeB')continue;const t=o.tilt||0,dx=o.fallDX||0,dz=o.fallDZ||0;const top=proj(o.x+dx*3.4*Math.sin(t),3.4*Math.cos(t),o.z+dz*3.4*Math.sin(t)),bottom=proj(o.x,0,o.z);if(!top||!bottom)continue;const rad=clamp(135/bottom[2],2,20);ctx.strokeStyle='#836b49';ctx.lineWidth=Math.max(1,rad*.36);ctx.beginPath();ctx.moveTo(bottom[0],bottom[1]);ctx.lineTo(top[0],top[1]);ctx.stroke();for(let k=0;k<3;k++){ctx.fillStyle=['#86ac75','#7da16c','#91b57e'][k];ctx.beginPath();ctx.arc(top[0]+(k-1)*rad*.62,top[1]-(k%2)*rad*.23,rad*(.85-(k%2)*.08),0,Math.PI*2);ctx.fill();}}}
+ {for(const s of SCENE_SOLDIERS){const p=proj(s.x,1,s.z);if(!p)continue;const killed=this.radius>=0&&Math.hypot(s.x-this.impact[0],s.z-this.impact[1])<this.radius;ctx.fillStyle=killed?'#564b39':s.team==='enemy'?'#ce5548':'#5cb283';const hh=clamp(400/p[2],3,21);ctx.beginPath();ctx.arc(p[0],p[1]-hh*.8,hh*.3,0,Math.PI*2);ctx.fill();ctx.fillRect(p[0]-hh*.29,p[1]-hh*.52,hh*.58,hh*.72);}}
   if(this.camPhase==='flight'&&this.flight){const a=this.flight,t=clamp((performance.now()-a.start)/a.duration,0,1),x=lerp(a.from[0],a.to[0],t),z=lerp(a.from[2],a.to[2],t),y=lerp(a.from[1],.4,t)+Math.sin(t*Math.PI)*13;const p=proj(x,y,z);if(p){const sz=clamp(290/Math.max(3,p[2]),6,23);ctx.fillStyle='#425d31';ctx.beginPath();ctx.ellipse(p[0],p[1],sz*.58,sz*.8,t*8,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#c6b77e';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p[0]+sz*.42,p[1]-sz*.72,sz*.34,0,Math.PI*2);ctx.stroke();}}
  if(this.camPhase==='landed'){const p=proj(this.impact[0],.20,this.impact[1]);if(p){const sz=clamp(105/Math.max(2,p[2]),5,32);ctx.save();ctx.translate(p[0],p[1]);ctx.rotate(.85);ctx.fillStyle='#4d643b';ctx.beginPath();ctx.ellipse(0,0,sz*.55,sz*.82,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#b9b89e';ctx.fillRect(-sz*.18,-sz*.9,sz*.35,sz*.25);ctx.strokeStyle='#e5d49c';ctx.lineWidth=2;ctx.beginPath();ctx.arc(sz*.38,-sz*.88,sz*.27,0,Math.PI*2);ctx.stroke();ctx.restore();}}
  if(this.radius>=0&&this.timer<3.2){const b=proj(this.impact[0],.9,this.impact[1]);if(b){const k=clamp(1-this.timer/3.2,0,1),size=clamp(950/Math.max(5,b[2]),7,160)*(1+this.timer*.9);const g=ctx.createRadialGradient(b[0],b[1],2,b[0],b[1],size);g.addColorStop(0,'rgba(255,249,199,'+(.83*k)+')');g.addColorStop(.24,'rgba(255,157,57,'+(.73*k)+')');g.addColorStop(.48,'rgba(215,96,30,'+(.46*k)+')');g.addColorStop(1,'rgba(46,48,40,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(b[0],b[1],size,0,Math.PI*2);ctx.fill();}}
