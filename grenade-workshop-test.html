@@ -82,6 +82,16 @@ body.shapemode #guide{display:none!important}
 #gallery .galCard{min-height:100px}
 #gallery .galCard small{font-size:11px}
 #gallery .galCard p{font-size:11px;color:#bfceb7;line-height:1.4;margin:6px 0 0}
+
+/* v1.38: persistent in-page 3D arena, especially for iOS Home Screen web apps. */
+#grenadeArenaFrame{position:fixed;inset:0;width:100%;height:100%;border:0;z-index:40;background:#13281e;opacity:.001;pointer-events:none}
+body.arena-live #grenadeArenaFrame{opacity:1;pointer-events:auto}
+#arenaTransition{display:none;position:fixed;inset:0;z-index:45;align-items:center;justify-content:center;padding:24px;background:#0d2118f4;color:#f2e8c7;text-align:center;font-family:system-ui,-apple-system,'PingFang TC',sans-serif}
+#arenaTransition.show{display:flex}
+.arena-transition-card{width:min(350px,100%);border:1px solid #d7c68d69;border-radius:18px;background:#213c2e;padding:22px 19px;box-shadow:0 24px 60px #0008}
+.arena-transition-card strong{display:block;font-size:21px;margin-bottom:9px}
+.arena-transition-card p{color:#cbd9c9;line-height:1.6;margin:0 0 16px;font-size:13px}
+#arenaRetry{display:none;width:100%;padding:13px 15px;border-radius:10px;background:#f0d18a;color:#1d321f;font-size:15px;font-weight:900}
 </style>
 </head>
 <body>
@@ -100,7 +110,7 @@ body.shapemode #guide{display:none!important}
 <div id="gallery"><div class="galInner"><div class="kicker">國軍手榴彈 · 收集紀錄</div><h2>🏅 成就圖鑑</h2><p id="achievementProgress" class="dim"></p><div class="galCards" id="galCards"></div><button id="closeGallery" class="btn primary full">返回遊戲</button></div></div>
 <div id="intro"><div class="modal introMinimal"><h1>這東西，真的能丟嗎？</h1><button class="btn primary full" id="startBtn">開始遊戲</button><button id="galleryBtn" class="btn ghost full">🏅 成就圖鑑</button></div></div>
 <div id="endOverlay"><div class="modal"><div class="kicker">爆炸演習 · 本回合完成</div><div style="font-size:43px;margin-bottom:6px">🎯</div><h2 id="endHeading">投擲完成！</h2><p id="endDesc">爆炸已經結束。</p><div id="outcomeCoords"><div class="outcomeCell"><small>投擲距離</small><strong id="distVal">0.0 m</strong></div><div class="outcomeCell"><small>偏離目標</small><strong id="missVal">0.0 m</strong></div></div><div class="outcomeCell" style="margin-bottom:16px"><small>本次火藥／密度</small><strong id="finalVal" style="font-size:20px">0 克 · 0.00</strong></div><div id="resultCounts"><div class="outcomeCell"><small>摧毀建築</small><strong id="endBuildings">0</strong></div><div class="outcomeCell"><small>擊殺人數</small><strong id="endPeople">0</strong></div></div><div class="outcomeCell" style="margin:10px 0;padding:10px 12px;text-align:left"><small>投擲精準成績</small><strong id="accuracyScore" style="font-size:21px">—</strong><div id="teamResult" style="font-size:12px;color:#c4d7bd;margin-top:4px"></div></div><div id="landmarkResults"></div><button class="btn primary full" id="retryBtn">再製作一顆　↻</button><button class="btn ghost full" id="endGalleryBtn">🏅 成就圖鑑</button><div class="underText">不顯示外殼耐久、定型品質或失敗原因。</div></div></div>
-<script src="./grenade-3d.js"></script>
+<!-- Old standalone explosion renderer removed: 3D arena is now preinitialized in-page. -->
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);const cv=$('scene'),ctx=cv.getContext('2d');
@@ -219,39 +229,63 @@ function triggerOverflow(){if(S.phase!=='fill')return;
  toast('⚠ 火藥滿出來造成危險！強制進入定型！',3100);
 }
 function startShape(){S.shape=0;S.shapeTarget=rnd(.88,1.07)+Math.min(.13,S.round*.009);phase('shape')}
-// v1.36: Prepare the *actual* 3D three-throw game while the player crafts.
-// Use the same URLs as the destination so Safari/Chrome can reuse HTTP cache.
-let throwingWarmStarted=false;
-function warmThrowingGame(){
- if(throwingWarmStarted)return;throwingWarmStarted=true;
- const preloadModule=(href)=>{
-  const link=document.createElement('link');link.rel='modulepreload';link.href=href;document.head.append(link);
- };
- preloadModule('./grenade-user-play-3d.js?v=132');
- preloadModule('./grenade-score.js?v=132');
- const warm=(url)=>fetch(url,{cache:'force-cache',priority:'low'}).then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);
- // Low-concurrency downloads leave most bandwidth free for the workshop.
- void warm('./grenade-user-play.html');
- void warm('./src/core/glb111.js');
- void warm('./src/characters/rigAnimator.js');
- fetch('./grenade-user-scene.json?v=130',{cache:'force-cache',priority:'low'}).then(async r=>{
-  if(!r.ok)return;
-  const scene=await r.json();
-  const paths=['./assets/characters/cadet/cadet-green.glb'];
-  // Warm a few heavy assets, not every model at once (particularly important on iPhone).
-  const unique=new Set(paths);
-  for(const item of scene.items||[]){
-   if(unique.size>=10)break;
-   for(const path of [item.model,item.destructible?.fracturedModel]){
-    if(path&&unique.size<10)unique.add(path);
-   }
-  }
-  const queue=[...unique];
-  await Promise.all(Array.from({length:2},async()=>{
-   while(queue.length)await warm(queue.shift());
-  }));
- }).catch(()=>{});
+// v1.38: Load the complete 3D arena in an invisible same-page iframe during crafting.
+// Old fetch/modulepreload only downloaded files; it did NOT initialize textures/GLB/GPU.
+let throwingWarmStarted=false,arenaFrame=null,arenaReady=false,arenaFailure='',pendingCraft=null,arenaWaitTimer=0;
+const arenaDialog=document.createElement('div');arenaDialog.id='arenaTransition';arenaDialog.setAttribute('role','status');
+arenaDialog.innerHTML='<div class="arena-transition-card"><strong id="arenaTransitionTitle">正在準備 3D 投擲場</strong><p id="arenaTransitionDetail">軍營模型正在背景載入，製作結果會完整保留。</p><button id="arenaRetry" type="button">重新載入投擲場</button></div>';
+document.body.appendChild(arenaDialog);
+function arenaNotice(title,detail,retry=false){
+ document.getElementById('arenaTransitionTitle').textContent=title;
+ document.getElementById('arenaTransitionDetail').textContent=detail;
+ document.getElementById('arenaRetry').style.display=retry?'block':'none';
+ arenaDialog.classList.add('show');
 }
+function makeArenaFrame(){
+ arenaReady=false;arenaFailure='';throwingWarmStarted=true;
+ if(arenaFrame)arenaFrame.remove();
+ arenaFrame=document.createElement('iframe');arenaFrame.id='grenadeArenaFrame';
+ arenaFrame.title='手榴彈三投鑑測';arenaFrame.setAttribute('loading','eager');
+ arenaFrame.setAttribute('aria-hidden','true');
+ // No top-level navigation: keeps iOS Add-to-Home-Screen standalone mode intact.
+ arenaFrame.src='./grenade-user-play.html?embedded=1&v=138';
+ arenaFrame.addEventListener('error',()=>{
+  arenaFailure='無法載入 3D 投擲場頁面。';
+  if(pendingCraft)arenaNotice('投擲場載入失敗',arenaFailure,true);
+ });
+ document.body.appendChild(arenaFrame);
+}
+function warmThrowingGame(){if(!throwingWarmStarted)makeArenaFrame()}
+function activateArena(){
+ if(!pendingCraft||!arenaReady||!arenaFrame)return;
+ if(arenaWaitTimer){clearTimeout(arenaWaitTimer);arenaWaitTimer=0;}
+ document.body.classList.add('arena-live');arenaFrame.setAttribute('aria-hidden','false');
+ arenaDialog.classList.remove('show');
+ arenaFrame.contentWindow.postMessage({type:'ARMY_GRENADE_START',craft:pendingCraft},location.origin==='null'?'*':location.origin);
+ pendingCraft=null;
+}
+window.addEventListener('message',event=>{
+ if(!arenaFrame||event.source!==arenaFrame.contentWindow)return;
+ if(event.origin!==location.origin)return;
+ const data=event.data;if(!data||typeof data!=='object')return;
+ if(data.type==='ARMY_GRENADE_READY'){
+  arenaReady=true;arenaFailure='';activateArena();
+ }else if(data.type==='ARMY_GRENADE_ERROR'){
+  arenaReady=false;arenaFailure=String(data.message||'3D 初始化失敗');
+  if(pendingCraft)arenaNotice('無法啟動 3D 軍營',arenaFailure,true);
+ }else if(data.type==='ARMY_GRENADE_RETURN'){
+  // Starting a new crafted grenade is a NEW training; never navigate away.
+  pendingCraft=null;arenaReady=false;throwingWarmStarted=false;
+  if(arenaWaitTimer){clearTimeout(arenaWaitTimer);arenaWaitTimer=0;}
+  document.body.classList.remove('arena-live');arenaDialog.classList.remove('show');
+  if(arenaFrame){arenaFrame.remove();arenaFrame=null;}
+  reset();$('intro').style.display='none';S.phase='fill';phase('fill');warmThrowingGame();
+ }
+});
+document.getElementById('arenaRetry').addEventListener('click',()=>{
+ arenaNotice('重新載入 3D 投擲場','正在重新建立軍營模型與 GPU 資源…');
+ makeArenaFrame();
+});
 // Entirely fictional game numbers: a forgiving floor, a hard-to-reach ceiling.
 function craftingPower(){
  const fill=clamp(powderLevel(),0,1);
@@ -276,8 +310,16 @@ function enterThrowTraining(){
   saved=false; // Safari private/storage-restricted fallback.
   console.warn('製作資料暫存失敗',err);
  }
- // Navigate to the EXACT preloaded URL; add power only when browser storage is blocked.
- location.href='./grenade-user-play.html'+(saved?'':'?craft='+payload.power);
+ // Hand off to the already-prepared iframe; do not open Safari or reload a new page.
+ pendingCraft=payload;warmThrowingGame();
+ if(arenaReady)activateArena();
+ else{
+  arenaNotice('正在完成投擲場預載','已完成製作！正在等候軍營模型與動畫就緒，稍後直接進入三投，不會跳出新網頁。');
+  if(arenaWaitTimer)clearTimeout(arenaWaitTimer);
+  arenaWaitTimer=setTimeout(()=>{
+   if(pendingCraft&&!arenaReady&&!arenaFailure)arenaNotice('投擲場仍在載入','這台裝置載入大型 3D 模型較慢。你可以繼續等待，或按下方按鈕重新載入。',true);
+  },45000);
+ }
 }
 function startAim(){// Play-only quality score. Hidden from the player.
  const closeness=Math.abs(S.shape-S.shapeTarget);S.shapeQuality=Math.max(.08,1/(1+Math.pow(closeness/.23,2)));if(closeness<=.08)unlockAchievement('wheel-perfect');unlockAchievement('wheel');S.aimClock=0;phase('aimX');}

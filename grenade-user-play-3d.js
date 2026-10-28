@@ -939,7 +939,8 @@ class WebWorld{
   if(this.throwing?.phase==='pitch'&&performance.now()-this.throwing.pitchStart>=this.throwing.duration){const a=this.throwing;this.launchFlight(a.target[0],a.target[1],a.onLanding);}
   if(this.flight&&!this.flight.done&&(performance.now()-this.flight.start)>=this.flight.duration){this.flight.done=true;this.camPhase='landed';this.landingProgress=0;this.onLanding?.();}
   this.drawFallback();return;}
-  try{this.drawLand();}catch(e){if(!this.errored){console.error('軍營試炸渲染錯誤',e);this.errored=true;}}}
+  if(this.modelState==='render-failed')return;
+  try{this.drawLand();this.lastSuccessfulDraw=performance.now();}catch(e){console.error('軍營試炸渲染錯誤',e);this.renderError=String(e?.message||e);this.modelState='render-failed';}}
 }
 window.GrenadeWorld=new WebWorld();window.GrenadeLandmarks=[];window.GrenadeUserScene=USER_SCENE;window.GrenadeEnemyGroups=ENEMY_GROUPS;
 })();
