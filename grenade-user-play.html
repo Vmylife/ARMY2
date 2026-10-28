@@ -252,18 +252,18 @@ body.show-stats #counters{display:grid;}
 @media(max-height:710px){#result .report-achievement{min-height:78px;padding:5px 3px;gap:3px}#result .report-achievement .emblem{height:30px;width:30px;font-size:21px}#result .report-achievement strong{font-size:11px}#result .report-section-heading{font-size:11px}}
 @media(max-height:565px){#result .resultCard{overflow:auto}#achievementDetail .achievement-detail-card{padding:17px}}
 
+/* v1.36 — power is created in the workshop, not adjusted at the range. */
+#powerDock{position:fixed;top:calc(9px + env(safe-area-inset-top));right:12px;width:auto;max-width:calc(100vw - 24px);z-index:7;pointer-events:none;display:block}
+#powerDock.hide{display:none!important}
+#craftedPowerBadge{display:flex;align-items:center;gap:7px;border-radius:16px;border:1px solid #e6d09194;background:#10291fe8;padding:9px 12px;color:#f5da94;font-weight:850;font-size:13px;box-shadow:0 4px 15px #0007;backdrop-filter:blur(7px)}
+#craftedPowerBadge strong{font-size:18px;font-variant-numeric:tabular-nums}
+#craftedPowerBadge small{font-size:10px;white-space:nowrap;border-left:1px solid #d0c98a6a;padding-left:8px}
 </style></head><body>
 <canvas id="world3d"></canvas>
-<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.34 成就詳情</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻ 重投</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
-<div id="powerDock" class="hide">
-  <button id="powerToggle" aria-expanded="false" aria-controls="powerDrawer" aria-label="展開或收合手榴彈威力設定">💥 威力 <strong id="powerMiniValue">10</strong><small id="throwCount">第 1 / 3 投</small> <span id="powerChevron">▾</span></button>
-  <div id="powerDrawer" hidden><div class="powerHead"><span>威力（0～100）</span><span id="powerOut">10</span></div>
-    <input id="powerSlider" aria-label="選擇爆炸威力" type="range" min="0" max="100" step="1" value="10">
-    <div id="powerHint">威力 100 最多覆蓋整座軍營</div>
-    <div id="powerTools"><button id="resetBottom" class="ghost">重新瞄準</button></div>
-  </div>
+<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.36 製作銜接三投</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
+<div id="powerDock" class="hide" aria-label="本場手榴彈製作結果">
+  <div id="craftedPowerBadge">💣 <span id="powerLabel">製作威力</span> <strong id="powerMiniValue">—</strong><small id="throwCount">第 1 / 3 投</small></div>
 </div>
-<div id="aimHint" class="hide" aria-live="polite">左右方向 · 點主角確認</div>
 <div id="meterH" class="hide" aria-label="左右方向計量條">
  <div class="meter-title">TACTICAL HUD<span>投擲方位</span></div>
  <svg viewBox="0 0 320 100" preserveAspectRatio="none" aria-hidden="true">
@@ -318,26 +318,35 @@ body.show-stats #counters{display:grid;}
 import './grenade-user-play-3d.js?v=132';
 import { ACHIEVEMENTS, calculateReport, readProgress, saveProgress } from './grenade-score.js?v=132';
 const $=id=>document.getElementById(id),world=window.GrenadeWorld,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),fmt=n=>Math.floor(n).toLocaleString('en-US');
-let phase='intro',pos=.5,direction=.5,clock=0,x=0,z=50,power=10,old=performance.now(),badgeTimer=0,resultTimer=0,landingClock=0;
+// Workshop-to-three-throw handoff: one crafted grenade, one fixed power for all three throws.
+const CRAFT_KEY='ARMY2_grenade_craft_v1';
+let craft=null;
+try{
+ const raw=JSON.parse(sessionStorage.getItem(CRAFT_KEY)||'null');
+ if(raw?.version===1&&raw.source==='workshop'&&Date.now()-Number(raw.createdAt)<12*3600*1000&&Number.isFinite(raw.power))craft=raw;
+}catch(e){console.warn('無法讀取製作資料',e)}
+const urlCraft=Number(new URLSearchParams(location.search).get('craft'));
+const craftedPower=Math.max(10,Math.min(100,Math.round(craft?.power??(urlCraft>=10&&urlCraft<=100?urlCraft:40))));
+const fromWorkshop=Boolean(craft||(urlCraft>=10&&urlCraft<=100));
+let phase='intro',pos=.5,direction=.5,clock=0,x=0,z=50,power=craftedPower,old=performance.now(),badgeTimer=0,resultTimer=0,landingClock=0;
 const MAX_THROWS=3;let throwsUsed=0,roundDone=false;
 const badge=t=>{const e=$('badge');e.textContent=t;e.classList.add('show');badgeTimer=performance.now()+1800;};
 function setState(p){
  phase=p;const aiming=p==='aimX'||p==='aimZ';document.body.classList.toggle('aiming',aiming);
  document.body.classList.toggle('show-stats',p==='blast'||p==='end');
- // Keep the power control present throughout preparation; hide it only on the result.
  $('powerDock').classList.toggle('hide',p==='end');
  $('meterH').classList.toggle('hide',p!=='aimX');
  $('meterV').classList.toggle('hide',p!=='aimZ');
  $('aimHint').classList.toggle('hide',!aiming);
- $('powerSlider').disabled=p!=='aimX'&&p!=='intro';
  $('aimHint').textContent=p==='aimX'?'左右方向 · 點畫面任意處確認':p==='aimZ'?'投擲遠近 · 再點畫面任意處投擲！':'';
- if(!aiming)closePower();
+
 }
-function closePower(){$('powerDrawer').hidden=true;$('powerToggle').setAttribute('aria-expanded','false');$('powerChevron').textContent='▾';}
-function togglePower(){const open=$('powerDrawer').hidden;$('powerDrawer').hidden=!open;$('powerToggle').setAttribute('aria-expanded',String(open));$('powerChevron').textContent=open?'▴':'▾';}
-$('powerToggle').addEventListener('click',togglePower);
-function updateTitle(){const p=Number($('powerSlider').value);power=p;$('powerOut').textContent=p;$('powerMiniValue').textContent=p;const title=p===0?'未引爆':p<=20?'局部爆炸':p<=50?'訓練區爆炸':p<=80?'大範圍營區爆炸':'全營區爆炸';$('powerHint').textContent=title+' · 威力 100 最多覆蓋整座軍營';}
-$('powerSlider').addEventListener('input',updateTitle);$('skipIntro').addEventListener('click',()=>reset(false));
+function updateTitle(){
+ power=craftedPower;
+ $('powerMiniValue').textContent=String(power);
+ $('powerLabel').textContent=fromWorkshop?'製作威力':'練習威力';
+}
+$('skipIntro').addEventListener('click',()=>reset(false));
 function reset(newRound=true){
  if(newRound)world.rollEnemySquad();
  throwsUsed=0;roundDone=false;$('throwCount').textContent='第 1 / 3 投';
@@ -356,8 +365,17 @@ function reset(newRound=true){
  }
 }
 let audioCtx=null;function blastSound(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioCtx=audioCtx||new AC();if(audioCtx.state==='suspended')audioCtx.resume();const t=audioCtx.currentTime;const n=audioCtx.sampleRate*.9|0,buf=audioCtx.createBuffer(1,n,audioCtx.sampleRate),data=buf.getChannelData(0);for(let i=0;i<n;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);const src=audioCtx.createBufferSource(),low=audioCtx.createBiquadFilter(),gain=audioCtx.createGain();src.buffer=buf;low.type='lowpass';low.frequency.setValueAtTime(650,t);low.frequency.exponentialRampToValueAtTime(70,t+.7);gain.gain.setValueAtTime(.48,t);gain.gain.exponentialRampToValueAtTime(.001,t+.83);src.connect(low);low.connect(gain);gain.connect(audioCtx.destination);src.start(t);src.stop(t+.86);const osc=audioCtx.createOscillator(),og=audioCtx.createGain();osc.type='sine';osc.frequency.setValueAtTime(110,t);osc.frequency.exponentialRampToValueAtTime(39,t+.40);og.gain.setValueAtTime(.5,t);og.gain.exponentialRampToValueAtTime(.001,t+.52);osc.connect(og);og.connect(audioCtx.destination);osc.start(t);osc.stop(t+.55);}catch(e){console.warn('Sound',e)}}
-function shoot(){if(throwsUsed>=MAX_THROWS||phase!=='aimZ')return;throwsUsed++;$('throwCount').textContent='第 '+throwsUsed+' / 3 投';if(!audioCtx){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume()}catch{}}setState('flight');$('msg').textContent='💣 手榴彈飛行中…';world.playThrow(x,z,(actual)=>{if(phase!=='flight')return;world.setLanding(actual[0],actual[1],true);world.camPhase='landed';world.landingProgress=0;landingClock=0;setState('landed');$('msg').textContent='💣 手榴彈落地……';});}
+function shoot(){if(throwsUsed>=MAX_THROWS||phase!=='aimZ')return;throwsUsed++;awardWorkshopAchievements(['first-throw']);$('throwCount').textContent='第 '+throwsUsed+' / 3 投';if(!audioCtx){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume()}catch{}}setState('flight');$('msg').textContent='💣 手榴彈飛行中…';world.playThrow(x,z,(actual)=>{if(phase!=='flight')return;world.setLanding(actual[0],actual[1],true);if(Math.hypot(actual[0]-world.redCenter[0],actual[1]-world.redCenter[1])<=3)awardWorkshopAchievements(['accurate']);world.camPhase='landed';world.landingProgress=0;landingClock=0;setState('landed');$('msg').textContent='💣 手榴彈落地……';});}
 function detonate(){if(phase!=='landed')return;world.beginTestPower(power);world.camPhase='blast';blastSound();setState('blast');$('msg').textContent='💥 衝擊波、爆炸碗罩與地表焦黑正在擴散！';}
+function awardWorkshopAchievements(ids){
+ try{
+  const key='ARMY2_grenade_workshop_achievements_v1';
+  const found=JSON.parse(localStorage.getItem(key)||'[]');
+  const set=new Set(Array.isArray(found)?found:[]);
+  for(const id of ids)set.add(id);
+  localStorage.setItem(key,JSON.stringify([...set]));
+ }catch(e){}
+}
 // v1.21: The screen-left / screen-middle / screen-right needle values
 // are mapped to the THREE actual landing positions supplied by the player.
 // Never infer left/right from world X or camera orientation; the camp map is rotated.
@@ -376,7 +394,7 @@ function meterLanding(dir,range){
  return [mix(feet[0],far[0],r),mix(feet[1],far[1],r)];
 }
 function confirmAim(){
- if(phase==='aimX'){direction=pos;setState('aimZ');closePower();clock=0;}
+ if(phase==='aimX'){direction=pos;setState('aimZ');clock=0;}
  else if(phase==='aimZ'){[x,z]=meterLanding(direction,pos);shoot();}
 }
 // Tap anywhere in the 3D view to confirm the meters. Ignore UI controls and
@@ -401,7 +419,7 @@ function positionAimHUD(){
  const meter=$('meterV'),mh=meter.offsetHeight||175;
  const vx=r.x+Math.max(80,r.width/2+24);meter.style.left=clamp(vx,8,w-64)+'px';meter.style.top=clamp((r.top+r.bottom-mh)/2,138,h-mh-74)+'px';
 }
-$('reset').addEventListener('click',()=>reset(true));$('resetBottom').addEventListener('click',()=>reset(true));$('retry').addEventListener('click',()=>reset(true));
+$('retry').addEventListener('click',()=>{try{sessionStorage.removeItem(CRAFT_KEY)}catch(e){}location.href='./grenade-workshop-test.html';});
 function nextThrow(){
  if(phase!=='blast'||throwsUsed>=MAX_THROWS||world.counter.red>=9)return;
  world.finishBlast();world.prepareNextThrow();
@@ -418,6 +436,13 @@ let currentReport=null;
 function result(){
  if(phase!=='blast')return;
  const report=calculateReport({red:world.counter.red,green:world.counter.green,buildings:world.counter.buildings,redTotal:9,buildingTotal:12,throwsUsed});
+ const earned=['first-blast'];
+ if(world.counter.buildings>=1)earned.push('building-one');
+ if(world.counter.buildings>=5)earned.push('building-five');
+ if(world.counter.red>=3)earned.push('red-three');
+ if(world.counter.red>0&&world.counter.green===0)earned.push('clean');
+ if(world.counter.green>=10)earned.push('friendly-ten');
+ awardWorkshopAchievements(earned);
  const oldProgress=readProgress();
  const progress=saveProgress(report);
  currentReport=report;
@@ -542,9 +567,9 @@ function tick(t){requestAnimationFrame(tick);const dt=clamp((t-old)/1000,0,.045)
  world.draw();if(t>badgeTimer)$('badge').classList.remove('show');}
 let loadingStarted=false;
 function startWhenReady(){if(loadingStarted)return;loadingStarted=true;$('loading').classList.add('hidden');world.camPhase='intro';world.introProgress=0;setState('intro');clock=0;$('msg').textContent='🎬 本場紅軍第 '+world.redSquadId+' 組（9 人）→ 回到投擲者';$('skipIntro').style.display='block';requestAnimationFrame(tick);}
-const loadingInterval=setInterval(()=>{if(world.modelState==='ready'){clearInterval(loadingInterval);$('loadingDetail').textContent='已載入你匯出的軍營場景；本局紅軍第 '+world.redSquadId+' 組（9 人），保留原版地形及碎裂模型。';$('loadingButton').disabled=false;$('loadingButton').textContent='開始 3D 試炸';}
+const loadingInterval=setInterval(()=>{if(world.modelState==='ready'){clearInterval(loadingInterval);$('loadingDetail').textContent='已載入你匯出的軍營場景；本局紅軍第 '+world.redSquadId+' 組（9 人），保留原版地形及碎裂模型。';$('loadingButton').disabled=false;$('loadingButton').textContent='開始 3D 試炸';if(fromWorkshop)startWhenReady();}
 else if(world.modelState==='partial'||world.modelState==='unavailable'){clearInterval(loadingInterval);$('loadingDetail').textContent='部分 3D 模型載入失敗，請確認已上傳所有可破壞建築及道具 GLB 與主遊戲模型。'+(world.modelErrors?.[0]||'');$('loadingButton').disabled=false;$('loadingButton').textContent='進入相容試驗場';}
 },500);
 $('loadingButton').addEventListener('click',startWhenReady);updateTitle();
-window.__grenadeTest={world,reset,shoot,skipIntro:()=>reset(false),setPower:p=>{$('powerSlider').value=p;updateTitle()},setAim:(a,b)=>{x=a;z=b},startBlast:()=>{world.setLanding(world.redCenter[0],world.redCenter[1]);world.camPhase='blast';world.beginTestPower(Number($('powerSlider').value));blastSound();setState('blast');},get state(){return phase},get throwsUsed(){return throwsUsed},nextThrow,get report(){return currentReport}};
+window.__grenadeTest={world,reset,shoot,skipIntro:()=>reset(false),setPower:p=>{console.info('本場威力由製作階段固定為',craftedPower)},setAim:(a,b)=>{x=a;z=b},startBlast:()=>{world.setLanding(world.redCenter[0],world.redCenter[1]);world.camPhase='blast';world.beginTestPower(power);blastSound();setState('blast');},get state(){return phase},get throwsUsed(){return throwsUsed},nextThrow,get report(){return currentReport}};
 </script></body></html>

@@ -75,8 +75,7 @@ body.fieldmode #guide{margin-bottom:8px}body.fieldmode #scene{pointer-events:non
 .introMinimal{display:flex;flex-direction:column;gap:12px;text-align:center;padding:28px 20px}
 .introMinimal h1{font-size:clamp(24px,5.6vw,31px);margin:2px 0 16px;letter-spacing:.4px}
 .introMinimal .btn{min-height:56px;font-size:17px}
-#qteTapLayer{display:none;position:fixed;inset:0;z-index:10;background:transparent;touch-action:none;cursor:pointer}
-body.pressmode #qteTapLayer{display:block}
+
 body.shapemode #guide{display:none!important}
 .actionThree .btn{gap:8px;font-size:clamp(13px,3.4vw,16px)}
 .actionThree .btn .ico{font-size:25px}
@@ -93,7 +92,7 @@ body.shapemode #guide{display:none!important}
     <div id="steps"><div class="step active"></div><div class="step"></div><div class="step"></div><div class="step"></div></div>
     <div id="stats"><div class="stat" id="gramStat"><label>目前火藥</label><div class="statValue"><strong id="gramText">0</strong><small>克</small></div></div><div class="stat" id="densityStat"><label>遊戲密度</label><div class="statValue"><strong id="densityText">0.60</strong><small>密度值</small></div></div></div>
   </header>
-  <div id="toast"></div><div id="qteTapLayer" role="button" tabindex="0" aria-label="點擊畫面壓實"></div>
+  <div id="toast"></div>
   <div id="guide"><div id="stageRound">已壓實 0 次</div><div id="stageName">自由裝填與壓實</div><div id="stageDesc">留意桶口：快滿時才會看見火藥；想倒就倒、想壓就壓。</div></div>
   <div id="controls" class="hidden"></div>
 </div>
@@ -146,13 +145,13 @@ let S={},rafTime=0,lastT=0,pouring=false,shapeDragging=false,lastAngle=0,qtePos=
 const BARREL_SPACE=1000; /* abstract game-only visual capacity, not a physical formula */
 const powderLevel=()=>S.powder/(Math.max(.1,S.density)*BARREL_SPACE);
 const TAU=Math.PI*2, clamp=(v,l,h)=>Math.max(l,Math.min(h,v)),rnd=(a,b)=>a+Math.random()*(b-a),ease=t=>t*t*(3-2*t),fmt=n=>Math.floor(n).toLocaleString('en-US');
-function reset(){S={phase:'intro',powder:0,density:0.60,round:1,totalPressed:0,lastPourPress:0,hp:100,broken:false,spillTime:0,shape:0,shapeTarget:rnd(.91,1.08),power:0,qteCenter:.5,qteSpeed:1.8,qteClock:0,compressT:0,compressMode:'',aimX:0,aimZ:0,aimClock:0,throwT:0,shotX:0,shotZ:0,particles:[],shake:0,shotRot:0};pouring=false;shapeDragging=false;lastT=0;renderHUD();$('intro').style.display='flex';$('endOverlay').classList.remove('show');$('impactHud').classList.remove('show');$('world3d').style.display='none';document.body.classList.remove('fieldmode','blastmode');if(WORLD){WORLD.radius=-1;WORLD.mode='field';WORLD.counter={buildings:0,kills:0};}hadNewLandmarks=new Set();lastLandmarkShown=0;roundAchievements=new Set();$('controls').classList.add('hidden');$('guide').classList.add('hidden');}
+function reset(){S={phase:'intro',powder:0,density:0.60,round:1,totalPressed:0,lastPourPress:0,hp:100,broken:false,overflowed:false,spillTime:0,shape:0,shapeTarget:rnd(.91,1.08),power:0,qteCenter:.5,qteSpeed:1.8,qteClock:0,compressT:0,compressMode:'',aimX:0,aimZ:0,aimClock:0,throwT:0,shotX:0,shotZ:0,particles:[],shake:0,shotRot:0};pouring=false;shapeDragging=false;lastT=0;renderHUD();$('intro').style.display='flex';$('endOverlay').classList.remove('show');$('impactHud').classList.remove('show');$('world3d').style.display='none';document.body.classList.remove('fieldmode','blastmode');if(WORLD){WORLD.radius=-1;WORLD.mode='field';WORLD.counter={buildings:0,kills:0};}hadNewLandmarks=new Set();lastLandmarkShown=0;roundAchievements=new Set();$('controls').classList.add('hidden');$('guide').classList.add('hidden');}
 function phase(p){S.phase=p;renderHUD();}
 function toast(text,ms=1300){const el=$('toast');el.textContent=text;el.classList.add('show');toastClock=performance.now()+ms;}
 function stepIndex(){return ['fill','press'].includes(S.phase)?0:S.phase==='shape'?1:['aimX','aimZ'].includes(S.phase)?2:3;}
 function renderHUD(){
  const ph=S.phase,work=ph==='fill'||ph==='press';
- document.body.classList.toggle('workmode',work);document.body.classList.toggle('pressmode',ph==='press');document.body.classList.toggle('shapemode',ph==='shape');const field=['aimX','aimZ','flight','blast','end'].includes(ph);document.body.classList.toggle('fieldmode',field);document.body.classList.toggle('blastmode',ph==='blast');$('world3d').style.display=field?'block':'none';$('impactHud').classList.toggle('show',ph==='blast');
+ document.body.classList.toggle('workmode',work);document.body.classList.toggle('shapemode',ph==='shape');const field=['aimX','aimZ','flight','blast','end'].includes(ph);document.body.classList.toggle('fieldmode',field);document.body.classList.toggle('blastmode',ph==='blast');$('world3d').style.display=field?'block':'none';$('impactHud').classList.toggle('show',ph==='blast');
  $('stats').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='blast'||ph==='flight');
  $('steps').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='blast');
  $('guide').classList.toggle('hidden',ph==='intro'||ph==='end'||ph==='blast');
@@ -168,7 +167,7 @@ function renderHUD(){
  if(work){
    ctl.innerHTML=`<div class="actionThree">
     <button id="pourBtn" class="btn" ${ph==='press'?'disabled':''}><span class="ico">⬇</span><span>倒火藥</span></button>
-    <button id="pressBtn" class="btn ${ph==='press'?'live':'primary'}" ${ph==='press'||S.powder<15?'disabled':''}><span class="ico">⚙</span><span>${ph==='press'?'點畫面壓實':'啟動壓實'}</span></button>
+    <button id="pressBtn" class="btn ${ph==='press'?'live':'primary'}" ${ph!=='press'&&S.powder<15?'disabled':''}><span class="ico">⚙</span><span>${ph==='press'?'立即壓實':'啟動壓實'}</span></button>
     <button id="shapeBtn" class="btn ghost" ${ph==='press'||S.powder<15?'disabled':''}><span class="ico">↻</span><span>轉輪定型</span></button>
    </div>`;
    const btn=$('pourBtn');
@@ -177,14 +176,14 @@ function renderHUD(){
      const stop=()=>{pouring=false;btn.classList.remove('isHeld')};
      btn.addEventListener('pointerup',stop);btn.addEventListener('pointercancel',stop);btn.addEventListener('lostpointercapture',stop);
    }
-   $('pressBtn').addEventListener('click',()=>{if(S.phase==='fill')startPress()});
+   $('pressBtn').addEventListener('click',()=>{if(S.phase==='press')finishPress();else if(S.phase==='fill')startPress()});
    $('shapeBtn').addEventListener('click',()=>{if(S.phase==='fill'&&S.powder>=15)startShape()});
  }else if(ph==='shape'){
    ctl.innerHTML=`<div id="wheelLayout"><div id="wheelPad"><div id="wheelFace"></div><div id="wheelRot"><div id="wheelGrip"></div></div><div id="wheelCenter">↻ 旋轉</div></div><div id="rotateInstructions"><b>將桶子慢慢定型</b><br>順時針轉動轉輪。<br>覺得外觀適合了，就按完成。</div></div><button id="shapeDone" class="btn primary full">完成定型 · 前往投擲　→</button>`;
    const wheel=$('wheelPad');wheel.addEventListener('pointerdown',e=>{e.preventDefault();wheel.setPointerCapture(e.pointerId);shapeDragging=true;lastAngle=pointerAngle(e,wheel)});
    wheel.addEventListener('pointermove',e=>{if(!shapeDragging||S.phase!=='shape')return;e.preventDefault();const a=pointerAngle(e,wheel);let d=a-lastAngle;if(d>Math.PI)d-=TAU;if(d<-Math.PI)d+=TAU;lastAngle=a;if(d>0&&d<1.3){S.shape=clamp(S.shape+d/TAU*.38,0,1.65);S.shake=Math.min(.4,S.shake+.012);updateWheel();}});
    const stop=()=>{shapeDragging=false};wheel.addEventListener('pointerup',stop);wheel.addEventListener('pointercancel',stop);wheel.addEventListener('lostpointercapture',stop);
-   $('shapeDone').addEventListener('click',startAim);updateWheel();
+   $('shapeDone').addEventListener('click',enterThrowTraining);updateWheel();
  }else if(ph==='aimX'||ph==='aimZ'){
    const ax=ph==='aimX';ctl.innerHTML=`<div class="smallTitle">${ax?'第 1 步：左右方向':'第 2 步：投擲遠近'}</div><div id="aimTrack"><div id="aimPerfect"></div><div id="aimPointer"></div></div><button id="lockAim" class="btn primary full">${ax?'鎖定左右方向　→':'投擲！　↗'}</button><div class="underText">金色指針會快速來回移動，靠近中央越準</div>`;
    $('lockAim').addEventListener('click',()=>{if(S.phase==='aimX'){S.aimX=aimPos;S.aimClock=0;phase('aimZ')}else{S.aimZ=aimPos;startFlight()}});
@@ -216,10 +215,70 @@ function finishPress(){if(S.phase!=='press')return;
  else{phase('fill');toast(`${label}　桶內火藥下降，可以繼續裝填／壓實`,1250)}
 }
 function triggerOverflow(){if(S.phase!=='fill')return;
- unlockAchievement('overflow');pouring=false;S.spillTime=1.55;S.shake=1.2;startShape();
+ unlockAchievement('overflow');S.overflowed=true;pouring=false;S.spillTime=1.55;S.shake=1.2;startShape();
  toast('⚠ 火藥滿出來造成危險！強制進入定型！',3100);
 }
 function startShape(){S.shape=0;S.shapeTarget=rnd(.88,1.07)+Math.min(.13,S.round*.009);phase('shape')}
+// v1.36: Prepare the *actual* 3D three-throw game while the player crafts.
+// Use the same URLs as the destination so Safari/Chrome can reuse HTTP cache.
+let throwingWarmStarted=false;
+function warmThrowingGame(){
+ if(throwingWarmStarted)return;throwingWarmStarted=true;
+ const preloadModule=(href)=>{
+  const link=document.createElement('link');link.rel='modulepreload';link.href=href;document.head.append(link);
+ };
+ preloadModule('./grenade-user-play-3d.js?v=132');
+ preloadModule('./grenade-score.js?v=132');
+ const warm=(url)=>fetch(url,{cache:'force-cache',priority:'low'}).then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);
+ // Low-concurrency downloads leave most bandwidth free for the workshop.
+ void warm('./grenade-user-play.html');
+ void warm('./src/core/glb111.js');
+ void warm('./src/characters/rigAnimator.js');
+ fetch('./grenade-user-scene.json?v=130',{cache:'force-cache',priority:'low'}).then(async r=>{
+  if(!r.ok)return;
+  const scene=await r.json();
+  const paths=['./assets/characters/cadet/cadet-green.glb'];
+  // Warm a few heavy assets, not every model at once (particularly important on iPhone).
+  const unique=new Set(paths);
+  for(const item of scene.items||[]){
+   if(unique.size>=10)break;
+   for(const path of [item.model,item.destructible?.fracturedModel]){
+    if(path&&unique.size<10)unique.add(path);
+   }
+  }
+  const queue=[...unique];
+  await Promise.all(Array.from({length:2},async()=>{
+   while(queue.length)await warm(queue.shift());
+  }));
+ }).catch(()=>{});
+}
+// Entirely fictional game numbers: a forgiving floor, a hard-to-reach ceiling.
+function craftingPower(){
+ const fill=clamp(powderLevel(),0,1);
+ const press=clamp((S.density-.60)/1.35,0,1)*clamp(S.hp/100,.20,1);
+ const closeness=Math.abs(S.shape-S.shapeTarget);
+ const shape=clamp(1/(1+Math.pow(closeness/.23,2)),.08,1);
+ const base=15+85*Math.pow(fill,.9)*(.45+.55*press)*(.65+.35*shape);
+ const limit=S.broken?70:S.overflowed?85:100;
+ return {power:clamp(Math.round(Math.min(limit,base)),10,100),
+  fill:Math.round(fill*100),press:Math.round(press*100),shape:Math.round(shape*100)};
+}
+function enterThrowTraining(){
+ if(S.phase!=='shape')return;
+ const item=craftingPower();
+ const accuracy=Math.abs(S.shape-S.shapeTarget);
+ if(accuracy<=.08)unlockAchievement('wheel-perfect');
+ unlockAchievement('wheel');
+ const payload={version:1,source:'workshop',createdAt:Date.now(),
+  power:item.power,fill:item.fill,press:item.press,shape:item.shape,maxThrows:3};
+ let saved=true;
+ try{sessionStorage.setItem('ARMY2_grenade_craft_v1',JSON.stringify(payload))}catch(err){
+  saved=false; // Safari private/storage-restricted fallback.
+  console.warn('製作資料暫存失敗',err);
+ }
+ // Navigate to the EXACT preloaded URL; add power only when browser storage is blocked.
+ location.href='./grenade-user-play.html'+(saved?'':'?craft='+payload.power);
+}
 function startAim(){// Play-only quality score. Hidden from the player.
  const closeness=Math.abs(S.shape-S.shapeTarget);S.shapeQuality=Math.max(.08,1/(1+Math.pow(closeness/.23,2)));if(closeness<=.08)unlockAchievement('wheel-perfect');unlockAchievement('wheel');S.aimClock=0;phase('aimX');}
 function startFlight(){S.phase='flight';S.throwT=0;S.shotX=(S.aimX-.5)*18;S.shotZ=5+(1-S.aimZ)*24;S.shotRot=rnd(-3,3);S.shake=.25;unlockAchievement('first-throw');if(Math.hypot(S.shotX,S.shotZ-17)<=3)unlockAchievement('accurate');if(WORLD)WORLD.setLanding(S.shotX,S.shotZ);renderHUD();}
@@ -249,9 +308,7 @@ function finishBlast(){
  $('landmarkResults').textContent=newNames.length?'🏅 本次新成就：'+newNames.join('、'):'🏅 查看成就圖鑑，收集更多特殊成就';
  $('endOverlay').classList.add('show');
 }
-function boot(){reset();$('startBtn').addEventListener('click',()=>{$('intro').style.display='none';S.phase='fill';S.round=1;phase('fill')});$('galleryBtn').addEventListener('click',showGallery);$('endGalleryBtn').addEventListener('click',showGallery);$('closeGallery').addEventListener('click',()=>$('gallery').classList.remove('show'));$('retryBtn').addEventListener('click',()=>{reset();$('intro').style.display='none';S.phase='fill';phase('fill')});$('restart').addEventListener('click',()=>{if(confirm('要重新開始這次訓練嗎？'))reset()});const qteTap=$('qteTapLayer');
- qteTap.addEventListener('pointerdown',e=>{if(S.phase!=='press')return;e.preventDefault();e.stopPropagation();finishPress()});
- qteTap.addEventListener('keydown',e=>{if(S.phase==='press'&&(e.key==='Enter'||e.key===' ')){e.preventDefault();finishPress()}});window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden)pouring=false});resize();requestAnimationFrame(loop)}
+function boot(){reset();$('startBtn').addEventListener('click',()=>{$('intro').style.display='none';S.phase='fill';S.round=1;phase('fill');warmThrowingGame();});$('galleryBtn').addEventListener('click',showGallery);$('endGalleryBtn').addEventListener('click',showGallery);$('closeGallery').addEventListener('click',()=>$('gallery').classList.remove('show'));$('retryBtn').addEventListener('click',()=>{reset();$('intro').style.display='none';S.phase='fill';phase('fill')});$('restart').addEventListener('click',()=>{if(confirm('要重新開始這次訓練嗎？'))reset()});window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden)pouring=false});resize();requestAnimationFrame(loop)}
 function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=Math.max(1,window.innerWidth);H=Math.max(1,window.innerHeight);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0)}
 function rr(x,y,w,h,r,fill,stroke,lw=1){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
 function line(x1,y1,x2,y2,color,width=2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
