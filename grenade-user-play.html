@@ -89,7 +89,7 @@ body.aiming:has(#meterH:not(.hide)) #aimHint{display:none}
 @media(orientation:landscape) and (max-height:530px){#earthCaption{bottom:calc(24px + env(safe-area-inset-bottom));padding:5px 9px}}
 </style></head><body>
 <canvas id="world3d"></canvas>
-<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.19 營區限定｜紅軍九人隨機組</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
+<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.20 投擲座標校正｜紅軍九人隨機組</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
 <div id="powerDock" class="hide">
   <button id="powerToggle" aria-expanded="false" aria-controls="powerDrawer" aria-label="展開或收合手榴彈威力設定">💥 威力 <strong id="powerMiniValue">10</strong> <span id="powerChevron">▾</span></button>
   <div id="powerDrawer" hidden><div class="powerHead"><span>威力（0～100）</span><span id="powerOut">10</span></div>
@@ -154,14 +154,22 @@ function reset(newRound=true){
 let audioCtx=null;function blastSound(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioCtx=audioCtx||new AC();if(audioCtx.state==='suspended')audioCtx.resume();const t=audioCtx.currentTime;const n=audioCtx.sampleRate*.9|0,buf=audioCtx.createBuffer(1,n,audioCtx.sampleRate),data=buf.getChannelData(0);for(let i=0;i<n;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);const src=audioCtx.createBufferSource(),low=audioCtx.createBiquadFilter(),gain=audioCtx.createGain();src.buffer=buf;low.type='lowpass';low.frequency.setValueAtTime(650,t);low.frequency.exponentialRampToValueAtTime(70,t+.7);gain.gain.setValueAtTime(.48,t);gain.gain.exponentialRampToValueAtTime(.001,t+.83);src.connect(low);low.connect(gain);gain.connect(audioCtx.destination);src.start(t);src.stop(t+.86);const osc=audioCtx.createOscillator(),og=audioCtx.createGain();osc.type='sine';osc.frequency.setValueAtTime(110,t);osc.frequency.exponentialRampToValueAtTime(39,t+.40);og.gain.setValueAtTime(.5,t);og.gain.exponentialRampToValueAtTime(.001,t+.52);osc.connect(og);og.connect(audioCtx.destination);osc.start(t);osc.stop(t+.55);}catch(e){console.warn('Sound',e)}}
 function shoot(){if(!audioCtx){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume()}catch{}}setState('flight');$('msg').textContent='💣 手榴彈飛行中…';world.playThrow(x,z,()=>{if(phase!=='flight')return;world.setLanding(x,z);world.camPhase='landed';world.landingProgress=0;landingClock=0;setState('landed');$('msg').textContent='💣 手榴彈落地……';});}
 function detonate(){if(phase!=='landed')return;world.beginTestPower(power);world.camPhase='blast';blastSound();setState('blast');$('msg').textContent='💥 衝擊波、爆炸碗罩與地表焦黑正在擴散！';}
-// Aim fan is anchored at the real thrower, facing the randomly chosen red squad.
-// Full distance covers the practice camp only, never city/country/globe.
+// v1.20: The screen-left / screen-middle / screen-right needle values
+// are mapped to the THREE actual landing positions supplied by the player.
+// Never infer left/right from world X or camera orientation; the camp map is rotated.
+// The distance gauge blends each full-power destination with the real thrower's feet.
+const MAX_LEFT=[44.26,-36.04];   // first gauge: leftmost, maximum range
+const MAX_CENTER=[39.17,30.58]; // first gauge: middle, maximum range
+const MAX_RIGHT=[-47.20,38.19];// first gauge: rightmost, maximum range
 function meterLanding(dir,range){
  const d=clamp(dir,0,1),r=clamp(range,0,1);
- const f=world.throwForward||[.7,.7],right=[f[1],-f[0]],a=(d-.5)*Math.PI*.88;
- const dx=f[0]*Math.cos(a)+right[0]*Math.sin(a),dz=f[1]*Math.cos(a)+right[1]*Math.sin(a);
- const dist=.9+r*69;
- return [clamp(world.player[0]+dx*dist,-52,50),clamp(world.player[1]+dz*dist,-39,43)];
+ const mix=(a,b,t)=>a+(b-a)*t;
+ // A continuous interpolation along the two left/center/right calibration segments.
+ const far=d<=.5
+  ? [mix(MAX_LEFT[0],MAX_CENTER[0],d*2),mix(MAX_LEFT[1],MAX_CENTER[1],d*2)]
+  : [mix(MAX_CENTER[0],MAX_RIGHT[0],(d-.5)*2),mix(MAX_CENTER[1],MAX_RIGHT[1],(d-.5)*2)];
+ const feet=world.player; // actual position of g10001 (no hard-coded old map position)
+ return [mix(feet[0],far[0],r),mix(feet[1],far[1],r)];
 }
 function confirmAim(){
  if(phase==='aimX'){direction=pos;setState('aimZ');closePower();clock=0;}
