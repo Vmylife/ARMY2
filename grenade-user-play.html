@@ -87,9 +87,65 @@ body.aiming:has(#meterH:not(.hide)) #aimHint{display:none}
 
 /* Cinematic camera altitude guide; never blocks the world or touch controls. */
 @media(orientation:landscape) and (max-height:530px){#earthCaption{bottom:calc(24px + env(safe-area-inset-bottom));padding:5px 9px}}
+
+/* v1.29: 國軍軍紀調查報告 — mobile-first result presentation. */
+#result{padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));background:#09150fdc;overscroll-behavior:contain}
+#result .resultCard{width:min(510px,100%);max-height:100%;max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px 15px 18px;border:1px solid #bca66b8f;background:linear-gradient(162deg,#233b2c 0%,#13271d 61%,#0d2119 100%);box-shadow:0 16px 80px #000c}
+.report-topline{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#dfca90;font-size:10px;letter-spacing:1px;font-weight:900}
+.report-id{color:#a6b8a8;letter-spacing:0;font-size:10px;white-space:nowrap}
+.report-title{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #d8c18a44;padding-bottom:9px;margin:6px 0 12px}
+#result .report-title h2{margin:0;font-size:clamp(20px,5.5vw,26px);line-height:1.28;color:#f4e8bd}
+.report-title p{margin:4px 0 0;color:#b9cdb8;font-size:11px}
+.report-stamp{border:2px solid #d7b46c;border-radius:9px;transform:rotate(-10deg);color:#f0ca7e;font-size:11px;letter-spacing:1px;font-weight:900;text-align:center;padding:5px 8px;line-height:1.25;flex:none;max-width:96px}
+.report-score{border:1px solid #dec78f66;background:linear-gradient(130deg,#2b4735,#1a3426);border-radius:16px;display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:11px}
+.report-score-main{display:flex;flex-direction:column;align-items:center;min-width:118px;border-right:1px solid #d9c38a44;padding-right:12px}
+.report-mini-label{font-size:10px;color:#ceb984;font-weight:850;letter-spacing:.8px}
+.report-numeric{font-size:clamp(47px,14vw,62px);line-height:1.02;letter-spacing:-2px;font-weight:950;color:#f7da87;font-variant-numeric:tabular-nums}
+.report-numeric small{font-size:13px;letter-spacing:0;color:#c6d0bb;font-weight:600}
+.report-grade{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.report-grade strong{font-size:clamp(17px,5vw,22px);color:#f5e9c5;line-height:1.3}
+.report-grade span{font-size:11px;color:#c8d8c8;line-height:1.45}
+.report-best{font-size:11px;color:#eed597;font-weight:750;margin-top:4px}
+.report-dual{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.report-rank{border:1px solid #bed0b52b;background:#0f291e;border-radius:11px;padding:10px 11px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.report-rank .value{font-size:25px;font-weight:950;line-height:1.1;color:#e1c781}
+.report-rank .value.bad{color:#e89b83}
+.report-rank small{font-size:11px;color:#b2c6b4;display:block;margin-bottom:3px}
+.report-rank span{font-size:10px;color:#c4d1c0}
+#result .cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+#result .cell{padding:10px 6px;text-align:center;background:#0e281e;border:1px solid #bed0b522}
+#result .cell small{font-size:11px;color:#b2c6b4}
+#result .cell b{font-size:24px;color:#f7edca;font-variant-numeric:tabular-nums;margin-top:3px}
+#result .cell b.danger{color:#eda18a}
+.report-section{margin:0 0 12px}
+.report-section-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #e1ce9550;padding-bottom:6px;margin:0 0 9px;color:#efd59a;font-size:12px;font-weight:900;letter-spacing:.5px}
+.report-section-heading small{font-size:10px;color:#aec2b0;font-weight:650;letter-spacing:0}
+.report-titles{display:grid;gap:6px}
+.report-title-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;padding:7px 9px;background:#203c2d;border-radius:8px}
+.report-title-row span{color:#b6c9b5;white-space:nowrap}
+.report-title-row strong{color:#efe4c0;font-size:12px;text-align:right}
+.report-achievements{display:grid;gap:7px}
+.report-achievement{display:flex;gap:9px;align-items:center;padding:9px 10px;border-radius:10px;background:#203b2c;border:1px solid #dcc68b3b}
+.report-achievement .emblem{width:36px;height:36px;flex:none;display:grid;place-items:center;background:#364e39;border-radius:10px;font-size:21px}
+.report-achievement .ach-copy{flex:1;min-width:0}
+.report-achievement strong{font-size:12px;color:#f2e2b4;display:block}
+.report-achievement small{font-size:10px;color:#bdcdbb;line-height:1.45;display:block;margin-top:2px}
+.report-achievement .ach-new{flex:none;font-size:9px;color:#243325;background:#f2d88e;border-radius:5px;padding:3px 5px;font-weight:900}
+.report-no-achievement{font-size:12px;color:#bdd2bf;line-height:1.6;padding:9px 11px;background:#203b2c;border-radius:10px}
+.report-officer{background:#182d23;border-left:3px solid #d1b874;padding:11px 12px;border-radius:0 10px 10px 0;color:#f3e8c9;font-size:12px;line-height:1.7}
+.report-officer strong{display:block;color:#e8cf91;margin-bottom:3px;font-size:11px}
+#result #newLandmarks{margin:6px 0 13px;color:#a8bba9;font-size:10px;line-height:1.55}
+#resultBtns{margin-top:10px;gap:8px}#resultBtns button{min-height:45px;padding:9px 11px;font-size:13px}
+#gallery{background:#0e211bea;overscroll-behavior:contain}#gallery .galleryBody{background:#172c20;border:1px solid #d0bc8470;border-radius:18px;padding:17px}#gallery h2{margin:0;color:#f2db9f}
+#gallery .galGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:13px 0}
+#gallery .gal{background:#254131;border-color:#c9b87c55;padding:12px;min-height:98px}
+#gallery .gal.locked{opacity:.52}#gallery .gal strong{color:#f0dfb4}
+#gallery .gal .gal-icon{font-size:24px;margin-bottom:5px}#gallery .gal small{line-height:1.4}
+@media(max-width:360px){#result .resultCard{padding:13px 11px}.report-score-main{min-width:100px;padding-right:9px}.report-score{padding:11px;gap:9px}.report-title-row{font-size:10px}.report-title-row strong{font-size:11px}}
+@media(orientation:landscape) and (max-height:530px){#result .resultCard{max-height:calc(100dvh - 16px)}#result .report-title h2{font-size:20px}.report-numeric{font-size:43px}}
 </style></head><body>
 <canvas id="world3d"></canvas>
-<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.28 道具比例修正</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
+<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.29 戰果結算</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
 <div id="powerDock" class="hide">
   <button id="powerToggle" aria-expanded="false" aria-controls="powerDrawer" aria-label="展開或收合手榴彈威力設定">💥 威力 <strong id="powerMiniValue">10</strong> <span id="powerChevron">▾</span></button>
   <div id="powerDrawer" hidden><div class="powerHead"><span>威力（0～100）</span><span id="powerOut">10</span></div>
@@ -120,10 +176,26 @@ body.aiming:has(#meterH:not(.hide)) #aimHint{display:none}
 
 <div id="blastFlash" aria-hidden="true"></div><div id="badge"></div><button id="skipIntro" style="position:fixed;right:14px;top:calc(175px + env(safe-area-inset-top));z-index:8;display:none;background:#1c422ce3">跳過開場</button>
 <div id="loading"><div class="loadCard"><div style="font-size:44px">🏗️</div><b>正在載入真實 3D 模型</b><p id="loadingDetail">載入你的 3D 場景、角色動畫和破壞模型…<br>場景 543 個原始物件；每場只出 9 名紅軍，其餘 3 組不載入。</p><button class="accent" id="loadingButton" disabled>載入中…</button></div></div>
-<section id="result"><div class="resultCard"><div style="font-size:11px;color:#f2d38e;letter-spacing:1.8px;font-weight:800">國軍手榴彈試炸報告</div><h2 id="resultHeading">爆炸結束</h2><div class="cards"><div class="cell"><small>摧毀建築</small><b id="rBuildings">0</b></div><div class="cell"><small>擊殺人數</small><b id="rKills">0</b></div><div class="cell"><small>紅軍擊殺</small><b id="rRed">0</b></div><div class="cell"><small>友軍誤傷</small><b id="rGreen">0</b></div></div><div id="newLandmarks">本局紅軍：9 人</div><div id="resultBtns"><button class="accent" id="retry">再投一次</button></div><p class="muted" style="margin-bottom:0">僅在軍營內試炸；顯示的是遊戲內爆炸與可破壞物件，不包含真實物理傷害。</p></div></section>
+<section id="result" role="dialog" aria-modal="true" aria-labelledby="resultHeading" aria-hidden="true">
+ <div class="resultCard">
+  <div class="report-topline"><span>國軍手榴彈投擲鑑測 · 結算報告</span><span class="report-id">訓練科目 04 / 100 分</span></div>
+  <div class="report-title"><div><h2 id="resultHeading">戰果暨軍紀調查報告</h2><p>國軍新兵訓練 · 本次投擲紀錄</p></div><div class="report-stamp" id="reportStamp">鑑測<br>完成</div></div>
+  <div class="report-score"><div class="report-score-main"><span class="report-mini-label">手榴彈訓練總分</span><div class="report-numeric"><span id="rScore">1</span><small> / 100</small></div></div><div class="report-grade"><strong id="rGradeText">F 級｜重大軍紀事故</strong><span id="rScoreNote">評分依實際戰果計算</span><div class="report-best" id="rBest">個人最高：—</div></div></div>
+  <div class="report-dual"><div class="report-rank"><div><small>戰果評價</small><span id="rBattleText">敵軍擊殺</span></div><b class="value" id="rBattleRank">F</b></div><div class="report-rank"><div><small>軍紀評價</small><span id="rDisciplineText">友軍及營產</span></div><b class="value" id="rDisciplineRank">S</b></div></div>
+  <div class="cards"><div class="cell"><small>紅軍擊殺</small><b id="rRed">0 / 9</b></div><div class="cell"><small>友軍誤殺</small><b id="rGreen" class="danger">0</b></div><div class="cell"><small>建築摧毀</small><b id="rBuildings">0 / 12</b></div></div>
+  <div class="report-section"><div class="report-section-heading">軍方核定稱號</div><div class="report-titles"><div class="report-title-row"><span>⚔️ 作戰</span><strong id="rEnemyTitle">—</strong></div><div class="report-title-row"><span>⚖️ 軍紀</span><strong id="rFriendlyTitle">—</strong></div><div class="report-title-row"><span>🏗️ 營產</span><strong id="rBuildingTitle">—</strong></div></div></div>
+  <div class="report-section"><div class="report-section-heading">本次達成成就 <small id="rAchievementsMeta">最多展示 3 項</small></div><div class="report-achievements" id="rAchievements"></div></div>
+  <div class="report-section"><div class="report-section-heading">長官綜合評語</div><div class="report-officer"><strong id="rOfficerTitle">訓練主任批示</strong><span id="rOfficerComment">請確認戰績。</span></div></div>
+  <div id="newLandmarks">本局紅軍 9 名。</div>
+  <div id="resultBtns"><button class="accent" id="retry">再投一次</button><button class="ghost" id="openGallery">🏅 軍旅榮譽簿</button></div>
+  <p class="muted" style="margin:10px 0 0">分數計算：每名紅軍 +11.11 分、每名友軍 −2 分、每棟建築 −4 分；最終限制 1～100 分。僅為遊戲內虛構戰績。</p>
+ </div>
+</section>
+<section id="gallery" role="dialog" aria-modal="true" aria-labelledby="galleryHeading" aria-hidden="true"><div class="galleryBody"><div class="report-topline"><span>國軍訓練紀錄 · 軍旅榮譽簿</span><span id="galleryCount">0 / 0</span></div><h2 id="galleryHeading">已取得勳章與隱藏成就</h2><p class="muted" style="margin:6px 0">成就會儲存在這個瀏覽器。未解鎖的隱藏成就不顯示名稱。</p><div id="galleryGrid" class="galGrid"></div><button class="accent" id="closeGallery" style="width:100%">返回結算報告</button></div></section>
 
 <script type="module">
 import './grenade-user-play-3d.js?v=38';
+import { ACHIEVEMENTS, calculateReport, readProgress, saveProgress } from './grenade-score.js?v=129';
 const $=id=>document.getElementById(id),world=window.GrenadeWorld,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),fmt=n=>Math.floor(n).toLocaleString('en-US');
 let phase='intro',pos=.5,direction=.5,clock=0,x=0,z=50,power=10,old=performance.now(),badgeTimer=0,resultTimer=0,landingClock=0;
 const badge=t=>{const e=$('badge');e.textContent=t;e.classList.add('show');badgeTimer=performance.now()+1800;};
@@ -147,7 +219,7 @@ function reset(newRound=true){
  $('blastFlash').style.opacity='0';$('skipIntro').style.display='none';
  world.setLanding(world.redCenter[0],world.redCenter[1]);world.resetDetailed();
  world.blastMax=0;world.timer=0;world.radius=-1;world.mode='field';world.time=0;world.buildEvents();
- $('buildings').textContent='0';$('kills').textContent='0';$('result').classList.remove('show');
+ $('buildings').textContent='0';$('kills').textContent='0';$('result').classList.remove('show');$('result').setAttribute('aria-hidden','true');$('gallery').classList.remove('show');$('gallery').setAttribute('aria-hidden','true');
  clock=0;pos=.5;resultTimer=0;landingClock=0;world.landingProgress=0;
  if(newRound){ // Every new red-squad placement gets its own orientation-correct intro.
    world.camPhase='intro';world.introProgress=0;setState('intro');
@@ -205,11 +277,56 @@ function positionAimHUD(){
  const vx=r.x+Math.max(80,r.width/2+24);meter.style.left=clamp(vx,8,w-64)+'px';meter.style.top=clamp((r.top+r.bottom-mh)/2,138,h-mh-74)+'px';
 }
 $('reset').addEventListener('click',()=>reset(true));$('resetBottom').addEventListener('click',()=>reset(true));$('retry').addEventListener('click',()=>reset(true));
-function result(){if(phase!=='blast')return;setState('end');world.camPhase='blast';
- $('resultHeading').textContent=power>=90?'報告長官！全營區爆炸結束！':power>=50?'報告長官！營區災情擴大！':'手榴彈試炸完成';
- $('rBuildings').textContent=fmt(world.counter.buildings);$('rKills').textContent=fmt(world.counter.kills);
- $('rRed').textContent=fmt(world.counter.red);$('rGreen').textContent=fmt(world.counter.green);
- $('newLandmarks').textContent='本局紅軍第 '+world.redSquadId+' 組／9 人；僅統計實際軍營內物件。';$('result').classList.add('show');}
+function setText(id,v){$(id).textContent=String(v);}
+let currentReport=null;
+function result(){
+ if(phase!=='blast')return;
+ const report=calculateReport({red:world.counter.red,green:world.counter.green,buildings:world.counter.buildings,redTotal:9,buildingTotal:12});
+ const oldProgress=readProgress();
+ const progress=saveProgress(report);
+ currentReport=report;
+ setState('end');world.camPhase='blast';
+ setText('rScore',report.score);setText('rGradeText',report.grade+' 級｜'+report.gradeLabel);
+ setText('rScoreNote',report.scoreNote);setText('rBest','個人最高：'+progress.bestScore+' 分'+(report.score>oldProgress.bestScore?' · 本次刷新紀錄！':''));
+ setText('rBattleRank',report.battleGrade);setText('rBattleText',report.red+' / '+report.redTotal+' 名紅軍');
+ setText('rDisciplineRank',report.disciplineGrade);$('rDisciplineRank').classList.toggle('bad',report.disciplineScore<60);
+ setText('rDisciplineText','誤殺 '+report.green+' ／毀建 '+report.buildings);
+ setText('rRed',report.red+' / '+report.redTotal);setText('rGreen',report.green);setText('rBuildings',report.buildings+' / '+report.buildingTotal);
+ setText('rEnemyTitle',report.enemyTitle);setText('rFriendlyTitle',report.friendlyTitle);setText('rBuildingTitle',report.buildingTitle);
+ setText('rOfficerTitle','訓練主任批示 · '+report.mainTitle);setText('rOfficerComment','「'+report.officerComment+'」');
+ setText('newLandmarks','本場紅軍第 '+world.redSquadId+' 組／9 人；累計解鎖 '+progress.unlockedIds.length+' / '+ACHIEVEMENTS.length+' 項成就。最佳成績將保留供主遊戲日後整合。');
+ setText('rAchievementsMeta','本次達成 '+report.achievements.length+' 項 · 展示最多 3 項');
+ const list=$('rAchievements');list.replaceChildren();
+ for(const ach of report.achievements.slice(0,3)){
+  const row=document.createElement('div');row.className='report-achievement';
+  const ico=document.createElement('span');ico.className='emblem';ico.textContent=ach.icon;
+  const copy=document.createElement('div');copy.className='ach-copy';
+  const title=document.createElement('strong');title.textContent=ach.name;
+  const detail=document.createElement('small');detail.textContent=ach.description;
+  copy.append(title,detail);row.append(ico,copy);
+  if(!oldProgress.unlockedIds.includes(ach.id)){const tag=document.createElement('span');tag.className='ach-new';tag.textContent='NEW';row.append(tag);}
+  list.append(row);
+ }
+ if(!report.achievements.length){const empty=document.createElement('div');empty.className='report-no-achievement';empty.textContent='本次沒有達成特殊成就。下次試著換個威力和落點！';list.append(empty);}
+ $('result').classList.add('show');$('result').setAttribute('aria-hidden','false');
+ $('result').querySelector('.resultCard').scrollTop=0;
+}
+function openGallery(){
+ const saved=readProgress(),unlocked=new Set(saved.unlockedIds),grid=$('galleryGrid');grid.replaceChildren();
+ setText('galleryCount',unlocked.size+' / '+ACHIEVEMENTS.length);
+ for(const achievement of ACHIEVEMENTS){
+  const known=unlocked.has(achievement.id),cell=document.createElement('div');cell.className='gal'+(known?'':' locked');
+  const icon=document.createElement('div');icon.className='gal-icon';icon.textContent=known?achievement.icon:'🔒';
+  const type=document.createElement('small');type.textContent=achievement.secret?'隱藏成就':achievement.rarity;
+  const name=document.createElement('strong');name.textContent=known?achievement.name:(achievement.secret?'??? 未知成就':achievement.name);
+  const desc=document.createElement('small');desc.textContent=known?achievement.description:(achievement.secret?'完成特殊投擲條件後解鎖':achievement.description);
+  cell.append(icon,type,name,desc);grid.append(cell);
+ }
+ $('gallery').classList.add('show');$('gallery').setAttribute('aria-hidden','false');$('gallery').scrollTop=0;
+}
+$('openGallery').addEventListener('click',openGallery);
+$('closeGallery').addEventListener('click',()=>{$('gallery').classList.remove('show');$('gallery').setAttribute('aria-hidden','true');});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('gallery').classList.contains('show')){$('gallery').classList.remove('show');$('gallery').setAttribute('aria-hidden','true');}});
 function tick(t){requestAnimationFrame(tick);const dt=clamp((t-old)/1000,0,.045);old=t;
  if(phase==='intro'){clock+=dt;world.introProgress=Math.min(1,clock/7);if(clock>=7){reset(false);$('msg').textContent='鏡頭已到投擲者後方；每場隨機選出一組紅軍';}}
  if(phase==='aimX'||phase==='aimZ'){clock+=dt;pos=.5+.5*Math.sin(clock*(phase==='aimX'?3.25:3.77));if(phase==='aimX'){const dirX=24+272*pos;$('grenadeDirectionRay').setAttribute('x2',String(dirX));$('needleHGlow').setAttribute('x2',String(dirX));}else $('needleV').style.top=`${16+(1-pos)*68}%`;positionAimHUD();}
