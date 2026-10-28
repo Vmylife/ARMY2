@@ -52,7 +52,7 @@ for(let i=0;i<ALL_RED.length;i+=9)ENEMY_GROUPS.push(ALL_RED.slice(i,i+9));
 let activeGroupIndex=Math.floor(Math.random()*ENEMY_GROUPS.length);
 const RED_ITEMS=[];
 const RED_CENTER=[0,0];
-// v1.21: stable screen-forward direction is the calibrated midpoint, not the randomly selected squad.
+// v1.22: model's actual +Z forward faces the calibrated midpoint; camera stays behind him.
 const AIM_CENTER=[39.17,30.58];
 const SCENE_BUILDINGS=ITEMS.filter(v=>v.category==='building');
 const SCENE_SOLDIERS=ITEMS.filter(v=>v.team==='friendly');
@@ -193,7 +193,7 @@ class WebWorld{
     this.actors.push(a);
    }
   }
-  if(this.thrower)this.thrower.angle=Math.atan2(-this.throwForward[0],-this.throwForward[1]);
+  if(this.thrower)this.thrower.angle=Math.atan2(this.throwForward[0],this.throwForward[1]);
   this.troop=inst(SCENE_SOLDIERS.filter(s=>s.uid!==PLAYER_ITEM.uid).map((s,i)=>({x:s.x,z:s.z,enemy:s.team==='enemy',seed:(i*.13)%1})),3);
   if(this.gl&&this.troopBuf){this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.troopBuf);this.gl.bufferData(this.gl.ARRAY_BUFFER,this.troop,this.gl.DYNAMIC_DRAW);}
   this.buildEvents();return next+1;
@@ -346,6 +346,7 @@ class WebWorld{
   if(this.campGroundVAO)this.drawOriginalCampGround(vp);else this.instanceDraw(this.groundBuf,1,2,vp);
   if(this.bld.length){this.instanceDraw(this.bldBuf,this.bld.length/12,0,vp);this.instanceDraw(this.bldBuf,this.bld.length/12,1,vp);}
   if(this.modelState!=='ready'&&this.detailProxyBuf){this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,0,vp);this.instanceDraw(this.detailProxyBuf,this.detailProxy.length/12,1,vp);}
+  this.frameDetailedActors=this.selectDetailedActors(dist);
   this.drawDistantSoldiers(vp,dist);this.drawCampProps(vp,dist);this.drawDetailed(vp,dist);this.drawFlight(vp);this.drawGroundedGrenade(vp);this.debris(vp);this.drawRing(vp);this.drawExplosion(vp,dist);
   if(this.throwing&&performance.now()-this.throwing.start>=this.throwing.duration){const a=this.throwing;this.launchFlight(a.target[0],a.target[1],a.onLanding);}
  }
@@ -355,7 +356,7 @@ class WebWorld{
    this.nearBuildings=SCENE_BUILDINGS.map((o,i)=>({x:o.x,z:o.z,type:o.assetId,people:0,hit:false,fragments:[]}));
    this.actors=SCENE_SOLDIERS.filter(o=>o.uid!==PLAYER_ITEM.uid).map((o,i)=>({x:o.x,z:o.z,px:o.x,pz:o.z,rot:o.rot||0,angle:(o.rot||0)*Math.PI/180,enemy:o.team==='enemy',hit:false,renderLift:0,seed:(i*.731)%1}));
    this.campProps=SCENE_PROPS.map(o=>({uid:o.uid,type:o.assetId,x:o.x,z:o.z,scale:o.scale||1,scaleXYZ:o.scaleXYZ,baseY:o.baseY||0,yaw:(o.rot||0)*Math.PI/180,size:o.size,model:o.model,fracturePath:o.destructible?.fracturedModel,hit:false,fragments:[]}));
-   this.thrower={x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,angle:Math.atan2(-this.throwForward[0],-this.throwForward[1]),anim:{setClip(){},hasClip(){return true}}};
+   this.thrower={x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,angle:Math.atan2(this.throwForward[0],this.throwForward[1]),anim:{setClip(){},hasClip(){return true}}};
    this.modelState='unavailable';this.buildEvents();this.modelErrors.push('瀏覽器不支援 WebGL2，顯示簡化備援場景；建議用手機 Safari 或 Chrome');this.buildEvents();return;
   }
   this.nearBuildings=[];this.actors=[];this.detailed={};
@@ -363,8 +364,8 @@ class WebWorld{
   // Far-view low-detail proxies retain the user's exact building placement.
   this.detailProxy=inst(this.nearBuildings.map(b=>({x:b.x,z:b.z,h:b.size[1],w:b.size[0],d:b.size[2],kind:0,seed:(b.idx%9)/9})),0);
   this.detailProxyBuf=this.gl.createBuffer();this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.detailProxyBuf);this.gl.bufferData(this.gl.ARRAY_BUFFER,this.detailProxy,this.gl.STATIC_DRAW);
-  this.actors=SCENE_SOLDIERS.filter(o=>o.uid!==PLAYER_ITEM.uid).map((o,i)=>({uid:o.uid,x:o.x,z:o.z,px:o.x,pz:o.z,rot:o.rot||0,scale:o.scale||1,quality:o.quality||'low',enemy:o.team==='enemy',hit:false,flyT:0,renderLift:0,angle:(o.rot||0)*Math.PI/180,seed:(i*.731)%1}));
-  this.thrower={uid:PLAYER_ITEM.uid,x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,rot:PLAYER_ITEM.rot,quality:'high',enemy:false,hit:false,flyT:0,renderLift:0,angle:Math.atan2(-this.throwForward[0],-this.throwForward[1]),seed:.2,scale:PLAYER_ITEM.scale||1};
+  this.actors=SCENE_SOLDIERS.filter(o=>o.uid!==PLAYER_ITEM.uid).map((o,i)=>({uid:o.uid,x:o.x,z:o.z,px:o.x,pz:o.z,rot:o.rot||0,scale:o.scale||1,quality:'high',enemy:o.team==='enemy',hit:false,flyT:0,renderLift:0,angle:(o.rot||0)*Math.PI/180,seed:(i*.731)%1}));
+  this.thrower={uid:PLAYER_ITEM.uid,x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,rot:PLAYER_ITEM.rot,quality:'high',enemy:false,hit:false,flyT:0,renderLift:0,angle:Math.atan2(this.throwForward[0],this.throwForward[1]),seed:.2,scale:PLAYER_ITEM.scale||1};
   try{
     // All six original camp building types, keyed by the actual GLB path rather than
     // a three-type substitute list. Fractures reuse the intact texture/UV map.
@@ -387,7 +388,8 @@ class WebWorld{
       const makeAnim=()=>{const anim=Object.create(RigAnimator.prototype);Object.assign(anim,{gltf:cadet,j:template.j,nodes:template.nodes,inverse:template.inverse,joints:template.joints,parents:template.parents,meshIndex:template.meshIndex,clips:template.clips,clip:'Idle',clock:0,speed:1,bones:new Float32Array(template.bones.length),globals:new Map(),prevClip:null,transition:0,prevTime:0,completed:false,rifleAim:0,recoil:0,handNode:template.handNode,rightHandWorld:null,leftHandNode:template.leftHandNode,leftHandWorld:null});anim.setClip(anim.hasClip('Idle_11')?'Idle_11':'Walking',{restart:true});anim.evaluate(.001);return anim;};
       this.soldierAssets[quality]={geo,tex,makeAnim};
     }
-    for(const a of [...this.actors,this.thrower])a.anim=this.soldierAssets[a.quality].makeAnim();
+    // Do not build ~280 full skeletons on load. Give a rig only to an actor when detailed rendering is needed.
+    this.thrower.anim=this.soldierAssets.high.makeAnim();
     // All environmental fracture meshes must finish loading before allowing 
     // the player to start a blast; otherwise objects could disappear unbroken.
     await this.initCampProps();
@@ -493,10 +495,25 @@ class WebWorld{
    if(f.y<.17){f.y=.17;f.vy=Math.max(0,-f.vy*.22);f.vx*=.91;f.vz*=.91;f.ax*=.94;f.az*=.94;}
  }}
  soldierDetailRange(dist){return dist>110?0:Math.max(28,Math.min(56,dist*.75+19));}
+ // Fixed high-detail budget: nearby friendly soldiers use the 5,205-triangle cadet,
+ // but the entire camp remains visible through batched, very-low-cost distant proxies.
+ selectDetailedActors(dist){
+  if(this.modelState!=='ready'||!this.actors)return [];
+  const focus=this.camFocus||this.player,range=this.soldierDetailRange(dist);
+  if(range<=0)return [];
+  const ranked=[];
+  for(const a of this.actors){
+   const d=Math.hypot(a.px-focus[0],a.pz-focus[1]);
+   if(d<=range)ranked.push({a,d});
+  }
+  ranked.sort((a,b)=>a.d-b.d);
+  // 40 animated cadets + the thrower; keeps CPU bone updates manageable on phones.
+  return ranked.slice(0,40).map(v=>v.a);
+ }
  drawDistantSoldiers(vp,dist){
   if(!this.actors||!this.gl||!this.troopBuf)return;
-  const focus=this.camFocus||this.player,near=this.modelState==='ready'?this.soldierDetailRange(dist):0;
-  const far=this.actors.filter(a=>Math.hypot(a.px-focus[0],a.pz-focus[1])>near);
+  const detailed=new Set(this.frameDetailedActors||[]);
+  const far=this.actors.filter(a=>!detailed.has(a));
   // Even at maximum zoom, every friendly soldier and all nine red enemies stay drawn.
   const data=inst(far.map((a,i)=>({x:a.px,z:a.pz,y:a.renderLift||0,
      h:a.hit?.35*(a.scale||1):1.7*(a.scale||1),w:a.hit?1.35:.7,d:a.hit?1.05:.65,enemy:a.enemy,seed:(i*.131)%1})),3);
@@ -516,10 +533,10 @@ class WebWorld{
   if(this.throwing&&this.thrower){const a=this.throwing,k=smooth(clamp((performance.now()-a.start)/400,0,1));this.thrower.angle=lerp(a.startAngle,a.endAngle,k);}
   // Animated GLBs are used nearby; all other soldiers are drawn by a single
   // lightweight instanced pass. No count cap or distance-based disappearance.
-  const nearRange=this.soldierDetailRange(dist);
-  const visibleActors=this.actors.filter(a=>Math.hypot(a.px-focus[0],a.pz-focus[1])<=nearRange);
+  const visibleActors=this.frameDetailedActors||[];
   for(const a of [...visibleActors,this.thrower]){
-   const sa=this.soldierAssets[a.quality];if(!sa)continue;
+   const sa=this.soldierAssets.high;if(!sa)continue;
+   if(!a.anim){a.anim=sa.makeAnim();if(a.hit){a.anim.setClip('Knock_Down',{restart:true});a.anim.speed=1.15;}}
    // Reuse animation clocks at distance, preserving near-view knockdown / throw.
    a.anim.evaluate(dt);const p=this.cadetProg,u=n=>g.getUniformLocation(p,n);
    g.useProgram(p);g.uniformMatrix4fv(u('uVP'),false,vp);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,sa.tex);g.uniform1i(u('uTex'),0);g.uniform3f(u('uTint'),1,1,1);g.uniform1f(u('uRed'),a.enemy?1:0);
@@ -576,14 +593,14 @@ class WebWorld{
   this.drawGrenade(vp,mul(T(x,y,z),mul(tilt,SC(.39))));
   if(t>=1){a.done=true;this.flightPosition=null;this.camPhase='landed';this.landingProgress=0;this.onLanding?.();}
  }
- playThrow(x,z,onLanding){const dx=x-this.player[0],dz=z-this.player[1],endAngle=Math.atan2(-dx,-dz);this.thrower.anim.setClip('baseball_pitching',{restart:true});this.thrower.anim.speed=1.45;this.throwing={start:performance.now(),duration:1120,target:[x,z],onLanding,startAngle:this.thrower.angle,endAngle};this.flight=null;this.camPhase='throw';}
+ playThrow(x,z,onLanding){const dx=x-this.player[0],dz=z-this.player[1],endAngle=Math.atan2(dx,dz);this.thrower.anim.setClip('baseball_pitching',{restart:true});this.thrower.anim.speed=1.45;this.throwing={start:performance.now(),duration:1120,target:[x,z],onLanding,startAngle:this.thrower.angle,endAngle};this.flight=null;this.camPhase='throw';}
  launchFlight(x,z,onLanding){const a=this.player,dx=x-a[0],dz=z-a[1],dl=Math.hypot(dx,dz)||1;
   // Spawn at the actual animated right wrist at the throwing release, not ahead
   // of the actor before the pitch has happened.
   const wrist=this.heldGrenadePosition();const from=wrist||[a[0]+dx/dl*.58,1.3,a[1]+dz/dl*.58];
   if(this.thrower)this.thrower.angle=this.throwing?.endAngle??this.thrower.angle;
   this.throwing=null;this.camPhase='flight';this.flight={start:performance.now(),duration:1850,from,to:[x,.4,z],done:false};this.onLanding=onLanding;}
- resetDetailed(){this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.impactStarted=null;this.landingProgress=0;if(this.thrower?.anim){this.thrower.angle=Math.atan2(-this.throwForward[0],-this.throwForward[1]);this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
+ resetDetailed(){this.nearBuildings?.forEach(b=>{b.hit=false;b.fragments=[]});this.actors?.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;if(a.anim){a.anim.speed=1;a.anim.setClip(a.anim.hasClip('Idle_11')?'Idle_11':'Idle',{restart:true})}});this.flight=null;this.throwing=null;this.flightPosition=null;this.impactStarted=null;this.landingProgress=0;if(this.thrower?.anim){this.thrower.angle=Math.atan2(this.throwForward[0],this.throwForward[1]);this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}this.camPhase='aim';}
  drawFallback(){
  // CPU backup draws actual perspective-projected 3D boxes, shaded faces and rooftops.
  // No textures / 3D library needed; designed for WebGL-disabled phones.
