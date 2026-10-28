@@ -260,7 +260,7 @@ body.show-stats #counters{display:grid;}
 #craftedPowerBadge small{font-size:10px;white-space:nowrap;border-left:1px solid #d0c98a6a;padding-left:8px}
 </style></head><body>
 <canvas id="world3d"></canvas>
-<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.38 主畫面連續遊玩</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
+<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.40 啟動修復</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
 <div id="powerDock" class="hide" aria-label="本場手榴彈製作結果">
   <div id="craftedPowerBadge">💣 <span id="powerLabel">製作威力</span> <strong id="powerMiniValue">—</strong><small id="throwCount">第 1 / 3 投</small></div>
 </div>
@@ -339,8 +339,8 @@ function setState(p){
  $('powerDock').classList.toggle('hide',p==='end');
  $('meterH').classList.toggle('hide',p!=='aimX');
  $('meterV').classList.toggle('hide',p!=='aimZ');
- $('aimHint').classList.toggle('hide',!aiming);
- $('aimHint').textContent=p==='aimX'?'左右方向 · 點畫面任意處確認':p==='aimZ'?'投擲遠近 · 再點畫面任意處投擲！':'';
+ // v1.40: The aim hint was intentionally removed from the minimal HUD.
+ // No DOM access: a missing hint previously aborted the intro with TypeError.
 
 }
 function updateTitle(){
