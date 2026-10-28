@@ -30,35 +30,14 @@ export function mainCampFingerprint(){
  // Changes only when the effective main-game geometry changes; no timestamps.
  const raw=JSON.stringify([MAIN_BUILDINGS,MAIN_PROPS,MAIN_ROADS,MAIN_ZONES]);let hash=2166136261;
  for(let i=0;i<raw.length;i++){hash^=raw.charCodeAt(i);hash=Math.imul(hash,16777619);}
- return (hash>>>0).toString(16)+'-'+MAIN_BUILDINGS.length+'-'+MAIN_PROPS.length;
+ return 'original-ground-v118-'+(hash>>>0).toString(16)+'-'+MAIN_BUILDINGS.length+'-'+MAIN_PROPS.length;
 }
 export function createMainCampScene(assetIndex){
  const items=[];const add=o=>items.push(o);
- // Preserve roads from main game's ROADS (not from any older grenade JSON).
- MAIN_ROADS.forEach((road,index)=>{for(let s=1;s<road.points.length;s++){
-  const [x0,z0]=road.points[s-1],[x1,z1]=road.points[s],dx=x1-x0,dz=z1-z0,len=Math.hypot(dx,dz);
-  if(len<.02)continue;
-  add({uid:`main-road-${index}-${s}`,assetId:'path',category:'ground',name:`道路 ${road.id} ${s}`,
-   x:round((x0+x1)/2),z:round((z0+z1)/2),rot:round(Math.atan2(-dz,dx)*TO_DEG),
-   scale:1,quality:'low',width:round(len),depth:road.width,size:[3,.08,20],
-   sourceRoadId:road.id,destructible:{kind:'scorched-ground'}});
- }});
- // Training surfaces. Oval and polygon training grounds use narrow strips so
- // their outline still resembles the actual camp instead of a large rectangle.
- MAIN_ZONES.forEach((zone,index)=>{
-  const assetId=zone.id==='drill'||zone.id==='grenade'?'plaza':'lawn',tint=colorHex(zone.color);
-  function ground(k,x,z,width,depth){if(width<=.03||depth<=.03)return;add({uid:`main-zone-${index}-${k}`,
-   assetId,category:'ground',name:`${zone.label||zone.id} 地面`,x:round(x),z:round(z),rot:0,
-   scale:1,quality:'low',width:round(width),depth:round(depth),size:[18,.08,18],
-   groundTint:tint,sourceZoneId:zone.id,destructible:{kind:'scorched-ground'}})}
-  if(zone.kind==='ellipse'&&zone.w&&zone.d){
-   const N=13;for(let j=0;j<N;j++){const p=(j+.5)/N*2-1,wd=zone.w*Math.sqrt(Math.max(0,1-p*p));ground(j,zone.x,zone.z+zone.d*p/2,wd,zone.d/N*1.015)}
-  }else if(zone.kind==='poly'&&Array.isArray(zone.points)){
-   const zs=zone.points.map(q=>q[1]),min=Math.min(...zs),max=Math.max(...zs),N=12;
-   for(let j=0;j<N;j++){const z=min+(j+.5)/N*(max-min),xs=perimeterSlice(zone.points,z);
-    for(let k=0;k+1<xs.length;k+=2)ground(j+'-'+k,(xs[k]+xs[k+1])/2,z,xs[k+1]-xs[k],(max-min)/N*1.02);}
-  }else if(zone.w&&zone.d)ground(0,zone.x,zone.z,zone.w,zone.d);
- });
+ // Ground is not part of the editable destruction objects. It is rendered from
+ // the original game's ground103/campGeometry/roadMesh modules, including the
+ // basketball court markings, real joined road polygons and oval training zones.
+ // Do not turn roads/zones into rectangular scene props; that caused v1.17 seams.
  MAIN_BUILDINGS.forEach((b,i)=>{
   const assetId=BUILDING_ASSET[b.id],a=assetIndex[assetId];if(!a)throw Error('缺少低畫質建築素材 '+b.id);
   const yaw=Number.isFinite(b.facingYaw)?b.facingYaw:Math.atan2(b.entry.x-b.x,b.entry.z-b.z);
@@ -86,7 +65,7 @@ export function createMainCampScene(assetIndex){
  if(items.some(o=>o.category==='soldier'))throw Error('同步的軍營不得包含人物');
  if(items.filter(o=>o.category==='building').some(o=>o.quality!=='low'||!o.destructible?.fracturedModel))throw Error('建築的低畫質或破壞模型設定有缺漏');
  return {format:'army-grenade-scene',schemaVersion:1,
-  sceneId:'main-camp-live',sceneName:'🏕️ 主遊戲最新軍營｜無士兵・低畫質建築',
+  sceneId:'main-camp-live',sceneName:'🏕️ 主遊戲原版地板｜全可破壞模型',groundStyle:'main-game',
   source:'src/map/activeCampLayout116.js → camp.js?v=092',sourceFingerprint:mainCampFingerprint(),
   throwOrigin:{x:-21,z:-9},counts:count,items};
 }

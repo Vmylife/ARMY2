@@ -1,4 +1,5 @@
-import {createMainCampScene} from './grenade-live-camp.js?v=117';
+import {createMainCampScene} from './grenade-live-camp.js?v=118';
+import {makeEnvironment as makeOriginalCampGround} from './src/map/ground103.js?v=103';
 import {loadGlb} from './src/core/glb111.js';
 import {RigAnimator} from './src/characters/rigAnimator.js';
 // Grenade-only scene editing. Never modifies the live camp objects or scene.
@@ -82,10 +83,10 @@ function batchAdd(){const o=scene.objects.find(x=>x.uid===selected);if(!o){msg('
 function newScene(){let name=prompt('新場景名稱（不會影響原軍營）','手榴彈場景 '+(store.scenes.length+1));if(name===null)return;name=name.trim()||'未命名手榴彈場景';const s={id:'scene-'+Date.now()+'-'+Math.floor(Math.random()*1000),name,serial:0,objects:[]};store.scenes.push(s);scene=s;history.length=0;future.length=0;select(null);setMoveSelectedMode(false);pivot={x:0,z:0};distance=96;listScenes();changed();msg('已新增空白場景：'+name)}
 function renameScene(){const v=prompt('修改場景名稱',scene.name);if(v===null)return;scene.name=v.trim()||scene.name;listScenes();save()}
 function deleteScene(){if(!confirm('確定要刪除場景「'+scene.name+'」？此操作不會影響主遊戲。'))return;store.scenes=store.scenes.filter(x=>x!==scene);if(!store.scenes.length)store.scenes=[initial()];scene=store.scenes[0];history.length=0;future.length=0;selected=null;setMoveSelectedMode(false);listScenes();changed()}
-function exportScene(){const data={format:'army-grenade-scene',schemaVersion:1,exportedAt:new Date().toISOString(),sceneId:scene.id,sceneName:scene.name,map:{width:280,depth:280,groundColor:'#adc9a7'},throwOrigin:(scene.throwOrigin||scene.objects.find(o=>o.assetId==='throwPoint')||scene.objects.find(o=>o.uid==='g888')||{x:0,z:0}),totalObjects:scene.objects.length,items:scene.objects.map(o=>{const a=BY[o.assetId];const model=modelPath(a,qualityOf(o));const fracturedModel=fracturePath(a,qualityOf(o));return{...o,quality:qualityOf(o),category:a.type,name:o.name||a.name,model,destructible:fracturedModel?{fracturedModel,kind:o.destructible?.kind||'mesh-fragments'}:a.type==='ground'?{kind:'scorched-ground'}:o.destructible||null,team:o.team||a.side||null,size:o.size||a.size}})};
+function exportScene(){const data={format:'army-grenade-scene',schemaVersion:1,exportedAt:new Date().toISOString(),sceneId:scene.id,sceneName:scene.name,map:{width:280,depth:280,groundColor:'#adc9a7',groundStyle:scene.groundStyle||'custom'},throwOrigin:(scene.throwOrigin||scene.objects.find(o=>o.assetId==='throwPoint')||scene.objects.find(o=>o.uid==='g888')||{x:0,z:0}),totalObjects:scene.objects.length,items:scene.objects.map(o=>{const a=BY[o.assetId];const model=modelPath(a,qualityOf(o));const fracturedModel=fracturePath(a,qualityOf(o));return{...o,quality:qualityOf(o),category:a.type,name:o.name||a.name,model,destructible:fracturedModel?{fracturedModel,kind:o.destructible?.kind||'mesh-fragments'}:a.type==='ground'?{kind:'scorched-ground'}:o.destructible||null,team:o.team||a.side||null,size:o.size||a.size}})};
  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=('手榴彈場景_'+scene.name.replace(/[\/:*?"<>|]/g,'_')+'.json');document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);msg('已匯出 '+data.totalObjects+' 個物件，保留原始模型及碎裂模型位置')}
 async function importData(data,label='匯入'){if(data.format!=='army-grenade-scene'||data.schemaVersion!==1||!Array.isArray(data.items))throw Error('請使用此編輯器匯出的場景 JSON');if(data.items.length>6000)throw Error('單次最多匯入 6,000 個物件');const invalid=data.items.filter(x=>!BY[x.assetId]||![x.x,x.z,x.rot,x.scale].every(Number.isFinite)||!['low','high',undefined,null].includes(x.quality));if(invalid.length)throw Error('匯入檔包含不支援的模型或座標：'+invalid.map(x=>x.assetId).slice(0,6).join(','));
- const name=(data.sceneName||label)+'（匯入）';const serial=Math.max(...data.items.map(x=>Number(String(x.uid).replace(/^g/,''))||0),0);const s={id:'scene-'+Date.now(),name,serial:Math.max(serial,1000),throwOrigin:data.throwOrigin||{x:0,z:0},objects:data.items.map(x=>({...x,quality:hasModel(BY[x.assetId])?qualityOf(x):'low'}))};store.scenes.push(s);scene=s;selected=null;setMoveSelectedMode(false);history.length=0;future.length=0;listScenes();changed();pivot={x:0,z:0};distance=115;const unique=new Map();for(const o of s.objects){const a=BY[o.assetId];if(hasModel(a))unique.set(o.assetId+':'+qualityOf(o),[a,qualityOf(o)]);}const queue=[...unique.values()];void Promise.all(Array.from({length:3},async()=>{while(queue.length){const [a,q]=queue.shift();await ensureAsset(a,q);}}));msg('已匯入 '+s.objects.length+' 個物件');}
+ const name=(data.sceneName||label)+'（匯入）';const serial=Math.max(...data.items.map(x=>Number(String(x.uid).replace(/^g/,''))||0),0);const s={id:'scene-'+Date.now(),name,serial:Math.max(serial,1000),throwOrigin:data.throwOrigin||{x:0,z:0},groundStyle:data.map?.groundStyle||'custom',objects:data.items.map(x=>({...x,quality:hasModel(BY[x.assetId])?qualityOf(x):'low'}))};store.scenes.push(s);scene=s;selected=null;setMoveSelectedMode(false);history.length=0;future.length=0;listScenes();changed();pivot={x:0,z:0};distance=115;const unique=new Map();for(const o of s.objects){const a=BY[o.assetId];if(hasModel(a))unique.set(o.assetId+':'+qualityOf(o),[a,qualityOf(o)]);}const queue=[...unique.values()];void Promise.all(Array.from({length:3},async()=>{while(queue.length){const [a,q]=queue.shift();await ensureAsset(a,q);}}));msg('已匯入 '+s.objects.length+' 個物件');}
 async function importScene(file){try{await importData(JSON.parse(await file.text()),file.name)}catch(err){msg('匯入失敗：'+err.message);console.error(err)}}
 function importMainCamp(){try{syncMainCamp(true)}catch(err){msg('同步主遊戲失敗：'+err.message);console.error(err)}}
 function refreshTemplates(){const type=$('category').value,sel=$('template'),prev=sel.value;sel.replaceChildren();for(const a of ASSETS.filter(x=>x.type===type)){for(const q of (hasTwoQualities(a)?['low','high']:hasModel(a)?['high']:['low'])){const op=document.createElement('option');op.value=a.id+':'+q;op.textContent=a.name+(hasModel(a)?'｜'+(q==='high'?'原版模型・可破壞':'低畫質（輕量）'):'');sel.add(op)}}if([...sel.options].some(x=>x.value===prev))sel.value=prev}
@@ -202,10 +203,50 @@ const cube=[];function face(a,b,c,d){for(const q of [a,b,c,a,c,d])cube.push(...q
 face([-.5,0,-.5],[.5,0,-.5],[.5,0,.5],[-.5,0,.5]);face([-.5,1,-.5],[-.5,1,.5],[.5,1,.5],[.5,1,-.5]);
 for(let i=0;i<4;i++){const t=i*Math.PI/2,t2=t+Math.PI/2;const p=[Math.cos(t)*.5,Math.sin(t)*.5],q=[Math.cos(t2)*.5,Math.sin(t2)*.5];face([p[0],0,p[1]],[q[0],0,q[1]],[q[0],1,q[1]],[p[0],1,p[1]])}
 let cubeVAO=null,white=null;
+// A single immutable GPU buffer, copied from the main game's exact terrain
+// generator. Geometry includes road curves, oval track and basketball lines.
+const CAMP_GROUND_VS=`#version 300 es
+precision highp float;
+layout(location=0) in vec3 p;
+layout(location=1) in vec3 c;
+layout(location=2) in vec3 n;
+uniform mat4 uVP;
+out vec3 vColor;
+out vec3 vN;
+void main(){gl_Position=uVP*vec4(p,1.);vColor=c;vN=n;}`;
+const CAMP_GROUND_FS=`#version 300 es
+precision highp float;
+in vec3 vColor;
+in vec3 vN;
+out vec4 frag;
+void main(){float sun=max(0.,dot(normalize(vN),normalize(vec3(-.5,1.,.4))));frag=vec4(vColor*(.82+.22*sun),1.);}`;
+let originalGroundVAO=null,originalGroundProgram=null,originalGroundCount=0;
+function initOriginalGround(){
+ // Construct only once. All subsequent frames are one drawElements-free draw call.
+ const env=makeOriginalCampGround();
+ if(!env?.verts||!env?.cols||!env?.norms||env.verts.length!==env.cols.length||env.verts.length!==env.norms.length)throw Error('主遊戲地板頂點資料不完整');
+ originalGroundProgram=makeProgram(CAMP_GROUND_VS,CAMP_GROUND_FS);
+ originalGroundVAO=gl.createVertexArray();gl.bindVertexArray(originalGroundVAO);
+ for(const [index,data] of [[0,env.verts],[1,env.cols],[2,env.norms]]){
+  const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
+  gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(index);gl.vertexAttribPointer(index,3,gl.FLOAT,false,0,0);
+ }
+ gl.bindVertexArray(null);originalGroundCount=env.count;
+}
+function drawOriginalGround(vp){
+ if(!originalGroundVAO)return;
+ gl.useProgram(originalGroundProgram);
+ gl.uniformMatrix4fv(gl.getUniformLocation(originalGroundProgram,'uVP'),false,vp);
+ gl.bindVertexArray(originalGroundVAO);gl.disable(gl.CULL_FACE);
+ gl.drawArrays(gl.TRIANGLES,0,originalGroundCount);gl.enable(gl.CULL_FACE);
+ gl.bindVertexArray(null);
+}
+
 function initGL(){if(!gl){msg('目前瀏覽器沒有 WebGL2，使用平面編輯預覽；JSON 仍可匯出');return}
  program=makeProgram(VS,FS);skinProgram=makeProgram(SKINVS,FS);flatProgram=makeProgram(FLATVS,FLATFS);gl.enable(gl.DEPTH_TEST);gl.enable(gl.CULL_FACE);gl.cullFace(gl.BACK);
  cubeVAO=gl.createVertexArray();gl.bindVertexArray(cubeVAO);const arr=new Float32Array(cube),buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,arr,gl.STATIC_DRAW);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,0,0);gl.bindVertexArray(null);
- white=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,white);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([255,255,255,255]));gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR)}
+ white=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,white);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([255,255,255,255]));gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);initOriginalGround()}
 function gpuAsset(gltf){const a=gltf.json.meshes[0].primitives[0],pr=a.attributes;
  const mesh=gl.createVertexArray();gl.bindVertexArray(mesh);
  for(const [key,i,sz] of [['POSITION',0,3],['NORMAL',1,3],['TEXCOORD_0',2,2],['JOINTS_0',3,4],['WEIGHTS_0',4,4]]){
@@ -244,18 +285,21 @@ function staticDraw(a,o,vp){const m=cache.get(modelPath(a,qualityOf(o)));if(!m)r
  gl.bindVertexArray(m.geo.mesh);gl.disable(gl.CULL_FACE);gl.drawElements(gl.TRIANGLES,m.geo.count,m.geo.itype,0);gl.enable(gl.CULL_FACE)}
 function flatDraw(vp,model,color){gl.useProgram(flatProgram);const u=n=>gl.getUniformLocation(flatProgram,n);gl.uniformMatrix4fv(u('uVP'),false,vp);gl.uniformMatrix4fv(u('uModel'),false,model);gl.uniform3fv(u('uColor'),color);gl.bindVertexArray(cubeVAO);gl.disable(gl.CULL_FACE);gl.drawArrays(gl.TRIANGLES,0,cube.length/3);gl.enable(gl.CULL_FACE)}
 function drawWebGL(){const w=canvas.clientWidth,h=canvas.clientHeight;const ratio=Math.min(window.devicePixelRatio||1,1.75);if(canvas.width!==Math.round(w*ratio)||canvas.height!==Math.round(h*ratio)){canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio)}gl.viewport(0,0,canvas.width,canvas.height);gl.clearColor(.66,.82,.91,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
- const c=camera(),vp=c.vp;flatDraw(vp,mul(T(0,-.10,0),S(280,.08,280)),[.70,.80,.67]);
- // Ground striping gives editor placement perspective without changing the game map.
- for(let i=-120;i<=120;i+=20){flatDraw(vp,mul(T(i,-.038,0),S(.11,.015,280)),[.66,.76,.64]);flatDraw(vp,mul(T(0,-.035,i),S(280,.015,.11)),[.66,.76,.64]);}
- // Cross marker at the origin / throwing point (not an actual placed object)
- flatDraw(vp,mul(T(0,-.024,0),S(2.5,.02,.35)),[.97,.77,.36]);flatDraw(vp,mul(T(0,-.023,0),S(.35,.02,2.5)),[.97,.77,.36]);
+ const c=camera(),vp=c.vp;
+ if(scene.groundStyle==='main-game'){
+  drawOriginalGround(vp);
+ }else{
+  // Existing custom grenade scenes keep their simple editable ground behavior.
+  flatDraw(vp,mul(T(0,-.10,0),S(280,.08,280)),[.70,.80,.67]);
+  for(let i=-120;i<=120;i+=20){flatDraw(vp,mul(T(i,-.038,0),S(.11,.015,280)),[.66,.76,.64]);flatDraw(vp,mul(T(0,-.035,i),S(280,.015,.11)),[.66,.76,.64]);}
+ }
  const ord=[...scene.objects].sort((x,y)=>Number(BY[x.assetId]?.type==='ground')-Number(BY[y.assetId]?.type==='ground')).reverse();
  for(const c of cache.values())if(c.animator)c.animator.evaluate(.016);
  for(const o of ord){const a=BY[o.assetId];if(!a)continue;
  const camDistance=Math.hypot(o.x-pivot.x,o.z-pivot.z);
  if(camDistance>distance*1.65+30&&selected!==o.uid)continue;
  const useProxy=distance>125 && a.type!=='ground' && (a.type==='soldier'||distance>190);
- if(a.type==='ground'){const sz=o.size||a.size,wd=o.width||sz[0],dp=o.depth||sz[2];flatDraw(vp,mul(T(o.x,-.020,o.z),mul(ry(o.rot*Math.PI/180),S(wd*o.scale,.07,dp*o.scale))),o.groundTint||a.color)}
+ if(a.type==='ground'){const sz=o.size||a.size,wd=o.width||sz[0],dp=o.depth||sz[2];flatDraw(vp,mul(T(o.x,.15,o.z),mul(ry(o.rot*Math.PI/180),S(wd*o.scale,.02,dp*o.scale))),o.groundTint||a.color)}
  else if(!useProxy&&cache.has(modelPath(a,qualityOf(o))))staticDraw(a,o,vp);else{flatDraw(vp,mul(T(o.x,0,o.z),S((o.size||a.size)[0]*o.scale,(o.size||a.size)[1]*o.scale,(o.size||a.size)[2]*o.scale)),a.type==='building'?[.73,.74,.69]:a.type==='soldier'?a.side==='enemy'?[.70,.22,.19]:[.24,.57,.32]:[.49,.64,.46])}
  if(selected===o.uid){const r=Math.max((o.size||a.size)[0],(o.size||a.size)[2])*.62*o.scale;flatDraw(vp,mul(T(o.x,.11,o.z),S(r*2,.025,.13)),[1,.75,.24]);flatDraw(vp,mul(T(o.x,.112,o.z),S(.13,.026,r*2)),[1,.75,.24])}}
  gl.bindVertexArray(null)}
@@ -272,7 +316,7 @@ function syncMainCamp(force=false){
  if(force&&old&&!confirm('重新同步將還原「主遊戲同步軍營」中的手動修改；其他自訂場景不受影響。確定繼續？'))return;
  if(!old||old.sourceFingerprint!==data.sourceFingerprint||force){
   const refreshed={id,name:data.sceneName,serial:10000,sourceFingerprint:data.sourceFingerprint,
-   sourceModule:data.source,throwOrigin:data.throwOrigin,objects:data.items.map(o=>({...o}))};
+   sourceModule:data.source,throwOrigin:data.throwOrigin,groundStyle:data.groundStyle,objects:data.items.map(o=>({...o}))};
   const idx=store.scenes.findIndex(s=>s.id===id);
   if(idx>=0)store.scenes[idx]=refreshed;else store.scenes.unshift(refreshed);
   old=refreshed;
@@ -285,7 +329,7 @@ function syncMainCamp(force=false){
   const a=BY[o.assetId],q=qualityOf(o);return [o.assetId+':'+q,[a,q]];})).values()];
  void Promise.all(Array.from({length:3},async()=>{while(queue.length){const [a,q]=queue.shift();await ensureAsset(a,q);}}));
  const n=data.counts;
- msg('直接同步主遊戲：'+n.buildings+' 棟低畫質建築、'+n.props+' 個道具、'+n.roads+' 條路線、'+n.zones+' 個地區，0 名士兵。');
+ msg('原版地板已還原：道路／籃球場／橢圓操場直接使用主遊戲幾何，'+n.buildings+' 棟低畫質建築、'+n.props+' 個可破壞道具，0 名士兵。');
 }
 async function boot(){try{syncMainCamp(false)}catch(err){console.error('主遊戲同步失敗',err);msg('主遊戲同步失敗：'+err.message+'，可按「同步主遊戲」重試')}
  setupUI();pointerEvents();try{initGL();if(!gl)$('loading').hidden=true;else{if(!scene.objects.length){['barracks','treeA'].forEach(id=>ensureAsset(BY[id],'low'))};if(!loading)$('loading').hidden=true}}catch(e){console.error(e);msg('初始化失敗：'+e.message);$('loading').hidden=true}
