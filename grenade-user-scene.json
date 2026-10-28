@@ -1,0 +1,8603 @@
+{
+  "format": "army-grenade-scene",
+  "schemaVersion": 1,
+  "exportedAt": "2026-10-28T10:07:31.910Z",
+  "sceneId": "scene-1",
+  "sceneName": "手榴彈場景 1",
+  "map": {
+    "width": 280,
+    "depth": 280,
+    "groundColor": "#adc9a7"
+  },
+  "throwOrigin": {
+    "x": 0,
+    "z": 0
+  },
+  "totalObjects": 426,
+  "items": [
+    {
+      "uid": "g1",
+      "assetId": "path",
+      "quality": "low",
+      "x": -85.97,
+      "z": -83.98,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g300",
+      "assetId": "path",
+      "quality": "low",
+      "x": -65.97,
+      "z": -83.98,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g301",
+      "assetId": "path",
+      "quality": "low",
+      "x": -45.97,
+      "z": -83.98,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g302",
+      "assetId": "path",
+      "quality": "low",
+      "x": -25.97,
+      "z": -83.98,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g303",
+      "assetId": "path",
+      "quality": "low",
+      "x": -5.969999999999999,
+      "z": -83.98,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g304",
+      "assetId": "path",
+      "quality": "low",
+      "x": 14.030000000000001,
+      "z": -83.98,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g305",
+      "assetId": "path",
+      "quality": "low",
+      "x": 34.03,
+      "z": -83.98,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g306",
+      "assetId": "path",
+      "quality": "low",
+      "x": 54.03,
+      "z": -83.98,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g307",
+      "assetId": "path",
+      "quality": "low",
+      "x": 74.03,
+      "z": -83.98,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g308",
+      "assetId": "path",
+      "quality": "low",
+      "x": 94.03,
+      "z": -83.98,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g309",
+      "assetId": "path",
+      "quality": "low",
+      "x": -85.97,
+      "z": -63.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g310",
+      "assetId": "path",
+      "quality": "low",
+      "x": -65.97,
+      "z": -63.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g311",
+      "assetId": "path",
+      "quality": "low",
+      "x": -45.97,
+      "z": -63.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g312",
+      "assetId": "path",
+      "quality": "low",
+      "x": -25.97,
+      "z": -63.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g313",
+      "assetId": "path",
+      "quality": "low",
+      "x": -5.969999999999999,
+      "z": -63.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g314",
+      "assetId": "path",
+      "quality": "low",
+      "x": 14.030000000000001,
+      "z": -63.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g315",
+      "assetId": "path",
+      "quality": "low",
+      "x": 34.03,
+      "z": -63.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g316",
+      "assetId": "path",
+      "quality": "low",
+      "x": 54.03,
+      "z": -63.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g317",
+      "assetId": "path",
+      "quality": "low",
+      "x": 74.03,
+      "z": -63.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g318",
+      "assetId": "path",
+      "quality": "low",
+      "x": 94.03,
+      "z": -63.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g319",
+      "assetId": "path",
+      "quality": "low",
+      "x": -85.97,
+      "z": -43.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g320",
+      "assetId": "path",
+      "quality": "low",
+      "x": -65.97,
+      "z": -43.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g321",
+      "assetId": "path",
+      "quality": "low",
+      "x": -45.97,
+      "z": -43.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g322",
+      "assetId": "path",
+      "quality": "low",
+      "x": -25.97,
+      "z": -43.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g323",
+      "assetId": "path",
+      "quality": "low",
+      "x": -5.969999999999999,
+      "z": -43.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g324",
+      "assetId": "path",
+      "quality": "low",
+      "x": 14.030000000000001,
+      "z": -43.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g325",
+      "assetId": "path",
+      "quality": "low",
+      "x": 34.03,
+      "z": -43.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g326",
+      "assetId": "path",
+      "quality": "low",
+      "x": 54.03,
+      "z": -43.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g327",
+      "assetId": "path",
+      "quality": "low",
+      "x": 74.03,
+      "z": -43.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g328",
+      "assetId": "path",
+      "quality": "low",
+      "x": 94.03,
+      "z": -43.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g329",
+      "assetId": "path",
+      "quality": "low",
+      "x": -85.97,
+      "z": -23.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g330",
+      "assetId": "path",
+      "quality": "low",
+      "x": -65.97,
+      "z": -23.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g331",
+      "assetId": "path",
+      "quality": "low",
+      "x": -45.97,
+      "z": -23.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g332",
+      "assetId": "path",
+      "quality": "low",
+      "x": -25.97,
+      "z": -23.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g333",
+      "assetId": "path",
+      "quality": "low",
+      "x": -5.969999999999999,
+      "z": -23.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g334",
+      "assetId": "path",
+      "quality": "low",
+      "x": 14.030000000000001,
+      "z": -23.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g335",
+      "assetId": "path",
+      "quality": "low",
+      "x": 34.03,
+      "z": -23.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g336",
+      "assetId": "path",
+      "quality": "low",
+      "x": 54.03,
+      "z": -23.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g337",
+      "assetId": "path",
+      "quality": "low",
+      "x": 74.03,
+      "z": -23.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g338",
+      "assetId": "path",
+      "quality": "low",
+      "x": 94.03,
+      "z": -23.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g339",
+      "assetId": "path",
+      "quality": "low",
+      "x": -85.97,
+      "z": -3.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g340",
+      "assetId": "path",
+      "quality": "low",
+      "x": -65.97,
+      "z": -3.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g341",
+      "assetId": "path",
+      "quality": "low",
+      "x": -45.97,
+      "z": -3.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g342",
+      "assetId": "path",
+      "quality": "low",
+      "x": -25.97,
+      "z": -3.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g343",
+      "assetId": "path",
+      "quality": "low",
+      "x": -5.969999999999999,
+      "z": -3.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g344",
+      "assetId": "path",
+      "quality": "low",
+      "x": 14.030000000000001,
+      "z": -3.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g345",
+      "assetId": "path",
+      "quality": "low",
+      "x": 34.03,
+      "z": -3.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g346",
+      "assetId": "path",
+      "quality": "low",
+      "x": 54.03,
+      "z": -3.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g347",
+      "assetId": "path",
+      "quality": "low",
+      "x": 74.03,
+      "z": -3.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g348",
+      "assetId": "path",
+      "quality": "low",
+      "x": 94.03,
+      "z": -3.980000000000004,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g349",
+      "assetId": "path",
+      "quality": "low",
+      "x": -85.97,
+      "z": 16.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g350",
+      "assetId": "path",
+      "quality": "low",
+      "x": -65.97,
+      "z": 16.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g351",
+      "assetId": "path",
+      "quality": "low",
+      "x": -45.97,
+      "z": 16.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g352",
+      "assetId": "path",
+      "quality": "low",
+      "x": -25.97,
+      "z": 16.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g353",
+      "assetId": "path",
+      "quality": "low",
+      "x": -5.969999999999999,
+      "z": 16.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g354",
+      "assetId": "path",
+      "quality": "low",
+      "x": 14.030000000000001,
+      "z": 16.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g355",
+      "assetId": "path",
+      "quality": "low",
+      "x": 34.03,
+      "z": 16.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g356",
+      "assetId": "path",
+      "quality": "low",
+      "x": 54.03,
+      "z": 16.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g357",
+      "assetId": "path",
+      "quality": "low",
+      "x": 74.03,
+      "z": 16.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g358",
+      "assetId": "path",
+      "quality": "low",
+      "x": 94.03,
+      "z": 16.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g359",
+      "assetId": "path",
+      "quality": "low",
+      "x": -85.97,
+      "z": 36.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g360",
+      "assetId": "path",
+      "quality": "low",
+      "x": -65.97,
+      "z": 36.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g361",
+      "assetId": "path",
+      "quality": "low",
+      "x": -45.97,
+      "z": 36.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g362",
+      "assetId": "path",
+      "quality": "low",
+      "x": -25.97,
+      "z": 36.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g363",
+      "assetId": "path",
+      "quality": "low",
+      "x": -5.969999999999999,
+      "z": 36.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g364",
+      "assetId": "path",
+      "quality": "low",
+      "x": 14.030000000000001,
+      "z": 36.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g365",
+      "assetId": "path",
+      "quality": "low",
+      "x": 34.03,
+      "z": 36.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g366",
+      "assetId": "path",
+      "quality": "low",
+      "x": 54.03,
+      "z": 36.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g367",
+      "assetId": "path",
+      "quality": "low",
+      "x": 74.03,
+      "z": 36.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g368",
+      "assetId": "path",
+      "quality": "low",
+      "x": 94.03,
+      "z": 36.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g369",
+      "assetId": "path",
+      "quality": "low",
+      "x": -85.97,
+      "z": 56.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g370",
+      "assetId": "path",
+      "quality": "low",
+      "x": -65.97,
+      "z": 56.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g371",
+      "assetId": "path",
+      "quality": "low",
+      "x": -45.97,
+      "z": 56.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g372",
+      "assetId": "path",
+      "quality": "low",
+      "x": -25.97,
+      "z": 56.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g373",
+      "assetId": "path",
+      "quality": "low",
+      "x": -5.969999999999999,
+      "z": 56.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g374",
+      "assetId": "path",
+      "quality": "low",
+      "x": 14.030000000000001,
+      "z": 56.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g375",
+      "assetId": "path",
+      "quality": "low",
+      "x": 34.03,
+      "z": 56.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g376",
+      "assetId": "path",
+      "quality": "low",
+      "x": 54.03,
+      "z": 56.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g377",
+      "assetId": "path",
+      "quality": "low",
+      "x": 74.03,
+      "z": 56.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g378",
+      "assetId": "path",
+      "quality": "low",
+      "x": 94.03,
+      "z": 56.019999999999996,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g379",
+      "assetId": "path",
+      "quality": "low",
+      "x": -85.97,
+      "z": 76.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g380",
+      "assetId": "path",
+      "quality": "low",
+      "x": -65.97,
+      "z": 76.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g381",
+      "assetId": "path",
+      "quality": "low",
+      "x": -45.97,
+      "z": 76.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g382",
+      "assetId": "path",
+      "quality": "low",
+      "x": -25.97,
+      "z": 76.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g383",
+      "assetId": "path",
+      "quality": "low",
+      "x": -5.969999999999999,
+      "z": 76.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g384",
+      "assetId": "path",
+      "quality": "low",
+      "x": 14.030000000000001,
+      "z": 76.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g385",
+      "assetId": "path",
+      "quality": "low",
+      "x": 34.03,
+      "z": 76.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g386",
+      "assetId": "path",
+      "quality": "low",
+      "x": 54.03,
+      "z": 76.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g387",
+      "assetId": "path",
+      "quality": "low",
+      "x": 74.03,
+      "z": 76.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g388",
+      "assetId": "path",
+      "quality": "low",
+      "x": 94.03,
+      "z": 76.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g389",
+      "assetId": "path",
+      "quality": "low",
+      "x": -85.97,
+      "z": 96.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g390",
+      "assetId": "path",
+      "quality": "low",
+      "x": -65.97,
+      "z": 96.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g391",
+      "assetId": "path",
+      "quality": "low",
+      "x": -45.97,
+      "z": 96.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g392",
+      "assetId": "path",
+      "quality": "low",
+      "x": -25.97,
+      "z": 96.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g393",
+      "assetId": "path",
+      "quality": "low",
+      "x": -5.969999999999999,
+      "z": 96.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g394",
+      "assetId": "path",
+      "quality": "low",
+      "x": 14.030000000000001,
+      "z": 96.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g395",
+      "assetId": "path",
+      "quality": "low",
+      "x": 34.03,
+      "z": 96.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g396",
+      "assetId": "path",
+      "quality": "low",
+      "x": 54.03,
+      "z": 96.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g397",
+      "assetId": "path",
+      "quality": "low",
+      "x": 74.03,
+      "z": 96.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g398",
+      "assetId": "path",
+      "quality": "low",
+      "x": 94.03,
+      "z": 96.02,
+      "rot": 0,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g399",
+      "assetId": "path",
+      "quality": "low",
+      "x": -76.29293636709237,
+      "z": -92.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g400",
+      "assetId": "path",
+      "quality": "low",
+      "x": -56.292936367092366,
+      "z": -92.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g401",
+      "assetId": "path",
+      "quality": "low",
+      "x": -36.292936367092366,
+      "z": -92.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g402",
+      "assetId": "path",
+      "quality": "low",
+      "x": -16.292936367092366,
+      "z": -92.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g403",
+      "assetId": "path",
+      "quality": "low",
+      "x": 3.7070636329076336,
+      "z": -92.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g404",
+      "assetId": "path",
+      "quality": "low",
+      "x": 23.707063632907634,
+      "z": -92.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g405",
+      "assetId": "path",
+      "quality": "low",
+      "x": 43.707063632907634,
+      "z": -92.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g406",
+      "assetId": "path",
+      "quality": "low",
+      "x": 63.707063632907634,
+      "z": -92.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g407",
+      "assetId": "path",
+      "quality": "low",
+      "x": 83.70706363290763,
+      "z": -92.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g408",
+      "assetId": "path",
+      "quality": "low",
+      "x": 103.70706363290763,
+      "z": -92.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g409",
+      "assetId": "path",
+      "quality": "low",
+      "x": -76.29293636709237,
+      "z": -72.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g410",
+      "assetId": "path",
+      "quality": "low",
+      "x": -56.292936367092366,
+      "z": -72.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g411",
+      "assetId": "path",
+      "quality": "low",
+      "x": -36.292936367092366,
+      "z": -72.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g412",
+      "assetId": "path",
+      "quality": "low",
+      "x": -16.292936367092366,
+      "z": -72.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g413",
+      "assetId": "path",
+      "quality": "low",
+      "x": 3.7070636329076336,
+      "z": -72.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g414",
+      "assetId": "path",
+      "quality": "low",
+      "x": 23.707063632907634,
+      "z": -72.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g415",
+      "assetId": "path",
+      "quality": "low",
+      "x": 43.707063632907634,
+      "z": -72.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g416",
+      "assetId": "path",
+      "quality": "low",
+      "x": 63.707063632907634,
+      "z": -72.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g417",
+      "assetId": "path",
+      "quality": "low",
+      "x": 83.70706363290763,
+      "z": -72.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g418",
+      "assetId": "path",
+      "quality": "low",
+      "x": 103.70706363290763,
+      "z": -72.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g419",
+      "assetId": "path",
+      "quality": "low",
+      "x": -76.29293636709237,
+      "z": -52.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g420",
+      "assetId": "path",
+      "quality": "low",
+      "x": -56.292936367092366,
+      "z": -52.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g421",
+      "assetId": "path",
+      "quality": "low",
+      "x": -36.292936367092366,
+      "z": -52.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g422",
+      "assetId": "path",
+      "quality": "low",
+      "x": -16.292936367092366,
+      "z": -52.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g423",
+      "assetId": "path",
+      "quality": "low",
+      "x": 3.7070636329076336,
+      "z": -52.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g424",
+      "assetId": "path",
+      "quality": "low",
+      "x": 23.707063632907634,
+      "z": -52.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g425",
+      "assetId": "path",
+      "quality": "low",
+      "x": 43.707063632907634,
+      "z": -52.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g426",
+      "assetId": "path",
+      "quality": "low",
+      "x": 63.707063632907634,
+      "z": -52.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g427",
+      "assetId": "path",
+      "quality": "low",
+      "x": 83.70706363290763,
+      "z": -52.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g428",
+      "assetId": "path",
+      "quality": "low",
+      "x": 103.70706363290763,
+      "z": -52.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g429",
+      "assetId": "path",
+      "quality": "low",
+      "x": -76.29293636709237,
+      "z": -32.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g430",
+      "assetId": "path",
+      "quality": "low",
+      "x": -56.292936367092366,
+      "z": -32.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g431",
+      "assetId": "path",
+      "quality": "low",
+      "x": -36.292936367092366,
+      "z": -32.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g432",
+      "assetId": "path",
+      "quality": "low",
+      "x": -16.292936367092366,
+      "z": -32.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g433",
+      "assetId": "path",
+      "quality": "low",
+      "x": 3.7070636329076336,
+      "z": -32.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g434",
+      "assetId": "path",
+      "quality": "low",
+      "x": 23.707063632907634,
+      "z": -32.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g435",
+      "assetId": "path",
+      "quality": "low",
+      "x": 43.707063632907634,
+      "z": -32.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g436",
+      "assetId": "path",
+      "quality": "low",
+      "x": 63.707063632907634,
+      "z": -32.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g437",
+      "assetId": "path",
+      "quality": "low",
+      "x": 83.70706363290763,
+      "z": -32.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g438",
+      "assetId": "path",
+      "quality": "low",
+      "x": 103.70706363290763,
+      "z": -32.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g439",
+      "assetId": "path",
+      "quality": "low",
+      "x": -76.29293636709237,
+      "z": -12.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g440",
+      "assetId": "path",
+      "quality": "low",
+      "x": -56.292936367092366,
+      "z": -12.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g441",
+      "assetId": "path",
+      "quality": "low",
+      "x": -36.292936367092366,
+      "z": -12.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g442",
+      "assetId": "path",
+      "quality": "low",
+      "x": -16.292936367092366,
+      "z": -12.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g443",
+      "assetId": "path",
+      "quality": "low",
+      "x": 3.7070636329076336,
+      "z": -12.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g444",
+      "assetId": "path",
+      "quality": "low",
+      "x": 23.707063632907634,
+      "z": -12.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g445",
+      "assetId": "path",
+      "quality": "low",
+      "x": 43.707063632907634,
+      "z": -12.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g446",
+      "assetId": "path",
+      "quality": "low",
+      "x": 63.707063632907634,
+      "z": -12.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g447",
+      "assetId": "path",
+      "quality": "low",
+      "x": 83.70706363290763,
+      "z": -12.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g448",
+      "assetId": "path",
+      "quality": "low",
+      "x": 103.70706363290763,
+      "z": -12.00697917510152,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g449",
+      "assetId": "path",
+      "quality": "low",
+      "x": -76.29293636709237,
+      "z": 7.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g450",
+      "assetId": "path",
+      "quality": "low",
+      "x": -56.292936367092366,
+      "z": 7.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g451",
+      "assetId": "path",
+      "quality": "low",
+      "x": -36.292936367092366,
+      "z": 7.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g452",
+      "assetId": "path",
+      "quality": "low",
+      "x": -16.292936367092366,
+      "z": 7.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g453",
+      "assetId": "path",
+      "quality": "low",
+      "x": 3.7070636329076336,
+      "z": 7.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g454",
+      "assetId": "path",
+      "quality": "low",
+      "x": 23.707063632907634,
+      "z": 7.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g455",
+      "assetId": "path",
+      "quality": "low",
+      "x": 43.707063632907634,
+      "z": 7.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g456",
+      "assetId": "path",
+      "quality": "low",
+      "x": 63.707063632907634,
+      "z": 7.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g457",
+      "assetId": "path",
+      "quality": "low",
+      "x": 83.70706363290763,
+      "z": 7.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g458",
+      "assetId": "path",
+      "quality": "low",
+      "x": 103.70706363290763,
+      "z": 7.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g459",
+      "assetId": "path",
+      "quality": "low",
+      "x": -76.29293636709237,
+      "z": 27.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g460",
+      "assetId": "path",
+      "quality": "low",
+      "x": -56.292936367092366,
+      "z": 27.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g461",
+      "assetId": "path",
+      "quality": "low",
+      "x": -36.292936367092366,
+      "z": 27.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g462",
+      "assetId": "path",
+      "quality": "low",
+      "x": -16.292936367092366,
+      "z": 27.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g463",
+      "assetId": "path",
+      "quality": "low",
+      "x": 3.7070636329076336,
+      "z": 27.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g464",
+      "assetId": "path",
+      "quality": "low",
+      "x": 23.707063632907634,
+      "z": 27.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g465",
+      "assetId": "path",
+      "quality": "low",
+      "x": 43.707063632907634,
+      "z": 27.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g466",
+      "assetId": "path",
+      "quality": "low",
+      "x": 63.707063632907634,
+      "z": 27.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g467",
+      "assetId": "path",
+      "quality": "low",
+      "x": 83.70706363290763,
+      "z": 27.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g468",
+      "assetId": "path",
+      "quality": "low",
+      "x": 103.70706363290763,
+      "z": 27.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g469",
+      "assetId": "path",
+      "quality": "low",
+      "x": -76.29293636709237,
+      "z": 47.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g470",
+      "assetId": "path",
+      "quality": "low",
+      "x": -56.292936367092366,
+      "z": 47.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g471",
+      "assetId": "path",
+      "quality": "low",
+      "x": -36.292936367092366,
+      "z": 47.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g472",
+      "assetId": "path",
+      "quality": "low",
+      "x": -16.292936367092366,
+      "z": 47.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g473",
+      "assetId": "path",
+      "quality": "low",
+      "x": 3.7070636329076336,
+      "z": 47.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g474",
+      "assetId": "path",
+      "quality": "low",
+      "x": 23.707063632907634,
+      "z": 47.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g475",
+      "assetId": "path",
+      "quality": "low",
+      "x": 43.707063632907634,
+      "z": 47.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g476",
+      "assetId": "path",
+      "quality": "low",
+      "x": 63.707063632907634,
+      "z": 47.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g477",
+      "assetId": "path",
+      "quality": "low",
+      "x": 83.70706363290763,
+      "z": 47.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g478",
+      "assetId": "path",
+      "quality": "low",
+      "x": 103.70706363290763,
+      "z": 47.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g479",
+      "assetId": "path",
+      "quality": "low",
+      "x": -76.29293636709237,
+      "z": 67.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g480",
+      "assetId": "path",
+      "quality": "low",
+      "x": -56.292936367092366,
+      "z": 67.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g481",
+      "assetId": "path",
+      "quality": "low",
+      "x": -36.292936367092366,
+      "z": 67.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g482",
+      "assetId": "path",
+      "quality": "low",
+      "x": -16.292936367092366,
+      "z": 67.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g483",
+      "assetId": "path",
+      "quality": "low",
+      "x": 3.7070636329076336,
+      "z": 67.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g484",
+      "assetId": "path",
+      "quality": "low",
+      "x": 23.707063632907634,
+      "z": 67.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g485",
+      "assetId": "path",
+      "quality": "low",
+      "x": 43.707063632907634,
+      "z": 67.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g486",
+      "assetId": "path",
+      "quality": "low",
+      "x": 63.707063632907634,
+      "z": 67.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g487",
+      "assetId": "path",
+      "quality": "low",
+      "x": 83.70706363290763,
+      "z": 67.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g488",
+      "assetId": "path",
+      "quality": "low",
+      "x": 103.70706363290763,
+      "z": 67.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g489",
+      "assetId": "path",
+      "quality": "low",
+      "x": -76.29293636709237,
+      "z": 87.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g490",
+      "assetId": "path",
+      "quality": "low",
+      "x": -56.292936367092366,
+      "z": 87.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g491",
+      "assetId": "path",
+      "quality": "low",
+      "x": -36.292936367092366,
+      "z": 87.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g492",
+      "assetId": "path",
+      "quality": "low",
+      "x": -16.292936367092366,
+      "z": 87.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g493",
+      "assetId": "path",
+      "quality": "low",
+      "x": 3.7070636329076336,
+      "z": 87.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g494",
+      "assetId": "path",
+      "quality": "low",
+      "x": 23.707063632907634,
+      "z": 87.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g495",
+      "assetId": "path",
+      "quality": "low",
+      "x": 43.707063632907634,
+      "z": 87.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g496",
+      "assetId": "path",
+      "quality": "low",
+      "x": 63.707063632907634,
+      "z": 87.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g497",
+      "assetId": "path",
+      "quality": "low",
+      "x": 83.70706363290763,
+      "z": 87.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g498",
+      "assetId": "path",
+      "quality": "low",
+      "x": 103.70706363290763,
+      "z": 87.99302082489848,
+      "rot": 90,
+      "scale": 1,
+      "width": 3,
+      "depth": 20,
+      "category": "ground",
+      "name": "步道（手榴彈用）",
+      "model": null,
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g499",
+      "assetId": "barracks",
+      "quality": "low",
+      "x": 3.942501865932705,
+      "z": 42.217602913910014,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "營舍（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-barracks-fractured-low.glb",
+        "pieces": 23
+      },
+      "team": null,
+      "size": [
+        14,
+        4.4,
+        6.6
+      ]
+    },
+    {
+      "uid": "g500",
+      "assetId": "barracks",
+      "quality": "low",
+      "x": 43.793983334838856,
+      "z": 62.680563687622666,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "營舍（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-barracks-fractured-low.glb",
+        "pieces": 23
+      },
+      "team": null,
+      "size": [
+        14,
+        4.4,
+        6.6
+      ]
+    },
+    {
+      "uid": "g501",
+      "assetId": "barracks",
+      "quality": "low",
+      "x": -15.986503331105984,
+      "z": 82.6244375744561,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "營舍（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-barracks-fractured-low.glb",
+        "pieces": 23
+      },
+      "team": null,
+      "size": [
+        14,
+        4.4,
+        6.6
+      ]
+    },
+    {
+      "uid": "g502",
+      "assetId": "barracks",
+      "quality": "low",
+      "x": 43.62678180603799,
+      "z": 22.249468620745773,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "營舍（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-barracks-fractured-low.glb",
+        "pieces": 23
+      },
+      "team": null,
+      "size": [
+        14,
+        4.4,
+        6.6
+      ]
+    },
+    {
+      "uid": "g503",
+      "assetId": "barracks",
+      "quality": "low",
+      "x": 23.1119243837177,
+      "z": 82.83340281999696,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "營舍（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-barracks-fractured-low.glb",
+        "pieces": 23
+      },
+      "team": null,
+      "size": [
+        14,
+        4.4,
+        6.6
+      ]
+    },
+    {
+      "uid": "g504",
+      "assetId": "barracks",
+      "quality": "low",
+      "x": -35.00436533725712,
+      "z": 42.46318572890033,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "營舍（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-barracks-fractured-low.glb",
+        "pieces": 23
+      },
+      "team": null,
+      "size": [
+        14,
+        4.4,
+        6.6
+      ]
+    },
+    {
+      "uid": "g505",
+      "assetId": "barracks",
+      "quality": "low",
+      "x": -35.83043899589956,
+      "z": 82.01196397878329,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "營舍（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-barracks-fractured-low.glb",
+        "pieces": 23
+      },
+      "team": null,
+      "size": [
+        14,
+        4.4,
+        6.6
+      ]
+    },
+    {
+      "uid": "g506",
+      "assetId": "barracks",
+      "quality": "low",
+      "x": 64.1554498639502,
+      "z": 43.00500838177554,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "營舍（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-barracks-fractured-low.glb",
+        "pieces": 23
+      },
+      "team": null,
+      "size": [
+        14,
+        4.4,
+        6.6
+      ]
+    },
+    {
+      "uid": "g507",
+      "assetId": "barracks",
+      "quality": "low",
+      "x": -21.043741422950724,
+      "z": 59.14361139433545,
+      "rot": 90,
+      "scale": 1,
+      "category": "building",
+      "name": "營舍（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-barracks-fractured-low.glb",
+        "pieces": 23
+      },
+      "team": null,
+      "size": [
+        14,
+        4.4,
+        6.6
+      ]
+    },
+    {
+      "uid": "g508",
+      "assetId": "barracks",
+      "quality": "low",
+      "x": -51.11226184463215,
+      "z": 59.13229329419133,
+      "rot": 90,
+      "scale": 1,
+      "category": "building",
+      "name": "營舍（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-barracks-fractured-low.glb",
+        "pieces": 23
+      },
+      "team": null,
+      "size": [
+        14,
+        4.4,
+        6.6
+      ]
+    },
+    {
+      "uid": "g509",
+      "assetId": "barracks",
+      "quality": "low",
+      "x": 49.563003133619944,
+      "z": 99.20973539471002,
+      "rot": 90,
+      "scale": 1,
+      "category": "building",
+      "name": "營舍（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-barracks-fractured-low.glb",
+        "pieces": 23
+      },
+      "team": null,
+      "size": [
+        14,
+        4.4,
+        6.6
+      ]
+    },
+    {
+      "uid": "g510",
+      "assetId": "guardhouse",
+      "quality": "low",
+      "x": -31.530715075367382,
+      "z": 63.24128976544473,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "哨所（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-guardhouse-fractured-low.glb",
+        "pieces": 30
+      },
+      "team": null,
+      "size": [
+        7.3,
+        4,
+        6.8
+      ]
+    },
+    {
+      "uid": "g511",
+      "assetId": "guardhouse",
+      "quality": "low",
+      "x": -51.388096569695136,
+      "z": 83.31604722539515,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "哨所（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-guardhouse-fractured-low.glb",
+        "pieces": 30
+      },
+      "team": null,
+      "size": [
+        7.3,
+        4,
+        6.8
+      ]
+    },
+    {
+      "uid": "g512",
+      "assetId": "guardhouse",
+      "quality": "low",
+      "x": -11.300722842814332,
+      "z": 22.762276570893675,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "哨所（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-guardhouse-fractured-low.glb",
+        "pieces": 30
+      },
+      "team": null,
+      "size": [
+        7.3,
+        4,
+        6.8
+      ]
+    },
+    {
+      "uid": "g513",
+      "assetId": "guardhouse",
+      "quality": "low",
+      "x": 19.59750512016644,
+      "z": 62.70113777573751,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "哨所（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-guardhouse-fractured-low.glb",
+        "pieces": 30
+      },
+      "team": null,
+      "size": [
+        7.3,
+        4,
+        6.8
+      ]
+    },
+    {
+      "uid": "g514",
+      "assetId": "guardhouse",
+      "quality": "low",
+      "x": -0.3079277694622444,
+      "z": 62.82265083793409,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "哨所（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-guardhouse-fractured-low.glb",
+        "pieces": 30
+      },
+      "team": null,
+      "size": [
+        7.3,
+        4,
+        6.8
+      ]
+    },
+    {
+      "uid": "g515",
+      "assetId": "guardhouse",
+      "quality": "low",
+      "x": 39.68230394012806,
+      "z": 82.94105892200606,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "哨所（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-guardhouse-fractured-low.glb",
+        "pieces": 30
+      },
+      "team": null,
+      "size": [
+        7.3,
+        4,
+        6.8
+      ]
+    },
+    {
+      "uid": "g516",
+      "assetId": "guardhouse",
+      "quality": "low",
+      "x": -20.482592048738034,
+      "z": 43.38979348394872,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "哨所（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-guardhouse-fractured-low.glb",
+        "pieces": 30
+      },
+      "team": null,
+      "size": [
+        7.3,
+        4,
+        6.8
+      ]
+    },
+    {
+      "uid": "g517",
+      "assetId": "office",
+      "quality": "low",
+      "x": -33.736740003056894,
+      "z": 21.627595187135228,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "辦公大樓（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-office-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-office-fractured-low.glb",
+        "pieces": 42
+      },
+      "team": null,
+      "size": [
+        14,
+        10,
+        11
+      ]
+    },
+    {
+      "uid": "g518",
+      "assetId": "office",
+      "quality": "low",
+      "x": -54.39113235506963,
+      "z": 40.9162895679805,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "辦公大樓（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-office-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-office-fractured-low.glb",
+        "pieces": 42
+      },
+      "team": null,
+      "size": [
+        14,
+        10,
+        11
+      ]
+    },
+    {
+      "uid": "g519",
+      "assetId": "office",
+      "quality": "low",
+      "x": 42.91152089047293,
+      "z": 41.37418278130083,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "辦公大樓（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-office-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-office-fractured-low.glb",
+        "pieces": 42
+      },
+      "team": null,
+      "size": [
+        14,
+        10,
+        11
+      ]
+    },
+    {
+      "uid": "g520",
+      "assetId": "office",
+      "quality": "low",
+      "x": 22.78426305472031,
+      "z": 41.28456330872751,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "辦公大樓（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-office-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-office-fractured-low.glb",
+        "pieces": 42
+      },
+      "team": null,
+      "size": [
+        14,
+        10,
+        11
+      ]
+    },
+    {
+      "uid": "g522",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": -42.8,
+      "z": 24.42,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g622",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": -17.799999999999997,
+      "z": 24.42,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g623",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 7.200000000000003,
+      "z": 24.42,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g624",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 32.2,
+      "z": 24.42,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g625",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 57.2,
+      "z": 24.42,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g626",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": -42.8,
+      "z": 44.42,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g627",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": -12.943402347116784,
+      "z": 52.50872714352815,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g628",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": -2.5664688494668306,
+      "z": 52.834354408406796,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g629",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 31.096095071748657,
+      "z": 44.453127086569864,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g630",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 57.441943040562194,
+      "z": 38.87154816010383,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g631",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": -42.8,
+      "z": 64.42,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g632",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": -16.51391312832399,
+      "z": 64.63303103843815,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g633",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 7.200000000000003,
+      "z": 64.42,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g634",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 30.55527673511882,
+      "z": 64.84477028697376,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g635",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 57.2,
+      "z": 64.42,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g636",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": -42.8,
+      "z": 84.42,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g637",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": -12.952213115416942,
+      "z": 74.24747931270798,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g638",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 11.12591411375705,
+      "z": 64.34100978741479,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g639",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 29.993425221824715,
+      "z": 75.60716883221713,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g640",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 57.177389872872155,
+      "z": 71.40828875841302,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g641",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": -50.30656682194776,
+      "z": 76.33209910858338,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g642",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": -41.661267196585314,
+      "z": 72.38210115784754,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g643",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": -30.563312081831278,
+      "z": 73.86069887604847,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g644",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 10.279899401791404,
+      "z": 57.170234535063685,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g645",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 46.95694386958395,
+      "z": 56.19994366939726,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g646",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": -9,
+      "z": 50.89,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g662",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": 11,
+      "z": 50.89,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g663",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": 31,
+      "z": 50.89,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g664",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": 51,
+      "z": 50.89,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g665",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": -9,
+      "z": 70.89,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g666",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": 11,
+      "z": 70.89,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g667",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": 31,
+      "z": 70.89,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g668",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": 51,
+      "z": 70.89,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g669",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": -9,
+      "z": 90.89,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g670",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": -32.27974340648426,
+      "z": 53.67286622902594,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g671",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": 27.798221052399427,
+      "z": 56.713171372798854,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g672",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": 38.85421147244622,
+      "z": 73.09205474886502,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g673",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": -9.372603373389719,
+      "z": 76.59257960035441,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g674",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": 22.43298473790364,
+      "z": 54.142829051038234,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g675",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": 18.360668048144646,
+      "z": 92.93812987552367,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g676",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": 47.050754995821606,
+      "z": 84.32019851024043,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g677",
+      "assetId": "guardhouse",
+      "quality": "low",
+      "x": -11.36300761369817,
+      "z": 63.23960687576718,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "哨所（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-guardhouse-fractured-low.glb",
+        "pieces": 30
+      },
+      "team": null,
+      "size": [
+        7.3,
+        4,
+        6.8
+      ]
+    },
+    {
+      "uid": "g678",
+      "assetId": "guardhouse",
+      "quality": "low",
+      "x": 19.504144103392356,
+      "z": 75.0948889625576,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "哨所（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-guardhouse-fractured-low.glb",
+        "pieces": 30
+      },
+      "team": null,
+      "size": [
+        7.3,
+        4,
+        6.8
+      ]
+    },
+    {
+      "uid": "g679",
+      "assetId": "guardhouse",
+      "quality": "low",
+      "x": -11.314753070010855,
+      "z": 43.47231523614681,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "哨所（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-guardhouse-fractured-low.glb",
+        "pieces": 30
+      },
+      "team": null,
+      "size": [
+        7.3,
+        4,
+        6.8
+      ]
+    },
+    {
+      "uid": "g680",
+      "assetId": "guardhouse",
+      "quality": "low",
+      "x": -19.64394105314569,
+      "z": 75.09829293040482,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "哨所（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-guardhouse-fractured-low.glb",
+        "pieces": 30
+      },
+      "team": null,
+      "size": [
+        7.3,
+        4,
+        6.8
+      ]
+    },
+    {
+      "uid": "g682",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": -35.256894790364534,
+      "z": 74.34843848727496,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g733",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 37.41,
+      "z": 55.16,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g734",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 38.41,
+      "z": 55.16,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g735",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 39.41,
+      "z": 55.16,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g736",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 40.41,
+      "z": 55.16,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g737",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 36.41,
+      "z": 56.16,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g738",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 37.41,
+      "z": 56.16,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g739",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 38.41,
+      "z": 56.16,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g740",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 39.41,
+      "z": 56.16,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g741",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 40.41,
+      "z": 56.16,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g766",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 24.54,
+      "z": 73.27,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g767",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 26.54,
+      "z": 73.27,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g768",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 28.54,
+      "z": 73.27,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g769",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 24.54,
+      "z": 74.27,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g770",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 26.54,
+      "z": 74.27,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g771",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 28.54,
+      "z": 74.27,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g772",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 24.54,
+      "z": 75.27,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g773",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 26.54,
+      "z": 75.27,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g774",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 28.54,
+      "z": 75.27,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g775",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 43.729711804902905,
+      "z": 71.72140097542312,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g776",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 45.729711804902905,
+      "z": 71.72140097542312,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g777",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 47.729711804902905,
+      "z": 71.72140097542312,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g778",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 43.729711804902905,
+      "z": 72.72140097542312,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g779",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 45.729711804902905,
+      "z": 72.72140097542312,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g780",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 47.729711804902905,
+      "z": 72.72140097542312,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g781",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 43.729711804902905,
+      "z": 73.72140097542312,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g782",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 45.729711804902905,
+      "z": 73.72140097542312,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g783",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 47.729711804902905,
+      "z": 73.72140097542312,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g784",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 0.33980098468041575,
+      "z": 52.21291410534269,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g785",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 2.3398009846804158,
+      "z": 52.21291410534269,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g786",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 4.339800984680416,
+      "z": 52.21291410534269,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g787",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 0.33980098468041575,
+      "z": 53.21291410534269,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g788",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 2.3398009846804158,
+      "z": 53.21291410534269,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g789",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 4.339800984680416,
+      "z": 53.21291410534269,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g790",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 0.33980098468041575,
+      "z": 54.21291410534269,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g791",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 2.3398009846804158,
+      "z": 54.21291410534269,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g792",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 4.339800984680416,
+      "z": 54.21291410534269,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g793",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 16.68373224241813,
+      "z": 51.024992329061675,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g795",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 18.68373224241813,
+      "z": 51.024992329061675,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g796",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 20.68373224241813,
+      "z": 51.024992329061675,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g797",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 16.68373224241813,
+      "z": 52.024992329061675,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g798",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 18.68373224241813,
+      "z": 52.024992329061675,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g799",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 20.68373224241813,
+      "z": 52.024992329061675,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g800",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 16.68373224241813,
+      "z": 53.024992329061675,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g801",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 18.68373224241813,
+      "z": 53.024992329061675,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g802",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 20.68373224241813,
+      "z": 53.024992329061675,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g803",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 11.87,
+      "z": 74.35,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g804",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 12.87,
+      "z": 74.35,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g805",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 13.87,
+      "z": 74.35,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g806",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 11.87,
+      "z": 76.35,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g807",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 12.87,
+      "z": 76.35,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g808",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 13.87,
+      "z": 76.35,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g809",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 11.87,
+      "z": 78.35,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g810",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 12.87,
+      "z": 78.35,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g811",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 13.87,
+      "z": 78.35,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g812",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 33.90428674885491,
+      "z": 61.46733036469189,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g813",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 34.90428674885491,
+      "z": 61.46733036469189,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g814",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 35.90428674885491,
+      "z": 61.46733036469189,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g815",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 33.90428674885491,
+      "z": 63.46733036469189,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g816",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 34.90428674885491,
+      "z": 63.46733036469189,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g817",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 35.90428674885491,
+      "z": 63.46733036469189,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g818",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 33.90428674885491,
+      "z": 65.46733036469189,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g819",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 34.90428674885491,
+      "z": 65.46733036469189,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g820",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 35.90428674885491,
+      "z": 65.46733036469189,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g821",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 24.93717990683538,
+      "z": 51.43780219634033,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g822",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 25.93717990683538,
+      "z": 51.43780219634033,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g823",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 26.93717990683538,
+      "z": 51.43780219634033,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g824",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 24.93717990683538,
+      "z": 53.43780219634033,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g825",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 25.93717990683538,
+      "z": 53.43780219634033,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g826",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 26.93717990683538,
+      "z": 53.43780219634033,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g827",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 24.93717990683538,
+      "z": 55.43780219634033,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g828",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 25.93717990683538,
+      "z": 55.43780219634033,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g829",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 26.93717990683538,
+      "z": 55.43780219634033,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g830",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 32.690489211725,
+      "z": 80.21135116623567,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g831",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 33.690489211725,
+      "z": 80.21135116623567,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g832",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 34.690489211725,
+      "z": 80.21135116623567,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g833",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 32.690489211725,
+      "z": 82.21135116623567,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g834",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 33.690489211725,
+      "z": 82.21135116623567,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g835",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 34.690489211725,
+      "z": 82.21135116623567,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g836",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 32.690489211725,
+      "z": 84.21135116623567,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g837",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 33.690489211725,
+      "z": 84.21135116623567,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g838",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 34.690489211725,
+      "z": 84.21135116623567,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g839",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -14.619486616136296,
+      "z": 67.39982001917193,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g840",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -13.619486616136296,
+      "z": 67.39982001917193,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g841",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -12.619486616136296,
+      "z": 67.39982001917193,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g842",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -14.619486616136296,
+      "z": 69.39982001917193,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g843",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -13.619486616136296,
+      "z": 69.39982001917193,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g844",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -12.619486616136296,
+      "z": 69.39982001917193,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g845",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -14.619486616136296,
+      "z": 71.39982001917193,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g846",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -13.619486616136296,
+      "z": 71.39982001917193,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g847",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -12.619486616136296,
+      "z": 71.39982001917193,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g848",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -15.23,
+      "z": 54,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g849",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -13.23,
+      "z": 54,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g850",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -11.23,
+      "z": 54,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g851",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -15.23,
+      "z": 55,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g852",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -13.23,
+      "z": 55,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g853",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -11.23,
+      "z": 55,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g854",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -15.23,
+      "z": 56,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g855",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -13.23,
+      "z": 56,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g856",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -11.23,
+      "z": 56,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g857",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -41.90252405943959,
+      "z": 53.37991083748612,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g858",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -39.90252405943959,
+      "z": 53.37991083748612,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g859",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -37.90252405943959,
+      "z": 53.37991083748612,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g860",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -41.90252405943959,
+      "z": 54.37991083748612,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g861",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -39.90252405943959,
+      "z": 54.37991083748612,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g862",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -37.90252405943959,
+      "z": 54.37991083748612,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g863",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -41.90252405943959,
+      "z": 55.37991083748612,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g864",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -39.90252405943959,
+      "z": 55.37991083748612,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g865",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -37.90252405943959,
+      "z": 55.37991083748612,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g866",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -27.84,
+      "z": 70.36,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g867",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -26.84,
+      "z": 70.36,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g868",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -25.84,
+      "z": 70.36,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g869",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -27.84,
+      "z": 72.36,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g870",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -26.84,
+      "z": 72.36,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g871",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -25.84,
+      "z": 72.36,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g872",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -27.84,
+      "z": 74.36,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g873",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -26.84,
+      "z": 74.36,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g874",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -25.84,
+      "z": 74.36,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g875",
+      "assetId": "enemy",
+      "quality": "high",
+      "x": 24.566412465099923,
+      "z": 61.291804359202494,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "紅軍士兵（手榴彈用）",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": null,
+      "team": "enemy",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g876",
+      "assetId": "enemy",
+      "quality": "high",
+      "x": 25.566412465099923,
+      "z": 61.291804359202494,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "紅軍士兵（手榴彈用）",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": null,
+      "team": "enemy",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g877",
+      "assetId": "enemy",
+      "quality": "high",
+      "x": 26.566412465099923,
+      "z": 61.291804359202494,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "紅軍士兵（手榴彈用）",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": null,
+      "team": "enemy",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g878",
+      "assetId": "enemy",
+      "quality": "high",
+      "x": 24.566412465099923,
+      "z": 63.291804359202494,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "紅軍士兵（手榴彈用）",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": null,
+      "team": "enemy",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g879",
+      "assetId": "enemy",
+      "quality": "high",
+      "x": 25.566412465099923,
+      "z": 63.291804359202494,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "紅軍士兵（手榴彈用）",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": null,
+      "team": "enemy",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g880",
+      "assetId": "enemy",
+      "quality": "high",
+      "x": 26.566412465099923,
+      "z": 63.291804359202494,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "紅軍士兵（手榴彈用）",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": null,
+      "team": "enemy",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g881",
+      "assetId": "enemy",
+      "quality": "high",
+      "x": 24.566412465099923,
+      "z": 65.2918043592025,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "紅軍士兵（手榴彈用）",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": null,
+      "team": "enemy",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g882",
+      "assetId": "enemy",
+      "quality": "high",
+      "x": 25.566412465099923,
+      "z": 65.2918043592025,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "紅軍士兵（手榴彈用）",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": null,
+      "team": "enemy",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g883",
+      "assetId": "enemy",
+      "quality": "high",
+      "x": 26.566412465099923,
+      "z": 65.2918043592025,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "紅軍士兵（手榴彈用）",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": null,
+      "team": "enemy",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g884",
+      "assetId": "guardhouse",
+      "quality": "low",
+      "x": -0.47771311541465655,
+      "z": 74.51465960625939,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "哨所（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-guardhouse-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-guardhouse-fractured-low.glb",
+        "pieces": 30
+      },
+      "team": null,
+      "size": [
+        7.3,
+        4,
+        6.8
+      ]
+    },
+    {
+      "uid": "g885",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": 6.652872930676203,
+      "z": 81.56059385246877,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g886",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": -0.7064227088286836,
+      "z": 84.35969526868742,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g887",
+      "assetId": "treeB",
+      "quality": "low",
+      "x": 10.208362889361418,
+      "z": 84.4077503501434,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 B（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-b-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.7,
+        5.5,
+        4.7
+      ]
+    },
+    {
+      "uid": "g888",
+      "assetId": "friendly",
+      "quality": "high",
+      "x": 1.5701044603875016,
+      "z": 118.29557380206487,
+      "rot": 150,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g889",
+      "assetId": "grenadeCrate",
+      "quality": "high",
+      "x": 2.8959796979933756,
+      "z": 117.42120172019607,
+      "rot": 0,
+      "scale": 0.5,
+      "category": "prop",
+      "name": "手榴彈投擲箱（手榴彈用）",
+      "model": "./assets/props/grenade-crate.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        2,
+        1.15,
+        1.6
+      ]
+    },
+    {
+      "uid": "g890",
+      "assetId": "sandbag",
+      "quality": "high",
+      "x": 1.6042672751474463,
+      "z": 117.01962519384071,
+      "rot": 0,
+      "scale": 0.5,
+      "category": "prop",
+      "name": "沙包（手榴彈用）",
+      "model": "./assets/props/sandbag.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        3,
+        1.2,
+        1.9
+      ]
+    },
+    {
+      "uid": "g891",
+      "assetId": "barracks",
+      "quality": "low",
+      "x": 5.659381873662032,
+      "z": 94.79168205538991,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "營舍（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-barracks-fractured-low.glb",
+        "pieces": 23
+      },
+      "team": null,
+      "size": [
+        14,
+        4.4,
+        6.6
+      ]
+    },
+    {
+      "uid": "g892",
+      "assetId": "barracks",
+      "quality": "low",
+      "x": 22.95708184173359,
+      "z": 102.9933729694338,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "營舍（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-barracks-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-barracks-fractured-low.glb",
+        "pieces": 23
+      },
+      "team": null,
+      "size": [
+        14,
+        4.4,
+        6.6
+      ]
+    },
+    {
+      "uid": "g902",
+      "assetId": "office",
+      "quality": "low",
+      "x": -16.26559536091436,
+      "z": 99.4365146782873,
+      "rot": 0,
+      "scale": 1,
+      "category": "building",
+      "name": "辦公大樓（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-office-low.glb",
+      "destructible": {
+        "fracturedModel": "./assets/grenade-low/grenade-office-fractured-low.glb",
+        "pieces": 42
+      },
+      "team": null,
+      "size": [
+        14,
+        10,
+        11
+      ]
+    },
+    {
+      "uid": "g912",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -2.163768898767743,
+      "z": 99.74289811689385,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g921",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -0.16376889876774303,
+      "z": 99.74289811689385,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g922",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 1.836231101232257,
+      "z": 99.74289811689385,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g923",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -2.163768898767743,
+      "z": 100.74289811689385,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g924",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -0.16376889876774303,
+      "z": 100.74289811689385,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g925",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 1.836231101232257,
+      "z": 100.74289811689385,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g926",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -2.163768898767743,
+      "z": 101.74289811689385,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g927",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": -0.16376889876774303,
+      "z": 101.74289811689385,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g928",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 1.836231101232257,
+      "z": 101.74289811689385,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g929",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 24.313311344567488,
+      "z": 91.56118908129056,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g930",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 26.313311344567488,
+      "z": 91.56118908129056,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g931",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 28.313311344567488,
+      "z": 91.56118908129056,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g932",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 24.313311344567488,
+      "z": 92.56118908129056,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g933",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 26.313311344567488,
+      "z": 92.56118908129056,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g934",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 28.313311344567488,
+      "z": 92.56118908129056,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g935",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 24.313311344567488,
+      "z": 93.56118908129056,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g936",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 26.313311344567488,
+      "z": 93.56118908129056,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g937",
+      "assetId": "friendly",
+      "quality": "low",
+      "x": 28.313311344567488,
+      "z": 93.56118908129056,
+      "rot": 0,
+      "scale": 1,
+      "category": "soldier",
+      "name": "友軍士兵（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-soldier-low.glb",
+      "destructible": null,
+      "team": "friendly",
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g946",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 7.512893990751898,
+      "z": 101.60529502061524,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g947",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 11.148130069560859,
+      "z": 101.92901795493879,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g948",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": -3.173895602151423,
+      "z": 96.43788564109106,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    },
+    {
+      "uid": "g949",
+      "assetId": "treeA",
+      "quality": "low",
+      "x": 17.79504199776234,
+      "z": 97.76568617022932,
+      "rot": 0,
+      "scale": 1,
+      "category": "prop",
+      "name": "樹木 A（手榴彈用）",
+      "model": "./assets/grenade-low/grenade-tree-a-low.glb",
+      "destructible": null,
+      "team": null,
+      "size": [
+        4.4,
+        5.5,
+        4.4
+      ]
+    }
+  ]
+}
