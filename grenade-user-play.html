@@ -89,7 +89,7 @@ body.aiming:has(#meterH:not(.hide)) #aimHint{display:none}
 @media(orientation:landscape) and (max-height:530px){#earthCaption{bottom:calc(24px + env(safe-area-inset-bottom));padding:5px 9px}}
 </style></head><body>
 <canvas id="world3d"></canvas>
-<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.24 先向右轉身／清除欄杆</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
+<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.25 投擲轉身方向修正</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
 <div id="powerDock" class="hide">
   <button id="powerToggle" aria-expanded="false" aria-controls="powerDrawer" aria-label="展開或收合手榴彈威力設定">💥 威力 <strong id="powerMiniValue">10</strong> <span id="powerChevron">▾</span></button>
   <div id="powerDrawer" hidden><div class="powerHead"><span>威力（0～100）</span><span id="powerOut">10</span></div>
@@ -123,7 +123,7 @@ body.aiming:has(#meterH:not(.hide)) #aimHint{display:none}
 <section id="result"><div class="resultCard"><div style="font-size:11px;color:#f2d38e;letter-spacing:1.8px;font-weight:800">國軍手榴彈試炸報告</div><h2 id="resultHeading">爆炸結束</h2><div class="cards"><div class="cell"><small>摧毀建築</small><b id="rBuildings">0</b></div><div class="cell"><small>擊殺人數</small><b id="rKills">0</b></div><div class="cell"><small>紅軍擊殺</small><b id="rRed">0</b></div><div class="cell"><small>友軍誤傷</small><b id="rGreen">0</b></div></div><div id="newLandmarks">本局紅軍：9 人</div><div id="resultBtns"><button class="accent" id="retry">再投一次</button></div><p class="muted" style="margin-bottom:0">僅在軍營內試炸；顯示的是遊戲內爆炸與可破壞物件，不包含真實物理傷害。</p></div></section>
 
 <script type="module">
-import './grenade-user-play-3d.js?v=34';
+import './grenade-user-play-3d.js?v=35';
 const $=id=>document.getElementById(id),world=window.GrenadeWorld,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),fmt=n=>Math.floor(n).toLocaleString('en-US');
 let phase='intro',pos=.5,direction=.5,clock=0,x=0,z=50,power=10,old=performance.now(),badgeTimer=0,resultTimer=0,landingClock=0;
 const badge=t=>{const e=$('badge');e.textContent=t;e.classList.add('show');badgeTimer=performance.now()+1800;};

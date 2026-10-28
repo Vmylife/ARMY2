@@ -639,11 +639,10 @@ class WebWorld{
  }
  playThrow(x,z,onLanding){
   const dx=x-this.player[0],dz=z-this.player[1];
-  // The supplied baseball_pitching clip throws 90° to the MODEL'S left.
-  // Turn its facing 90° to the right of the selected world-space target first.
-  // This changes animation orientation only; meterLanding and the actual
-  // grenade destination remain exactly as calibrated by the player.
-  const targetYaw=Math.atan2(dx,dz)+Math.PI/2;
+  // The baseball_pitching animation releases 90° offset from the rig's facing.
+  // v1.24 used +90°, which turned the thrower back toward the camera.
+  // Use the opposite (-90°) offset; idle facing and target coordinates stay unchanged.
+  const targetYaw=Math.atan2(dx,dz)-Math.PI/2;
   const startAngle=this.thrower.angle;
   const delta=Math.atan2(Math.sin(targetYaw-startAngle),Math.cos(targetYaw-startAngle));
   const endAngle=startAngle+delta;
