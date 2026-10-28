@@ -303,13 +303,13 @@ class WebWorld{
     // a three-type substitute list. Fractures reuse the intact texture/UV map.
     const buildingKeys=[...new Map(this.nearBuildings.map(b=>[b.type,b])).values()];
     await Promise.all(buildingKeys.map(async sample=>{try{
-      const [whole,fractured]=await Promise.all([loadGlb(sample.modelPath),loadGlb(sample.fracturePath)]);
+      const [whole,fractured]=await Promise.all([loadGlb(sample.modelPath),loadGlb(sample.fracturePath+'?v=113')]);
       const prim=whole.json.meshes[0].primitives[0],ac=whole.json.accessors[prim.attributes.POSITION];
       const lo=ac.min||[-.5,-.5,-.5],hi=ac.max||[.5,.5,.5],size=sample.size;
       const scaleVec=[size[0]/Math.max(.0001,hi[0]-lo[0]),size[1]/Math.max(.0001,hi[1]-lo[1]),size[2]/Math.max(.0001,hi[2]-lo[2])];
       const center=[(lo[0]+hi[0])/2,lo[1],(lo[2]+hi[2])/2];
       const asset={scaleVec,center,extents:hi.map((v,i)=>Math.max(.0001,v-lo[i])),whole:this.staticGeometry(whole,prim),pieces:[],tex:await this.glbTexture(whole,prim)};
-      for(const node of fractured.json.nodes){if(node.mesh==null)continue;const pg=fractured.json.meshes[node.mesh].primitives[0];asset.pieces.push({geo:this.staticGeometry(fractured,pg),node:node.translation||[0,0,0]});}
+      for(const node of fractured.json.nodes){if(node.mesh==null)continue;const mesh=fractured.json.meshes[node.mesh],pg=mesh.primitives[0],geo=this.staticGeometry(fractured,pg);geo.innerColor=mesh.extras?.innerColor||[.44,.42,.39];asset.pieces.push({geo,node:node.translation||[0,0,0]});}
       this.detailed[sample.type]=asset;
     }catch(err){this.modelErrors.push('建築破壞模型 '+sample.type+': '+err.message);console.error(err);}}));
     this.soldierAssets={};
@@ -331,9 +331,9 @@ class WebWorld{
  async initCampProps(){
   this.campProps=SCENE_PROPS.map(o=>({uid:o.uid,type:o.assetId,x:o.x,z:o.z,scale:o.scale||1,scaleXYZ:o.scaleXYZ,baseY:o.baseY||0,yaw:(o.rot||0)*Math.PI/180,size:o.size,model:o.model,fracturePath:o.destructible?.fracturedModel,hit:false,fragments:[]}));
   this.buildEvents();this.propModels={};const queue=[...new Map(this.campProps.map(p=>[p.type,p])).values()];await Promise.all(Array.from({length:3},async()=>{while(queue.length){const item=queue.shift();try{
-   const [gltf,fractured]=await Promise.all([loadGlb(item.model),item.fracturePath?loadGlb(item.fracturePath):Promise.resolve(null)]);
+   const [gltf,fractured]=await Promise.all([loadGlb(item.model),item.fracturePath?loadGlb(item.fracturePath+'?v=113'):Promise.resolve(null)]);
    const p=gltf.json.meshes[0].primitives[0],ac=gltf.json.accessors[p.attributes.POSITION],lo=ac.min||[-.5,-.5,-.5],hi=ac.max||[.5,.5,.5];
-   const pieces=[];if(fractured)for(const node of fractured.json.nodes){if(node.mesh==null)continue;const pg=fractured.json.meshes[node.mesh].primitives[0];pieces.push({geo:this.staticGeometry(fractured,pg),node:node.translation||[0,0,0]});}
+   const pieces=[];if(fractured)for(const node of fractured.json.nodes){if(node.mesh==null)continue;const mesh=fractured.json.meshes[node.mesh],pg=mesh.primitives[0],geo=this.staticGeometry(fractured,pg);geo.innerColor=mesh.extras?.innerColor||[.44,.42,.39];pieces.push({geo,node:node.translation||[0,0,0]});}
    this.propModels[item.type]={geo:this.staticGeometry(gltf,p),tex:await this.glbTexture(gltf,p),center:[(lo[0]+hi[0])/2,lo[1],(lo[2]+hi[2])/2],extents:hi.map((v,i)=>Math.max(.0001,v-lo[i])),pieces};
   }catch(e){this.modelErrors.push('場景小物件 '+item.type+': '+e.message);console.error(e);}}}));
  }
@@ -353,12 +353,12 @@ class WebWorld{
   }
  }
  staticGeometry(gltf,p){const g=this.gl,vao=g.createVertexArray();g.bindVertexArray(vao);
-  for(const [attr,loc,size] of [['POSITION',0,3],['NORMAL',1,3],['TEXCOORD_0',2,2]]){
+  for(const [attr,loc,size] of [['POSITION',0,3],['NORMAL',1,3],['TEXCOORD_0',2,2],['_CAP',5,1]]){
     const ix=p.attributes[attr];if(ix==null)continue;const array=gltf.read(ix),buf=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,buf);g.bufferData(g.ARRAY_BUFFER,array,g.STATIC_DRAW);
     g.enableVertexAttribArray(loc);g.vertexAttribPointer(loc,size,gltf.json.accessors[ix].componentType,false,0,0);
   }
   const indexes=gltf.read(p.indices),buf=g.createBuffer();g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,buf);g.bufferData(g.ELEMENT_ARRAY_BUFFER,indexes,g.STATIC_DRAW);g.bindVertexArray(null);
-  return {vao,count:indexes.length,indexType:gltf.json.accessors[p.indices].componentType};
+  return {vao,count:indexes.length,indexType:gltf.json.accessors[p.indices].componentType,hasCap:p.attributes._CAP!=null};
  }
  skinGeometry(gltf){const g=this.gl,p=gltf.json.meshes[0].primitives[0],vao=g.createVertexArray();g.bindVertexArray(vao);
    for(const [attr,loc,size] of [['POSITION',0,3],['NORMAL',1,3],['TEXCOORD_0',2,2],['JOINTS_0',3,4],['WEIGHTS_0',4,4]]){
@@ -377,12 +377,12 @@ class WebWorld{
  blankTexture(){const g=this.gl,t=g.createTexture();g.bindTexture(g.TEXTURE_2D,t);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,1,1,0,g.RGBA,g.UNSIGNED_BYTE,new Uint8Array([255,255,255,255]));g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);return t;}
  setupDetailPrograms(){if(this.detailProg||!this.gl?.createVertexArray)return;const g=this.gl;
   this.detailProg=compile(g,`#version 300 es
-    precision highp float;layout(location=0)in vec3 p;layout(location=1)in vec3 n;layout(location=2)in vec2 uv;
-    uniform mat4 uVP,uModel;out vec3 vN;out vec2 vUV;
-    void main(){gl_Position=uVP*uModel*vec4(p,1.);vN=normalize(mat3(uModel)*n);vUV=uv;}`,
+    precision highp float;layout(location=0)in vec3 p;layout(location=1)in vec3 n;layout(location=2)in vec2 uv;layout(location=5)in float aCap;
+    uniform mat4 uVP,uModel;out vec3 vN;out vec2 vUV;out float vCap;
+    void main(){gl_Position=uVP*uModel*vec4(p,1.);vN=normalize(mat3(uModel)*n);vUV=uv;vCap=aCap;}`,
     `#version 300 es
-    precision mediump float;in vec3 vN;in vec2 vUV;uniform sampler2D uTex;uniform vec3 uTint;out vec4 frag;
-    void main(){vec3 col=texture(uTex,vUV).rgb*uTint;float s=max(0.,dot(normalize(vN),normalize(vec3(-.5,1.2,.65))));frag=vec4(col*(.72+.36*s),1.);}`);
+    precision mediump float;in vec3 vN;in vec2 vUV;in float vCap;uniform sampler2D uTex;uniform vec3 uTint,uInnerColor;out vec4 frag;
+    void main(){vec3 surface=texture(uTex,vUV).rgb;vec3 inside=uInnerColor*(.92+.08*fract(vUV.x*13.2+vUV.y*8.4));vec3 col=mix(surface,inside,clamp(vCap,0.,1.))*uTint;float s=max(0.,dot(normalize(vN),normalize(vec3(-.5,1.2,.65))));frag=vec4(col*(.72+.36*s),1.);}`);
   this.cadetProg=compile(g,`#version 300 es
     precision highp float;layout(location=0)in vec3 p;layout(location=1)in vec3 n;layout(location=2)in vec2 uv;layout(location=3)in vec4 j;layout(location=4)in vec4 w;
     uniform mat4 uVP,uModel;uniform mat4 uBones[44];out vec2 vUV;out vec3 vN;
@@ -392,7 +392,7 @@ class WebWorld{
     void main(){vec3 base=texture(uTex,vUV).rgb;float l=.7+.31*max(0.,dot(normalize(vN),normalize(vec3(-.4,1.1,.55))));
       float cloth=smoothstep(.025,.10,base.g-base.r)*smoothstep(.055,.13,base.g-base.b);vec3 redCloth=vec3(min(1.,base.g*1.58),base.g*.47,base.g*.38);vec3 c=mix(base,redCloth,uRed*cloth);frag=vec4(c*l,1.);}`);
  }
- drawStaticMesh(geo,tex,model,vp){const g=this.gl,p=this.detailProg;g.useProgram(p);g.uniformMatrix4fv(g.getUniformLocation(p,'uVP'),false,vp);g.uniformMatrix4fv(g.getUniformLocation(p,'uModel'),false,model);g.uniform3f(g.getUniformLocation(p,'uTint'),1,1,1);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,tex);g.uniform1i(g.getUniformLocation(p,'uTex'),0);g.bindVertexArray(geo.vao);g.drawElements(g.TRIANGLES,geo.count,geo.indexType,0);}
+ drawStaticMesh(geo,tex,model,vp){const g=this.gl,p=this.detailProg;g.useProgram(p);g.uniformMatrix4fv(g.getUniformLocation(p,'uVP'),false,vp);g.uniformMatrix4fv(g.getUniformLocation(p,'uModel'),false,model);g.uniform3f(g.getUniformLocation(p,'uTint'),1,1,1);g.uniform3fv(g.getUniformLocation(p,'uInnerColor'),geo.innerColor||[.42,.41,.37]);if(!geo.hasCap)g.vertexAttrib1f(5,0);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,tex);g.uniform1i(g.getUniformLocation(p,'uTex'),0);g.bindVertexArray(geo.vao);if(geo.hasCap)g.disable(g.CULL_FACE);g.drawElements(g.TRIANGLES,geo.count,geo.indexType,0);if(geo.hasCap)g.enable(g.CULL_FACE);}
  explodeBuilding(b){if(b.hit)return;b.hit=true;b.fragments=[];const info=this.detailed?.[b.type];if(!info)return;
   // No silent cap on destruction: every building gets physical fragments.
   for(let i=0;i<info.pieces.length;i++){
