@@ -100,7 +100,7 @@ function setupUI(){listScenes();refreshTemplates();changed();$('scenes').onchang
  $('undo').onclick=undo;$('redo').onclick=redo;$('export').onclick=exportScene;$('import').onclick=()=>$('importFile').click();$('importMainCamp').onclick=importMainCamp;$('importFile').onchange=async e=>{if(e.target.files?.[0])await importScene(e.target.files[0]);e.target.value=''};
  $('togglePanel').onclick=()=>{document.body.classList.toggle('folded');$('togglePanel').textContent=document.body.classList.contains('folded')?'開啟工具':'收合工具'};
  $('camOrbit').onclick=()=>{orbit=!orbit;if(orbit)setMoveSelectedMode(false);$('camOrbit').textContent='旋轉視角：'+(orbit?'開':'關')};
- $('moveSelected').onclick=()=>setMoveSelectedMode(!moveSelectedMode);$('zoomIn').onclick=()=>distance=cap(distance*.80,12,290);$('zoomOut').onclick=()=>distance=cap(distance*1.25,12,290);$('homeCamera').onclick=()=>{pivot={x:0,z:0};distance=96;yaw=.55;pitch=.90};}
+ $('moveSelected').onclick=()=>setMoveSelectedMode(!moveSelectedMode);$('zoomIn').onclick=()=>distance=cap(distance*.80,12,290);$('zoomOut').onclick=()=>distance=cap(distance*1.25,12,290);$('homeCamera').onclick=()=>{pivot={x:0,z:5};distance=155;yaw=.46;pitch=.98};}
 function setMoveSelectedMode(enabled){moveSelectedMode=!!enabled&&!!selected;if(moveSelectedMode&&orbit){orbit=false;$('camOrbit').textContent='旋轉視角：關'}const b=$('moveSelected');b.classList.toggle('isActive',moveSelectedMode);b.textContent='移動選取：'+(moveSelectedMode?'開':'關');$('camHelp').textContent=moveSelectedMode?'移動模式：手指在場景任意處拖曳選取物件；點按可直接定位。關閉後可平移視角。':'點選或拖曳模型 · 小物件可先選取再開啟「移動選取」 · 空白處平移';}
 // vector/matrix convention matches the Army grenade WebGL engine (column-major).
 const dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0),sub=(a,b)=>a.map((v,i)=>v-b[i]);
@@ -194,9 +194,9 @@ function shader(gl,t,src){const s=gl.createShader(t);gl.shaderSource(s,src);gl.c
 function makeProgram(vs,fs){const p=gl.createProgram();gl.attachShader(p,shader(gl,gl.VERTEX_SHADER,vs));gl.attachShader(p,shader(gl,gl.FRAGMENT_SHADER,fs));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));return p}
 const VS=`#version 300 es\nprecision highp float;layout(location=0)in vec3 p;layout(location=1)in vec3 n;layout(location=2)in vec2 uv;uniform mat4 uVP,uModel;out vec2 vUV;out vec3 vN;void main(){gl_Position=uVP*uModel*vec4(p,1.);vUV=uv;vN=normalize(mat3(uModel)*n);}`;
 const SKINVS=`#version 300 es\nprecision highp float;layout(location=0)in vec3 p;layout(location=1)in vec3 n;layout(location=2)in vec2 uv;layout(location=3)in vec4 j;layout(location=4)in vec4 w;uniform mat4 uVP,uModel,uBones[44];out vec2 vUV;out vec3 vN;void main(){ivec4 ji=ivec4(j+.5);mat4 m=uBones[ji.x]*w.x+uBones[ji.y]*w.y+uBones[ji.z]*w.z+uBones[ji.w]*w.w;gl_Position=uVP*uModel*m*vec4(p,1.);vUV=uv;vN=normalize(mat3(uModel)*mat3(m)*n);}`;
-const FS=`#version 300 es\nprecision mediump float;in vec2 vUV;in vec3 vN;uniform sampler2D uTex;uniform vec3 uTint;uniform float uRed;out vec4 outColor;void main(){vec3 col=texture(uTex,vUV).rgb;float cloth=smoothstep(.025,.10,col.g-col.r)*smoothstep(.055,.13,col.g-col.b);vec3 redCloth=vec3(min(1.,col.g*1.58),col.g*.47,col.g*.38);col=mix(col,redCloth,uRed*cloth);float light=.76+.29*max(0.,dot(normalize(vN),normalize(vec3(-.45,1.,.60))));outColor=vec4(col*uTint*light,1.);}`;
+const FS=`#version 300 es\nprecision highp float;in vec2 vUV;in vec3 vN;uniform sampler2D uTex;uniform vec3 uTint;uniform float uRed;out vec4 outColor;void main(){vec3 col=texture(uTex,vUV).rgb;float cloth=smoothstep(.025,.10,col.g-col.r)*smoothstep(.055,.13,col.g-col.b);vec3 redCloth=vec3(min(1.,col.g*1.58),col.g*.47,col.g*.38);col=mix(col,redCloth,uRed*cloth);float light=.76+.29*max(0.,dot(normalize(vN),normalize(vec3(-.45,1.,.60))));outColor=vec4(col*uTint*light,1.);}`;
 const FLATVS=`#version 300 es\nprecision highp float;layout(location=0)in vec3 p;uniform mat4 uVP,uModel;void main(){gl_Position=uVP*uModel*vec4(p,1.);}`;
-const FLATFS=`#version 300 es\nprecision mediump float;uniform vec3 uColor;out vec4 outColor;void main(){outColor=vec4(uColor,1.);}`;
+const FLATFS=`#version 300 es\nprecision highp float;uniform vec3 uColor;out vec4 outColor;void main(){outColor=vec4(uColor,1.);}`;
 const cube=[];function face(a,b,c,d){for(const q of [a,b,c,a,c,d])cube.push(...q)}
 face([-.5,0,-.5],[.5,0,-.5],[.5,0,.5],[-.5,0,.5]);face([-.5,1,-.5],[-.5,1,.5],[.5,1,.5],[.5,1,-.5]);
 for(let i=0;i<4;i++){const t=i*Math.PI/2,t2=t+Math.PI/2;const p=[Math.cos(t)*.5,Math.sin(t)*.5],q=[Math.cos(t2)*.5,Math.sin(t2)*.5];face([p[0],0,p[1]],[q[0],0,q[1]],[q[0],1,q[1]],[p[0],1,p[1]])}
@@ -249,6 +249,28 @@ function draw2D(){let c=canvas.getContext('2d');if(!c)return;const w=canvas.widt
  for(let z=-120;z<=120;z+=20){c.strokeStyle='#98b995';c.beginPath();c.moveTo(0,h/2+(z-pivot.z)*ss);c.lineTo(w,h/2+(z-pivot.z)*ss);c.stroke()}
  for(const o of scene.objects){const a=BY[o.assetId],x=w/2+(o.x-pivot.x)*ss,y=h/2+(o.z-pivot.z)*ss;c.fillStyle=a.type==='soldier'?a.side==='enemy'?'#b6402f':'#368348':a.type==='building'?'#d9d2b4':a.type==='ground'?'#e8dabc':'#6b995f';const sz=o.size||a.size,wd=(o.width||sz[0])*ss*o.scale,dp=(o.depth||sz[2])*ss*o.scale;c.save();c.translate(x,y);c.rotate(o.rot*Math.PI/180);c.fillRect(-wd/2,-dp/2,wd,dp);if(selected===o.uid){c.strokeStyle='#efbc3b';c.lineWidth=3;c.strokeRect(-wd/2-2,-dp/2-2,wd+4,dp+4)}c.restore()}}
 function loop(){try{if(gl)drawWebGL();else draw2D()}catch(e){console.error(e);if(!loop.errored){msg('3D 預覽失敗：'+e.message);loop.errored=true}}requestAnimationFrame(loop)}
-function boot(){setupUI();pointerEvents();try{initGL();if(!gl)$('loading').hidden=true;else{if(scene.objects.length){for(const o of scene.objects){const a=BY[o.assetId];if(hasModel(a))ensureAsset(a,qualityOf(o))}}else{['barracks','enemy','treeA'].forEach(id=>ensureAsset(BY[id],'low'))};if(!loading)$('loading').hidden=true}}catch(e){console.error(e);msg('初始化失敗：'+e.message);$('loading').hidden=true}
+// v1.14: install the supplied complete camp as the startup editing scene, once.
+// Never delete previous user-created scenes or overwrite an already edited camp.
+async function seedMainCampOnFirstOpen(){
+ if(store.mainCampSeedVersion===14)return;
+ const res=await fetch('./main-camp-destructible.json?v=14',{cache:'no-store'});
+ if(!res.ok)throw Error('完整軍營場景檔無法載入（HTTP '+res.status+'）');
+ const data=await res.json();
+ if(data.format!=='army-grenade-scene'||data.schemaVersion!==1||!Array.isArray(data.items))throw Error('內建軍營資料格式錯誤');
+ const invalid=data.items.filter(o=>!BY[o.assetId]||![o.x,o.z,o.rot,o.scale].every(Number.isFinite));
+ if(invalid.length)throw Error('主軍營物件類型無法辨識：'+invalid[0].assetId);
+ let camp=store.scenes.find(s=>s.id==='main-camp-destructible');
+ if(!camp){
+   const serial=Math.max(1000,...data.items.map(o=>Number(String(o.uid).replace(/^g/,''))||0));
+   camp={id:'main-camp-destructible',name:'🏕️ 主遊戲完整軍營｜全可破壞',serial,objects:data.items.map(o=>({...o}))};
+   if(store.scenes.length===1&&store.scenes[0].id==='scene-1'&&store.scenes[0].objects.length===0)store.scenes=[camp];
+   else store.scenes.unshift(camp);
+ }
+ scene=camp;store.active=camp.id;store.mainCampSeedVersion=14;
+ pivot={x:0,z:5};distance=155;yaw=.46;pitch=.98;
+ save();
+}
+async function boot(){try{await seedMainCampOnFirstOpen()}catch(err){console.error('完整軍營預載失敗',err);msg('軍營預載失敗：'+err.message+'，可使用「載入完整軍營」重試')}
+ setupUI();pointerEvents();try{initGL();if(!gl)$('loading').hidden=true;else{if(scene.objects.length){for(const o of scene.objects){const a=BY[o.assetId];if(hasModel(a))ensureAsset(a,qualityOf(o))}}else{['barracks','enemy','treeA'].forEach(id=>ensureAsset(BY[id],'low'))};if(!loading)$('loading').hidden=true}}catch(e){console.error(e);msg('初始化失敗：'+e.message);$('loading').hidden=true}
  requestAnimationFrame(loop)}
 boot();

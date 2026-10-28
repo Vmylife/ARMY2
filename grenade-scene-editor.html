@@ -7,7 +7,7 @@
 </head>
 <body>
 <header class="topbar">
- <div><b>💣 手榴彈場景編輯器</b><small>獨立場景 · 不影響原軍營</small></div>
+ <div><b>💣 手榴彈場景編輯器</b><small>預載主遊戲軍營 · 建築與器材可破壞 · 不影響主遊戲</small></div>
  <div class="topactions"><a href="./editor.html">原軍營編輯器</a><button id="togglePanel">收合工具</button></div>
 </header>
 <main id="stage"><canvas id="world" aria-label="3D 編輯場景"></canvas><div id="loading">正在載入模型…</div>
@@ -40,11 +40,11 @@
   </details>
   <div class="btnRow"><button data-nudge="x-">←</button><button data-nudge="z+">↑</button><button data-nudge="z-">↓</button><button data-nudge="x+">→</button><button data-nudge="rot-">↶ 15°</button><button data-nudge="rot+">15° ↷</button></div>
  </div>
- <div class="section last"><div class="btnRow"><button id="undo">↶ 復原</button><button id="redo">↷ 重做</button><button id="export" class="primary">匯出場景 JSON</button><button id="import">匯入 JSON</button><button id="importMainCamp" class="warm">🏕️ 載入完整軍營（全可破壞）</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
+ <div class="section last"><div class="btnRow"><button id="undo">↶ 復原</button><button id="redo">↷ 重做</button><button id="export" class="primary">匯出場景 JSON</button><button id="import">匯入 JSON</button><button id="importMainCamp" class="warm">🏕️ 再建立一份完整軍營</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
   <p id="hint">場景會自動存在這台裝置。你可以建立多個手榴彈場景，匯出的 JSON 會記住每個模型的高／低畫質選擇、座標、角度、縮放及所有建築、圍欄、器材的碎塊路徑。道路與地面使用焦黑破壞標記。</p>
   <div id="message"></div>
  </div>
 </aside>
-<script type="module" src="./grenade-scene-editor.js?v=14"></script>
+<script type="module" src="./grenade-scene-editor.js?v=15"></script>
 </body>
 </html>

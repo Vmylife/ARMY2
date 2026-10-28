@@ -104,7 +104,7 @@ void main(){
  vCol=iTint.rgb;vN=aNorm;vLocal=aPos;vXZ=world.xz;vKind=iShape.w;vHit=hit;vPart=part;
  gl_Position=uVP*vec4(world,1.);
 }`;
-const FS=`precision mediump float;
+const FS=`precision highp float;
 uniform vec2 uImpact;uniform float uRadius;varying vec2 vXZ;varying vec3 vCol;varying vec3 vN;varying vec3 vLocal;varying float vKind,vHit,vPart;
 void main(){float lit=.79+.19*max(0.,dot(normalize(vN),normalize(vec3(.42,1.,.63))))+.04*max(0.,dot(normalize(vN),normalize(vec3(-1.,.2,-.1))));
 vec3 col=vCol*lit;
@@ -119,11 +119,11 @@ col=mix(col,col*.45+vec3(.21,.13,.10),vHit*.88);
 if(vPart>1.5&&vPart<2.5&&uRadius>=0.){float dis=distance(vXZ,uImpact);float soot=1.-smoothstep(uRadius-1.2,uRadius+2.6,dis);float edge=exp(-pow((dis-uRadius)/1.2,2.));col=mix(col,vec3(.13,.115,.10),soot*.79);col+=vec3(.26,.09,.025)*edge*.27;}
 gl_FragColor=vec4(col,1.);}`;
 const RING_VS=`precision highp float;attribute vec4 aRing;uniform mat4 uVP;uniform vec2 uCenter;uniform float uRadius,uWidth;varying float vAl;void main(){float r=max(0.,uRadius+aRing.z*uWidth);vec3 p=vec3(uCenter.x+aRing.x*r,.52,uCenter.y+aRing.y*r);gl_Position=uVP*vec4(p,1.);vAl=aRing.w;}`;
-const RING_FS=`precision mediump float;varying float vAl;void main(){gl_FragColor=vec4(1.,.63,.23,vAl*.82);}`;
+const RING_FS=`precision highp float;varying float vAl;void main(){gl_FragColor=vec4(1.,.63,.23,vAl*.82);}`;
 const PLANET_VS=`precision highp float;attribute vec3 aPos;attribute vec3 aNorm;uniform mat4 uVP;uniform vec3 uCenter;uniform float uScale;varying vec3 vP,vN;void main(){vP=aPos;vN=aNorm;gl_Position=uVP*vec4(uCenter+aPos*uScale,1.);}`;
-const PLANET_FS=`precision mediump float;uniform float uDamage,uEarth,uHue,uTime,uBlastR;uniform vec3 uBlast;varying vec3 vP,vN;void main(){vec3 n=normalize(vN);float light=.36+.64*max(0.,dot(n,normalize(vec3(-.55,.82,.82))));float terrain=sin(n.x*9.+sin(n.z*5.)*2.)*sin(n.y*11.+n.x*7.)+sin(n.z*18.+n.x*7.)*.3;vec3 earth=mix(vec3(.06,.31,.66),vec3(.17,.54,.31),smoothstep(.16,.40,terrain));earth=mix(earth,vec3(.77,.82,.76),smoothstep(.78,.90,n.y));vec3 rocky=vec3(.45,.33,.24)+vec3(.18,.10,.05)*sin(terrain*2.+uHue);vec3 base=mix(rocky,earth,uEarth);float crack=0.;if(uEarth<.5){float c=abs(sin(n.x*28.+sin(n.y*12.))+sin(n.y*20.+n.z*10.))*.5;crack=1.-smoothstep(.035,.14,c);base=mix(base,vec3(1.,.42,.08),crack*clamp(uDamage,0.,1.)*.93);}float rim=pow(1.-abs(n.z),3.);base+=vec3(.09,.18,.28)*rim*uEarth;float active=smoothstep(.001,.02,uBlastR);if(uEarth>.5&&active>.0){float blastDist=1.-dot(normalize(vP),normalize(uBlast));float scorch=1.-smoothstep(max(0.,uBlastR-.12),uBlastR+.04,blastDist);float wave=exp(-pow((blastDist-uBlastR)/.03,2.));float hotEdge=exp(-pow((blastDist-uBlastR)/.012,2.));base=mix(base,base*vec3(.14,.13,.12),clamp(scorch,0.,1.)*.97);base=mix(base,vec3(.28,.24,.21),clamp(scorch-.25,0.,1.)*.40);base+=vec3(1.0,.43,.10)*wave*.72;base+=vec3(1.0,.72,.25)*hotEdge*.58;}gl_FragColor=vec4(base*light+vec3(1.,.27,.05)*uDamage*crack*.45,1.);}`;
+const PLANET_FS=`precision highp float;uniform float uDamage,uEarth,uHue,uTime,uBlastR;uniform vec3 uBlast;varying vec3 vP,vN;void main(){vec3 n=normalize(vN);float light=.36+.64*max(0.,dot(n,normalize(vec3(-.55,.82,.82))));float terrain=sin(n.x*9.+sin(n.z*5.)*2.)*sin(n.y*11.+n.x*7.)+sin(n.z*18.+n.x*7.)*.3;vec3 earth=mix(vec3(.06,.31,.66),vec3(.17,.54,.31),smoothstep(.16,.40,terrain));earth=mix(earth,vec3(.77,.82,.76),smoothstep(.78,.90,n.y));vec3 rocky=vec3(.45,.33,.24)+vec3(.18,.10,.05)*sin(terrain*2.+uHue);vec3 base=mix(rocky,earth,uEarth);float crack=0.;if(uEarth<.5){float c=abs(sin(n.x*28.+sin(n.y*12.))+sin(n.y*20.+n.z*10.))*.5;crack=1.-smoothstep(.035,.14,c);base=mix(base,vec3(1.,.42,.08),crack*clamp(uDamage,0.,1.)*.93);}float rim=pow(1.-abs(n.z),3.);base+=vec3(.09,.18,.28)*rim*uEarth;float active=smoothstep(.001,.02,uBlastR);if(uEarth>.5&&active>.0){float blastDist=1.-dot(normalize(vP),normalize(uBlast));float scorch=1.-smoothstep(max(0.,uBlastR-.12),uBlastR+.04,blastDist);float wave=exp(-pow((blastDist-uBlastR)/.03,2.));float hotEdge=exp(-pow((blastDist-uBlastR)/.012,2.));base=mix(base,base*vec3(.14,.13,.12),clamp(scorch,0.,1.)*.97);base=mix(base,vec3(.28,.24,.21),clamp(scorch-.25,0.,1.)*.40);base+=vec3(1.0,.43,.10)*wave*.72;base+=vec3(1.0,.72,.25)*hotEdge*.58;}gl_FragColor=vec4(base*light+vec3(1.,.27,.05)*uDamage*crack*.45,1.);}`;
 const FX_VS=`precision highp float;attribute vec3 p;uniform mat4 uVP;uniform vec3 uCenter;uniform vec3 uSize;varying vec3 vP;void main(){vP=p;gl_Position=uVP*vec4(uCenter+p*uSize,1.);}`;
-const FX_FS=`precision mediump float;varying vec3 vP;uniform vec3 uColor;uniform float uAlpha,uHot,uTime;void main(){
+const FX_FS=`precision highp float;varying vec3 vP;uniform vec3 uColor;uniform float uAlpha,uHot,uTime;void main(){
  float pattern=sin(vP.x*17.+uTime*4.)*sin(vP.y*13.-uTime*2.)*sin(vP.z*15.+uTime*3.);
  float lit=.64+.36*max(0.,dot(normalize(vP),normalize(vec3(-.33,.9,.64))));
  float glow=mix(lit,.85+.40*pattern,uHot);
@@ -133,7 +133,7 @@ function sphereMesh(){const out=[];const n=20,m=32;for(let i=0;i<n;i++)for(let j
 class WebWorld{
  constructor(){this.gl=null;this.fallback=null;this.ext=null;this.quality=1;this.width=0;this.height=0;this.impact=[0,17];this.radius=-1;this.time=0;this.mode='field';this.earthStage='';this.flyingT=0;this.mapDone=false;this.counter={buildings:0,kills:0,red:0,green:0};this.sorted=[];this.events=[];this.eventIndex=0;this.newLandmarks=[];this.LM=new Set();this.blastMax=0;this.blastDuration=10;this.timer=0;this.bursts=[];this.fxTick=0;
  try{this.gl=c.getContext('webgl2',{alpha:false,antialias:true,powerPreference:'default'})||c.getContext('webgl',{alpha:false,antialias:false,powerPreference:'low-power'});if(!this.gl)throw Error('no WebGL');this.setup();}catch(e){console.warn('3D fallback:',e);const hadContext=!!this.gl;this.gl=null;
- if(hadContext){this.backup=document.createElement('canvas');this.backup.id='world3d-cpu';this.backup.style.cssText='position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;display:none';c.parentNode.insertBefore(this.backup,c.nextSibling);this.fallback=this.backup.getContext('2d');c.style.opacity='0';}
+ if(hadContext){this.backup=document.createElement('canvas');this.backup.id='world3d-cpu';this.backup.style.cssText='position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;display:block';c.parentNode.insertBefore(this.backup,c.nextSibling);this.fallback=this.backup.getContext('2d');c.style.opacity='0';}
  else this.fallback=c.getContext('2d');}
 
  this.resize();window.addEventListener('resize',()=>this.resize());this.player=[PLAYER_ITEM.x,PLAYER_ITEM.z];this.redCenter=RED_CENTER;this.camPhase='intro';this.introProgress=0;this.resetCamTarget=null;this.globe=new GrenadeEarthCinematic();this.buildEvents();this.initDetailedAssets();}
@@ -381,14 +381,14 @@ class WebWorld{
     uniform mat4 uVP,uModel;out vec3 vN;out vec2 vUV;out float vCap;
     void main(){gl_Position=uVP*uModel*vec4(p,1.);vN=normalize(mat3(uModel)*n);vUV=uv;vCap=aCap;}`,
     `#version 300 es
-    precision mediump float;in vec3 vN;in vec2 vUV;in float vCap;uniform sampler2D uTex;uniform vec3 uTint,uInnerColor;out vec4 frag;
+    precision highp float;in vec3 vN;in vec2 vUV;in float vCap;uniform sampler2D uTex;uniform vec3 uTint,uInnerColor;out vec4 frag;
     void main(){vec3 surface=texture(uTex,vUV).rgb;vec3 inside=uInnerColor*(.92+.08*fract(vUV.x*13.2+vUV.y*8.4));vec3 col=mix(surface,inside,clamp(vCap,0.,1.))*uTint;float s=max(0.,dot(normalize(vN),normalize(vec3(-.5,1.2,.65))));frag=vec4(col*(.72+.36*s),1.);}`);
   this.cadetProg=compile(g,`#version 300 es
     precision highp float;layout(location=0)in vec3 p;layout(location=1)in vec3 n;layout(location=2)in vec2 uv;layout(location=3)in vec4 j;layout(location=4)in vec4 w;
     uniform mat4 uVP,uModel;uniform mat4 uBones[44];out vec2 vUV;out vec3 vN;
     void main(){ivec4 ji=ivec4(j+.5);mat4 m=uBones[ji.x]*w.x+uBones[ji.y]*w.y+uBones[ji.z]*w.z+uBones[ji.w]*w.w;gl_Position=uVP*uModel*m*vec4(p,1.);vN=normalize(mat3(uModel)*mat3(m)*n);vUV=uv;}`,
     `#version 300 es
-    precision mediump float;in vec2 vUV;in vec3 vN;uniform sampler2D uTex;uniform vec3 uTint;uniform float uRed;out vec4 frag;
+    precision highp float;in vec2 vUV;in vec3 vN;uniform sampler2D uTex;uniform vec3 uTint;uniform float uRed;out vec4 frag;
     void main(){vec3 base=texture(uTex,vUV).rgb;float l=.7+.31*max(0.,dot(normalize(vN),normalize(vec3(-.4,1.1,.55))));
       float cloth=smoothstep(.025,.10,base.g-base.r)*smoothstep(.055,.13,base.g-base.b);vec3 redCloth=vec3(min(1.,base.g*1.58),base.g*.47,base.g*.38);vec3 c=mix(base,redCloth,uRed*cloth);frag=vec4(c*l,1.);}`);
  }
