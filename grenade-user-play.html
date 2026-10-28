@@ -25,9 +25,18 @@ body.aiming #msg{display:none}
 @media(max-height:730px){#top{top:calc(4px + env(safe-area-inset-top))}#titlebar{padding:6px 9px}#counters>div{padding:6px 9px}#counters strong{font-size:21px}#msg{margin-top:4px;padding:4px 8px}#powerDock{top:calc(145px + env(safe-area-inset-top))}#meterH{bottom:calc(10px + env(safe-area-inset-bottom))}#aimHint{bottom:calc(42px + env(safe-area-inset-bottom))}}
 @media(orientation:landscape) and (max-height:530px){#top{top:5px;left:8px;right:auto;width:210px}h1{font-size:12px}#caption,#version{font-size:9px}#titlebar{padding:5px}#counters{gap:3px}#counters strong{font-size:16px}#counters span{font-size:10px}#msg{font-size:10px}#powerDock{top:9px;right:10px}#meterH{bottom:calc(9px + env(safe-area-inset-bottom));width:53%;left:23.5%;height:19px}#aimHint{bottom:calc(31px + env(safe-area-inset-bottom));font-size:10px}#meterV{height:113px;width:20px}#tapHint{font-size:10px}}
 #blastFlash{position:fixed;inset:0;pointer-events:none;z-index:3;background:radial-gradient(ellipse at 50% 57%,rgba(255,236,178,.89),rgba(255,152,61,.39) 45%,transparent 83%);opacity:0;transition:none;mix-blend-mode:screen}
+
+/* v1.9 - visual direction & distance meters, without success/OK zones. */
+#meterH{left:50%;width:min(88vw,420px);height:142px;bottom:calc(8px + env(safe-area-inset-bottom));transform:translateX(-50%);background:transparent;border:0;border-radius:0;box-shadow:none;backdrop-filter:none;overflow:visible}
+#meterH svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 2px 2px #fff8)}
+#meterH .dir-labels{display:flex;position:absolute;top:0;left:0;right:0;justify-content:space-between;pointer-events:none;color:#14221a;font-size:11px;font-weight:900;text-shadow:0 1px 2px #fffa}
+#meterV{width:27px;height:175px;z-index:5;border:2px solid #202a25;border-radius:6px;background:#e0e5d8c9;box-shadow:0 2px 8px #0006;backdrop-filter:none;overflow:visible}
+#meterV:before{content:'';position:absolute;inset:4px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 15px,#162e2345 16px,#162e2345 17px);pointer-events:none}
+#needleV{left:-7px;right:-7px;top:50%;height:5px;background:#d82929;box-shadow:0 1px 4px #220,0 0 0 1px #fff9;transform:translateY(-50%);border-radius:3px}
+@media(orientation:landscape) and (max-height:530px){#meterH{left:50%;width:min(48vw,320px);height:103px;bottom:calc(5px + env(safe-area-inset-bottom))}#meterV{height:126px;width:24px}}
 </style></head><body>
 <canvas id="world3d"></canvas>
-<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.8 落地特寫</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
+<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.9 無跳鏡跟拍</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
 <div id="powerDock" class="hide">
   <button id="powerToggle" aria-expanded="false" aria-controls="powerDrawer" aria-label="展開或收合手榴彈威力設定">💥 威力 <strong id="powerMiniValue">10</strong> <span id="powerChevron">▾</span></button>
   <div id="powerDrawer" hidden><div class="powerHead"><span>威力（0～100）</span><span id="powerOut">10</span></div>
@@ -37,8 +46,14 @@ body.aiming #msg{display:none}
   </div>
 </div>
 <div id="aimHint" class="hide" aria-live="polite">左右方向 · 點主角確認</div>
-<div id="meterH" class="hide" aria-label="左右方向計量條"><div id="zoneH"></div><div id="needleH"></div></div>
-<div id="meterV" class="hide" aria-label="遠近計量條"><div id="zoneV"></div><div id="needleV"></div></div>
+<div id="meterH" class="hide" aria-label="左右方向計量條">
+ <svg viewBox="0 0 300 142" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M8 14 C46 41 116 112 145 130 Q150 134 155 130 C184 112 254 41 292 14" fill="none" stroke="#18221c" stroke-width="3.6" stroke-linecap="round" />
+  <line id="needleH" x1="150" y1="129" x2="150" y2="14" stroke="#d72929" stroke-width="3" stroke-linecap="round" />
+ </svg>
+ <div class="dir-labels"><span>左</span><span>中</span><span>右</span></div>
+</div>
+<div id="meterV" class="hide" aria-label="遠近計量條"><div id="needleV"></div></div>
 
 
 <div id="blastFlash" aria-hidden="true"></div><div id="badge"></div><button id="skipIntro" style="position:fixed;right:14px;top:calc(175px + env(safe-area-inset-top));z-index:8;display:none;background:#1c422ce3">跳過開場</button>
@@ -46,9 +61,9 @@ body.aiming #msg{display:none}
 <section id="result"><div class="resultCard"><div style="font-size:11px;color:#f2d38e;letter-spacing:1.8px;font-weight:800">國軍手榴彈試炸報告</div><h2 id="resultHeading">爆炸結束</h2><div class="cards"><div class="cell"><small>摧毀建築</small><b id="rBuildings">0</b></div><div class="cell"><small>擊殺人數</small><b id="rKills">0</b></div><div class="cell"><small>紅軍擊殺</small><b id="rRed">0</b></div><div class="cell"><small>友軍誤傷</small><b id="rGreen">0</b></div></div><div id="newLandmarks">本次波及地標：無</div><div id="resultBtns"><button class="accent" id="retry">再投一次</button><button id="seeGallery">地標圖鑑</button></div><p class="muted" style="margin-bottom:0">遊戲虛構爆炸尺度；遠距離破壞統計為場景模擬值。暫不計算真實物理傷害。</p></div></section>
 <section id="gallery"><div class="galleryBody"><div style="display:flex;align-items:center;justify-content:space-between"><h2 style="margin:0">🌍 地標圖鑑</h2><button id="closeGallery">返回</button></div><p class="muted">只有衝擊波實際到達後才解鎖。地理位置採遊戲化排列，非現實比例。</p><div class="galGrid" id="galleryGrid"></div></div></section>
 <script type="module">
-import './grenade-user-play-3d.js?v=18';
+import './grenade-user-play-3d.js?v=19';
 const $=id=>document.getElementById(id),world=window.GrenadeWorld,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),fmt=n=>Math.floor(n).toLocaleString('en-US');
-let phase='intro',pos=.5,clock=0,x=0,z=50,power=10,old=performance.now(),reportedLandmarks=new Set(),prevGallery=[],badgeTimer=0,resultTimer=0,landingClock=0;
+let phase='intro',pos=.5,direction=.5,clock=0,x=0,z=50,power=10,old=performance.now(),reportedLandmarks=new Set(),prevGallery=[],badgeTimer=0,resultTimer=0,landingClock=0;
 const key='ARMY2_grenade_landmarks_v1',saved=()=>{try{return JSON.parse(localStorage.getItem(key)||'[]')}catch{return []}},store=names=>{try{localStorage.setItem(key,JSON.stringify([...new Set([...saved(),...names])]))}catch{}};
 const badge=t=>{const e=$('badge');e.textContent=t;e.classList.add('show');badgeTimer=performance.now()+1800;};
 function setState(p){
@@ -70,9 +85,20 @@ function reset(){$('blastFlash').style.opacity='0';$('skipIntro').style.display=
 let audioCtx=null;function blastSound(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioCtx=audioCtx||new AC();if(audioCtx.state==='suspended')audioCtx.resume();const t=audioCtx.currentTime;const n=audioCtx.sampleRate*.9|0,buf=audioCtx.createBuffer(1,n,audioCtx.sampleRate),data=buf.getChannelData(0);for(let i=0;i<n;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);const src=audioCtx.createBufferSource(),low=audioCtx.createBiquadFilter(),gain=audioCtx.createGain();src.buffer=buf;low.type='lowpass';low.frequency.setValueAtTime(650,t);low.frequency.exponentialRampToValueAtTime(70,t+.7);gain.gain.setValueAtTime(.48,t);gain.gain.exponentialRampToValueAtTime(.001,t+.83);src.connect(low);low.connect(gain);gain.connect(audioCtx.destination);src.start(t);src.stop(t+.86);const osc=audioCtx.createOscillator(),og=audioCtx.createGain();osc.type='sine';osc.frequency.setValueAtTime(110,t);osc.frequency.exponentialRampToValueAtTime(39,t+.40);og.gain.setValueAtTime(.5,t);og.gain.exponentialRampToValueAtTime(.001,t+.52);osc.connect(og);og.connect(audioCtx.destination);osc.start(t);osc.stop(t+.55);}catch(e){console.warn('Sound',e)}}
 function shoot(){if(!audioCtx){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume()}catch{}}setState('flight');$('msg').textContent='💣 手榴彈飛行中…';world.playThrow(x,z,()=>{if(phase!=='flight')return;world.setLanding(x,z);world.camPhase='landed';world.landingProgress=0;landingClock=0;setState('landed');$('msg').textContent='💣 手榴彈落地……';});}
 function detonate(){if(phase!=='landed')return;world.beginTestPower(power);world.camPhase='blast';blastSound();setState('blast');$('msg').textContent='💥 火球與衝擊波一起擴散！';}
+// Far-end coordinates are calibrated against the user's scene editor.
+// For any direction, the distance meter interpolates continuously from the
+// thrower's feet (bottom = near) to the chosen far endpoint (top = far).
+const FAR_LEFT=[-41.70,61.61],FAR_MIDDLE=[7.50,34.83],FAR_RIGHT=[59.90,48.90];
+function meterLanding(dir,range){
+ const d=clamp(dir,0,1),r=clamp(range,0,1),mix=(a,b,t)=>a+(b-a)*t;
+ const far=d<=.5?[mix(FAR_LEFT[0],FAR_MIDDLE[0],d*2),mix(FAR_LEFT[1],FAR_MIDDLE[1],d*2)]
+  :[mix(FAR_MIDDLE[0],FAR_RIGHT[0],(d-.5)*2),mix(FAR_MIDDLE[1],FAR_RIGHT[1],(d-.5)*2)];
+ const near=world.player;
+ return [mix(near[0],far[0],r),mix(near[1],far[1],r)];
+}
 function confirmAim(){
- if(phase==='aimX'){x=world.redCenter[0]+(pos-.5)*76;setState('aimZ');closePower();clock=0;}
- else if(phase==='aimZ'){z=world.redCenter[1]+(pos-.5)*70;shoot();}
+ if(phase==='aimX'){direction=pos;setState('aimZ');closePower();clock=0;}
+ else if(phase==='aimZ'){[x,z]=meterLanding(direction,pos);shoot();}
 }
 // Tap anywhere in the 3D view to confirm the meters. Ignore UI controls and
 // swipes, so operating the power slider never fires a throw accidentally.
@@ -93,7 +119,7 @@ document.addEventListener('pointercancel',()=>{tapStart=null;},{passive:true});
 function positionAimHUD(){
  const r=world.getPlayerScreen?.();if(!r||!Number.isFinite(r.x))return;
  const w=window.innerWidth,h=window.innerHeight;
- const meter=$('meterV'),mh=window.matchMedia('(orientation: landscape) and (max-height: 530px)').matches?113:160;
+ const meter=$('meterV'),mh=meter.offsetHeight||175;
  const vx=r.x+Math.max(65,r.width/2+13);meter.style.left=clamp(vx,7,w-32)+'px';meter.style.top=clamp((r.top+r.bottom-mh)/2,135,h-mh-62)+'px';
 }
 $('reset').addEventListener('click',reset);$('resetBottom').addEventListener('click',reset);$('retry').addEventListener('click',reset);
@@ -102,7 +128,7 @@ $('galleryButton').addEventListener('click',openGallery);$('seeGallery').addEven
 function result(){if(phase!=='blast')return;setState('end');world.camPhase='blast';$('resultHeading').textContent=power>=85?'報告長官！宇宙出事了！':power>=65?'報告長官！災情擴大！':power>=20?'報告長官！整片都炸了！':'手榴彈試炸完成';$('rBuildings').textContent=fmt(world.counter.buildings);$('rKills').textContent=fmt(world.counter.kills);$('rRed').textContent=fmt(world.counter.red);$('rGreen').textContent=fmt(world.counter.green);$('newLandmarks').textContent=reportedLandmarks.size?`本次波及地標：${[...reportedLandmarks].join('、')}`:'本次沒有解鎖新地標';$('result').classList.add('show');}
 function tick(t){requestAnimationFrame(tick);const dt=clamp((t-old)/1000,0,.045);old=t;
  if(phase==='intro'){clock+=dt;world.introProgress=Math.min(1,clock/9);if(clock>=9){reset();$('msg').textContent='鏡頭下降到投擲者後方，紅軍在右前方';}}
- if(phase==='aimX'||phase==='aimZ'){clock+=dt;pos=.5+.48*Math.sin(clock*(phase==='aimX'?3.25:3.77));if(phase==='aimX')$('needleH').style.left=`${pos*100}%`;else $('needleV').style.top=`${(1-pos)*100}%`;positionAimHUD();}
+ if(phase==='aimX'||phase==='aimZ'){clock+=dt;pos=.5+.5*Math.sin(clock*(phase==='aimX'?3.25:3.77));if(phase==='aimX')$('needleH').setAttribute('x2',String(8+284*pos));else $('needleV').style.top=`${(1-pos)*100}%`;positionAimHUD();}
  if(phase==='landed'){landingClock+=dt;world.landingProgress=clamp(landingClock/1.0,0,1);if(landingClock>=1.0)detonate();}
  if(phase==='blast'){$('blastFlash').style.opacity=String(Math.min(.83,Math.exp(-world.timer*4.3)*(.25+Math.log10(world.blastMax+1)*.13)));if(world.advance(dt)){if(!resultTimer)resultTimer=t+1550;if(t>=resultTimer)result();}
    $('buildings').textContent=fmt(world.counter.buildings);$('kills').textContent=fmt(world.counter.kills);

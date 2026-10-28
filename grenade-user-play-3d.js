@@ -229,11 +229,23 @@ class WebWorld{
   g.depthMask(true);g.disable(g.BLEND);g.enable(g.CULL_FACE);g.disableVertexAttribArray(a);
  }
  drawRing(vp){if(this.radius<=.18)return;const g=this.gl,p=this.ringP;g.useProgram(p);g.bindBuffer(g.ARRAY_BUFFER,this.ringBuf);const a=g.getAttribLocation(p,'aRing');g.enableVertexAttribArray(a);g.vertexAttribPointer(a,4,g.FLOAT,false,16,0);g.uniformMatrix4fv(g.getUniformLocation(p,'uVP'),false,vp);g.uniform2f(g.getUniformLocation(p,'uCenter'),this.impact[0],this.impact[1]);g.uniform1f(g.getUniformLocation(p,'uRadius'),this.radius);g.uniform1f(g.getUniformLocation(p,'uWidth'),Math.max(.48,Math.min(65,this.radius*.14)));g.enable(g.BLEND);g.blendFunc(g.SRC_ALPHA,g.ONE);g.depthMask(false);g.drawArrays(g.TRIANGLES,0,this.ringVerts.length/4);g.depthMask(true);g.disable(g.BLEND);}
- landingCamera(progress=0){
-  const a=this.flight,dx=(a?.to[0]??this.impact[0])-(a?.from[0]??this.player[0]),dz=(a?.to[2]??this.impact[1])-(a?.from[2]??this.player[1]),len=Math.hypot(dx,dz)||1;
-  const nx=dx/len,nz=dz/len,k=smooth(clamp(progress,0,1)),ix=this.impact[0],iz=this.impact[1];
-  return {eye:[ix-nx*3.1+.72+k*(-nx*6+1.05),1.9+k*4.8,iz-nz*3.1+.55+k*(-nz*6+1.05)],target:[ix,.40+k*(-.25),iz]};
+ // v1.9: a single camera path for release, airborne tracking and touchdown.
+ // t=0 is exactly the existing shoulder view; t=1 is also the landing camera.
+ // Avoid any late-stage transition to a different pose at impact.
+ followFlightCamera(progress=0){
+  const a=this.flight;
+  if(!a)return {eye:[this.player[0]-1,1.9,this.player[1]+5.55],target:[this.player[0]+1.2,2.25,this.player[1]-12]};
+  const t=clamp(progress,0,1),dx=a.to[0]-a.from[0],dz=a.to[2]-a.from[2],len=Math.hypot(dx,dz)||1;
+  const nx=dx/len,nz=dz/len,x=lerp(a.from[0],a.to[0],t),z=lerp(a.from[2],a.to[2],t);
+  const y=lerp(a.from[1],.4,t)+Math.sin(Math.PI*t)*13;
+  const followEye=[x-nx*5+1.15,y+2.7,z-nz*5+1.10];
+  const followTarget=[x,y+.18,z];
+  const enter=smooth(clamp(t/.18,0,1));
+  const shoulderEye=[this.player[0]-1,1.9,this.player[1]+5.55];
+  const shoulderTarget=[this.player[0]+1.2,2.25,this.player[1]-12];
+  return {eye:mix3(shoulderEye,followEye,enter),target:mix3(shoulderTarget,followTarget,enter)};
  }
+ landingCamera(){return this.followFlightCamera(1);}
  drawGroundedGrenade(vp){if(this.camPhase==='landed'&&this.flight){const x=this.impact[0],z=this.impact[1];this.drawGrenade(vp,mul(T(x,.05,z),mul(R(0,0,Math.PI*.38),SC(.29))));}}
  drawLand(){const g=this.gl;g.clearColor(.66,.80,.91,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);
   const px=this.player[0],pz=this.player[1];let eye,tgt,dist=26;
@@ -245,14 +257,12 @@ class WebWorld{
   }else if(this.camPhase==='aim'||this.camPhase==='throw'){
     eye=aimEye;tgt=aimTarget;dist=30;
   }else if(this.camPhase==='flight'&&this.flight){
-    const a=this.flight,t=clamp((performance.now()-a.start)/a.duration,0,1);const x=lerp(a.from[0],a.to[0],t),z=lerp(a.from[2],a.to[2],t),y=lerp(a.from[1],.4,t)+Math.sin(Math.PI*t)*13;
-    const dx=a.to[0]-a.from[0],dz=a.to[2]-a.from[2],ll=Math.hypot(dx,dz)||1;
-    const near=smooth(clamp((t-.79)/.21,0,1));
-    const endCam=this.landingCamera(0);
-    const normalEye=[x-dx/ll*6+2.1,y+3.3,z-dz/ll*6+1.5],normalTarget=[x+dx/ll*7,y-.9,z+dz/ll*7];
-    eye=mix3(normalEye,endCam.eye,near);tgt=mix3(normalTarget,endCam.target,near);dist=24;
+    const a=this.flight,t=clamp((performance.now()-a.start)/a.duration,0,1);
+    const pose=this.followFlightCamera(t);eye=pose.eye;tgt=pose.target;
+    dist=clamp(Math.hypot(...eye.map((v,i)=>v-tgt[i])),3,80);
   }else if(this.camPhase==='landed'){
-    const pose=this.landingCamera(this.landingProgress||0);eye=pose.eye;tgt=pose.target;dist=clamp(Math.hypot(...eye.map((v,i)=>v-tgt[i])),3,17);
+    const pose=this.landingCamera();eye=pose.eye;tgt=pose.target;
+    dist=clamp(Math.hypot(...eye.map((v,i)=>v-tgt[i])),3,80);
   }else{
     const r=Math.max(0,this.radius),d=clamp(r*.94+22,24,7600);dist=d;
     eye=[this.impact[0]+d*.43,d*.70,this.impact[1]+d*.93];tgt=[this.impact[0],0,this.impact[1]];
@@ -509,8 +519,8 @@ class WebWorld{
  let eye=[tx+dist*.43,dist*.66,tz+dist*.95],center=[tx,0,tz];
  if(this.camPhase==='intro'){const pose=introCamera(clamp(this.introProgress||0,0,1));eye=pose.eye;center=pose.target;dist=Math.hypot(eye[0]-center[0],eye[2]-center[2]);tx=center[0];tz=center[2];}
  else if(this.camPhase==='aim'||this.camPhase==='throw'){eye=[this.player[0]-1.00,1.9,this.player[1]+5.55];center=[this.player[0]+1.2,2.25,this.player[1]-12.0];tx=center[0];tz=center[2];}
- else if(this.camPhase==='landed'){const pose=this.landingCamera(this.landingProgress||0);eye=pose.eye;center=pose.target;tx=center[0];tz=center[2];dist=Math.hypot(eye[0]-center[0],eye[2]-center[2]);}
- if(this.camPhase==='flight'&&this.flight){const a=this.flight,t=clamp((performance.now()-a.start)/a.duration,0,1);tx=lerp(a.from[0],a.to[0],t);tz=lerp(a.from[2],a.to[2],t);dist=28;eye=[tx+dist*.4,dist*.60,tz+dist*.82];center=[tx,0,tz];}const f=norm(center.map((v,i)=>v-eye[i])),rt=norm(cross(f,[0,1,0])),up=cross(rt,f);
+ else if(this.camPhase==='landed'){const pose=this.landingCamera();eye=pose.eye;center=pose.target;tx=center[0];tz=center[2];dist=Math.hypot(eye[0]-center[0],eye[2]-center[2]);}
+ if(this.camPhase==='flight'&&this.flight){const a=this.flight,t=clamp((performance.now()-a.start)/a.duration,0,1),pose=this.followFlightCamera(t);eye=pose.eye;center=pose.target;tx=center[0];tz=center[2];dist=Math.hypot(eye[0]-center[0],eye[2]-center[2]);}const f=norm(center.map((v,i)=>v-eye[i])),rt=norm(cross(f,[0,1,0])),up=cross(rt,f);
  const focal=h/(2*Math.tan(54*Math.PI/360/2));
  const proj=(x,y,z)=>{const d=[x-eye[0],y-eye[1],z-eye[2]],deep=dot(d,f);if(deep<1)return null;return [w*.5+focal*dot(d,rt)/deep,h*.5-focal*dot(d,up)/deep,deep];};
  const polygon=(vs,color)=>{if(vs.some(v=>!v))return;ctx.beginPath();vs.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=color;ctx.fill();};
