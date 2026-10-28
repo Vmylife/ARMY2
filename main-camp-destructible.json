@@ -1,0 +1,5442 @@
+{
+  "format": "army-grenade-scene",
+  "schemaVersion": 1,
+  "exportedAt": "2026-10-28T00:00:00Z",
+  "sceneId": "main-camp-destructible",
+  "sceneName": "主遊戲完整軍營｜全物件可破壞",
+  "map": {
+    "width": 280,
+    "depth": 280,
+    "groundColor": "#adc9a7"
+  },
+  "throwOrigin": {
+    "x": -21,
+    "z": -9
+  },
+  "totalObjects": 213,
+  "items": [
+    {
+      "uid": "g1001",
+      "quality": "high",
+      "rot": 90,
+      "scale": 1,
+      "assetId": "barracks",
+      "x": -39.3,
+      "z": -3.1,
+      "category": "building",
+      "name": "營舍（連隊寢室）",
+      "sourceBuildingId": "barracks",
+      "model": "./assets/buildings/building-1-barracks.glb",
+      "size": [
+        17.472,
+        2.8,
+        7.735
+      ],
+      "destructible": {
+        "fracturedModel": "./assets/buildings/destructible/barracks-fractured.glb",
+        "pieces": 23,
+        "kind": "mesh-fragments"
+      }
+    },
+    {
+      "uid": "g1002",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "community",
+      "x": -20,
+      "z": 14.8,
+      "category": "building",
+      "name": "中山室",
+      "sourceBuildingId": "office",
+      "model": "./assets/buildings/building-2-community.glb",
+      "size": [
+        11.83,
+        3.35,
+        4.277
+      ],
+      "destructible": {
+        "fracturedModel": "./assets/buildings/destructible/building-2-community-fractured.glb",
+        "pieces": 16,
+        "kind": "mesh-fragments"
+      }
+    },
+    {
+      "uid": "g1003",
+      "quality": "high",
+      "rot": 90,
+      "scale": 1,
+      "assetId": "office",
+      "x": -5.05,
+      "z": 7.55,
+      "category": "building",
+      "name": "辦公大樓",
+      "sourceBuildingId": "hq",
+      "model": "./assets/buildings/building-6-office.glb",
+      "size": [
+        11.1625,
+        3.9485,
+        4.97
+      ],
+      "destructible": {
+        "fracturedModel": "./assets/buildings/destructible/office-fractured.glb",
+        "pieces": 42,
+        "kind": "mesh-fragments"
+      }
+    },
+    {
+      "uid": "g1004",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "guardhouse",
+      "x": 22.4,
+      "z": 20.1,
+      "category": "building",
+      "name": "彈藥庫",
+      "sourceBuildingId": "ammo",
+      "model": "./assets/buildings/building-4-guardhouse.glb",
+      "size": [
+        4.641,
+        2.45,
+        4.641
+      ],
+      "destructible": {
+        "fracturedModel": "./assets/buildings/destructible/guardhouse-fractured.glb",
+        "pieces": 30,
+        "kind": "mesh-fragments"
+      }
+    },
+    {
+      "uid": "g1005",
+      "quality": "high",
+      "rot": 88.698,
+      "scale": 1,
+      "assetId": "smallRear",
+      "x": 23,
+      "z": 3.2,
+      "category": "building",
+      "name": "毒氣體驗室／核生化教室",
+      "sourceBuildingId": "chem",
+      "model": "./assets/buildings/building-3-small-rear-fixed.glb",
+      "size": [
+        6.461,
+        2.8,
+        6.097
+      ],
+      "destructible": {
+        "fracturedModel": "./assets/buildings/destructible/building-3-small-rear-fixed-fractured.glb",
+        "pieces": 18,
+        "kind": "mesh-fragments"
+      }
+    },
+    {
+      "uid": "g1006",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "smallRear",
+      "x": 34,
+      "z": 7.6,
+      "category": "building",
+      "name": "營站（福利社）",
+      "sourceBuildingId": "store",
+      "model": "./assets/buildings/building-3-small-rear-fixed.glb",
+      "size": [
+        5.096,
+        2.6,
+        4.55
+      ],
+      "destructible": {
+        "fracturedModel": "./assets/buildings/destructible/building-3-small-rear-fixed-fractured.glb",
+        "pieces": 18,
+        "kind": "mesh-fragments"
+      }
+    },
+    {
+      "uid": "g1007",
+      "quality": "high",
+      "rot": -90,
+      "scale": 1,
+      "assetId": "community",
+      "x": 37.3,
+      "z": -2.6,
+      "category": "building",
+      "name": "餐廳（廚房）",
+      "sourceBuildingId": "canteen",
+      "model": "./assets/buildings/building-2-community.glb",
+      "size": [
+        8.645,
+        3,
+        5.915
+      ],
+      "destructible": {
+        "fracturedModel": "./assets/buildings/destructible/building-2-community-fractured.glb",
+        "pieces": 16,
+        "kind": "mesh-fragments"
+      }
+    },
+    {
+      "uid": "g1008",
+      "quality": "high",
+      "rot": -90,
+      "scale": 1,
+      "assetId": "wash",
+      "x": 43.2,
+      "z": 3,
+      "category": "building",
+      "name": "洗手／洗碗區",
+      "sourceBuildingId": "wash",
+      "model": "./assets/buildings/building-5-wash.glb",
+      "size": [
+        3.7346,
+        1.75,
+        2.0111
+      ],
+      "destructible": {
+        "fracturedModel": "./assets/buildings/destructible/building-5-wash-fractured.glb",
+        "pieces": 18,
+        "kind": "mesh-fragments"
+      }
+    },
+    {
+      "uid": "g1009",
+      "quality": "high",
+      "rot": -90,
+      "scale": 1,
+      "assetId": "smallRear",
+      "x": 31.5,
+      "z": -12.3,
+      "category": "building",
+      "name": "醫務所",
+      "sourceBuildingId": "medic",
+      "model": "./assets/buildings/building-3-small-rear-fixed.glb",
+      "size": [
+        3.822,
+        2.5,
+        5.278
+      ],
+      "destructible": {
+        "fracturedModel": "./assets/buildings/destructible/building-3-small-rear-fixed-fractured.glb",
+        "pieces": 18,
+        "kind": "mesh-fragments"
+      }
+    },
+    {
+      "uid": "g1010",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "barracks",
+      "x": 7.2,
+      "z": -16.2,
+      "category": "building",
+      "name": "軍械室",
+      "sourceBuildingId": "armory",
+      "model": "./assets/buildings/building-1-barracks.glb",
+      "size": [
+        5.551,
+        2.35,
+        4.641
+      ],
+      "destructible": {
+        "fracturedModel": "./assets/buildings/destructible/barracks-fractured.glb",
+        "pieces": 23,
+        "kind": "mesh-fragments"
+      }
+    },
+    {
+      "uid": "g1011",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "smallRear",
+      "x": -4.9,
+      "z": -15.8,
+      "category": "building",
+      "name": "會客室",
+      "sourceBuildingId": "visitor",
+      "model": "./assets/buildings/building-3-small-rear-fixed.glb",
+      "size": [
+        4.823,
+        2.35,
+        4.459
+      ],
+      "destructible": {
+        "fracturedModel": "./assets/buildings/destructible/building-3-small-rear-fixed-fractured.glb",
+        "pieces": 18,
+        "kind": "mesh-fragments"
+      }
+    },
+    {
+      "uid": "g1012",
+      "quality": "high",
+      "rot": -90,
+      "scale": 1,
+      "assetId": "guardhouse",
+      "x": 3.7,
+      "z": -19.5,
+      "category": "building",
+      "name": "大門哨口",
+      "sourceBuildingId": "guard",
+      "model": "./assets/buildings/building-4-guardhouse.glb",
+      "size": [
+        2.184,
+        2.5,
+        2.366
+      ],
+      "destructible": {
+        "fracturedModel": "./assets/buildings/destructible/guardhouse-fractured.glb",
+        "pieces": 30,
+        "kind": "mesh-fragments"
+      }
+    },
+    {
+      "uid": "g1013",
+      "quality": "low",
+      "rot": -90,
+      "scale": 1,
+      "assetId": "path",
+      "x": 0,
+      "z": -20,
+      "width": 6,
+      "depth": 3.5,
+      "category": "ground",
+      "name": "道路 gate-main",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1014",
+      "quality": "low",
+      "rot": -90,
+      "scale": 1,
+      "assetId": "path",
+      "x": 0,
+      "z": -13.5,
+      "width": 7,
+      "depth": 3.5,
+      "category": "ground",
+      "name": "道路 gate-main",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1015",
+      "quality": "low",
+      "rot": -90,
+      "scale": 1,
+      "assetId": "path",
+      "x": 0,
+      "z": -6.5,
+      "width": 7,
+      "depth": 3.5,
+      "category": "ground",
+      "name": "道路 gate-main",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1016",
+      "quality": "low",
+      "rot": -90,
+      "scale": 1,
+      "assetId": "path",
+      "x": 0,
+      "z": 1,
+      "width": 8,
+      "depth": 3.5,
+      "category": "ground",
+      "name": "道路 gate-main",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1017",
+      "quality": "low",
+      "rot": -90,
+      "scale": 1,
+      "assetId": "path",
+      "x": 0,
+      "z": 9,
+      "width": 8,
+      "depth": 3.5,
+      "category": "ground",
+      "name": "道路 gate-main",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1018",
+      "quality": "low",
+      "rot": -90,
+      "scale": 1,
+      "assetId": "path",
+      "x": 0,
+      "z": 15.5,
+      "width": 5,
+      "depth": 3.5,
+      "category": "ground",
+      "name": "道路 gate-main",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1019",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 6,
+      "z": -2,
+      "width": 12,
+      "depth": 3.6,
+      "category": "ground",
+      "name": "道路 middle-east",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1020",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 18.5,
+      "z": -2,
+      "width": 13,
+      "depth": 3.6,
+      "category": "ground",
+      "name": "道路 middle-east",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1021",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 28.5,
+      "z": -2,
+      "width": 7,
+      "depth": 3.6,
+      "category": "ground",
+      "name": "道路 middle-east",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1022",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 36.5,
+      "z": -2,
+      "width": 9,
+      "depth": 3.6,
+      "category": "ground",
+      "name": "道路 middle-east",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1023",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 4.5,
+      "z": -12,
+      "width": 9,
+      "depth": 3.2,
+      "category": "ground",
+      "name": "道路 east-south",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1024",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 15,
+      "z": -12,
+      "width": 12,
+      "depth": 3.2,
+      "category": "ground",
+      "name": "道路 east-south",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1025",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 24,
+      "z": -12,
+      "width": 6,
+      "depth": 3.2,
+      "category": "ground",
+      "name": "道路 east-south",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1026",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 29.5,
+      "z": -12,
+      "width": 5,
+      "depth": 3.2,
+      "category": "ground",
+      "name": "道路 east-south",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1027",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": -8,
+      "z": 15,
+      "width": 6,
+      "depth": 2.9,
+      "category": "ground",
+      "name": "道路 north-road",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1028",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 0,
+      "z": 15,
+      "width": 10,
+      "depth": 2.9,
+      "category": "ground",
+      "name": "道路 north-road",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1029",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 10.5,
+      "z": 15,
+      "width": 11,
+      "depth": 2.9,
+      "category": "ground",
+      "name": "道路 north-road",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1030",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 21.5,
+      "z": 15,
+      "width": 11,
+      "depth": 2.9,
+      "category": "ground",
+      "name": "道路 north-road",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1031",
+      "quality": "low",
+      "rot": 63.435,
+      "scale": 1,
+      "assetId": "path",
+      "x": 28,
+      "z": 13,
+      "width": 4.47213595499958,
+      "depth": 2.9,
+      "category": "ground",
+      "name": "道路 north-road",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1032",
+      "quality": "low",
+      "rot": -146.31,
+      "scale": 1,
+      "assetId": "path",
+      "x": -32,
+      "z": -16,
+      "width": 7.211102550927979,
+      "depth": 3,
+      "category": "ground",
+      "name": "道路 west-loop",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1033",
+      "quality": "low",
+      "rot": -102.529,
+      "scale": 1,
+      "assetId": "path",
+      "x": -36,
+      "z": -9.5,
+      "width": 9.219544457292889,
+      "depth": 3,
+      "category": "ground",
+      "name": "道路 west-loop",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1034",
+      "quality": "low",
+      "rot": -85.236,
+      "scale": 1,
+      "assetId": "path",
+      "x": -36.5,
+      "z": 1,
+      "width": 12.041594578792294,
+      "depth": 3,
+      "category": "ground",
+      "name": "道路 west-loop",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1035",
+      "quality": "low",
+      "rot": -50.194,
+      "scale": 1,
+      "assetId": "path",
+      "x": -33.5,
+      "z": 10,
+      "width": 7.810249675906656,
+      "depth": 3,
+      "category": "ground",
+      "name": "道路 west-loop",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1036",
+      "quality": "low",
+      "rot": -15.945,
+      "scale": 1,
+      "assetId": "path",
+      "x": -27.5,
+      "z": 14,
+      "width": 7.280109889280519,
+      "depth": 3,
+      "category": "ground",
+      "name": "道路 west-loop",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1037",
+      "quality": "low",
+      "rot": -5.711,
+      "scale": 1,
+      "assetId": "path",
+      "x": -19,
+      "z": 15.5,
+      "width": 10.04987562112089,
+      "depth": 3,
+      "category": "ground",
+      "name": "道路 west-loop",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1038",
+      "quality": "low",
+      "rot": 36.87,
+      "scale": 1,
+      "assetId": "path",
+      "x": -12,
+      "z": 14.5,
+      "width": 5,
+      "depth": 3,
+      "category": "ground",
+      "name": "道路 west-loop",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1039",
+      "quality": "low",
+      "rot": 90,
+      "scale": 1,
+      "assetId": "path",
+      "x": -10,
+      "z": 1,
+      "width": 24,
+      "depth": 3,
+      "category": "ground",
+      "name": "道路 west-loop",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1040",
+      "quality": "low",
+      "rot": 135,
+      "scale": 1,
+      "assetId": "path",
+      "x": -13,
+      "z": -14,
+      "width": 8.485281374238571,
+      "depth": 3,
+      "category": "ground",
+      "name": "道路 west-loop",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1041",
+      "quality": "low",
+      "rot": 175.601,
+      "scale": 1,
+      "assetId": "path",
+      "x": -22.5,
+      "z": -17.5,
+      "width": 13.038404810405298,
+      "depth": 3,
+      "category": "ground",
+      "name": "道路 west-loop",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1042",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": -7.5,
+      "z": 0,
+      "width": 5,
+      "depth": 3.1,
+      "category": "ground",
+      "name": "道路 west-cross",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1043",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": -2.5,
+      "z": 0,
+      "width": 5,
+      "depth": 3.1,
+      "category": "ground",
+      "name": "道路 west-cross",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1044",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 4,
+      "z": -3,
+      "width": 8,
+      "depth": 2.6,
+      "category": "ground",
+      "name": "道路 company-east",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1045",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 16.5,
+      "z": -3,
+      "width": 17,
+      "depth": 2.6,
+      "category": "ground",
+      "name": "道路 company-east",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1046",
+      "quality": "low",
+      "rot": 45,
+      "scale": 1,
+      "assetId": "path",
+      "x": 27,
+      "z": -5,
+      "width": 5.656854249492381,
+      "depth": 2.6,
+      "category": "ground",
+      "name": "道路 company-east",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1047",
+      "quality": "low",
+      "rot": 90,
+      "scale": 1,
+      "assetId": "path",
+      "x": 29,
+      "z": -9.5,
+      "width": 5,
+      "depth": 2.6,
+      "category": "ground",
+      "name": "道路 company-east",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1048",
+      "quality": "low",
+      "rot": 84.289,
+      "scale": 1,
+      "assetId": "path",
+      "x": 27.5,
+      "z": 10,
+      "width": 10.04987562112089,
+      "depth": 2.7,
+      "category": "ground",
+      "name": "道路 east-access",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1049",
+      "quality": "low",
+      "rot": 51.34,
+      "scale": 1,
+      "assetId": "path",
+      "x": 30,
+      "z": 2.5,
+      "width": 6.4031242374328485,
+      "depth": 2.7,
+      "category": "ground",
+      "name": "道路 east-access",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1050",
+      "quality": "low",
+      "rot": 90,
+      "scale": 1,
+      "assetId": "path",
+      "x": 32,
+      "z": -5.5,
+      "width": 11,
+      "depth": 2.7,
+      "category": "ground",
+      "name": "道路 east-access",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1051",
+      "quality": "low",
+      "rot": -75.964,
+      "scale": 1,
+      "assetId": "path",
+      "x": 32.5,
+      "z": 0,
+      "width": 4.123105625617661,
+      "depth": 2.9,
+      "category": "ground",
+      "name": "道路 canteen-approach",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1052",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": 35.5,
+      "z": 2,
+      "width": 5,
+      "depth": 2.9,
+      "category": "ground",
+      "name": "道路 canteen-approach",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1053",
+      "quality": "low",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "path",
+      "x": -36.5,
+      "z": -8,
+      "width": 5,
+      "depth": 2.7,
+      "category": "ground",
+      "name": "道路 barrack-approach",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1054",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": -6,
+      "z": -12,
+      "width": 4,
+      "depth": 2.4,
+      "category": "ground",
+      "name": "道路 reception",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1055",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "path",
+      "x": -2,
+      "z": -12,
+      "width": 4,
+      "depth": 2.4,
+      "category": "ground",
+      "name": "道路 reception",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        3,
+        0.08,
+        20
+      ]
+    },
+    {
+      "uid": "g1056",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "plaza",
+      "x": -20.8,
+      "z": -2,
+      "width": 17.6,
+      "depth": 25.3,
+      "category": "ground",
+      "name": "大操場",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        18,
+        0.08,
+        18
+      ]
+    },
+    {
+      "uid": "g1057",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "lawn",
+      "x": -20.5,
+      "z": -11,
+      "width": 8.5,
+      "depth": 6.9,
+      "category": "ground",
+      "name": "手榴彈投擲場",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        18,
+        0.08,
+        18
+      ]
+    },
+    {
+      "uid": "g1058",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "lawn",
+      "x": 12,
+      "z": 9.6,
+      "width": 26.5,
+      "depth": 4.7,
+      "category": "ground",
+      "name": "500公尺障礙場",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        18,
+        0.08,
+        18
+      ]
+    },
+    {
+      "uid": "g1059",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "lawn",
+      "x": 10.6,
+      "z": 20,
+      "width": 22,
+      "depth": 6.6,
+      "category": "ground",
+      "name": "靶場",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        18,
+        0.08,
+        18
+      ]
+    },
+    {
+      "uid": "g1060",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "lawn",
+      "x": 12,
+      "z": 2.95,
+      "width": 26,
+      "depth": 8.5,
+      "category": "ground",
+      "name": "單兵戰鬥教練場",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        18,
+        0.08,
+        18
+      ]
+    },
+    {
+      "uid": "g1061",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "lawn",
+      "x": 15,
+      "z": -8.2,
+      "width": 19.5,
+      "depth": 6.9,
+      "category": "ground",
+      "name": "連隊集合場",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        18,
+        0.08,
+        18
+      ]
+    },
+    {
+      "uid": "g1062",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "lawn",
+      "x": 20,
+      "z": -16.2,
+      "width": 13.5,
+      "depth": 4.5,
+      "category": "ground",
+      "name": "單槓／體能訓練場",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        18,
+        0.08,
+        18
+      ]
+    },
+    {
+      "uid": "g1063",
+      "quality": "low",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "lawn",
+      "x": -39,
+      "z": -18.1,
+      "width": 7,
+      "depth": 4.8,
+      "category": "ground",
+      "name": "吸菸區",
+      "model": null,
+      "destructible": {
+        "kind": "scorched-ground"
+      },
+      "size": [
+        18,
+        0.08,
+        18
+      ]
+    },
+    {
+      "uid": "g1064",
+      "quality": "high",
+      "rot": 0,
+      "scale": 2.5,
+      "assetId": "streetlamp",
+      "x": -34,
+      "z": 8,
+      "scaleXYZ": [
+        2.5,
+        2.5,
+        2.5
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "streetlamp",
+      "model": "./assets/props/streetlamp.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/streetlamp-fractured.glb",
+        "pieces": 6,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.50391,
+        0.95166,
+        0.26318
+      ]
+    },
+    {
+      "uid": "g1065",
+      "quality": "high",
+      "rot": 0,
+      "scale": 2.5,
+      "assetId": "streetlamp",
+      "x": -12,
+      "z": 8,
+      "scaleXYZ": [
+        2.5,
+        2.5,
+        2.5
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "streetlamp",
+      "model": "./assets/props/streetlamp.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/streetlamp-fractured.glb",
+        "pieces": 6,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.50391,
+        0.95166,
+        0.26318
+      ]
+    },
+    {
+      "uid": "g1066",
+      "quality": "high",
+      "rot": 0,
+      "scale": 2.5,
+      "assetId": "streetlamp",
+      "x": -7,
+      "z": -4,
+      "scaleXYZ": [
+        2.5,
+        2.5,
+        2.5
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "streetlamp",
+      "model": "./assets/props/streetlamp.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/streetlamp-fractured.glb",
+        "pieces": 6,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.50391,
+        0.95166,
+        0.26318
+      ]
+    },
+    {
+      "uid": "g1067",
+      "quality": "high",
+      "rot": 0,
+      "scale": 2.5,
+      "assetId": "streetlamp",
+      "x": 5,
+      "z": -5,
+      "scaleXYZ": [
+        2.5,
+        2.5,
+        2.5
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "streetlamp",
+      "model": "./assets/props/streetlamp.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/streetlamp-fractured.glb",
+        "pieces": 6,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.50391,
+        0.95166,
+        0.26318
+      ]
+    },
+    {
+      "uid": "g1068",
+      "quality": "high",
+      "rot": 0,
+      "scale": 2.5,
+      "assetId": "streetlamp",
+      "x": 28,
+      "z": -3,
+      "scaleXYZ": [
+        2.5,
+        2.5,
+        2.5
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "streetlamp",
+      "model": "./assets/props/streetlamp.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/streetlamp-fractured.glb",
+        "pieces": 6,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.50391,
+        0.95166,
+        0.26318
+      ]
+    },
+    {
+      "uid": "g1069",
+      "quality": "high",
+      "rot": 0,
+      "scale": 2.5,
+      "assetId": "streetlamp",
+      "x": 31,
+      "z": 2,
+      "scaleXYZ": [
+        2.5,
+        2.5,
+        2.5
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "streetlamp",
+      "model": "./assets/props/streetlamp.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/streetlamp-fractured.glb",
+        "pieces": 6,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.50391,
+        0.95166,
+        0.26318
+      ]
+    },
+    {
+      "uid": "g1070",
+      "quality": "high",
+      "rot": 0,
+      "scale": 2.5,
+      "assetId": "streetlamp",
+      "x": 12,
+      "z": -20,
+      "scaleXYZ": [
+        2.5,
+        2.5,
+        2.5
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "streetlamp",
+      "model": "./assets/props/streetlamp.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/streetlamp-fractured.glb",
+        "pieces": 6,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.50391,
+        0.95166,
+        0.26318
+      ]
+    },
+    {
+      "uid": "g1071",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1.55,
+      "assetId": "target",
+      "x": 2.1,
+      "z": 22.15,
+      "scaleXYZ": [
+        1.55,
+        1.55,
+        1.55
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "target",
+      "model": "./assets/props/target.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/target-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.7417,
+        0.95361,
+        0.48877
+      ]
+    },
+    {
+      "uid": "g1072",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1.55,
+      "assetId": "target",
+      "x": 5.5,
+      "z": 22.15,
+      "scaleXYZ": [
+        1.55,
+        1.55,
+        1.55
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "target",
+      "model": "./assets/props/target.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/target-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.7417,
+        0.95361,
+        0.48877
+      ]
+    },
+    {
+      "uid": "g1073",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1.55,
+      "assetId": "target",
+      "x": 8.9,
+      "z": 22.15,
+      "scaleXYZ": [
+        1.55,
+        1.55,
+        1.55
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "target",
+      "model": "./assets/props/target.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/target-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.7417,
+        0.95361,
+        0.48877
+      ]
+    },
+    {
+      "uid": "g1074",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1.55,
+      "assetId": "target",
+      "x": 12.299999999999999,
+      "z": 22.15,
+      "scaleXYZ": [
+        1.55,
+        1.55,
+        1.55
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "target",
+      "model": "./assets/props/target.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/target-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.7417,
+        0.95361,
+        0.48877
+      ]
+    },
+    {
+      "uid": "g1075",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1.55,
+      "assetId": "target",
+      "x": 15.7,
+      "z": 22.15,
+      "scaleXYZ": [
+        1.55,
+        1.55,
+        1.55
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "target",
+      "model": "./assets/props/target.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/target-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.7417,
+        0.95361,
+        0.48877
+      ]
+    },
+    {
+      "uid": "g1076",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1.55,
+      "assetId": "target",
+      "x": 19.1,
+      "z": 22.15,
+      "scaleXYZ": [
+        1.55,
+        1.55,
+        1.55
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "target",
+      "model": "./assets/props/target.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/target-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.7417,
+        0.95361,
+        0.48877
+      ]
+    },
+    {
+      "uid": "g1077",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1.68,
+      "assetId": "sandbag",
+      "x": -20,
+      "z": -11.2,
+      "scaleXYZ": [
+        1.68,
+        1.68,
+        1.68
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "sandbag",
+      "model": "./assets/props/sandbag.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/sandbag-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.9502,
+        0.30713,
+        0.33545
+      ]
+    },
+    {
+      "uid": "g1078",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1.68,
+      "assetId": "sandbag",
+      "x": 4,
+      "z": 3,
+      "scaleXYZ": [
+        1.68,
+        1.68,
+        1.68
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "sandbag",
+      "model": "./assets/props/sandbag.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/sandbag-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.9502,
+        0.30713,
+        0.33545
+      ]
+    },
+    {
+      "uid": "g1079",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1.68,
+      "assetId": "sandbag",
+      "x": 9,
+      "z": 1,
+      "scaleXYZ": [
+        1.68,
+        1.68,
+        1.68
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "sandbag",
+      "model": "./assets/props/sandbag.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/sandbag-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.9502,
+        0.30713,
+        0.33545
+      ]
+    },
+    {
+      "uid": "g1080",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1.68,
+      "assetId": "sandbag",
+      "x": 16,
+      "z": 5,
+      "scaleXYZ": [
+        1.68,
+        1.68,
+        1.68
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "sandbag",
+      "model": "./assets/props/sandbag.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/sandbag-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.9502,
+        0.30713,
+        0.33545
+      ]
+    },
+    {
+      "uid": "g1081",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1.68,
+      "assetId": "sandbag",
+      "x": 19,
+      "z": 1,
+      "scaleXYZ": [
+        1.68,
+        1.68,
+        1.68
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "sandbag",
+      "model": "./assets/props/sandbag.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/sandbag-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.9502,
+        0.30713,
+        0.33545
+      ]
+    },
+    {
+      "uid": "g1082",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1.37,
+      "assetId": "crate",
+      "x": 2.2,
+      "z": 6.7,
+      "scaleXYZ": [
+        1.37,
+        1.37,
+        1.37
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "crate",
+      "model": "./assets/props/crate.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/crate-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95459,
+        0.48779,
+        0.70898
+      ]
+    },
+    {
+      "uid": "g1083",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1.15,
+      "assetId": "barrel",
+      "x": 7.8,
+      "z": 6.7,
+      "scaleXYZ": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "barrel",
+      "model": "./assets/props/barrel.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/barrel-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.72607,
+        0.9502,
+        0.72949
+      ]
+    },
+    {
+      "uid": "g1084",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1.37,
+      "assetId": "crate",
+      "x": 13.399999999999999,
+      "z": 6.7,
+      "scaleXYZ": [
+        1.37,
+        1.37,
+        1.37
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "crate",
+      "model": "./assets/props/crate.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/crate-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95459,
+        0.48779,
+        0.70898
+      ]
+    },
+    {
+      "uid": "g1085",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1.15,
+      "assetId": "barrel",
+      "x": 18.999999999999996,
+      "z": 6.7,
+      "scaleXYZ": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "barrel",
+      "model": "./assets/props/barrel.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/barrel-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.72607,
+        0.9502,
+        0.72949
+      ]
+    },
+    {
+      "uid": "g1086",
+      "quality": "high",
+      "rot": 90,
+      "scale": 1.1,
+      "assetId": "bench",
+      "x": -32,
+      "z": -16,
+      "scaleXYZ": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "bench",
+      "model": "./assets/props/bench.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/bench-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95508,
+        0.26514,
+        0.30615
+      ]
+    },
+    {
+      "uid": "g1087",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1.1,
+      "assetId": "bench",
+      "x": -1,
+      "z": 8,
+      "scaleXYZ": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "bench",
+      "model": "./assets/props/bench.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/bench-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95508,
+        0.26514,
+        0.30615
+      ]
+    },
+    {
+      "uid": "g1088",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1.1,
+      "assetId": "bench",
+      "x": 27,
+      "z": -19,
+      "scaleXYZ": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "bench",
+      "model": "./assets/props/bench.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/bench-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95508,
+        0.26514,
+        0.30615
+      ]
+    },
+    {
+      "uid": "g1089",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1.1,
+      "assetId": "bench",
+      "x": 33,
+      "z": 13,
+      "scaleXYZ": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "bench",
+      "model": "./assets/props/bench.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/bench-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95508,
+        0.26514,
+        0.30615
+      ]
+    },
+    {
+      "uid": "g1090",
+      "quality": "high",
+      "rot": 90,
+      "scale": 1.9,
+      "assetId": "signboard",
+      "x": -33.32,
+      "z": -1.9500000000000002,
+      "scaleXYZ": [
+        1.9,
+        1.9,
+        1.9
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "signboard",
+      "model": "./assets/props/signboard.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/signboard-fractured.glb",
+        "pieces": 10,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95703,
+        0.94238,
+        0.1377
+      ]
+    },
+    {
+      "uid": "g1091",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1.9,
+      "assetId": "signboard",
+      "x": -18.85,
+      "z": 10.72,
+      "scaleXYZ": [
+        1.9,
+        1.9,
+        1.9
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "signboard",
+      "model": "./assets/props/signboard.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/signboard-fractured.glb",
+        "pieces": 10,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95703,
+        0.94238,
+        0.1377
+      ]
+    },
+    {
+      "uid": "g1092",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1.9,
+      "assetId": "signboard",
+      "x": 23.549999999999997,
+      "z": 16.220000000000002,
+      "scaleXYZ": [
+        1.9,
+        1.9,
+        1.9
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "signboard",
+      "model": "./assets/props/signboard.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/signboard-fractured.glb",
+        "pieces": 10,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95703,
+        0.94238,
+        0.1377
+      ]
+    },
+    {
+      "uid": "g1093",
+      "quality": "high",
+      "rot": -90,
+      "scale": 1.9,
+      "assetId": "signboard",
+      "x": 32.82,
+      "z": -3.75,
+      "scaleXYZ": [
+        1.9,
+        1.9,
+        1.9
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "signboard",
+      "model": "./assets/props/signboard.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/signboard-fractured.glb",
+        "pieces": 10,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95703,
+        0.94238,
+        0.1377
+      ]
+    },
+    {
+      "uid": "g1094",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1.9,
+      "assetId": "signboard",
+      "x": 6.050000000000001,
+      "z": -12.02,
+      "scaleXYZ": [
+        1.9,
+        1.9,
+        1.9
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "signboard",
+      "model": "./assets/props/signboard.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/signboard-fractured.glb",
+        "pieces": 10,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95703,
+        0.94238,
+        0.1377
+      ]
+    },
+    {
+      "uid": "g1095",
+      "quality": "high",
+      "rot": -90,
+      "scale": 1.9,
+      "assetId": "signboard",
+      "x": 27.42,
+      "z": -13.450000000000001,
+      "scaleXYZ": [
+        1.9,
+        1.9,
+        1.9
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "signboard",
+      "model": "./assets/props/signboard.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/signboard-fractured.glb",
+        "pieces": 10,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95703,
+        0.94238,
+        0.1377
+      ]
+    },
+    {
+      "uid": "g1096",
+      "quality": "high",
+      "rot": 90,
+      "scale": 1.15,
+      "assetId": "hurdle",
+      "x": 5.2,
+      "z": 10,
+      "scaleXYZ": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "hurdle",
+      "model": "./assets/props/hurdle.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/hurdle-fractured.glb",
+        "pieces": 11,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.57813,
+        0.53125
+      ]
+    },
+    {
+      "uid": "g1097",
+      "quality": "high",
+      "rot": 90,
+      "scale": 1.15,
+      "assetId": "hurdle",
+      "x": 7.65,
+      "z": 10,
+      "scaleXYZ": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "hurdle",
+      "model": "./assets/props/hurdle.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/hurdle-fractured.glb",
+        "pieces": 11,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.57813,
+        0.53125
+      ]
+    },
+    {
+      "uid": "g1098",
+      "quality": "high",
+      "rot": 90,
+      "scale": 1.15,
+      "assetId": "hurdle",
+      "x": 10.1,
+      "z": 10,
+      "scaleXYZ": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "hurdle",
+      "model": "./assets/props/hurdle.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/hurdle-fractured.glb",
+        "pieces": 11,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.57813,
+        0.53125
+      ]
+    },
+    {
+      "uid": "g1099",
+      "quality": "high",
+      "rot": 90,
+      "scale": 1.15,
+      "assetId": "hurdle",
+      "x": 12.55,
+      "z": 10,
+      "scaleXYZ": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "hurdle",
+      "model": "./assets/props/hurdle.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/hurdle-fractured.glb",
+        "pieces": 11,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.57813,
+        0.53125
+      ]
+    },
+    {
+      "uid": "g1100",
+      "quality": "high",
+      "rot": 90,
+      "scale": 1.15,
+      "assetId": "hurdle",
+      "x": 14.1,
+      "z": 10,
+      "scaleXYZ": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "hurdle",
+      "model": "./assets/props/hurdle.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/hurdle-fractured.glb",
+        "pieces": 11,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.57813,
+        0.53125
+      ]
+    },
+    {
+      "uid": "g1101",
+      "quality": "high",
+      "rot": 90,
+      "scale": 1.15,
+      "assetId": "hurdle",
+      "x": 16.55,
+      "z": 10,
+      "scaleXYZ": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "hurdle",
+      "model": "./assets/props/hurdle.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/hurdle-fractured.glb",
+        "pieces": 11,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.57813,
+        0.53125
+      ]
+    },
+    {
+      "uid": "g1102",
+      "quality": "high",
+      "rot": 90,
+      "scale": 1.15,
+      "assetId": "hurdle",
+      "x": 19,
+      "z": 10,
+      "scaleXYZ": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "hurdle",
+      "model": "./assets/props/hurdle.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/hurdle-fractured.glb",
+        "pieces": 11,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.57813,
+        0.53125
+      ]
+    },
+    {
+      "uid": "g1103",
+      "quality": "high",
+      "rot": 90,
+      "scale": 1.15,
+      "assetId": "hurdle",
+      "x": 21.45,
+      "z": 10,
+      "scaleXYZ": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "hurdle",
+      "model": "./assets/props/hurdle.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/hurdle-fractured.glb",
+        "pieces": 11,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.57813,
+        0.53125
+      ]
+    },
+    {
+      "uid": "g1104",
+      "quality": "high",
+      "rot": 0,
+      "scale": 2.3,
+      "assetId": "pullup",
+      "x": 15.9,
+      "z": -17,
+      "scaleXYZ": [
+        2.3,
+        2.3,
+        2.3
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "pullup",
+      "model": "./assets/props/pullup.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/pullup-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95703,
+        0.75781,
+        0.10254
+      ]
+    },
+    {
+      "uid": "g1105",
+      "quality": "high",
+      "rot": 0,
+      "scale": 2.3,
+      "assetId": "pullup",
+      "x": 18.8,
+      "z": -17,
+      "scaleXYZ": [
+        2.3,
+        2.3,
+        2.3
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "pullup",
+      "model": "./assets/props/pullup.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/pullup-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95703,
+        0.75781,
+        0.10254
+      ]
+    },
+    {
+      "uid": "g1106",
+      "quality": "high",
+      "rot": 0,
+      "scale": 2.3,
+      "assetId": "pullup",
+      "x": 21.7,
+      "z": -17,
+      "scaleXYZ": [
+        2.3,
+        2.3,
+        2.3
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "pullup",
+      "model": "./assets/props/pullup.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/pullup-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95703,
+        0.75781,
+        0.10254
+      ]
+    },
+    {
+      "uid": "g1107",
+      "quality": "high",
+      "rot": 0,
+      "scale": 2.3,
+      "assetId": "pullup",
+      "x": 24.6,
+      "z": -17,
+      "scaleXYZ": [
+        2.3,
+        2.3,
+        2.3
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "pullup",
+      "model": "./assets/props/pullup.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/pullup-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95703,
+        0.75781,
+        0.10254
+      ]
+    },
+    {
+      "uid": "g1108",
+      "quality": "high",
+      "rot": 0,
+      "scale": 4.85,
+      "assetId": "podium",
+      "x": -17.6,
+      "z": -18,
+      "scaleXYZ": [
+        4.85,
+        4.85,
+        4.85
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "podium",
+      "model": "./assets/props/podium.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/podium-fractured.glb",
+        "pieces": 8,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.45117,
+        0.7583
+      ]
+    },
+    {
+      "uid": "g1109",
+      "quality": "high",
+      "rot": 0,
+      "scale": 5.85,
+      "assetId": "flagpole",
+      "x": -23,
+      "z": -19,
+      "scaleXYZ": [
+        5.85,
+        5.85,
+        5.85
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "flagpole",
+      "model": "./assets/props/flagpole.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/flagpole-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.77246,
+        0.95166,
+        0.19287
+      ]
+    },
+    {
+      "uid": "g1110",
+      "quality": "high",
+      "rot": -100.305,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -45.333333333333336,
+      "z": -18.166666666666668,
+      "scaleXYZ": [
+        3.8901669754693624,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1111",
+      "quality": "high",
+      "rot": -100.305,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -46,
+      "z": -14.5,
+      "scaleXYZ": [
+        3.8901669754693624,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1112",
+      "quality": "high",
+      "rot": -100.305,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -46.666666666666664,
+      "z": -10.833333333333332,
+      "scaleXYZ": [
+        3.8901669754693624,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1113",
+      "quality": "high",
+      "rot": -90,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -47,
+      "z": -6.666666666666667,
+      "scaleXYZ": [
+        4.8712595685455815,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1114",
+      "quality": "high",
+      "rot": -90,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -47,
+      "z": -2,
+      "scaleXYZ": [
+        4.8712595685455815,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1115",
+      "quality": "high",
+      "rot": -90,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -47,
+      "z": 2.666666666666668,
+      "scaleXYZ": [
+        4.8712595685455815,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1116",
+      "quality": "high",
+      "rot": -68.199,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -46.333333333333336,
+      "z": 6.666666666666666,
+      "scaleXYZ": [
+        3.7475050849926963,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1117",
+      "quality": "high",
+      "rot": -68.199,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -45,
+      "z": 10,
+      "scaleXYZ": [
+        3.7475050849926963,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1118",
+      "quality": "high",
+      "rot": -68.199,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -43.666666666666664,
+      "z": 13.333333333333334,
+      "scaleXYZ": [
+        3.7475050849926963,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1119",
+      "quality": "high",
+      "rot": -19.983,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -41.166666666666664,
+      "z": 15.666666666666666,
+      "scaleXYZ": [
+        4.072616531217685,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1120",
+      "quality": "high",
+      "rot": -19.983,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -37.5,
+      "z": 17,
+      "scaleXYZ": [
+        4.072616531217685,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1121",
+      "quality": "high",
+      "rot": -19.983,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -33.83333333333333,
+      "z": 18.333333333333332,
+      "scaleXYZ": [
+        4.072616531217685,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1122",
+      "quality": "high",
+      "rot": -19.29,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -30,
+      "z": 19.7,
+      "scaleXYZ": [
+        4.423720271485823,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1123",
+      "quality": "high",
+      "rot": -19.29,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -26,
+      "z": 21.1,
+      "scaleXYZ": [
+        4.423720271485823,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1124",
+      "quality": "high",
+      "rot": -19.29,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -22,
+      "z": 22.5,
+      "scaleXYZ": [
+        4.423720271485823,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1125",
+      "quality": "high",
+      "rot": -19.29,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -18,
+      "z": 23.9,
+      "scaleXYZ": [
+        4.423720271485823,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1126",
+      "quality": "high",
+      "rot": -19.29,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -14,
+      "z": 25.3,
+      "scaleXYZ": [
+        4.423720271485823,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1127",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -9.714285714285715,
+      "z": 26,
+      "scaleXYZ": [
+        4.771846107963018,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1128",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -5.142857142857143,
+      "z": 26,
+      "scaleXYZ": [
+        4.771846107963018,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1129",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -0.5714285714285712,
+      "z": 26,
+      "scaleXYZ": [
+        4.771846107963018,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1130",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 4,
+      "z": 26,
+      "scaleXYZ": [
+        4.771846107963018,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1131",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 8.571428571428573,
+      "z": 26,
+      "scaleXYZ": [
+        4.771846107963018,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1132",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 13.142857142857142,
+      "z": 26,
+      "scaleXYZ": [
+        4.771846107963018,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1133",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 17.714285714285715,
+      "z": 26,
+      "scaleXYZ": [
+        4.771846107963018,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1134",
+      "quality": "high",
+      "rot": 21.801,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 21.25,
+      "z": 25.5,
+      "scaleXYZ": [
+        2.8106288137445223,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1135",
+      "quality": "high",
+      "rot": 21.801,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 23.75,
+      "z": 24.5,
+      "scaleXYZ": [
+        2.8106288137445223,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1136",
+      "quality": "high",
+      "rot": 74.055,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 25.5,
+      "z": 22.25,
+      "scaleXYZ": [
+        3.7996398169522543,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1137",
+      "quality": "high",
+      "rot": 74.055,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 26.5,
+      "z": 18.75,
+      "scaleXYZ": [
+        3.7996398169522543,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1138",
+      "quality": "high",
+      "rot": 38.66,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 28.25,
+      "z": 16,
+      "scaleXYZ": [
+        3.3419228796622384,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1139",
+      "quality": "high",
+      "rot": 38.66,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 30.75,
+      "z": 14,
+      "scaleXYZ": [
+        3.3419228796622384,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1140",
+      "quality": "high",
+      "rot": 7.125,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 34,
+      "z": 12.75,
+      "scaleXYZ": [
+        4.207858950051435,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1141",
+      "quality": "high",
+      "rot": 7.125,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 38,
+      "z": 12.25,
+      "scaleXYZ": [
+        4.207858950051435,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1142",
+      "quality": "high",
+      "rot": 36.87,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 41,
+      "z": 11.25,
+      "scaleXYZ": [
+        2.6096033402922756,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1143",
+      "quality": "high",
+      "rot": 36.87,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 43,
+      "z": 9.75,
+      "scaleXYZ": [
+        2.6096033402922756,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1144",
+      "quality": "high",
+      "rot": 86.987,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 44.125,
+      "z": 6.625,
+      "scaleXYZ": [
+        4.965108974540827,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1145",
+      "quality": "high",
+      "rot": 86.987,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 44.375,
+      "z": 1.875,
+      "scaleXYZ": [
+        4.965108974540827,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1146",
+      "quality": "high",
+      "rot": 86.987,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 44.625,
+      "z": -2.875,
+      "scaleXYZ": [
+        4.965108974540827,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1147",
+      "quality": "high",
+      "rot": 86.987,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 44.875,
+      "z": -7.625,
+      "scaleXYZ": [
+        4.965108974540827,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1148",
+      "quality": "high",
+      "rot": 116.565,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 44,
+      "z": -12,
+      "scaleXYZ": [
+        4.668200370563236,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1149",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 41.5,
+      "z": -14,
+      "scaleXYZ": [
+        3.131524008350731,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1150",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 38.5,
+      "z": -14,
+      "scaleXYZ": [
+        3.131524008350731,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1151",
+      "quality": "high",
+      "rot": 108.435,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 36.5,
+      "z": -15.5,
+      "scaleXYZ": [
+        3.300916137962818,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1152",
+      "quality": "high",
+      "rot": 108.435,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 35.5,
+      "z": -18.5,
+      "scaleXYZ": [
+        3.300916137962818,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1153",
+      "quality": "high",
+      "rot": 176.634,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 32.875,
+      "z": -20.125,
+      "scaleXYZ": [
+        4.443994354364928,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1154",
+      "quality": "high",
+      "rot": 176.634,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 28.625,
+      "z": -20.375,
+      "scaleXYZ": [
+        4.443994354364928,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1155",
+      "quality": "high",
+      "rot": 176.634,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 24.375,
+      "z": -20.625,
+      "scaleXYZ": [
+        4.443994354364928,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1156",
+      "quality": "high",
+      "rot": 176.634,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 20.125,
+      "z": -20.875,
+      "scaleXYZ": [
+        4.443994354364928,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1157",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 16.175,
+      "z": -21,
+      "scaleXYZ": [
+        3.8100208768267225,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1158",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 12.525,
+      "z": -21,
+      "scaleXYZ": [
+        3.8100208768267225,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1159",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 8.875,
+      "z": -21,
+      "scaleXYZ": [
+        3.8100208768267225,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1160",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": 5.225,
+      "z": -21,
+      "scaleXYZ": [
+        3.8100208768267225,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1161",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -5.655555555555554,
+      "z": -21,
+      "scaleXYZ": [
+        4.708884249594062,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1162",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -10.166666666666664,
+      "z": -21,
+      "scaleXYZ": [
+        4.708884249594062,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1163",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -14.677777777777777,
+      "z": -21,
+      "scaleXYZ": [
+        4.708884249594062,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1164",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -19.18888888888889,
+      "z": -21,
+      "scaleXYZ": [
+        4.708884249594062,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1165",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -23.7,
+      "z": -21,
+      "scaleXYZ": [
+        4.708884249594062,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1166",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -28.211111111111112,
+      "z": -21,
+      "scaleXYZ": [
+        4.708884249594062,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1167",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -32.72222222222222,
+      "z": -21,
+      "scaleXYZ": [
+        4.708884249594062,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1168",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -37.233333333333334,
+      "z": -21,
+      "scaleXYZ": [
+        4.708884249594062,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1169",
+      "quality": "high",
+      "rot": -180,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -41.74444444444444,
+      "z": -21,
+      "scaleXYZ": [
+        4.708884249594062,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1170",
+      "quality": "high",
+      "rot": -135,
+      "scale": 1,
+      "assetId": "fence",
+      "x": -44.5,
+      "z": -20.5,
+      "scaleXYZ": [
+        1.476214574502187,
+        5.7,
+        5.7
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "fence",
+      "model": "./assets/props/fence.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/fence-fractured.glb",
+        "pieces": 12,
+        "kind": "mesh-fragments"
+      },
+      "size": [
+        0.95752,
+        0.24609,
+        0.03516
+      ]
+    },
+    {
+      "uid": "g1171",
+      "quality": "high",
+      "rot": 0,
+      "scale": 3.625,
+      "assetId": "treeA",
+      "x": -42,
+      "z": 13,
+      "scaleXYZ": [
+        3.625,
+        3.625,
+        3.625
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeA",
+      "model": "./assets/props/tree-a.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-a-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.90723,
+        0.95313,
+        0.83496
+      ]
+    },
+    {
+      "uid": "g1172",
+      "quality": "high",
+      "rot": 24.637,
+      "scale": 4.262500000000001,
+      "assetId": "treeB",
+      "x": -43,
+      "z": -17,
+      "scaleXYZ": [
+        4.262500000000001,
+        4.262500000000001,
+        4.262500000000001
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeB",
+      "model": "./assets/props/tree-b.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-b-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.59033,
+        0.95264,
+        0.50732
+      ]
+    },
+    {
+      "uid": "g1173",
+      "quality": "high",
+      "rot": 49.274,
+      "scale": 3.2624999999999997,
+      "assetId": "treeA",
+      "x": -37,
+      "z": 17,
+      "scaleXYZ": [
+        3.2624999999999997,
+        3.2624999999999997,
+        3.2624999999999997
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeA",
+      "model": "./assets/props/tree-a.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-a-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.90723,
+        0.95313,
+        0.83496
+      ]
+    },
+    {
+      "uid": "g1174",
+      "quality": "high",
+      "rot": 73.912,
+      "scale": 4.262500000000001,
+      "assetId": "treeB",
+      "x": -28,
+      "z": 21,
+      "scaleXYZ": [
+        4.262500000000001,
+        4.262500000000001,
+        4.262500000000001
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeB",
+      "model": "./assets/props/tree-b.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-b-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.59033,
+        0.95264,
+        0.50732
+      ]
+    },
+    {
+      "uid": "g1175",
+      "quality": "high",
+      "rot": 0,
+      "scale": 3.625,
+      "assetId": "treeA",
+      "x": -10,
+      "z": 23,
+      "scaleXYZ": [
+        3.625,
+        3.625,
+        3.625
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeA",
+      "model": "./assets/props/tree-a.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-a-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.90723,
+        0.95313,
+        0.83496
+      ]
+    },
+    {
+      "uid": "g1176",
+      "quality": "high",
+      "rot": 24.637,
+      "scale": 3.875,
+      "assetId": "treeB",
+      "x": 5,
+      "z": 24,
+      "scaleXYZ": [
+        3.875,
+        3.875,
+        3.875
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeB",
+      "model": "./assets/props/tree-b.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-b-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.59033,
+        0.95264,
+        0.50732
+      ]
+    },
+    {
+      "uid": "g1177",
+      "quality": "high",
+      "rot": 49.274,
+      "scale": 3.625,
+      "assetId": "treeA",
+      "x": 20,
+      "z": 25,
+      "scaleXYZ": [
+        3.625,
+        3.625,
+        3.625
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeA",
+      "model": "./assets/props/tree-a.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-a-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.90723,
+        0.95313,
+        0.83496
+      ]
+    },
+    {
+      "uid": "g1178",
+      "quality": "high",
+      "rot": 73.912,
+      "scale": 2.7125,
+      "assetId": "treeB",
+      "x": 26,
+      "z": 21,
+      "scaleXYZ": [
+        2.7125,
+        2.7125,
+        2.7125
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeB",
+      "model": "./assets/props/tree-b.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-b-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.59033,
+        0.95264,
+        0.50732
+      ]
+    },
+    {
+      "uid": "g1179",
+      "quality": "high",
+      "rot": 0,
+      "scale": 3.2624999999999997,
+      "assetId": "treeA",
+      "x": 40,
+      "z": 10,
+      "scaleXYZ": [
+        3.2624999999999997,
+        3.2624999999999997,
+        3.2624999999999997
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeA",
+      "model": "./assets/props/tree-a.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-a-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.90723,
+        0.95313,
+        0.83496
+      ]
+    },
+    {
+      "uid": "g1180",
+      "quality": "high",
+      "rot": 24.637,
+      "scale": 3.875,
+      "assetId": "treeB",
+      "x": 41,
+      "z": -11,
+      "scaleXYZ": [
+        3.875,
+        3.875,
+        3.875
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeB",
+      "model": "./assets/props/tree-b.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-b-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.59033,
+        0.95264,
+        0.50732
+      ]
+    },
+    {
+      "uid": "g1181",
+      "quality": "high",
+      "rot": 49.274,
+      "scale": 2.9,
+      "assetId": "treeA",
+      "x": -41,
+      "z": -19,
+      "scaleXYZ": [
+        2.9,
+        2.9,
+        2.9
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeA",
+      "model": "./assets/props/tree-a.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-a-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.90723,
+        0.95313,
+        0.83496
+      ]
+    },
+    {
+      "uid": "g1182",
+      "quality": "high",
+      "rot": 73.912,
+      "scale": 3.875,
+      "assetId": "treeB",
+      "x": -31,
+      "z": -19,
+      "scaleXYZ": [
+        3.875,
+        3.875,
+        3.875
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeB",
+      "model": "./assets/props/tree-b.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-b-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.59033,
+        0.95264,
+        0.50732
+      ]
+    },
+    {
+      "uid": "g1183",
+      "quality": "high",
+      "rot": 0,
+      "scale": 3.2624999999999997,
+      "assetId": "treeA",
+      "x": 28,
+      "z": -20,
+      "scaleXYZ": [
+        3.2624999999999997,
+        3.2624999999999997,
+        3.2624999999999997
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeA",
+      "model": "./assets/props/tree-a.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-a-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.90723,
+        0.95313,
+        0.83496
+      ]
+    },
+    {
+      "uid": "g1184",
+      "quality": "high",
+      "rot": 0,
+      "scale": 3.5,
+      "assetId": "treeB",
+      "x": -39,
+      "z": 18.8,
+      "scaleXYZ": [
+        3.5,
+        3.5,
+        3.5
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeB",
+      "model": "./assets/props/tree-b.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-b-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.59033,
+        0.95264,
+        0.50732
+      ]
+    },
+    {
+      "uid": "g1185",
+      "quality": "high",
+      "rot": 30.94,
+      "scale": 3.7874999999999996,
+      "assetId": "treeA",
+      "x": -18,
+      "z": 23.9,
+      "scaleXYZ": [
+        3.7874999999999996,
+        3.7874999999999996,
+        3.7874999999999996
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeA",
+      "model": "./assets/props/tree-a.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-a-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.90723,
+        0.95313,
+        0.83496
+      ]
+    },
+    {
+      "uid": "g1186",
+      "quality": "high",
+      "rot": 61.879,
+      "scale": 4.074999999999999,
+      "assetId": "treeB",
+      "x": 13,
+      "z": 23.6,
+      "scaleXYZ": [
+        4.074999999999999,
+        4.074999999999999,
+        4.074999999999999
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeB",
+      "model": "./assets/props/tree-b.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-b-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.59033,
+        0.95264,
+        0.50732
+      ]
+    },
+    {
+      "uid": "g1187",
+      "quality": "high",
+      "rot": 92.819,
+      "scale": 3.5,
+      "assetId": "treeA",
+      "x": 36,
+      "z": -17.8,
+      "scaleXYZ": [
+        3.5,
+        3.5,
+        3.5
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeA",
+      "model": "./assets/props/tree-a.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-a-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.90723,
+        0.95313,
+        0.83496
+      ]
+    },
+    {
+      "uid": "g1188",
+      "quality": "high",
+      "rot": 123.759,
+      "scale": 3.7874999999999996,
+      "assetId": "treeB",
+      "x": -7,
+      "z": 23.5,
+      "scaleXYZ": [
+        3.7874999999999996,
+        3.7874999999999996,
+        3.7874999999999996
+      ],
+      "baseY": 0,
+      "category": "prop",
+      "name": "treeB",
+      "model": "./assets/props/tree-b.glb",
+      "destructible": {
+        "fracturedModel": "./assets/props/destructible/tree-b-fractured.glb",
+        "pieces": 8,
+        "kind": "fall-and-fragments"
+      },
+      "size": [
+        0.59033,
+        0.95264,
+        0.50732
+      ]
+    },
+    {
+      "uid": "g888",
+      "quality": "high",
+      "rot": 160,
+      "scale": 1,
+      "assetId": "friendly",
+      "x": -21,
+      "z": -9,
+      "category": "soldier",
+      "name": "投擲者",
+      "team": "friendly",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1190",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "enemy",
+      "x": 2,
+      "z": 23,
+      "category": "soldier",
+      "name": "紅軍",
+      "team": "enemy",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1191",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "enemy",
+      "x": 4,
+      "z": 23,
+      "category": "soldier",
+      "name": "紅軍",
+      "team": "enemy",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1192",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "enemy",
+      "x": 6,
+      "z": 23,
+      "category": "soldier",
+      "name": "紅軍",
+      "team": "enemy",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1193",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "enemy",
+      "x": 8,
+      "z": 23,
+      "category": "soldier",
+      "name": "紅軍",
+      "team": "enemy",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1194",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "enemy",
+      "x": 2,
+      "z": 25.3,
+      "category": "soldier",
+      "name": "紅軍",
+      "team": "enemy",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1195",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "enemy",
+      "x": 4,
+      "z": 25.3,
+      "category": "soldier",
+      "name": "紅軍",
+      "team": "enemy",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1196",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "enemy",
+      "x": 6,
+      "z": 25.3,
+      "category": "soldier",
+      "name": "紅軍",
+      "team": "enemy",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1197",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "enemy",
+      "x": 8,
+      "z": 25.3,
+      "category": "soldier",
+      "name": "紅軍",
+      "team": "enemy",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1198",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "enemy",
+      "x": 2,
+      "z": 27.6,
+      "category": "soldier",
+      "name": "紅軍",
+      "team": "enemy",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1199",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "enemy",
+      "x": 4,
+      "z": 27.6,
+      "category": "soldier",
+      "name": "紅軍",
+      "team": "enemy",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1200",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "enemy",
+      "x": 6,
+      "z": 27.6,
+      "category": "soldier",
+      "name": "紅軍",
+      "team": "enemy",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1201",
+      "quality": "high",
+      "rot": 180,
+      "scale": 1,
+      "assetId": "enemy",
+      "x": 8,
+      "z": 27.6,
+      "category": "soldier",
+      "name": "紅軍",
+      "team": "enemy",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1202",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "friendly",
+      "x": -47,
+      "z": 18,
+      "category": "soldier",
+      "name": "友軍",
+      "team": "friendly",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1203",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "friendly",
+      "x": -45,
+      "z": 18,
+      "category": "soldier",
+      "name": "友軍",
+      "team": "friendly",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1204",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "friendly",
+      "x": -43,
+      "z": 18,
+      "category": "soldier",
+      "name": "友軍",
+      "team": "friendly",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1205",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "friendly",
+      "x": -41,
+      "z": 18,
+      "category": "soldier",
+      "name": "友軍",
+      "team": "friendly",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1206",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "friendly",
+      "x": -47,
+      "z": 19.8,
+      "category": "soldier",
+      "name": "友軍",
+      "team": "friendly",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1207",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "friendly",
+      "x": -45,
+      "z": 19.8,
+      "category": "soldier",
+      "name": "友軍",
+      "team": "friendly",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1208",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "friendly",
+      "x": -43,
+      "z": 19.8,
+      "category": "soldier",
+      "name": "友軍",
+      "team": "friendly",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1209",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "friendly",
+      "x": -41,
+      "z": 19.8,
+      "category": "soldier",
+      "name": "友軍",
+      "team": "friendly",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1210",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "friendly",
+      "x": -47,
+      "z": 21.6,
+      "category": "soldier",
+      "name": "友軍",
+      "team": "friendly",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1211",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "friendly",
+      "x": -45,
+      "z": 21.6,
+      "category": "soldier",
+      "name": "友軍",
+      "team": "friendly",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1212",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "friendly",
+      "x": -43,
+      "z": 21.6,
+      "category": "soldier",
+      "name": "友軍",
+      "team": "friendly",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    },
+    {
+      "uid": "g1213",
+      "quality": "high",
+      "rot": 0,
+      "scale": 1,
+      "assetId": "friendly",
+      "x": -41,
+      "z": 21.6,
+      "category": "soldier",
+      "name": "友軍",
+      "team": "friendly",
+      "model": "./assets/characters/cadet/cadet-green.glb",
+      "destructible": {
+        "kind": "knock-down"
+      },
+      "size": [
+        1.12,
+        1.7,
+        0.86
+      ]
+    }
+  ]
+}

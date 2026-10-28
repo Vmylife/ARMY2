@@ -80,7 +80,7 @@ quad([-.5,0,.5],[.5,0,.5],[.5,1,.5],[-.5,1,.5],[0,0,1]);quad([.5,0,-.5],[-.5,0,-
 const VS=`precision highp float;
 attribute vec3 aPos;attribute vec3 aNorm;attribute vec4 iLoc;attribute vec4 iShape;attribute vec4 iTint;
 uniform mat4 uVP;uniform float uPart,uRadius,uTime;uniform vec2 uImpact;
-varying vec3 vCol;varying vec3 vN;varying vec3 vLocal;varying float vKind,vHit,vPart;
+varying vec3 vCol;varying vec3 vN;varying vec3 vLocal;varying vec2 vXZ;varying float vKind,vHit,vPart;
 void main(){
  vec3 p=aPos;float h=iLoc.w;float part=uPart;float isBuilding=1.;
  if(part<.5){p*=vec3(iShape.x,h,iShape.y);}
@@ -101,11 +101,11 @@ void main(){
    rel.z+=cos(iShape.z*14.5)*rel.y*sin(tilt)*.8;
    world=vec3(iLoc.x,0.,iLoc.z)+rel;
  }
- vCol=iTint.rgb;vN=aNorm;vLocal=aPos;vKind=iShape.w;vHit=hit;vPart=part;
+ vCol=iTint.rgb;vN=aNorm;vLocal=aPos;vXZ=world.xz;vKind=iShape.w;vHit=hit;vPart=part;
  gl_Position=uVP*vec4(world,1.);
 }`;
 const FS=`precision mediump float;
-varying vec3 vCol;varying vec3 vN;varying vec3 vLocal;varying float vKind,vHit,vPart;
+uniform vec2 uImpact;uniform float uRadius;varying vec2 vXZ;varying vec3 vCol;varying vec3 vN;varying vec3 vLocal;varying float vKind,vHit,vPart;
 void main(){float lit=.79+.19*max(0.,dot(normalize(vN),normalize(vec3(.42,1.,.63))))+.04*max(0.,dot(normalize(vN),normalize(vec3(-1.,.2,-.1))));
 vec3 col=vCol*lit;
 if(vPart>.5&&vPart<1.5)col*=.82;
@@ -116,6 +116,7 @@ if(vPart<.5&&vKind>.5&&vKind<1.5){
  col=mix(col,vec3(.16,.30,.33)*(.65+vCol.r),win*.77);}}
 if(vPart<.5&&vKind>1.5&&abs(vN.y)<.5){vec2 p=abs(vN.x)>.5?vec2(vLocal.z,vLocal.y):vec2(vLocal.x,vLocal.y);vec2 w=fract(vec2((p.x+.5)*5.,p.y*11.));float win=step(.21,w.x)*step(w.x,.77)*step(.2,w.y)*step(w.y,.78);col=mix(col,vec3(.20,.31,.40),win*.9);}
 col=mix(col,col*.45+vec3(.21,.13,.10),vHit*.88);
+if(vPart>1.5&&vPart<2.5&&uRadius>=0.){float dis=distance(vXZ,uImpact);float soot=1.-smoothstep(uRadius-1.2,uRadius+2.6,dis);float edge=exp(-pow((dis-uRadius)/1.2,2.));col=mix(col,vec3(.13,.115,.10),soot*.79);col+=vec3(.26,.09,.025)*edge*.27;}
 gl_FragColor=vec4(col,1.);}`;
 const RING_VS=`precision highp float;attribute vec4 aRing;uniform mat4 uVP;uniform vec2 uCenter;uniform float uRadius,uWidth;varying float vAl;void main(){float r=max(0.,uRadius+aRing.z*uWidth);vec3 p=vec3(uCenter.x+aRing.x*r,.52,uCenter.y+aRing.y*r);gl_Position=uVP*vec4(p,1.);vAl=aRing.w;}`;
 const RING_FS=`precision mediump float;varying float vAl;void main(){gl_FragColor=vec4(1.,.63,.23,vAl*.82);}`;
@@ -162,12 +163,12 @@ class WebWorld{
   return {x:middle.x,y:middle.y,top:Math.min(head.y,foot.y),bottom:Math.max(head.y,foot.y),width:Math.max(55,Math.abs(head.y-foot.y)*.48)};
  }
 
- buildEvents(){this.events=[];const [ix,iz]=this.impact;buildings.forEach((v,i)=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'b',v}));soldiers.forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'s',v}));(this.nearBuildings||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'detail',v}));(this.actors||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'actor',v}));(this.campProps||[]).filter(v=>v.type==='treeA'||v.type==='treeB').forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'tree',v}));landmarks.forEach(v=>this.events.push({r:v.radius||Math.hypot(v.x-ix,v.z-iz),type:'land',v}));this.events.sort((a,b)=>a.r-b.r);this.eventIndex=0;this.counter={buildings:0,kills:0,red:0,green:0};this.newLandmarks=[];this.LM=new Set();if(this.nearBuildings)this.nearBuildings.forEach(b=>{b.hit=false;b.fragments=[]});if(this.actors)this.actors.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;a.anim?.setClip('Idle_11',{restart:true})});if(this.campProps)this.campProps.forEach(p=>{p.hit=false;p.fallT=0;p.tilt=0});this.bursts=[];if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}}
+ buildEvents(){this.events=[];const [ix,iz]=this.impact;buildings.forEach((v,i)=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'b',v}));soldiers.forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'s',v}));(this.nearBuildings||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'detail',v}));(this.actors||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'actor',v}));(this.campProps||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'prop',v}));landmarks.forEach(v=>this.events.push({r:v.radius||Math.hypot(v.x-ix,v.z-iz),type:'land',v}));this.events.sort((a,b)=>a.r-b.r);this.eventIndex=0;this.counter={buildings:0,kills:0,red:0,green:0};this.newLandmarks=[];this.LM=new Set();if(this.nearBuildings)this.nearBuildings.forEach(b=>{b.hit=false;b.fragments=[]});if(this.actors)this.actors.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;a.anim?.setClip('Idle_11',{restart:true})});if(this.campProps)this.campProps.forEach(p=>{p.hit=false;p.fallT=0;p.tilt=0;p.fragments=[]});this.bursts=[];if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}}
  setLanding(x,z){this.impact=[x,z];this.radius=-1;this.mode='field';this.earthStage='';this.globe?.reset();this.buildEvents();}
  begin(powder,density,quality,broken){const amount=Math.max(0,powder)/600, comp=Math.max(1,density/.6);let max=6+Math.pow(amount,1.37)*Math.pow(comp,2.65)*17*Math.max(.06,quality)*(broken?.39:1);max=clamp(max,7,2300);this.blastMax=max;this.blastDuration=2.5+Math.min(10,Math.log10(max+1)*1.8);this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();return max;}
  beginTestPower(power){const points=[[0,2.5],[10,13.3],[20,38],[35,140],[50,440],[65,1350],[75,1750],[88,2050],[100,2300]];let max=2300;for(let i=1;i<points.length;i++)if(power<=points[i][0]){const a=points[i-1],b=points[i],t=(power-a[0])/(b[0]-a[0]);max=Math.exp(Math.log(a[1])+(Math.log(b[1])-Math.log(a[1]))*t);break;}this.impactStarted=performance.now();this.blastMax=max;this.blastDuration=max>=1650?12.2:4.8+Math.min(6.5,Math.log10(max+1)*1.35);this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();this.lastHitR=0;this.bursts=[{x:this.impact[0],z:this.impact[1],age:0,life:4.3,size:Math.min(12,2.2+Math.log10(max+1)*2.2),type:'origin',seed:.27}];return max;}
  advance(dt){if(this.timer>=this.blastDuration)return true;this.timer=Math.min(this.blastDuration,this.timer+dt);this.time+=dt;const x=clamp(this.timer/this.blastDuration,0,1),blend=1-Math.pow(1-x,1.12);if(this.blastMax>=1650){const phase=.40;this.radius=x<phase?Math.expm1(Math.log1p(1030)*smooth(x/phase)):1030+(this.blastMax-1030)*smooth((x-phase)/(1-phase));}else this.radius=Math.expm1(Math.log1p(this.blastMax)*blend);
- while(this.eventIndex<this.events.length&&this.events[this.eventIndex].r<=this.radius){const e=this.events[this.eventIndex++];if(e.type==='b'){this.counter.buildings++;this.counter.kills+=e.v.people;}else if(e.type==='detail'){this.counter.buildings++;this.counter.kills+=e.v.people;this.explodeBuilding(e.v);this.addBurst(e.v.x,e.v.z,'impact');}else if(e.type==='tree'){this.hitTree(e.v);}else if(e.type==='actor'){this.counter.kills++;if(e.v.enemy)this.counter.red++;else this.counter.green++;this.hitActor(e.v);}else if(e.type==='s'){this.counter.kills++;if(e.v.enemy)this.counter.red++;else this.counter.green++;}else if(!this.LM.has(e.v.name)){this.LM.add(e.v.name);this.newLandmarks.push(e.v.name);}}
+ while(this.eventIndex<this.events.length&&this.events[this.eventIndex].r<=this.radius){const e=this.events[this.eventIndex++];if(e.type==='b'){this.counter.buildings++;this.counter.kills+=e.v.people;}else if(e.type==='detail'){this.counter.buildings++;this.counter.kills+=e.v.people;this.explodeBuilding(e.v);this.addBurst(e.v.x,e.v.z,'impact');}else if(e.type==='prop'){this.explodeProp(e.v);this.addBurst(e.v.x,e.v.z,'dust');}else if(e.type==='actor'){this.counter.kills++;if(e.v.enemy)this.counter.red++;else this.counter.green++;this.hitActor(e.v);}else if(e.type==='s'){this.counter.kills++;if(e.v.enemy)this.counter.red++;else this.counter.green++;}else if(!this.LM.has(e.v.name)){this.LM.add(e.v.name);this.newLandmarks.push(e.v.name);}}
  // Far-field is intentionally abstracted; beyond detailed city we only simulate clusters/census.
  if(this.radius>1550){const ratio=Math.max(0,this.radius/1550-1);const hidden=Math.round(64000*Math.pow(ratio,1.12));const occupants=Math.round(560000*Math.pow(ratio,1.24));this.counter.buildings=buildings.length+(this.nearBuildings?.length||0)+hidden;this.counter.kills=Math.max(this.counter.kills,Math.round(occupants));}
  this.stepActors(dt);this.stepFragments(dt);this.stepTrees(dt);for(const b of this.bursts)b.age+=dt;this.bursts=this.bursts.filter(b=>b.age<b.life);this.mode='field';const geo=this.blastMax>=1650&&this.radius>=1030;const k=clamp((this.radius-1030)/1270,0,1);this.earthStage=geo?(k<.34?'taiwan':k<.86?'asia':'earth'):'';return this.timer>=this.blastDuration;}
@@ -286,30 +287,31 @@ class WebWorld{
   if(!this.gl?.createVertexArray){
    this.nearBuildings=SCENE_BUILDINGS.map((o,i)=>({x:o.x,z:o.z,type:o.assetId,people:0,hit:false,fragments:[]}));
    this.actors=SCENE_SOLDIERS.filter(o=>o.uid!==PLAYER_ITEM.uid).map((o,i)=>({x:o.x,z:o.z,px:o.x,pz:o.z,rot:o.rot||0,angle:(o.rot||0)*Math.PI/180,enemy:o.team==='enemy',hit:false,renderLift:0,seed:(i*.731)%1}));
-   this.campProps=SCENE_PROPS.map(o=>({uid:o.uid,type:o.assetId,x:o.x,z:o.z,scale:o.scale||1,yaw:(o.rot||0)*Math.PI/180,size:o.size,model:o.model}));
+   this.campProps=SCENE_PROPS.map(o=>({uid:o.uid,type:o.assetId,x:o.x,z:o.z,scale:o.scale||1,scaleXYZ:o.scaleXYZ,baseY:o.baseY||0,yaw:(o.rot||0)*Math.PI/180,size:o.size,model:o.model,fracturePath:o.destructible?.fracturedModel,hit:false,fragments:[]}));
    this.thrower={x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,angle:0,anim:{setClip(){},hasClip(){return true}}};
    this.modelState='unavailable';this.buildEvents();this.modelErrors.push('瀏覽器不支援 WebGL2，顯示簡化備援場景；建議用手機 Safari 或 Chrome');this.buildEvents();return;
   }
   this.nearBuildings=[];this.actors=[];this.detailed={};
-  this.nearBuildings=SCENE_BUILDINGS.map((o,i)=>({x:o.x,z:o.z,rot:o.rot||0,scale:o.scale||1,size:o.size,type:o.assetId,quality:o.quality||'low',modelPath:o.model,fracturePath:o.destructible?.fracturedModel,idx:i,people:0,hit:false,fragments:[]}));
+  this.nearBuildings=SCENE_BUILDINGS.map((o,i)=>({uid:o.uid,x:o.x,z:o.z,rot:o.rot||0,scale:o.scale||1,size:o.size,type:o.assetId,quality:o.quality||'high',modelPath:o.model,fracturePath:o.destructible?.fracturedModel,idx:i,people:0,hit:false,fragments:[]}));
   // Far-view low-detail proxies retain the user's exact building placement.
   this.detailProxy=inst(this.nearBuildings.map(b=>({x:b.x,z:b.z,h:b.size[1],w:b.size[0],d:b.size[2],kind:0,seed:(b.idx%9)/9})),0);
   this.detailProxyBuf=this.gl.createBuffer();this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.detailProxyBuf);this.gl.bufferData(this.gl.ARRAY_BUFFER,this.detailProxy,this.gl.STATIC_DRAW);
   this.actors=SCENE_SOLDIERS.filter(o=>o.uid!==PLAYER_ITEM.uid).map((o,i)=>({uid:o.uid,x:o.x,z:o.z,px:o.x,pz:o.z,rot:o.rot||0,scale:o.scale||1,quality:o.quality||'low',enemy:o.team==='enemy',hit:false,flyT:0,renderLift:0,angle:(o.rot||0)*Math.PI/180,seed:(i*.731)%1}));
   this.thrower={uid:PLAYER_ITEM.uid,x:PLAYER_ITEM.x,z:PLAYER_ITEM.z,px:PLAYER_ITEM.x,pz:PLAYER_ITEM.z,rot:PLAYER_ITEM.rot,quality:'high',enemy:false,hit:false,flyT:0,renderLift:0,angle:0,seed:.2};
   try{
-    const keys=['barracks','guardhouse','office'];
-    await Promise.all(keys.map(async key=>{
-      const sample=this.nearBuildings.find(b=>b.type===key);if(!sample)return;
+    // All six original camp building types, keyed by the actual GLB path rather than
+    // a three-type substitute list. Fractures reuse the intact texture/UV map.
+    const buildingKeys=[...new Map(this.nearBuildings.map(b=>[b.type,b])).values()];
+    await Promise.all(buildingKeys.map(async sample=>{try{
       const [whole,fractured]=await Promise.all([loadGlb(sample.modelPath),loadGlb(sample.fracturePath)]);
       const prim=whole.json.meshes[0].primitives[0],ac=whole.json.accessors[prim.attributes.POSITION];
       const lo=ac.min||[-.5,-.5,-.5],hi=ac.max||[.5,.5,.5],size=sample.size;
       const scaleVec=[size[0]/Math.max(.0001,hi[0]-lo[0]),size[1]/Math.max(.0001,hi[1]-lo[1]),size[2]/Math.max(.0001,hi[2]-lo[2])];
       const center=[(lo[0]+hi[0])/2,lo[1],(lo[2]+hi[2])/2];
-      const asset={scaleVec,center,whole:this.staticGeometry(whole,prim),pieces:[],tex:await this.glbTexture(whole,prim)};
+      const asset={scaleVec,center,extents:hi.map((v,i)=>Math.max(.0001,v-lo[i])),whole:this.staticGeometry(whole,prim),pieces:[],tex:await this.glbTexture(whole,prim)};
       for(const node of fractured.json.nodes){if(node.mesh==null)continue;const pg=fractured.json.meshes[node.mesh].primitives[0];asset.pieces.push({geo:this.staticGeometry(fractured,pg),node:node.translation||[0,0,0]});}
-      this.detailed[key]=asset;
-    }));
+      this.detailed[sample.type]=asset;
+    }catch(err){this.modelErrors.push('建築破壞模型 '+sample.type+': '+err.message);console.error(err);}}));
     this.soldierAssets={};
     for(const quality of ['low','high']){
       const model=quality==='low'?'./assets/grenade-low/grenade-soldier-low.glb':'./assets/characters/cadet/cadet-green.glb';
@@ -319,28 +321,35 @@ class WebWorld{
       this.soldierAssets[quality]={geo,tex,makeAnim};
     }
     for(const a of [...this.actors,this.thrower])a.anim=this.soldierAssets[a.quality].makeAnim();
+    // All environmental fracture meshes must finish loading before allowing 
+    // the player to start a blast; otherwise objects could disappear unbroken.
+    await this.initCampProps();
     this.modelState='ready';
-    // Optional original GLB props. Scene remains playable while props download.
-    void this.initCampProps();
   }catch(e){this.modelState='partial';this.modelErrors.push(String(e));console.error('模型載入出錯',e);}
   this.buildEvents();
  }
  async initCampProps(){
-  this.campProps=SCENE_PROPS.map(o=>({uid:o.uid,type:o.assetId,x:o.x,z:o.z,scale:o.scale||1,yaw:(o.rot||0)*Math.PI/180,size:o.size,model:o.model}));
-  this.buildEvents();this.propModels={};await Promise.all([...new Set(this.campProps.map(p=>p.type))].map(async kind=>{try{
-   const item=this.campProps.find(p=>p.type===kind),gltf=await loadGlb(item.model),p=gltf.json.meshes[0].primitives[0];const ac=gltf.json.accessors[p.attributes.POSITION],lo=ac.min||[-.5,-.5,-.5],hi=ac.max||[.5,.5,.5];
-   const sv=[item.size[0]/Math.max(.0001,hi[0]-lo[0]),item.size[1]/Math.max(.0001,hi[1]-lo[1]),item.size[2]/Math.max(.0001,hi[2]-lo[2])];
-   this.propModels[kind]={geo:this.staticGeometry(gltf,p),tex:await this.glbTexture(gltf,p),center:[(lo[0]+hi[0])/2,lo[1],(lo[2]+hi[2])/2],sv};
-  }catch(e){this.modelErrors.push('場景小物件 '+kind+': '+e.message);}}));
+  this.campProps=SCENE_PROPS.map(o=>({uid:o.uid,type:o.assetId,x:o.x,z:o.z,scale:o.scale||1,scaleXYZ:o.scaleXYZ,baseY:o.baseY||0,yaw:(o.rot||0)*Math.PI/180,size:o.size,model:o.model,fracturePath:o.destructible?.fracturedModel,hit:false,fragments:[]}));
+  this.buildEvents();this.propModels={};const queue=[...new Map(this.campProps.map(p=>[p.type,p])).values()];await Promise.all(Array.from({length:3},async()=>{while(queue.length){const item=queue.shift();try{
+   const [gltf,fractured]=await Promise.all([loadGlb(item.model),item.fracturePath?loadGlb(item.fracturePath):Promise.resolve(null)]);
+   const p=gltf.json.meshes[0].primitives[0],ac=gltf.json.accessors[p.attributes.POSITION],lo=ac.min||[-.5,-.5,-.5],hi=ac.max||[.5,.5,.5];
+   const pieces=[];if(fractured)for(const node of fractured.json.nodes){if(node.mesh==null)continue;const pg=fractured.json.meshes[node.mesh].primitives[0];pieces.push({geo:this.staticGeometry(fractured,pg),node:node.translation||[0,0,0]});}
+   this.propModels[item.type]={geo:this.staticGeometry(gltf,p),tex:await this.glbTexture(gltf,p),center:[(lo[0]+hi[0])/2,lo[1],(lo[2]+hi[2])/2],extents:hi.map((v,i)=>Math.max(.0001,v-lo[i])),pieces};
+  }catch(e){this.modelErrors.push('場景小物件 '+item.type+': '+e.message);console.error(e);}}}));
  }
  drawCampProps(vp,dist){
-  if(this.modelState!=='ready'||dist>270||!this.campProps||!this.propModels)return;
+  if(this.modelState!=='ready'||dist>370||!this.campProps||!this.propModels)return;
   this.setupDetailPrograms();if(!this.detailProg)return;
-  const focus=this.camFocus||this.player;
+  const focus=this.camFocus||this.player;let drawnFragments=0;
   for(const p of this.campProps){const a=this.propModels[p.type];if(!a)continue;
-    if(Math.hypot(p.x-focus[0],p.z-focus[1])>170)continue;
-    const sv=a.sv,tilt=p.tilt||0,fall=R((p.fallDZ||0)*tilt,0,-(p.fallDX||0)*tilt),model=mul(T(p.x,0,p.z),mul(fall,mul(RY(p.yaw||0),mul(S3(sv[0]*p.scale,sv[1]*p.scale,sv[2]*p.scale),T(-a.center[0],-a.center[1],-a.center[2])))));
-    this.drawStaticMesh(a.geo,a.tex,model,vp);
+    const dd=Math.hypot(p.x-focus[0],p.z-focus[1]);if(dd>Math.max(120,dist*1.3))continue;
+    const sv=p.size.map((v,i)=>v/(a.extents?.[i]||1));const scale=(p.scaleXYZ||[p.scale,p.scale,p.scale]);
+    const scaleVec=sv.map((v,i)=>v*(scale[i]||1));
+    if(!p.hit){const model2=mul(T(p.x,p.baseY||0,p.z),mul(RY(p.yaw||0),mul(S3(...scaleVec),T(-a.center[0],-(a.center[1]-a.extents[1]/2),-a.center[2]))));
+       this.drawStaticMesh(a.geo,a.tex,model2,vp);
+    }else if(dist<265&&p.fragments){for(const f of p.fragments){if(drawnFragments++>260)break;
+       const model=mul(T(f.x,f.y,f.z),mul(R(f.rx,f.ry,f.rz),S3(...f.scale)));this.drawStaticMesh(f.p.geo,a.tex,model,vp);
+    }}
   }
  }
  staticGeometry(gltf,p){const g=this.gl,vao=g.createVertexArray();g.bindVertexArray(vao);
@@ -385,13 +394,23 @@ class WebWorld{
  }
  drawStaticMesh(geo,tex,model,vp){const g=this.gl,p=this.detailProg;g.useProgram(p);g.uniformMatrix4fv(g.getUniformLocation(p,'uVP'),false,vp);g.uniformMatrix4fv(g.getUniformLocation(p,'uModel'),false,model);g.uniform3f(g.getUniformLocation(p,'uTint'),1,1,1);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,tex);g.uniform1i(g.getUniformLocation(p,'uTex'),0);g.bindVertexArray(geo.vao);g.drawElements(g.TRIANGLES,geo.count,geo.indexType,0);}
  explodeBuilding(b){if(b.hit)return;b.hit=true;b.fragments=[];const info=this.detailed?.[b.type];if(!info)return;
-  if(this.nearBuildings.filter(x=>x.hit&&x.fragments.length).length>12)return;
+  // No silent cap on destruction: every building gets physical fragments.
   for(let i=0;i<info.pieces.length;i++){
-    const p=info.pieces[i],s=info.scaleVec,c=info.center,n=p.node;
+    const p=info.pieces[i],s=b.size.map((v,k)=>v/(info.extents?.[k]||1)),c=info.center,n=p.node;
     const dx=(n[0]-c[0])*s[0],dz=(n[2]-c[2])*s[2],ang=b.rot*Math.PI/180;
     const bx=b.x+Math.cos(ang)*dx+Math.sin(ang)*dz,bz=b.z-Math.sin(ang)*dx+Math.cos(ang)*dz,by=(n[1]-c[1])*s[1];
     const a=Math.atan2(bz-this.impact[1],bx-this.impact[0])+(i%5-2)*.16,force=4.5+(i%7)*.57;
-    b.fragments.push({p,x:bx,y:by,z:bz,vx:Math.cos(a)*force,vz:Math.sin(a)*force,vy:4.2+(i%9)*.53,rx:0,ry:ang,rz:0,ax:(i%7-3)*.93,az:(i%5-2)*.74});
+    b.fragments.push({p,x:bx,y:by,z:bz,vx:Math.cos(a)*force,vz:Math.sin(a)*force,vy:4.2+(i%9)*.53,rx:0,ry:ang,rz:0,ax:(i%7-3)*.93,az:(i%5-2)*.74,scale:s.map(q=>q*b.scale)});
+  }
+ }
+ // Break every environmental GLB into unique, textured geometry pieces.
+ explodeProp(p){if(p.hit)return;p.hit=true;p.fragments=[];const a=this.propModels?.[p.type];
+  if(!a?.pieces?.length){if(p.type==='treeA'||p.type==='treeB')this.hitTree(p);return;}
+  const sv=p.size.map((v,i)=>v/(a.extents?.[i]||1)),scale=(p.scaleXYZ||[p.scale,p.scale,p.scale]),size=sv.map((v,i)=>v*(scale[i]||1));
+  for(let i=0;i<a.pieces.length;i++){const piece=a.pieces[i],n=piece.node,c=a.center,dx=(n[0]-c[0])*size[0],dz=(n[2]-c[2])*size[2],ang=p.yaw;
+   const x=p.x+Math.cos(ang)*dx+Math.sin(ang)*dz,z=p.z-Math.sin(ang)*dx+Math.cos(ang)*dz,y=(p.baseY||0)+(n[1]-(c[1]-a.extents[1]/2))*size[1];
+   const phi=Math.atan2(z-this.impact[1],x-this.impact[0])+(i%5-2)*.25,force=2.6+(i%4)*.85;
+   p.fragments.push({p:piece,x,y,z,vx:Math.cos(phi)*force,vz:Math.sin(phi)*force,vy:2.8+(i%5)*.7,rx:0,ry:ang,rz:0,ax:(i%7-3)*.72,az:(i%5-2)*.69,scale:size});
   }
  }
  hitActor(a){if(a.hit)return;a.hit=true;a.flyT=0;const dx=a.x-this.impact[0],dz=a.z-this.impact[1],d=Math.hypot(dx,dz)||1;
@@ -402,16 +421,16 @@ class WebWorld{
    a.px+=a.vx*dt;a.pz+=a.vz*dt;a.vx*=Math.max(.5,1-dt*1.3);a.vz*=Math.max(.5,1-dt*1.3);
    a.renderLift=Math.max(0,(a.renderLift||0)+a.vy*dt);a.vy-=13*dt;if(a.renderLift<=.01&&a.vy<0){a.renderLift=0;a.vy=0;}
   }}
- stepFragments(dt){if(!this.nearBuildings)return;for(const b of this.nearBuildings)for(const f of b.fragments){
+ stepFragments(dt){for(const b of [...(this.nearBuildings||[]),...(this.campProps||[])])for(const f of b.fragments||[]){
    f.x+=f.vx*dt;f.y+=f.vy*dt;f.z+=f.vz*dt;f.vy-=17*dt;f.rx+=f.ax*dt;f.rz+=f.az*dt;
    if(f.y<.17){f.y=.17;f.vy=Math.max(0,-f.vy*.22);f.vx*=.91;f.vz*=.91;f.ax*=.94;f.az*=.94;}
  }}
  drawDetailed(vp,dist){if(this.modelState!=='ready'||!this.gl?.createVertexArray||dist>370)return;
   this.setupDetailPrograms();if(!this.detailProg)return;const g=this.gl,focus=this.camFocus||this.player;
   for(const b of this.nearBuildings){if(Math.hypot(b.x-focus[0],b.z-focus[1])>Math.max(125,dist*1.4))continue;
-   const asset=this.detailed[b.type];if(!asset)continue;const s=asset.scaleVec,c=asset.center,ang=b.rot*Math.PI/180;
+   const asset=this.detailed[b.type];if(!asset)continue;const s=b.size.map((n,i)=>n/(asset.extents?.[i]||asset.baseSize?.[i]||1)),c=asset.center,ang=b.rot*Math.PI/180;
    if(!b.hit){const model=mul(T(b.x,0,b.z),mul(RY(ang),mul(S3(s[0]*b.scale,s[1]*b.scale,s[2]*b.scale),T(-c[0],-c[1],-c[2]))));this.drawStaticMesh(asset.whole,asset.tex,model,vp);}
-   else for(const f of b.fragments){const model=mul(T(f.x,f.y,f.z),mul(R(f.rx,f.ry,f.rz),S3(s[0]*b.scale,s[1]*b.scale,s[2]*b.scale)));this.drawStaticMesh(f.p.geo,asset.tex,model,vp);}
+   else for(const f of b.fragments){const model=mul(T(f.x,f.y,f.z),mul(R(f.rx,f.ry,f.rz),S3(f.scale[0],f.scale[1],f.scale[2])));this.drawStaticMesh(f.p.geo,asset.tex,model,vp);}
   }
   const now=performance.now(),dt=Math.min(.034,Math.max(.001,(now-(this.lastDetailedTime||now))/1000));this.lastDetailedTime=now;
   if(this.throwing&&this.thrower){const a=this.throwing,k=smooth(clamp((performance.now()-a.start)/400,0,1));this.thrower.angle=lerp(a.startAngle,a.endAngle,k);}

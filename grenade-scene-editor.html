@@ -19,7 +19,7 @@
  <div class="section">
   <div class="sectionTitle"><b>新增模型</b><span id="objectCount">0 個物件</span></div>
   <div class="two"><label>分類<select id="category"><option value="building">建築（手榴彈用）</option><option value="soldier">士兵（手榴彈用）</option><option value="prop">環境物件（手榴彈用）</option><option value="ground">道路與地面（手榴彈用）</option></select></label><label>素材<select id="template"></select></label></div>
-  <p class="qualityHint">每個建築、士兵、環境模型都有「低／高」兩種版本，且能在場景中混用。</p>
+  <p class="qualityHint">原有模型可切換畫質；新增的完整軍營建築與器材使用原版模型，並配置獨立碎裂模型。</p>
   <div class="btnRow"><button id="add" class="primary">＋ 放到鏡頭中心</button><button id="duplicate">複製選取</button><button id="remove" class="danger">刪除選取</button></div>
   <details><summary>場景物件清單（可快速選取）</summary><select id="objectList" size="5" style="margin-top:8px"></select></details>
  </div>
@@ -40,11 +40,11 @@
   </details>
   <div class="btnRow"><button data-nudge="x-">←</button><button data-nudge="z+">↑</button><button data-nudge="z-">↓</button><button data-nudge="x+">→</button><button data-nudge="rot-">↶ 15°</button><button data-nudge="rot+">15° ↷</button></div>
  </div>
- <div class="section last"><div class="btnRow"><button id="undo">↶ 復原</button><button id="redo">↷ 重做</button><button id="export" class="primary">匯出場景 JSON</button><button id="import">匯入 JSON</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
-  <p id="hint">場景會自動存在這台裝置。你可以建立多個手榴彈場景，匯出的 JSON 會記住每個模型的高／低畫質選擇、座標、角度、縮放及可破壞建築的對應碎塊路徑。道路和地面是純色幾何，不分高低貼圖。</p>
+ <div class="section last"><div class="btnRow"><button id="undo">↶ 復原</button><button id="redo">↷ 重做</button><button id="export" class="primary">匯出場景 JSON</button><button id="import">匯入 JSON</button><button id="importMainCamp" class="warm">🏕️ 載入完整軍營（全可破壞）</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
+  <p id="hint">場景會自動存在這台裝置。你可以建立多個手榴彈場景，匯出的 JSON 會記住每個模型的高／低畫質選擇、座標、角度、縮放及所有建築、圍欄、器材的碎塊路徑。道路與地面使用焦黑破壞標記。</p>
   <div id="message"></div>
  </div>
 </aside>
-<script type="module" src="./grenade-scene-editor.js?v=13"></script>
+<script type="module" src="./grenade-scene-editor.js?v=14"></script>
 </body>
 </html>
