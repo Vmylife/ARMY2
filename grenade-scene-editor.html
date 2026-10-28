@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>手榴彈場景編輯器｜ARMY2</title>
-<link rel="stylesheet" href="./grenade-scene-editor.css?v=1">
+<link rel="stylesheet" href="./grenade-scene-editor.css?v=2">
 </head>
 <body>
 <header class="topbar">
@@ -11,8 +11,8 @@
  <div class="topactions"><a href="./editor.html">原軍營編輯器</a><button id="togglePanel">收合工具</button></div>
 </header>
 <main id="stage"><canvas id="world" aria-label="3D 編輯場景"></canvas><div id="loading">載入低配模型中…</div>
- <div id="camHelp">手指點選／拖曳物件 · 空白處平移 · 按「旋轉視角」後拖曳轉動</div>
- <div class="camera"><button id="camOrbit">旋轉視角：關</button><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="homeCamera">回中心</button></div>
+ <div id="camHelp">點選或拖曳模型 · 小物件可先選取再開啟「移動選取」 · 空白處平移</div>
+ <div class="camera"><button id="moveSelected">移動選取：關</button><button id="camOrbit">旋轉視角：關</button><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="homeCamera">回中心</button></div>
 </main>
 <aside id="panel">
  <div class="sceneLine"><label>目前場景<select id="scenes"></select></label><button id="newScene" class="warm">＋ 新增場景</button><button id="renameScene">改名</button><button id="deleteScene" class="danger">刪除場景</button></div>
@@ -43,6 +43,6 @@
   <div id="message"></div>
  </div>
 </aside>
-<script type="module" src="./grenade-scene-editor.js?v=1"></script>
+<script type="module" src="./grenade-scene-editor.js?v=2"></script>
 </body>
 </html>
