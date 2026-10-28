@@ -12,7 +12,7 @@ body.aiming #msg{display:none}
 #meterH{position:fixed;left:5.5%;bottom:calc(16px + env(safe-area-inset-bottom));height:25px;width:89%;z-index:5;background:#102d23ae;border:1px solid #d7e1ac95;border-radius:16px;backdrop-filter:blur(4px);box-shadow:0 4px 14px #0007;overflow:hidden;pointer-events:none}
 #meterH.hide,#meterV.hide,#aimHint.hide,#tapHero.hide{display:none}
 #zoneH{position:absolute;top:0;bottom:0;left:45%;width:10%;background:#bce09255;border-left:2px solid #d9eec0;border-right:2px solid #d9eec0}
-#needleH{position:absolute;top:-1px;bottom:-1px;left:50%;width:5px;border-radius:6px;background:#ffe7a1;box-shadow:0 0 9px 3px #fff0a683;transform:translateX(-50%)}
+
 #meterV{position:fixed;z-index:5;width:25px;height:160px;left:70%;top:43%;background:#102d23bf;border:1px solid #d7e1ac95;border-radius:18px;overflow:hidden;pointer-events:none;box-shadow:0 4px 14px #0007;backdrop-filter:blur(4px)}
 #zoneV{position:absolute;left:0;right:0;top:45%;height:10%;background:#bce09255;border-top:2px solid #d9eec0;border-bottom:2px solid #d9eec0}
 #needleV{position:absolute;left:0;right:0;top:50%;height:5px;border-radius:5px;background:#ffe7a1;box-shadow:0 0 9px 3px #fff0a683;transform:translateY(-50%)}
@@ -48,9 +48,45 @@ body.aiming #msg{display:none}
 #aimHint{position:fixed;z-index:6;left:50%;bottom:calc(58px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:min(88vw,340px);padding:7px 12px;border-radius:999px;background:#11271ee3;border:1px solid #ccb9847c;color:#f4e5a8;white-space:nowrap;pointer-events:none;text-align:center;font-size:12px;font-weight:900;text-shadow:0 1px 3px #061a12;box-shadow:0 6px 18px #0005}
 @media(max-height:730px){#meterH{bottom:calc(88px + env(safe-area-inset-bottom));width:min(80vw,350px);height:120px}#aimHint{bottom:calc(54px + env(safe-area-inset-bottom))}}
 @media(orientation:landscape) and (max-height:530px){#meterH{bottom:calc(16px + env(safe-area-inset-bottom));width:min(46vw,312px);height:100px;padding:8px 10px 10px}#meterH .meter-title{top:6px;font-size:9px}#meterH .meter-title span{font-size:11px}#meterH svg{left:12px;right:12px;bottom:22px;height:58px;width:calc(100% - 24px)}#meterH .dir-labels{left:15px;right:15px;bottom:6px;font-size:10px}#meterV{width:46px;height:132px}#meterV .meter-v-title{font-size:8px}#meterV .meter-v-top,#meterV .meter-v-bottom{font-size:10px}#aimHint{bottom:calc(12px + env(safe-area-inset-bottom));font-size:10px;padding:5px 9px}}
+
+/* v1.9.2: FIX SVG STYLE COLLISION + COMPACT LOWER TACTICAL HUD */
+#meterH{
+ left:50%;bottom:calc(3px + env(safe-area-inset-bottom));
+ width:min(75vw,370px);height:91px;transform:translateX(-50%);
+ padding:0;border-radius:13px;overflow:hidden;
+ background:linear-gradient(170deg,rgba(23,45,33,.96),rgba(12,31,23,.96));
+ border:1px solid rgba(208,196,147,.77);
+ box-shadow:0 6px 18px #0009, inset 0 1px 0 #d8cf8e24;
+ clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px),0 10px)
+}
+#meterH .meter-title{top:3px;font-size:8px;letter-spacing:1.2px;line-height:1.05;color:#baa96c}
+#meterH .meter-title span{font-size:10px;margin-top:1px;color:#f4e6b6}
+#meterH svg{left:13px;right:13px;top:17px;bottom:auto;width:calc(100% - 26px);height:53px;filter:drop-shadow(0 1px 2px #000a)}
+#meterH .dir-labels{left:13px;right:13px;bottom:4px;font-size:9px;color:#d8dfcc}
+#meterH:before{top:5px;left:5px;width:12px;height:9px}
+#meterH:after{bottom:5px;right:5px;width:12px;height:9px}
+#aimHint{bottom:calc(102px + env(safe-area-inset-bottom));padding:5px 9px;font-size:10px;max-width:90vw;background:#14291ee8;border-color:#d0bf8b66}
+/* The stage-one hint is already clear on the panel. Remove the floating bubble so it does not cover the soldier. */
+body.aiming:has(#meterH:not(.hide)) #aimHint{display:none}
+#meterV{width:48px;height:166px;border-radius:12px}
+#meterV:before{top:29px;bottom:27px;width:10px}
+#meterV .meter-v-title{font-size:8px;top:4px}
+#meterV .meter-v-top{top:18px;font-size:10px}
+#meterV .meter-v-bottom{bottom:17px;font-size:10px}
+#needleV{left:5px;right:5px}
+@media (orientation:landscape) and (max-height:530px){
+ #meterH{width:min(50vw,310px);height:72px;bottom:calc(2px + env(safe-area-inset-bottom))}
+ #meterH svg{top:13px;height:42px}
+ #meterH .meter-title{top:2px;font-size:7px}
+ #meterH .meter-title span{font-size:9px}
+ #meterH .dir-labels{font-size:8px;bottom:2px}
+ #aimHint{bottom:calc(82px + env(safe-area-inset-bottom));font-size:9px}
+ #meterV{width:42px;height:128px}
+}
+
 </style></head><body>
 <canvas id="world3d"></canvas>
-<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.9.1 戰術 HUD</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
+<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.9.2 戰術 HUD 修正</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
 <div id="powerDock" class="hide">
   <button id="powerToggle" aria-expanded="false" aria-controls="powerDrawer" aria-label="展開或收合手榴彈威力設定">💥 威力 <strong id="powerMiniValue">10</strong> <span id="powerChevron">▾</span></button>
   <div id="powerDrawer" hidden><div class="powerHead"><span>威力（0～100）</span><span id="powerOut">10</span></div>
@@ -70,7 +106,7 @@ body.aiming #msg{display:none}
   <line x1="160" y1="68" x2="160" y2="60" stroke="#8e9678" stroke-width="2"/>
   <line x1="248" y1="24" x2="258" y2="28" stroke="#8e9678" stroke-width="2"/>
   <line id="needleHGlow" x1="160" y1="88" x2="160" y2="14" stroke="#ffb3b3" stroke-width="6" stroke-linecap="round" opacity=".22"/>
-  <line id="needleH" x1="160" y1="88" x2="160" y2="14" stroke="#e13b3b" stroke-width="3.6" stroke-linecap="round"/>
+  <line id="grenadeDirectionRay" x1="160" y1="88" x2="160" y2="14" stroke="#e13b3b" stroke-width="3.6" stroke-linecap="round"/>
   <circle cx="160" cy="88" r="5" fill="#dfcf8d" stroke="#233428" stroke-width="2"/>
  </svg>
  <div class="dir-labels"><span>左翼</span><span>中央</span><span>右翼</span></div>
@@ -150,7 +186,7 @@ $('galleryButton').addEventListener('click',openGallery);$('seeGallery').addEven
 function result(){if(phase!=='blast')return;setState('end');world.camPhase='blast';$('resultHeading').textContent=power>=85?'報告長官！宇宙出事了！':power>=65?'報告長官！災情擴大！':power>=20?'報告長官！整片都炸了！':'手榴彈試炸完成';$('rBuildings').textContent=fmt(world.counter.buildings);$('rKills').textContent=fmt(world.counter.kills);$('rRed').textContent=fmt(world.counter.red);$('rGreen').textContent=fmt(world.counter.green);$('newLandmarks').textContent=reportedLandmarks.size?`本次波及地標：${[...reportedLandmarks].join('、')}`:'本次沒有解鎖新地標';$('result').classList.add('show');}
 function tick(t){requestAnimationFrame(tick);const dt=clamp((t-old)/1000,0,.045);old=t;
  if(phase==='intro'){clock+=dt;world.introProgress=Math.min(1,clock/9);if(clock>=9){reset();$('msg').textContent='鏡頭下降到投擲者後方，紅軍在右前方';}}
- if(phase==='aimX'||phase==='aimZ'){clock+=dt;pos=.5+.5*Math.sin(clock*(phase==='aimX'?3.25:3.77));if(phase==='aimX'){const dirX=24+272*pos;$('needleH').setAttribute('x2',String(dirX));$('needleHGlow').setAttribute('x2',String(dirX));}else $('needleV').style.top=`${(1-pos)*100}%`;positionAimHUD();}
+ if(phase==='aimX'||phase==='aimZ'){clock+=dt;pos=.5+.5*Math.sin(clock*(phase==='aimX'?3.25:3.77));if(phase==='aimX'){const dirX=24+272*pos;$('grenadeDirectionRay').setAttribute('x2',String(dirX));$('needleHGlow').setAttribute('x2',String(dirX));}else $('needleV').style.top=`${16+(1-pos)*68}%`;positionAimHUD();}
  if(phase==='landed'){landingClock+=dt;world.landingProgress=clamp(landingClock/1.0,0,1);if(landingClock>=1.0)detonate();}
  if(phase==='blast'){$('blastFlash').style.opacity=String(Math.min(.83,Math.exp(-world.timer*4.3)*(.25+Math.log10(world.blastMax+1)*.13)));if(world.advance(dt)){if(!resultTimer)resultTimer=t+1550;if(t>=resultTimer)result();}
    $('buildings').textContent=fmt(world.counter.buildings);$('kills').textContent=fmt(world.counter.kills);
