@@ -119,15 +119,7 @@ gl_FragColor=vec4(col,1.);}`;
 const RING_VS=`precision highp float;attribute vec4 aRing;uniform mat4 uVP;uniform vec2 uCenter;uniform float uRadius,uWidth;varying float vAl;void main(){float r=max(0.,uRadius+aRing.z*uWidth);vec3 p=vec3(uCenter.x+aRing.x*r,.52,uCenter.y+aRing.y*r);gl_Position=uVP*vec4(p,1.);vAl=aRing.w;}`;
 const RING_FS=`precision mediump float;varying float vAl;void main(){gl_FragColor=vec4(1.,.63,.23,vAl*.82);}`;
 const PLANET_VS=`precision highp float;attribute vec3 aPos;attribute vec3 aNorm;uniform mat4 uVP;uniform vec3 uCenter;uniform float uScale;varying vec3 vP,vN;void main(){vP=aPos;vN=aNorm;gl_Position=uVP*vec4(uCenter+aPos*uScale,1.);}`;
-const PLANET_FS=`precision mediump float;uniform float uDamage,uEarth,uHue,uTime,uBlastR;uniform vec3 uBlast;varying vec3 vP,vN;void main(){vec3 n=normalize(vN);float light=.31+.67*max(0.,dot(n,normalize(vec3(-.55,.8,.8))));float terrain=sin(n.x*13.+sin(n.z*7.)*3.)*sin(n.y*18.+n.x*9.)+sin(n.z*32.+n.x*11.)*.4;
-vec3 earth=mix(vec3(.05,.30,.62),vec3(.20,.55,.33),smoothstep(.17,.42,terrain));earth=mix(earth,vec3(.78,.82,.75),smoothstep(.75,.88,n.y));
-vec3 base=mix(vec3(.39,.30,.22)+vec3(.27,.12,.04)*sin(terrain*2.+uHue),earth,uEarth);
-float c=abs(sin(n.x*28.+sin(n.y*12.))+sin(n.y*20.+n.z*10.))*.5;float crack=1.-smoothstep(.035,.14,c);base=mix(base,vec3(1.,.42,.08),crack*clamp(uDamage,0.,1.)*.93);
-float rim=pow(1.-abs(n.z),3.);base+=vec3(.09,.18,.28)*rim*uEarth;
-float active=smoothstep(.001,.02,uBlastR);float geo=1.-dot(normalize(vP),normalize(uBlast));
-float scorch=1.-smoothstep(uBlastR,uBlastR+.08,geo);float edge=smoothstep(max(0.,uBlastR-.035),uBlastR+.01,geo)-smoothstep(uBlastR+.01,uBlastR+.065,geo);
-base=mix(base,base*vec3(.18,.17,.16),scorch*.96*active*uEarth);base+=vec3(.95,.38,.08)*edge*.75*active;
-gl_FragColor=vec4(base*light+vec3(1.,.27,.05)*uDamage*crack*.45,1.);}`;
+const PLANET_FS=`precision mediump float;uniform float uDamage,uEarth,uHue,uTime,uBlastR;uniform vec3 uBlast;varying vec3 vP,vN;void main(){vec3 n=normalize(vN);float light=.36+.64*max(0.,dot(n,normalize(vec3(-.55,.82,.82))));float terrain=sin(n.x*9.+sin(n.z*5.)*2.)*sin(n.y*11.+n.x*7.)+sin(n.z*18.+n.x*7.)*.3;vec3 earth=mix(vec3(.06,.31,.66),vec3(.17,.54,.31),smoothstep(.16,.40,terrain));earth=mix(earth,vec3(.77,.82,.76),smoothstep(.78,.90,n.y));vec3 rocky=vec3(.45,.33,.24)+vec3(.18,.10,.05)*sin(terrain*2.+uHue);vec3 base=mix(rocky,earth,uEarth);float crack=0.;if(uEarth<.5){float c=abs(sin(n.x*28.+sin(n.y*12.))+sin(n.y*20.+n.z*10.))*.5;crack=1.-smoothstep(.035,.14,c);base=mix(base,vec3(1.,.42,.08),crack*clamp(uDamage,0.,1.)*.93);}float rim=pow(1.-abs(n.z),3.);base+=vec3(.09,.18,.28)*rim*uEarth;float active=smoothstep(.001,.02,uBlastR);if(uEarth>.5&&active>.0){float blastDist=1.-dot(normalize(vP),normalize(uBlast));float scorch=1.-smoothstep(max(0.,uBlastR-.12),uBlastR+.04,blastDist);float wave=exp(-pow((blastDist-uBlastR)/.03,2.));float hotEdge=exp(-pow((blastDist-uBlastR)/.012,2.));base=mix(base,base*vec3(.14,.13,.12),clamp(scorch,0.,1.)*.97);base=mix(base,vec3(.28,.24,.21),clamp(scorch-.25,0.,1.)*.40);base+=vec3(1.0,.43,.10)*wave*.72;base+=vec3(1.0,.72,.25)*hotEdge*.58;}gl_FragColor=vec4(base*light+vec3(1.,.27,.05)*uDamage*crack*.45,1.);}`;
 const FX_VS=`precision highp float;attribute vec3 p;uniform mat4 uVP;uniform vec3 uCenter;uniform vec3 uSize;varying vec3 vP;void main(){vP=p;gl_Position=uVP*vec4(uCenter+p*uSize,1.);}`;
 const FX_FS=`precision mediump float;varying vec3 vP;uniform vec3 uColor;uniform float uAlpha,uHot,uTime;void main(){
  float pattern=sin(vP.x*17.+uTime*4.)*sin(vP.y*13.-uTime*2.)*sin(vP.z*15.+uTime*3.);
@@ -137,7 +129,7 @@ const FX_FS=`precision mediump float;varying vec3 vP;uniform vec3 uColor;uniform
 function compile(gl,vs,fs){const p=gl.createProgram();for(const [str,kind] of [[vs,gl.VERTEX_SHADER],[fs,gl.FRAGMENT_SHADER]]){const s=gl.createShader(kind);gl.shaderSource(s,str);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));gl.attachShader(p,s);}gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));return p;}
 function sphereMesh(){const out=[];const n=20,m=32;for(let i=0;i<n;i++)for(let j=0;j<m;j++){let a=i*Math.PI/n,b=(i+1)*Math.PI/n,c=j*Math.PI*2/m,d=(j+1)*Math.PI*2/m;const xyz=(th,ph)=>[Math.sin(th)*Math.cos(ph),Math.cos(th),Math.sin(th)*Math.sin(ph)];const verts=[xyz(a,c),xyz(b,c),xyz(b,d),xyz(a,c),xyz(b,d),xyz(a,d)];verts.forEach(v=>out.push(...v,...v));}return new Float32Array(out);}
 class WebWorld{
- constructor(){this.gl=null;this.fallback=null;this.ext=null;this.quality=1;this.width=0;this.height=0;this.impact=[0,17];this.radius=-1;this.time=0;this.mode='field';this.flyingT=0;this.mapDone=false;this.counter={buildings:0,kills:0,red:0,green:0};this.sorted=[];this.events=[];this.eventIndex=0;this.newLandmarks=[];this.LM=new Set();this.blastMax=0;this.blastDuration=10;this.timer=0;this.bursts=[];this.fxTick=0;
+ constructor(){this.gl=null;this.fallback=null;this.ext=null;this.quality=1;this.width=0;this.height=0;this.impact=[0,17];this.radius=-1;this.time=0;this.mode='field';this.earthStage='';this.flyingT=0;this.mapDone=false;this.counter={buildings:0,kills:0,red:0,green:0};this.sorted=[];this.events=[];this.eventIndex=0;this.newLandmarks=[];this.LM=new Set();this.blastMax=0;this.blastDuration=10;this.timer=0;this.bursts=[];this.fxTick=0;
  try{this.gl=c.getContext('webgl2',{alpha:false,antialias:true,powerPreference:'default'})||c.getContext('webgl',{alpha:false,antialias:false,powerPreference:'low-power'});if(!this.gl)throw Error('no WebGL');this.setup();}catch(e){console.warn('3D fallback:',e);const hadContext=!!this.gl;this.gl=null;
  if(hadContext){this.backup=document.createElement('canvas');this.backup.id='world3d-cpu';this.backup.style.cssText='position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;display:none';c.parentNode.insertBefore(this.backup,c.nextSibling);this.fallback=this.backup.getContext('2d');c.style.opacity='0';}
  else this.fallback=c.getContext('2d');}
@@ -170,7 +162,7 @@ class WebWorld{
  }
 
  buildEvents(){this.events=[];const [ix,iz]=this.impact;buildings.forEach((v,i)=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'b',v}));soldiers.forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'s',v}));(this.nearBuildings||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'detail',v}));(this.actors||[]).forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'actor',v}));(this.campProps||[]).filter(v=>v.type==='treeA'||v.type==='treeB').forEach(v=>this.events.push({r:Math.hypot(v.x-ix,v.z-iz),type:'tree',v}));landmarks.forEach(v=>this.events.push({r:v.radius||Math.hypot(v.x-ix,v.z-iz),type:'land',v}));this.events.sort((a,b)=>a.r-b.r);this.eventIndex=0;this.counter={buildings:0,kills:0,red:0,green:0};this.newLandmarks=[];this.LM=new Set();if(this.nearBuildings)this.nearBuildings.forEach(b=>{b.hit=false;b.fragments=[]});if(this.actors)this.actors.forEach(a=>{a.hit=false;a.flyT=0;a.px=a.x;a.pz=a.z;a.renderLift=0;a.angle=a.rot*Math.PI/180;a.anim?.setClip('Idle_11',{restart:true})});if(this.campProps)this.campProps.forEach(p=>{p.hit=false;p.fallT=0;p.tilt=0});this.bursts=[];if(this.thrower?.anim){this.thrower.anim.speed=1;this.thrower.anim.setClip('Idle_11',{restart:true});}}
- setLanding(x,z){this.impact=[x,z];this.radius=-1;this.mode='field';this.buildEvents();}
+ setLanding(x,z){this.impact=[x,z];this.radius=-1;this.mode='field';this.earthStage='';this.buildEvents();}
  begin(powder,density,quality,broken){const amount=Math.max(0,powder)/600, comp=Math.max(1,density/.6);let max=6+Math.pow(amount,1.37)*Math.pow(comp,2.65)*17*Math.max(.06,quality)*(broken?.39:1);max=clamp(max,7,2300);this.blastMax=max;this.blastDuration=2.5+Math.min(10,Math.log10(max+1)*1.8);this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();return max;}
  beginTestPower(power){const points=[[0,2.5],[10,13.3],[20,38],[35,140],[50,440],[65,1350],[75,1750],[88,2050],[100,2300]];let max=2300;for(let i=1;i<points.length;i++)if(power<=points[i][0]){const a=points[i-1],b=points[i],t=(power-a[0])/(b[0]-a[0]);max=Math.exp(Math.log(a[1])+(Math.log(b[1])-Math.log(a[1]))*t);break;}this.impactStarted=performance.now();this.blastMax=max;this.blastDuration=4.8+Math.min(6.5,Math.log10(max+1)*1.35);this.timer=0;this.radius=0;this.time=.01;this.mode='field';this.buildEvents();this.lastHitR=0;this.bursts=[{x:this.impact[0],z:this.impact[1],age:0,life:4.3,size:Math.min(12,2.2+Math.log10(max+1)*2.2),type:'origin',seed:.27}];return max;}
  advance(dt){if(this.timer>=this.blastDuration)return true;this.timer=Math.min(this.blastDuration,this.timer+dt);this.time+=dt;const x=clamp(this.timer/this.blastDuration,0,1),smooth=1-Math.pow(1-x,1.12);this.radius=Math.expm1(Math.log1p(this.blastMax)*smooth);
@@ -492,17 +484,37 @@ class WebWorld{
  drawSphere(vp,center,radius,earth,damage,hue){const g=this.gl,p=this.pPlanet;g.useProgram(p);g.bindBuffer(g.ARRAY_BUFFER,this.sphere);for(const [name,s,off] of [['aPos',3,0],['aNorm',3,12]]){const id=g.getAttribLocation(p,name);g.enableVertexAttribArray(id);g.vertexAttribPointer(id,s,g.FLOAT,false,24,off);}
  const u=n=>g.getUniformLocation(p,n);g.uniformMatrix4fv(u('uVP'),false,vp);g.uniform3fv(u('uCenter'),center);g.uniform1f(u('uScale'),radius);g.uniform1f(u('uDamage'),damage);g.uniform1f(u('uEarth'),earth);g.uniform1f(u('uHue'),hue);g.uniform1f(u('uTime'),this.time);const blast=arguments[6]||[0,0,1],blastR=arguments[7]||0;const ub=u('uBlast');if(ub)g.uniform3fv(ub,blast);const ur=u('uBlastR');if(ur)g.uniform1f(ur,blastR);
  g.drawArrays(g.TRIANGLES,0,this.sphereVertices.length/6);}
- drawEarth(){const g=this.gl;g.clearColor(.02,.03,.075,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);
-  const scale=10.8,blastDir=norm([0.72,.26,.64]);
+ drawEarthLabel(vp,pos,text){const ctx=this.fallback;if(!ctx)return;const project=(x,y,z)=>{const v=[x,y,z,1];const cx=vp[0]*v[0]+vp[4]*v[1]+vp[8]*v[2]+vp[12],cy=vp[1]*v[0]+vp[5]*v[1]+vp[9]*v[2]+vp[13],cw=vp[3]*v[0]+vp[7]*v[1]+vp[11]*v[2]+vp[15];if(cw<=0)return null;return [(cx/cw*.5+.5)*c.width,(.5-cy/cw*.5)*c.height];};const p=project(pos[0],pos[1],pos[2]);if(!p)return;ctx.save();ctx.font='bold 24px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='rgba(7,18,14,.78)';const padX=18,padY=10,w=ctx.measureText(text).width+padX*2,h=42;ctx.beginPath();ctx.roundRect?.(p[0]-w/2,p[1]-h/2,w,h,16);if(!ctx.roundRect){ctx.rect(p[0]-w/2,p[1]-h/2,w,h);}ctx.fill();ctx.strokeStyle='rgba(241,214,140,.85)';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#f6efca';ctx.fillText(text,p[0],p[1]+1);ctx.restore();}
+
+ drawEarth(){const g=this.gl;g.clearColor(.012,.018,.052,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);
+  const scale=10.8,blastDir=norm([0.80,.18,.56]);
   const k=clamp((this.radius-1700)/Math.max(1,this.blastMax-1700),0,1);
+  this.earthStage=k<.34?'taiwan':k<.72?'asia':'earth';
   let eye,target;
-  if(k<.34){const u=smooth(k/.34);eye=mix3([13,5.5,8.5],[18,8.5,13.5],u);target=mix3(blastDir.map(v=>v*scale),[1.9,.8,1.0],u);}
-  else if(k<.72){const u=smooth((k-.34)/.38);eye=mix3([18,8.5,13.5],[27,12.5,20.5],u);target=mix3([1.9,.8,1.0],[0,0,0],u);}
-  else {const u=smooth((k-.72)/.28);eye=mix3([27,12.5,20.5],[37,16.5,29.5],u);target=[0,0,0];}
-  const vp=mul(pers(43,c.width/c.height,.1,240),lookAt(eye,target));
-  const damage=clamp(.28+k*.85,0,1),blastR=lerp(.010,.62,k);
+  if(k<.34){
+    const u=smooth(k/.34);
+    eye=mix3([9.8,2.8,7.6],[12.8,5.7,10.6],u);
+    target=mix3(blastDir.map(v=>v*scale),blastDir.map(v=>v*(scale*.93)),u);
+  }else if(k<.72){
+    const u=smooth((k-.34)/.38);
+    eye=mix3([12.8,5.7,10.6],[18.8,9.8,15.4],u);
+    target=mix3(blastDir.map(v=>v*(scale*.93)),blastDir.map(v=>v*(scale*.63)),u);
+  }else{
+    const u=smooth((k-.72)/.28);
+    eye=mix3([18.8,9.8,15.4],[27.8,14.8,23.6],u);
+    target=mix3(blastDir.map(v=>v*(scale*.63)),[0,0,0],u);
+  }
+  const vp=mul(pers(42,c.width/c.height,.1,260),lookAt(eye,target));
+  const blastR=lerp(.018,1.98,k),damage=clamp(.20+k*.95,0,1);
   this.drawSphere(vp,[0,0,0],scale,1,damage,0,blastDir,blastR);
-  if(k>.1){for(let i=0;i<11;i++){const ang=i*Math.PI*2/11+this.time*.35;const rr=scale*(1.23+.10*Math.sin(i*2.3+this.time));const y=Math.sin(i*3.1+this.time*.6)*1.6;this.drawSphere(vp,[Math.cos(ang)*rr,y,Math.sin(ang)*rr],.22+(i%3)*.06,0,.40,3,blastDir,0);}}}
+  if(k<.34){
+    const labelPos=[blastDir[0]*scale*1.01,blastDir[1]*scale*1.01,blastDir[2]*scale*1.01];
+    this.drawEarthLabel(vp,labelPos,'台灣');
+  }else if(k<.72){
+    const labelPos=[blastDir[0]*scale*.96-1.1,blastDir[1]*scale*.96+.65,blastDir[2]*scale*.96+.15];
+    this.drawEarthLabel(vp,labelPos,'亞洲');
+  }
+ }
  drawFallback(){
  // CPU backup draws actual perspective-projected 3D boxes, shaded faces and rooftops.
  // No textures / 3D library needed; designed for WebGL-disabled phones.
@@ -511,15 +523,19 @@ class WebWorld{
  const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,this.mode!=='field'?'#080c1d':'#a9d0eb');sky.addColorStop(.50,this.mode!=='field'?'#11122b':'#d5e5c8');sky.addColorStop(1,this.mode!=='field'?'#070b1b':'#abc49e');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
  if(this.mode==='earth'){
    for(let i=0;i<190;i++){const sx=((i*171.17+Math.sin(i)*77)%1+1)%1*w,sy=((i*131.78+Math.cos(i*13)*19)%1+1)%1*h;ctx.globalAlpha=.20+(i%9)*.075;ctx.fillStyle=i%8===0?'#ffdca2':'#d2e7ff';ctx.fillRect(sx,sy,(i%5===0?2:1),i%5===0?2:1);}ctx.globalAlpha=1;
-   const k=clamp((this.radius-1700)/Math.max(1,this.blastMax-1700),0,1);
-   const R1=Math.min(w*.42,h*.46),R2=Math.min(w*.31,h*.34),R3=Math.min(w*.22,h*.24);
-   const R=k<.34?lerp(R1,R2,smooth(k/.34)):k<.72?lerp(R2,R3,smooth((k-.34)/.38)):lerp(R3,Math.min(w*.18,h*.19),smooth((k-.72)/.28));
-   const x=w*.5,y=h*.54;const grad=ctx.createRadialGradient(x-R*.30,y-R*.35,R*.02,x,y,R);grad.addColorStop(0,'#cde0ee');grad.addColorStop(.24,'#4d8bc0');grad.addColorStop(.74,'#16527d');grad.addColorStop(1,'#0f2438');ctx.fillStyle=grad;ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.fill();
+   const k=clamp((this.radius-1700)/Math.max(1,this.blastMax-1700),0,1);const stage=k<.34?'taiwan':k<.72?'asia':'earth';this.earthStage=stage;
+   const Rstage=stage==='taiwan'?Math.min(w*.86,h*.88):stage==='asia'?Math.min(w*.67,h*.70):Math.min(w*.43,h*.46);
+   const mixA=stage==='taiwan'?smooth(k/.34):stage==='asia'?smooth((k-.34)/.38):smooth((k-.72)/.28);
+   const R=stage==='taiwan'?lerp(Math.min(w*.98,h*.98),Math.min(w*.72,h*.74),mixA):stage==='asia'?lerp(Math.min(w*.72,h*.74),Math.min(w*.50,h*.52),mixA):lerp(Math.min(w*.50,h*.52),Math.min(w*.38,h*.40),mixA);
+   const x=w*.5+(stage==='taiwan'?-w*.05*(1-mixA):stage==='asia'?-w*.02*(1-mixA):0),y=stage==='taiwan'?h*.78:stage==='asia'?h*.66:h*.53;
+   const grad=ctx.createRadialGradient(x-R*.28,y-R*.33,R*.02,x,y,R);grad.addColorStop(0,'#d4e5f1');grad.addColorStop(.24,'#4e8fc4');grad.addColorStop(.74,'#185683');grad.addColorStop(1,'#0d2234');ctx.fillStyle=grad;ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.fill();
    ctx.save();ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.clip();ctx.fillStyle='#4b7d52';
-   const continents=k<.34?[[.18,-.08,.28,.17,.2],[.33,.01,.12,.10,-.4],[.08,.16,.10,.08,.5]]:k<.72?[[-.18,-.08,.22,.15,-.2],[.02,-.02,.30,.18,.1],[.25,.12,.18,.12,.5]]:[[-.22,-.12,.22,.14,-.5],[.02,-.02,.36,.20,.08],[.28,.13,.17,.12,.55],[-.02,.20,.12,.08,.3]];
+   const continents=stage==='taiwan'?[[.08,-.04,.20,.13,.2],[.17,.01,.10,.07,-.3],[.24,.05,.045,.034,0],[.29,.00,.025,.018,0]]:stage==='asia'?[[-.10,-.08,.18,.13,-.4],[.05,-.03,.34,.18,.12],[.30,.12,.14,.09,.55],[.18,-.10,.05,.04,-.5]]:[[-.24,-.10,.18,.12,-.6],[-.06,-.02,.22,.15,-.2],[.08,-.02,.34,.18,.08],[.30,.12,.15,.10,.55],[.02,.23,.12,.07,.25],[-.28,.18,.12,.08,.8]];
    for(const c of continents){ctx.beginPath();ctx.ellipse(x+R*c[0],y+R*c[1],R*c[2],R*c[3],c[4],0,Math.PI*2);ctx.fill();}
-   const scorchR=lerp(R*.05,R*.48,k),edgeR=scorchR*1.08;ctx.fillStyle='#151313';ctx.beginPath();ctx.arc(x+R*.18,y-R*.02,scorchR,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(255,138,61,.72)';ctx.lineWidth=Math.max(2,R*.025);ctx.beginPath();ctx.arc(x+R*.18,y-R*.02,edgeR,0,Math.PI*2);ctx.stroke();
-   ctx.fillStyle='#d6d6c8';ctx.beginPath();ctx.arc(x+R*.18,y-R*.02,Math.max(2,R*.015),0,Math.PI*2);ctx.fill();ctx.restore();
+   // Taiwan island marker in close / medium views
+   if(stage!=='earth'){ctx.fillStyle='#f1e4a1';ctx.beginPath();ctx.ellipse(x+R*.26,y+R*.00,R*.020,R*.040,.20,0,Math.PI*2);ctx.fill();}
+   const scorch=lerp(R*.03,R*1.34,k),ring=scorch*1.015;ctx.fillStyle='rgba(16,14,14,.88)';ctx.beginPath();ctx.arc(x+R*.20,y-R*.02,scorch,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(255,133,56,.90)';ctx.lineWidth=Math.max(2,R*.026);ctx.beginPath();ctx.arc(x+R*.20,y-R*.02,ring,0,Math.PI*2);ctx.stroke();ctx.restore();
+   if(stage==='taiwan'||stage==='asia'){const label=stage==='taiwan'?'台灣':'亞洲';ctx.font='bold 22px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';const lx=stage==='taiwan'?x+R*.28:x+R*.02,ly=stage==='taiwan'?y-R*.22:y-R*.28;const bw=ctx.measureText(label).width+28,bh=40;ctx.fillStyle='rgba(7,18,14,.78)';ctx.strokeStyle='rgba(241,214,140,.85)';ctx.lineWidth=2;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(lx-bw/2,ly-bh/2,bw,bh,16);else ctx.rect(lx-bw/2,ly-bh/2,bw,bh);ctx.fill();ctx.stroke();ctx.fillStyle='#f6efca';ctx.fillText(label,lx,ly+1);}
    return;
  }
  let dist=this.radius<0?31:clamp(this.radius*.88+24,24,7600);
