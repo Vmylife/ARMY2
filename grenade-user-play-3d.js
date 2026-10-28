@@ -2,7 +2,7 @@ import {loadGlb} from "./src/core/glb111.js";
 import {RigAnimator} from "./src/characters/rigAnimator.js";
 import './src/map/activeCampLayout116.js?v=126';
 import {makeEnvironment as makeOriginalCampGround} from './src/map/ground103.js?v=103';
-const USER_SCENE = await fetch('./grenade-user-scene.json?v=28').then(async r=>{if(!r.ok)throw Error('找不到手榴彈場景 JSON');return r.json()});
+const USER_SCENE = await fetch('./grenade-user-scene.json?v=130').then(async r=>{if(!r.ok)throw Error('找不到手榴彈場景 JSON');return r.json()});
 /* Army grenade arena v1.0. Custom dependency-free WebGL instanced 3D.
  * Fictional game-only explosion scales and estimates: not physical modelling.
  */
@@ -42,7 +42,21 @@ const S3=(x,y,z)=>new Float32Array([x,0,0,0,0,y,0,0,0,0,z,0,0,0,0,1]);
 const RY=(a)=>{const c=Math.cos(a),s=Math.sin(a);return new Float32Array([c,0,-s,0,0,1,0,0,s,0,c,0,0,0,0,1]);};
 const R=(x,y,z)=>{const sx=Math.sin(x),cx=Math.cos(x),sy=Math.sin(y),cy=Math.cos(y),sz=Math.sin(z),cz=Math.cos(z);return new Float32Array([cy*cz,cy*sz,-sy,0,sx*sy*cz-cx*sz,sx*sy*sz+cx*cz,sx*cy,0,cx*sy*cz+sx*sz,cx*sy*sz-sx*cz,cx*cy,0,0,0,0,1]);};
 const buildings=[],soldiers=[],landmarks=[];
-const ITEMS=USER_SCENE.items;
+// Keep the firing lane clear even if an older scene file is cached or re-exported.
+// The perimeter polygon is measured from the ORIGINAL fence positions before these
+// obstructing sections are removed, so the invisible wall stays in its old place.
+const REMOVED_THROW_LANE_FENCES=new Set(['main-prop-134','main-prop-171','main-prop-172','main-prop-173','main-prop-174','main-prop-175','main-prop-176','main-prop-177','main-prop-178']);
+const ORIGINAL_FENCE_POINTS=USER_SCENE.items.filter(v=>v.assetId==='fence').map(v=>[v.x,v.z]);
+function convexCampPerimeter(points){
+ const list=points.slice().sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
+ const cross=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
+ const low=[],up=[];
+ for(const p of list){while(low.length>=2&&cross(low[low.length-2],low[low.length-1],p)<=0)low.pop();low.push(p);}
+ for(const p of list.slice().reverse()){while(up.length>=2&&cross(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p);}
+ return low.slice(0,-1).concat(up.slice(0,-1));
+}
+const CAMP_WALL=convexCampPerimeter(ORIGINAL_FENCE_POINTS);
+const ITEMS=USER_SCENE.items.filter(v=>!REMOVED_THROW_LANE_FENCES.has(v.uid));
 const PLAYER_ITEM=ITEMS.find(v=>v.uid===(USER_SCENE.throwerUid||'g10001'));
 if(!PLAYER_ITEM)throw Error('投擲者 g10001 不在目前匯出的場景裡');
 const ENEMY_GROUPS=[];
@@ -69,7 +83,11 @@ updateRedSelection(activeGroupIndex);
 function playerAimPose(){
  const fx=AIM_CENTER[0]-PLAYER_ITEM.x,fz=AIM_CENTER[1]-PLAYER_ITEM.z,len=Math.hypot(fx,fz)||1;
  const nx=fx/len,nz=fz/len,rx=nz,rz=-nx;
- return {forward:[nx,nz],right:[rx,rz],eye:[PLAYER_ITEM.x-nx*5.6+rx*.75,2.0,PLAYER_ITEM.z-nz*5.6+rz*.75],target:[PLAYER_ITEM.x+nx*19,2.35,PLAYER_ITEM.z+nz*19]};
+ // On a portrait phone use a true behind-the-back camera: thrower at 50% X.
+ // The older +0.75m shoulder shift displaced him to the right on narrow screens.
+ const portraitPhone=(c.clientWidth||window.innerWidth)<=700&&(c.clientHeight||window.innerHeight)>(c.clientWidth||window.innerWidth);
+ const shoulder=portraitPhone?0:.75;
+ return {forward:[nx,nz],right:[rx,rz],eye:[PLAYER_ITEM.x-nx*5.6+rx*shoulder,2.0,PLAYER_ITEM.z-nz*5.6+rz*shoulder],target:[PLAYER_ITEM.x+nx*19+rx*shoulder,2.35,PLAYER_ITEM.z+nz*19+rz*shoulder]};
 }
 function initMap(){seed=319427;buildings.length=0;soldiers.length=0;}
 initMap();
@@ -640,6 +658,41 @@ class WebWorld{
   const g=this.gl,p=this.detailProg,u=k=>g.getUniformLocation(p,k);g.useProgram(p);g.uniformMatrix4fv(u('uVP'),false,vp);g.uniformMatrix4fv(u('uModel'),false,model);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,this.grenadeBlank);g.uniform1i(u('uTex'),0);
   for(const part of this.grenadeParts){g.uniform3fv(u('uTint'),part.tint);g.bindVertexArray(part.geo.vao);g.disable(g.CULL_FACE);g.drawElements(g.TRIANGLES,part.geo.count,part.geo.indexType,0);}g.enable(g.CULL_FACE);g.bindVertexArray(null);
  }
+ // The arena wall is collision-only: no extra fence model or visible geometry.
+ // A swept test against the true camp perimeter prevents even fast throws leaving it.
+ sweepCampWall(from,to,r=.23){
+  const poly=CAMP_WALL;if(poly.length<3)return null;
+  let best=null;
+  for(let i=0;i<poly.length;i++){
+   const a=poly[i],b=poly[(i+1)%poly.length],dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz)||1;
+   // Convex hull is CCW; (-dz,dx) points inward.
+   const nx=-dz/len,nz=dx/len;
+   const d0=(from[0]-a[0])*nx+(from[2]-a[1])*nz-r;
+   const d1=(to[0]-a[0])*nx+(to[2]-a[1])*nz-r;
+   if(d0>=0&&d1>=0)continue;
+   // An invalid spawn outside the camp is corrected on the first step.
+   if(d0<0){
+    const cand={t:0,normal:[nx,0,nz],penetration:-d0};
+    if(!best||best.t>0||cand.penetration>best.penetration)best=cand;
+   }else if(d1<0){
+    const t=d0/(d0-d1);
+    if(!best||t<best.t)best={t,normal:[nx,0,nz],penetration:0};
+   }
+  }
+  return best;
+ }
+ clampGrenadeInsideCamp(pos,r=.23){
+  for(let pass=0;pass<4;pass++){
+   let moved=false;
+   for(let i=0;i<CAMP_WALL.length;i++){
+    const a=CAMP_WALL[i],b=CAMP_WALL[(i+1)%CAMP_WALL.length],dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz)||1,nx=-dz/len,nz=dx/len;
+    const d=(pos[0]-a[0])*nx+(pos[2]-a[1])*nz;
+    if(d<r){pos[0]+=(r-d+.004)*nx;pos[2]+=(r-d+.004)*nz;moved=true;}
+   }
+   if(!moved)break;
+  }
+  return pos;
+ }
  // Buildings use an oriented bounding box matching the original scene rotation and size.
  // Sweep the complete grenade segment, not just its end point, to prevent tunneling.
  sweepBuilding(from,to,r=.23){
@@ -678,17 +731,21 @@ class WebWorld{
    a.accum-=step;a.age+=step;
    const prev=a.pos.slice(),next=[a.pos[0]+a.vel[0]*step,a.pos[1]+a.vel[1]*step,a.pos[2]+a.vel[2]*step];
    a.vel[1]-=a.gravity*step;
-   const hit=this.sweepBuilding(prev,next,r);
+   const buildingHit=this.sweepBuilding(prev,next,r);
+   const wallHit=this.sweepCampWall(prev,next,r);
+   const hit=wallHit&&(!buildingHit||wallHit.t<=buildingHit.t)?wallHit:buildingHit;
    if(hit){
     const t=Math.max(0,hit.t-1e-4),n=hit.normal;
     a.pos=[prev[0]+(next[0]-prev[0])*t+n[0]*.025,prev[1]+(next[1]-prev[1])*t+n[1]*.025,prev[2]+(next[2]-prev[2])*t+n[2]*.025];
     const vn=a.vel[0]*n[0]+a.vel[1]*n[1]+a.vel[2]*n[2];
-    if(vn<0){const bounce=hit.building.size[1]>.5?.53:.35;
+    if(vn<0){const bounce=hit.building?(hit.building.size[1]>.5?.53:.35):.53;
       for(let i=0;i<3;i++)a.vel[i]-=(1+bounce)*vn*n[i];
       a.vel[0]*=.78;a.vel[2]*=.78;
     }
+    if(wallHit===hit)this.clampGrenadeInsideCamp(a.pos,r);
     a.bounces=(a.bounces||0)+1;
    }else a.pos=next;
+   this.clampGrenadeInsideCamp(a.pos,r);
    if(a.pos[1]<=r){a.pos[1]=r;
     if(a.vel[1]<0){a.vel[1]=-a.vel[1]*.25;a.vel[0]*=.66;a.vel[2]*=.66;a.bounces=(a.bounces||0)+1;}
     if((Math.abs(a.vel[1])<1.2&&Math.hypot(a.vel[0],a.vel[2])<2.4)||a.age>4.4){this.finishGrenadeFlight();break;}
@@ -699,7 +756,7 @@ class WebWorld{
  }
  finishGrenadeFlight(){
   const a=this.flight;if(!a||a.done)return;
-  a.done=true;a.to=[a.pos[0],a.pos[1],a.pos[2]];this.flightPosition=null;
+  a.done=true;this.clampGrenadeInsideCamp(a.pos,.23);a.to=[a.pos[0],a.pos[1],a.pos[2]];this.flightPosition=null;
   this.camPhase='landed';this.landingProgress=0;
   // Report the physical collision/bounce resting point, not the aiming target.
   this.impact=[a.pos[0],a.pos[2]];

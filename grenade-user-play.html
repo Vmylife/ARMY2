@@ -145,7 +145,7 @@ body.aiming:has(#meterH:not(.hide)) #aimHint{display:none}
 @media(orientation:landscape) and (max-height:530px){#result .resultCard{max-height:calc(100dvh - 16px)}#result .report-title h2{font-size:20px}.report-numeric{font-size:43px}}
 </style></head><body>
 <canvas id="world3d"></canvas>
-<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.29 戰果結算</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
+<header id="top"><div id="titlebar"><div id="logo">💣</div><div id="ttl"><h1>手榴彈｜你的場景 3D 試炸 <span id="version">v1.30 鏡頭・邊界</span></h1><div id="caption">你製作的場景 · 投擲動畫 · 跟拍鏡頭 · 爆炸測試</div></div><button id="reset" aria-label="重新投擲">↻</button></div><div id="counters"><div><span>摧毀建築</span><strong id="buildings">0</strong></div><div><span>擊殺人數</span><strong id="kills">0</strong></div></div><div id="msg">載入 3D 模型中…</div></header>
 <div id="powerDock" class="hide">
   <button id="powerToggle" aria-expanded="false" aria-controls="powerDrawer" aria-label="展開或收合手榴彈威力設定">💥 威力 <strong id="powerMiniValue">10</strong> <span id="powerChevron">▾</span></button>
   <div id="powerDrawer" hidden><div class="powerHead"><span>威力（0～100）</span><span id="powerOut">10</span></div>
@@ -194,7 +194,7 @@ body.aiming:has(#meterH:not(.hide)) #aimHint{display:none}
 <section id="gallery" role="dialog" aria-modal="true" aria-labelledby="galleryHeading" aria-hidden="true"><div class="galleryBody"><div class="report-topline"><span>國軍訓練紀錄 · 軍旅榮譽簿</span><span id="galleryCount">0 / 0</span></div><h2 id="galleryHeading">已取得勳章與隱藏成就</h2><p class="muted" style="margin:6px 0">成就會儲存在這個瀏覽器。未解鎖的隱藏成就不顯示名稱。</p><div id="galleryGrid" class="galGrid"></div><button class="accent" id="closeGallery" style="width:100%">返回結算報告</button></div></section>
 
 <script type="module">
-import './grenade-user-play-3d.js?v=38';
+import './grenade-user-play-3d.js?v=130';
 import { ACHIEVEMENTS, calculateReport, readProgress, saveProgress } from './grenade-score.js?v=129';
 const $=id=>document.getElementById(id),world=window.GrenadeWorld,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),fmt=n=>Math.floor(n).toLocaleString('en-US');
 let phase='intro',pos=.5,direction=.5,clock=0,x=0,z=50,power=10,old=performance.now(),badgeTimer=0,resultTimer=0,landingClock=0;
